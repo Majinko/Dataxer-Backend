@@ -1,6 +1,6 @@
 package com.data.dataxer.models.enums;
 
-public enum BillingDocumentType {
+public enum DocumentType {
     COST,
     OFFER,
     PROFORMA,

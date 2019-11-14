@@ -15,6 +15,7 @@ import java.util.Collection;
 @Entity
 @Getter
 @Setter
+@Table(name="users")
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,7 +34,6 @@ public class User {
     private String password;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(referencedColumnName = "id")
     private Company company;
 
     @ManyToMany

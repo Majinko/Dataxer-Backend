@@ -25,7 +25,7 @@ public class Contact {
 
     private String street;
 
-    private String town;
+    private String city;
 
     private String country;
 

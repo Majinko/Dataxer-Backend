@@ -10,7 +10,7 @@ public class ContactDTO {
     private String firstName;
     private String lastName;
     private String street;
-    private String town;
+    private String city;
     private String country;
     private String postalCode;
     private String regNumber;

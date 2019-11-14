@@ -1,6 +1,6 @@
 package com.data.dataxer.models.enums;
 
-public enum BillingDocumentState {
+public enum DocumentState {
     REJECT,
     WAITING,
     APPROVED

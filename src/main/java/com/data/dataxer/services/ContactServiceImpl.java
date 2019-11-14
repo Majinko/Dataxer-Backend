@@ -61,7 +61,7 @@ public class ContactServiceImpl implements ContactService {
                     contact.setFirstName(c.getFirstName());
                     contact.setLastName(c.getLastName());
                     contact.setStreet(c.getStreet());
-                    contact.setTown(c.getTown());
+                    contact.setCity(c.getCity());
                     contact.setCountry(c.getCountry());
                     contact.setPostalCode(c.getPostalCode());
                     contact.setRegNumber(c.getRegNumber());
