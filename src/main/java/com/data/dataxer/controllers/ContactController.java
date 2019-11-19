@@ -1,16 +1,20 @@
 package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.ContactMapper;
+import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.dto.ContactDTO;
 import com.data.dataxer.services.ContactService;
+import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/contact")
@@ -22,6 +26,11 @@ public class ContactController {
     public ContactController(ContactService contactService, ContactMapper contactMapper) {
         this.contactService = contactService;
         this.contactMapper = contactMapper;
+    }
+
+    @GetMapping("/filter")
+    public List<Contact> filter(@QuerydslPredicate(root = Contact.class) Predicate predicate) {
+        return contactService.filtering(predicate);
     }
 
     @GetMapping("/{id}")
@@ -40,10 +49,15 @@ public class ContactController {
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
-    public ResponseEntity<Page<ContactDTO>> paginate(@RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "15") int size, @RequestParam(value = "sort", defaultValue = "firstName") String sort) {
+    public ResponseEntity<Page<ContactDTO>> paginate(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "15") int size,
+            @RequestParam(value = "sort", defaultValue = "firstName") String sort,
+            @RequestParam(value = "email", defaultValue = "") String email
+    ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
 
-        return ResponseEntity.ok(contactService.paginate(pageable).map(contactMapper::toContactDto));
+        return ResponseEntity.ok(contactService.paginate(pageable, email).map(contactMapper::toContactDto));
     }
 
     @PostMapping("/store")
