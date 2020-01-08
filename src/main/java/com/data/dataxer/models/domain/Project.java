@@ -25,7 +25,7 @@ public class Project {
     String number;
 
     @OneToOne
-    User user;
+    DataxerUser user;
 
     @Column(updatable = false)
     @CreationTimestamp

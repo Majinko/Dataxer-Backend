@@ -1,13 +1,12 @@
 package com.data.dataxer.security;
 
-import com.data.dataxer.security.jwt.JwtTokenUtils;
-import com.data.dataxer.security.service.JwtUserDetailsServiceImpl;
+import com.data.dataxer.security.service.FirebaseUserDetailService;
+import com.google.firebase.auth.FirebaseAuth;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -19,18 +18,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private final EntryPointUnauthorizedHandler unauthorizedHandler;
-    private final JwtUserDetailsServiceImpl jwtUserDetailsServiceImpl;
-    private final JwtTokenUtils jwtTokenUtils;
+    private final FirebaseUserDetailService firebaseUserDetailService;
+    private final FirebaseAuth firebaseAuth;
 
-    public WebSecurity(EntryPointUnauthorizedHandler unauthorizedHandler, JwtUserDetailsServiceImpl jwtUserDetailsServiceImpl, JwtTokenUtils jwtTokenUtils) {
+    public WebSecurity(EntryPointUnauthorizedHandler unauthorizedHandler, FirebaseUserDetailService firebaseUserDetailService, FirebaseAuth firebaseAuth) {
         this.unauthorizedHandler = unauthorizedHandler;
-        this.jwtUserDetailsServiceImpl = jwtUserDetailsServiceImpl;
-        this.jwtTokenUtils = jwtTokenUtils;
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(jwtUserDetailsServiceImpl).passwordEncoder(bCryptPasswordEncoder());
+        this.firebaseUserDetailService = firebaseUserDetailService;
+        this.firebaseAuth = firebaseAuth;
     }
 
     @Bean
@@ -39,16 +33,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
-    }
-
-    @Bean
-    public AuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
-        AuthenticationTokenFilter filter = new AuthenticationTokenFilter(jwtTokenUtils, jwtUserDetailsServiceImpl);
-        filter.setAuthenticationManager(authenticationManagerBean());
-        return filter;
+    public FirebaseAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
+        FirebaseAuthenticationTokenFilter authenticationTokenFilter = new FirebaseAuthenticationTokenFilter(firebaseUserDetailService, firebaseAuth);
+        authenticationTokenFilter.setAuthenticationManager(authenticationManager());
+        return authenticationTokenFilter;
     }
 
     @Override

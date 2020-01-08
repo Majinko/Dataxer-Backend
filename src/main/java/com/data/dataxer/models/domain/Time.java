@@ -24,7 +24,7 @@ public class Time {
     Project project;
 
     @OneToOne
-    User user;
+    DataxerUser user;
 
     @OneToOne
     Category category;

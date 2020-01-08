@@ -1,7 +1,7 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.User;
+import com.data.dataxer.models.domain.DataxerUser;
 
 public interface UserService {
-    User loggedUser();
+    DataxerUser loggedUser();
 }

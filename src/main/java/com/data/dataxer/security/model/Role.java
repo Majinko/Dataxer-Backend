@@ -1,6 +1,6 @@
 package com.data.dataxer.security.model;
 
-import com.data.dataxer.models.domain.User;
+import com.data.dataxer.models.domain.DataxerUser;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +19,7 @@ public class Role {
     private String name;
 
     @ManyToMany(mappedBy = "roles")
-    private Collection<User> users = new ArrayList<User>();
+    private Collection<DataxerUser> users = new ArrayList<DataxerUser>();
 
     @ManyToMany
     private Collection<Privilege> privileges = new ArrayList<Privilege>();

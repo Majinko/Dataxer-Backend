@@ -22,7 +22,7 @@ public class Company {
     private String name;
 
     @ManyToMany
-    List<User> users = new ArrayList<User>();
+    List<DataxerUser> users = new ArrayList<DataxerUser>();
 
     @OneToMany(mappedBy="company")
     private List<BillingInformation> billingInformation = new ArrayList<BillingInformation>();

@@ -16,7 +16,8 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class User {
+@Table(name = "user")
+public class DataxerUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
