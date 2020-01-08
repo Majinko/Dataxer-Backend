@@ -2,8 +2,6 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -12,16 +10,21 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-public class Contact {
+public class Contact extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Company company;
 
     @NotNull
     private String firstName;
 
     @NotNull
     private String lastName;
+
+    private String companyName;
 
     private String street;
 
@@ -37,13 +40,8 @@ public class Contact {
 
     private String phone;
 
-    @Column(updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Column
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
+    @Column(columnDefinition = "text")
+    private String note;
 
     private LocalDateTime deletedAt;
 }

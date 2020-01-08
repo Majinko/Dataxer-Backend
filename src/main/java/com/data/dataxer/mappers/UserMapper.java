@@ -12,6 +12,7 @@ public interface UserMapper {
 
     UserDTO toUserDto(User user);
 
+    @Mapping(target = "roles", source = "")
     @Mapping(target = "updatedAt", source = "")
     @Mapping(target = "deletedAt", source = "")
     @Mapping(target = "createdAt", source = "")

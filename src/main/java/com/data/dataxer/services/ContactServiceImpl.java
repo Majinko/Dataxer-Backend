@@ -5,6 +5,7 @@ import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.qrepositores.QContactRepository;
 import com.data.dataxer.repositories.ContactRepository;
 
+import com.data.dataxer.securityContextUtils.SecurityContextUtils;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,7 +45,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public Page<Contact> paginate(Pageable pageable, String email) {
-        return contactRepository.findAllByDeletedAtIsNullAndEmailContaining(pageable, email)
+        return contactRepository.findAllByDeletedAtIsNullAndEmailContainingAndAndCompanyIdIn(pageable, email, SecurityContextUtils.CompanyIds())
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 
@@ -72,6 +73,7 @@ public class ContactServiceImpl implements ContactService {
                     contact.setRegNumber(c.getRegNumber());
                     contact.setEmail(c.getEmail());
                     contact.setPhone(c.getPhone());
+                    contact.setCompany(SecurityContextUtils.user().getCompanies().get(0));
 
                     return contactRepository.save(c);
                 });

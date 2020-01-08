@@ -17,6 +17,9 @@ public class Time {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Company company;
+
     @OneToOne
     Project project;
 
@@ -26,11 +29,11 @@ public class Time {
     @OneToOne
     Category category;
 
-    int time;
+    Integer time;
 
-    int timeFrom;
+    Integer timeFrom;
 
-    int timeTo;
+    Integer timeTo;
 
     @Column(precision = 10, scale = 2)
     BigDecimal price;

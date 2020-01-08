@@ -16,10 +16,13 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class Item {
+public class Item extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Company company;
 
     // represent code of item on the other web
     String code;
@@ -52,14 +55,6 @@ public class Item {
 
     @ManyToMany
     private List<Category> categories = new ArrayList<Category>();
-
-    @Column(updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Column
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
 
     private LocalDateTime deletedAt;
 }

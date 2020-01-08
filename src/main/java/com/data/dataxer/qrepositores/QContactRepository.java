@@ -1,25 +1,17 @@
 package com.data.dataxer.qrepositores;
 
 import com.data.dataxer.models.domain.Contact;
-import com.data.dataxer.models.domain.QContact;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
+import com.querydsl.core.types.Predicate;
+
 import java.util.List;
 
-@Repository
-public class QContactRepository {
-    private final JPAQueryFactory query;
+public interface QContactRepository {
+    public List<Contact> filtering(Predicate predicate);
 
-    private QContact CONTACT = QContact.contact;
+    public Contact getById(Long id);
 
-    public QContactRepository(EntityManager entityManager) {
-        this.query = new JPAQueryFactory(entityManager);
-    }
+    public Contact getByEmail(String email);
 
-    public List<Contact> filtering(Predicate predicate){
-        return query.selectFrom(CONTACT).where(predicate).fetch();
-    }
+    public Contact getByName(String name);
 }

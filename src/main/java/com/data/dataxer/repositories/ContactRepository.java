@@ -14,7 +14,6 @@ import org.springframework.data.querydsl.binding.QuerydslBindings;
 import java.util.List;
 import java.util.Optional;
 
-
 public interface ContactRepository extends JpaRepository<Contact, Long>, QuerydslPredicateExecutor<Contact>, QuerydslBinderCustomizer<QContact> {
     List<Contact> findAll(Predicate predicate);
 
@@ -22,7 +21,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long>, Queryds
 
     Optional<List<Contact>> findFirst5ByFirstNameContainingAndLastNameContainingAndDeletedAtIsNull(String firstName, String lastName);
 
-    Optional<Page<Contact>> findAllByDeletedAtIsNullAndEmailContaining(Pageable pageable, String email);
+    Optional<Page<Contact>> findAllByDeletedAtIsNullAndEmailContainingAndAndCompanyIdIn(Pageable pageable, String email, List<Long> companyIds);
 
     @Override
     default public void customize(QuerydslBindings bindings, QContact root) {

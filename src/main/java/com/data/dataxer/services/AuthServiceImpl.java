@@ -1,12 +1,10 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.Role;
 import com.data.dataxer.models.domain.User;
 import com.data.dataxer.models.dto.TokenDTO;
 import com.data.dataxer.repositories.UserRepository;
 import com.data.dataxer.security.jwt.JwtTokenUtils;
 import com.data.dataxer.security.model.UserAuthenticationDetails;
-import com.data.dataxer.securityContextUtils.SecurityContextUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
