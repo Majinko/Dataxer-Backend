@@ -7,7 +7,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -37,8 +36,7 @@ public class DataxerUser {
     @Column(unique = true, nullable = false, updatable = false, length = 50)
     private String email;
 
-    @NotNull
-    private String password;
+    private String profileImg;
 
     @ManyToMany
     private Collection<Role> roles = new ArrayList<Role>();

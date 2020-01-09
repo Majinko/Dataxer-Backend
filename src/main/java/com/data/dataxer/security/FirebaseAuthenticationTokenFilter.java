@@ -1,14 +1,15 @@
 package com.data.dataxer.security;
 
 import com.data.dataxer.security.service.FirebaseUserDetailService;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthException;
-import com.google.firebase.auth.FirebaseToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseToken;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -40,7 +41,7 @@ public class FirebaseAuthenticationTokenFilter extends UsernamePasswordAuthentic
             e.printStackTrace();
         }
 
-        if (firebaseToken != null) {
+        if (firebaseToken != null /*&& firebaseToken.isEmailVerified()*/) {
             UserDetails userDetails = firebaseUserDetailService.loadOrCreateUser(firebaseToken);
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     userDetails, null, userDetails.getAuthorities());

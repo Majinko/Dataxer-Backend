@@ -1,6 +1,7 @@
 package com.data.dataxer.security;
 
-
+import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import com.data.dataxer.security.service.FirebaseUserDetailService;
 import com.google.firebase.auth.FirebaseAuth;
 import org.springframework.context.annotation.Configuration;
@@ -31,7 +32,6 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
 
     public FirebaseAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
         FirebaseAuthenticationTokenFilter authenticationTokenFilter = new FirebaseAuthenticationTokenFilter(firebaseUserDetailService, firebaseAuth);

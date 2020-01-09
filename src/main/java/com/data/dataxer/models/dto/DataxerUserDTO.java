@@ -6,11 +6,10 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserDTO {
+public class DataxerUserDTO {
     private Long id;
     private String firstName;
     private String lastName;
     private String email;
     private String password;
-    private Company company;
 }

@@ -14,4 +14,9 @@ public class UserServiceImpl implements UserService {
     public DataxerUser loggedUser() {
         return this.userRepository.findById(SecurityContextUtils.id()).orElseThrow(() -> new RuntimeException("Contact not found"));
     }
+
+    @Override
+    public DataxerUser store(DataxerUser dataxerUser) {
+        return this.userRepository.save(dataxerUser);
+    }
 }

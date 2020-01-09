@@ -16,7 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class Item extends Model {
+public class Item extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

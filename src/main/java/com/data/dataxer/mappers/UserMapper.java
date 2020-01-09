@@ -1,7 +1,7 @@
 package com.data.dataxer.mappers;
 
 import com.data.dataxer.models.domain.DataxerUser;
-import com.data.dataxer.models.dto.UserDTO;
+import com.data.dataxer.models.dto.DataxerUserDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -10,11 +10,11 @@ import org.mapstruct.factory.Mappers;
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    UserDTO toUserDto(DataxerUser user);
+    DataxerUserDTO toDataxerUserDTO(DataxerUser user);
 
     @Mapping(target = "roles", source = "")
     @Mapping(target = "updatedAt", source = "")
     @Mapping(target = "deletedAt", source = "")
     @Mapping(target = "createdAt", source = "")
-    DataxerUser toUser(UserDTO userDTO);
+    DataxerUser toDataxerUser(DataxerUserDTO userDTO);
 }

@@ -15,8 +15,8 @@ public class SecurityContextUtils {
         return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser().getCompanies().get(0).getId();
     }
 
-    public static DataxerUser user() {
-        return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser();
+    public static DataxerUser loggedUser() {
+        return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getLoggedUser();
     }
 
     public static List<Long> CompanyIds() {

@@ -73,7 +73,7 @@ public class ContactServiceImpl implements ContactService {
                     contact.setRegNumber(c.getRegNumber());
                     contact.setEmail(c.getEmail());
                     contact.setPhone(c.getPhone());
-                    contact.setCompany(SecurityContextUtils.user().getCompanies().get(0));
+                    contact.setCompany(SecurityContextUtils.loggedUser().getCompanies().get(0));
 
                     return contactRepository.save(c);
                 });
