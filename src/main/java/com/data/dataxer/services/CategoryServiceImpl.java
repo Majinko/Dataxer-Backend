@@ -1,8 +1,8 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.mappers.CategoryMapper;
-import com.data.dataxer.models.dto.CategoryDTO;
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.repositories.CategoryRepository;
+import com.data.dataxer.securityContextUtils.SecurityContextUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,20 +12,28 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
-    private final CategoryMapper categoryMapper;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository, CategoryMapper categoryMapper) {
+    public CategoryServiceImpl(CategoryRepository categoryRepository) {
         this.categoryRepository = categoryRepository;
-        this.categoryMapper = categoryMapper;
     }
 
     @Autowired
     EntityManager entityManager;
 
     @Override
-    public List<CategoryDTO> nested() {
-        return categoryMapper
-                .toCategoryDTOs(this.categoryRepository.nested()
-                .orElseThrow(() -> new RuntimeException("Categories not found")));
+    public List<Category> all() {
+        return categoryRepository
+                .findAllByDeletedAtIsNull()
+                .orElseThrow(() -> new RuntimeException("Contact not found"));
+    }
+
+    @Override
+    public List<Category> nested() {
+       return this.categoryRepository.nested(SecurityContextUtils.CompanyIds()).orElseThrow(() -> new RuntimeException("Categories not found"));
+    }
+
+    @Override
+    public Category store(Category category) {
+        return this.categoryRepository.save(category);
     }
 }

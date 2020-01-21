@@ -3,8 +3,6 @@ package com.data.dataxer.models.domain;
 import com.data.dataxer.models.enums.ItemPriceLevel;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import javax.validation.constraints.DecimalMin;

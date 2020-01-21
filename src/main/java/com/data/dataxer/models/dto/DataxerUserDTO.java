@@ -4,12 +4,13 @@ import com.data.dataxer.models.domain.Company;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 public class DataxerUserDTO {
     private Long id;
-    private String firstName;
-    private String lastName;
+    private String uid;
     private String email;
-    private String password;
+    private List<Company> companies;
 }

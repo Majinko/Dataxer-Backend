@@ -2,7 +2,10 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+
+import javax.annotation.PreDestroy;
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,16 +13,25 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-public class Category {
+public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    String title;
+    @NotNull
+    private String name;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToOne
+    private Category parent;
+
+    @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
-    private List<Category> children = new ArrayList<Category>();
+    private List<Category> child = new ArrayList<>();
 
     private LocalDateTime deletedAt;
+
+    @PreDestroy
+    private void destroy() {
+        deletedAt = LocalDateTime.now();
+    }
 }

@@ -14,9 +14,13 @@ public interface ContactMapper {
 
     ContactDTO toContactDto(Contact contact);
 
-    @Mapping(target = "deletedAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", source = "")
+    @Mapping(target = "updated", source = "")
+    @Mapping(target = "note", source = "")
+    @Mapping(target = "deletedAt", source = "")
+    @Mapping(target = "createdAt", source = "")
+    @Mapping(target = "created", source = "")
+    @Mapping(target = "company", source = "")
     Contact toContact(ContactDTO contactDTO);
 
     List<ContactDTO> toContactDTOs(List<Contact> contacts);

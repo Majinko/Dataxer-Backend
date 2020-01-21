@@ -12,28 +12,19 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-public class Project {
+public class Project extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Company company;
-
-    String title;
-
-    String number;
+    @ManyToOne
+    @JoinColumn(name = "contact_id")
+    private Contact contact;
 
     @OneToOne
     DataxerUser user;
 
-    @Column(updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
+    String name;
 
-    @Column
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
-    private LocalDateTime deletedAt;
+    String number;
 }

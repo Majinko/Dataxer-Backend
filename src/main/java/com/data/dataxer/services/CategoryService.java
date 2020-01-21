@@ -1,9 +1,13 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.dto.CategoryDTO;
+import com.data.dataxer.models.domain.Category;
 
 import java.util.List;
 
 public interface CategoryService {
-    List<CategoryDTO> nested();
+    List<Category> all();
+
+    List<Category> nested();
+
+    Category store(Category category);
 }

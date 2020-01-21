@@ -33,6 +33,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         return new BCryptPasswordEncoder();
     }
 
+
     public FirebaseAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
         FirebaseAuthenticationTokenFilter authenticationTokenFilter = new FirebaseAuthenticationTokenFilter(firebaseUserDetailService, firebaseAuth);
         authenticationTokenFilter.setAuthenticationManager(authenticationManager());
@@ -52,7 +53,6 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
-                //.antMatchers("**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

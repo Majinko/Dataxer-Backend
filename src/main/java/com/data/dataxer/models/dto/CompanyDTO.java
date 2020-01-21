@@ -5,7 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class CategoryDTO {
+public class CompanyDTO {
     private Long id;
     private String name;
+    private String legalForm;
+    private String street;
+    private String city;
+    private String postalCode;
 }

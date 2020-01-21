@@ -24,7 +24,7 @@ public class UserController {
     }
 
     @PostMapping("/store")
-    public ResponseEntity<DataxerUserDTO> store(@RequestBody DataxerUserDTO dataxerUserDTO) {
-        return ResponseEntity.ok(userMapper.toDataxerUserDTO(userService.store(userMapper.toDataxerUser(dataxerUserDTO))));
+    public void store(@RequestBody DataxerUserDTO dataxerUserDTO) {
+        ResponseEntity.ok(userMapper.toDataxerUserDTO(userService.store(userMapper.toDataxerUser(dataxerUserDTO))));
     }
 }

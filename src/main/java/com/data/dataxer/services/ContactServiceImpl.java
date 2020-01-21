@@ -2,6 +2,8 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Contact;
 
+import com.data.dataxer.models.domain.DataxerUser;
+import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.qrepositores.QContactRepository;
 import com.data.dataxer.repositories.ContactRepository;
 
@@ -10,6 +12,8 @@ import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -66,6 +70,7 @@ public class ContactServiceImpl implements ContactService {
                     // do mapu mi pride vysledok metody findById cize kontakt
                     contact.setFirstName(c.getFirstName());
                     contact.setLastName(c.getLastName());
+                    contact.setPhotoUrl(c.getPhotoUrl());
                     contact.setStreet(c.getStreet());
                     contact.setCity(c.getCity());
                     contact.setCountry(c.getCountry());
@@ -73,9 +78,9 @@ public class ContactServiceImpl implements ContactService {
                     contact.setRegNumber(c.getRegNumber());
                     contact.setEmail(c.getEmail());
                     contact.setPhone(c.getPhone());
-                    contact.setCompany(SecurityContextUtils.loggedUser().getCompanies().get(0));
+                    //contact.setCompany(SecurityContextUtils.loggedUser().getCompanies().get(0));
 
-                    return contactRepository.save(c);
+                    return contactRepository.save(contact);
                 });
 
         return c;

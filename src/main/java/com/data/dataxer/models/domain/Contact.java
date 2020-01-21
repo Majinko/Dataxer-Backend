@@ -3,9 +3,12 @@ package com.data.dataxer.models.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.annotation.PreDestroy;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -15,16 +18,13 @@ public class Contact extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Company company;
-
     @NotNull
     private String firstName;
 
     @NotNull
     private String lastName;
 
-    private String companyName;
+    private String photoUrl;
 
     private String street;
 
@@ -44,4 +44,12 @@ public class Contact extends BaseEntity {
     private String note;
 
     private LocalDateTime deletedAt;
+
+    @OneToMany(mappedBy = "contact", fetch = FetchType.EAGER)
+    private List<Project> projects = new ArrayList<>();
+
+    @PreDestroy
+    private void destroy() {
+        deletedAt = LocalDateTime.now();
+    }
 }

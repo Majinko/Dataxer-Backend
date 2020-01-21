@@ -21,9 +21,11 @@ public class Company extends BaseEntity {
     @Column(length = 50)
     private String name;
 
-    @ManyToMany
-    List<DataxerUser> users = new ArrayList<DataxerUser>();
+    private String legalForm;
 
-    @OneToMany(mappedBy="company")
-    private List<BillingInformation> billingInformation = new ArrayList<BillingInformation>();
+    private String street;
+
+    private String city;
+
+    private String postalCode;
 }

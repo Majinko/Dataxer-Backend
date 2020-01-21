@@ -1,6 +1,7 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.securityContextUtils.SecurityContextUtils;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -12,13 +13,16 @@ import java.time.LocalDateTime;
 
 @Data
 @MappedSuperclass
-abstract class BaseEntity implements Serializable {
+public abstract class BaseEntity implements Serializable {
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Company company;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "created", referencedColumnName = "uid", updatable = false, nullable = true)
     private DataxerUser created;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "updated", referencedColumnName = "uid", nullable = false)
+    @JoinColumn(name = "updated", referencedColumnName = "uid", nullable = true)
     private DataxerUser updated;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -39,9 +43,10 @@ abstract class BaseEntity implements Serializable {
         if (SecurityContextHolder.getContext().getAuthentication() != null)
             try {
                 created = SecurityContextUtils.loggedUser();
+                company = SecurityContextUtils.defaultCompany();
             } catch (NullPointerException ex) {
                 created = null;
+                company = null;
             }
-
     }
 }

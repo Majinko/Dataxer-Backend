@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface UserRepository extends JpaRepository<DataxerUser, Long> {
+public interface DataxerUserRepository extends JpaRepository<DataxerUser, Long> {
     Optional<DataxerUser> findUserByEmail(String email);
 
     Optional<DataxerUser> findByUid(String uid);

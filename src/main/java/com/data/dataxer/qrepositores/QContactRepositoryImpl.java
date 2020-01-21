@@ -2,10 +2,10 @@ package com.data.dataxer.qrepositores;
 
 import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.QContact;
+import com.data.dataxer.models.domain.QProject;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
-
 import javax.persistence.EntityManager;
 import java.util.List;
 
@@ -23,16 +23,25 @@ public class QContactRepositoryImpl implements QContactRepository {
         return query.selectFrom(CONTACT).where(predicate).fetch();
     }
 
-    public Contact getById(Long id) {
-        return query.selectFrom(CONTACT)
-                .where(CONTACT.id.eq(id))
-                .fetchOne();
+    @Override
+    public List<Contact> all(List<Long> companyIds) {
+        QProject PROJECT = QProject.project;
+
+        return query
+                .selectFrom(CONTACT)
+                .where(CONTACT.company.id.in(companyIds))
+                .join(CONTACT.projects, PROJECT)
+                .fetch();
     }
 
+    @Override
+    public Contact getById(Long id) {
+        return null;
+    }
+
+    @Override
     public Contact getByEmail(String email) {
-        return query.selectFrom(CONTACT)
-                .where(CONTACT.email.likeIgnoreCase(email))
-                .fetchOne();
+        return null;
     }
 
     @Override
