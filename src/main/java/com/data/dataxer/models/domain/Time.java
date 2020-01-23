@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-public class Time {
+public class Time extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -42,13 +42,4 @@ public class Time {
     String description;
 
     private LocalDateTime dateWork;
-
-    @Column(updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Column
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
 }

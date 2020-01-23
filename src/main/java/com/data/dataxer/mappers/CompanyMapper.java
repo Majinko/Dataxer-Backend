@@ -12,10 +12,5 @@ public interface CompanyMapper {
 
     CompanyDTO toCompanyDTO(Company company);
 
-    @Mapping(target = "updatedAt", source = "")
-    @Mapping(target = "updated", source = "")
-    @Mapping(target = "createdAt", source = "")
-    @Mapping(target = "created", source = "")
-    @Mapping(target = "company", source = "")
     Company toCompany(CompanyDTO companyDTO);
 }

@@ -2,6 +2,7 @@ package com.data.dataxer.mappers;
 
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.dto.CategoryDTO;
+import com.data.dataxer.models.dto.CategoryNestedDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -14,16 +15,14 @@ public interface CategoryMapper {
 
     List<CategoryDTO> toCategoryDTOs(List<Category> categories);
 
+    List<Category> toCategories(List<CategoryDTO> categoryDTOS);
+
     CategoryDTO toCategoryDTO(Category category);
 
-    @Mapping(target = "updatedAt", source = "")
-    @Mapping(target = "updated", source = "")
-    @Mapping(target = "parent", source = "")
-    @Mapping(target = "deletedAt", source = "")
-    @Mapping(target = "createdAt", source = "")
-    @Mapping(target = "created", source = "")
-    @Mapping(target = "company", source = "")
-    @Mapping(target = "child", source = "")
+    CategoryNestedDTO toCategoryNestedDTO(Category category);
+
+    List<CategoryNestedDTO> toCategoryNestedDTOs(List<Category> categories);
+
     Category toCategory(CategoryDTO categoryDTO);
 }
 

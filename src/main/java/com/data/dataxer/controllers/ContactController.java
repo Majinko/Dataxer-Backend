@@ -2,6 +2,7 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.ContactMapper;
 import com.data.dataxer.models.domain.Contact;
+import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.dto.ContactDTO;
 import com.data.dataxer.services.ContactService;
 import com.querydsl.core.types.Predicate;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.querydsl.binding.QuerydslPredicate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -34,6 +36,7 @@ public class ContactController {
     }
 
     @GetMapping("/{id}")
+    @Transactional
     public ResponseEntity<ContactDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.getById(id)));
     }

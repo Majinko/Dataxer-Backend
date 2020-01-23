@@ -12,11 +12,5 @@ public interface ItemMapper {
 
     ItemDTO toItemDto(Item item);
 
-    @Mapping(target = "updated", source = "")
-    @Mapping(target = "created", source = "")
-    @Mapping(target = "company", source = "")
-    @Mapping(target = "updatedAt", source = "")
-    @Mapping(target = "deletedAt", source = "")
-    @Mapping(target = "createdAt", source = "")
     Item toItem(ItemDTO itemDTO);
 }

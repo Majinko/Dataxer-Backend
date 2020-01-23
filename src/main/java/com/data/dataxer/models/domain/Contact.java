@@ -45,7 +45,7 @@ public class Contact extends BaseEntity {
 
     private LocalDateTime deletedAt;
 
-    @OneToMany(mappedBy = "contact", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "contact", fetch = FetchType.LAZY)
     private List<Project> projects = new ArrayList<>();
 
     @PreDestroy

@@ -23,5 +23,4 @@ public class ContactDTO {
     private String regNumber;
     private String email;
     private String phone;
-    private List<Project> projects = new ArrayList<>();
 }

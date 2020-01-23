@@ -10,4 +10,6 @@ public interface CategoryService {
     List<Category> nested();
 
     Category store(Category category);
+
+    void updateTree(List<Category> categories, Category category);
 }

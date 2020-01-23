@@ -12,9 +12,5 @@ public interface UserMapper {
 
     DataxerUserDTO toDataxerUserDTO(DataxerUser user);
 
-    @Mapping(target = "roles", source = "")
-    @Mapping(target = "updatedAt", source = "")
-    @Mapping(target = "deletedAt", source = "")
-    @Mapping(target = "createdAt", source = "")
     DataxerUser toDataxerUser(DataxerUserDTO userDTO);
 }

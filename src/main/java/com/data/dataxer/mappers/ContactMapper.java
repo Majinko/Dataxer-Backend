@@ -16,6 +16,7 @@ public interface ContactMapper {
 
     @Mapping(target = "updatedAt", source = "")
     @Mapping(target = "updated", source = "")
+    @Mapping(target = "projects", source = "")
     @Mapping(target = "note", source = "")
     @Mapping(target = "deletedAt", source = "")
     @Mapping(target = "createdAt", source = "")

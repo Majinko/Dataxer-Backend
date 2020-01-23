@@ -3,10 +3,8 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityContextUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 @Service
@@ -17,23 +15,38 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryRepository = categoryRepository;
     }
 
-    @Autowired
-    EntityManager entityManager;
-
     @Override
     public List<Category> all() {
         return categoryRepository
-                .findAllByDeletedAtIsNull()
-                .orElseThrow(() -> new RuntimeException("Contact not found"));
+                .findAllByCompanyIdInAndDeletedAtIsNull(SecurityContextUtils.CompanyIds())
+                .orElse(null);
     }
 
     @Override
     public List<Category> nested() {
-       return this.categoryRepository.nested(SecurityContextUtils.CompanyIds()).orElseThrow(() -> new RuntimeException("Categories not found"));
+        return this.categoryRepository
+                .findAllByCompanyIdInAndDeletedAtIsNullAndParentIsNull(SecurityContextUtils.CompanyIds())
+                .orElseThrow(() -> new RuntimeException("Categories not found"));
     }
 
     @Override
     public Category store(Category category) {
         return this.categoryRepository.save(category);
+    }
+
+    @Override
+    public void updateTree(List<Category> categories, Category category) {
+        if (!categories.isEmpty()) {
+            categories.forEach(c -> {
+                Category cc = categoryRepository.findByIdAndCompanyIdIn(c.getId(), SecurityContextUtils.CompanyIds());
+
+                cc.setParent(category);
+                categoryRepository.save(cc);
+
+                if (!c.getChildren().isEmpty()) {
+                    this.updateTree(c.getChildren(), c);
+                }
+            });
+        }
     }
 }

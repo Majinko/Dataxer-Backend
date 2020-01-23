@@ -35,9 +35,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public List<Contact> findAll() {
-        return contactRepository
-                .findAllByDeletedAtIsNull()
-                .orElseThrow(() -> new RuntimeException("Contact not found"));
+        return qContactRepository.all(SecurityContextUtils.CompanyIds());
     }
 
     @Override
