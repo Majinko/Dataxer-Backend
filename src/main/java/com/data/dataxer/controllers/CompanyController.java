@@ -4,10 +4,10 @@ import com.data.dataxer.mappers.CompanyMapper;
 import com.data.dataxer.models.dto.CompanyDTO;
 import com.data.dataxer.services.CompanyService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/company")
@@ -20,8 +20,25 @@ public class CompanyController {
         this.companyMapper = companyMapper;
     }
 
+    @Transactional
+    @GetMapping("/{id}")
+    public ResponseEntity<CompanyDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(companyMapper.toCompanyWithBillingInfoDTO(this.companyService.findById(id)));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<CompanyDTO>> all() {
+        return ResponseEntity.ok(companyMapper.toCompaniesDTO(this.companyService.findAll()));
+    }
+
     @PostMapping("/store")
     public ResponseEntity<CompanyDTO> store(@RequestBody CompanyDTO companyDTO) {
-        return ResponseEntity.ok(companyMapper.toCompanyDTO(this.companyService.store(companyMapper.toCompany(companyDTO))));
+        return ResponseEntity.ok(companyMapper.toCompanyDTO(this.companyService.store(companyMapper.toCompanyWithBillingInfo(companyDTO))));
+    }
+
+    @Transactional
+    @PostMapping("/update/{id}")
+    public ResponseEntity<CompanyDTO> update(@RequestBody CompanyDTO companyDTO, @PathVariable Long id) {
+        return ResponseEntity.ok(companyMapper.toCompanyWithBillingInfoDTO(this.companyService.update(companyMapper.toCompany(companyDTO), id)));
     }
 }

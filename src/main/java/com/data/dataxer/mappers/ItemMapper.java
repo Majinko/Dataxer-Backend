@@ -10,7 +10,18 @@ import org.mapstruct.factory.Mappers;
 public interface ItemMapper {
     ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
 
+    @Mapping(target = "wholesaleTax", source = "")
+    @Mapping(target = "wholesalePrice", source = "")
+    @Mapping(target = "tax", source = "")
+    @Mapping(target = "price", source = "")
     ItemDTO toItemDto(Item item);
 
+    @Mapping(target = "updatedAt", source = "")
+    @Mapping(target = "updated", source = "")
+    @Mapping(target = "itemPrices", source = "")
+    @Mapping(target = "deletedAt", source = "")
+    @Mapping(target = "createdAt", source = "")
+    @Mapping(target = "created", source = "")
+    @Mapping(target = "company", source = "")
     Item toItem(ItemDTO itemDTO);
 }

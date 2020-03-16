@@ -4,16 +4,18 @@ import com.data.dataxer.models.domain.Category;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 
+@Repository
 public interface CategoryRepository extends CrudRepository<Category, Long> {
     Category findByIdAndCompanyIdIn(Long id, List<Long> companyIds);
-    Optional<List<Category>> findAllByCompanyIdInAndDeletedAtIsNull(List<Long> companyIds);
+    Optional<List<Category>> findAllByCompanyIdIn(List<Long> companyIds);
 
-    @EntityGraph(attributePaths = {"children"})
-    Optional<List<Category>> findAllByCompanyIdInAndDeletedAtIsNullAndParentIsNull(List<Long> companyIds);
+    /*@EntityGraph(attributePaths = "children")*/
+    Optional<List<Category>> findAllByCompanyIdInAndParentIsNull(List<Long> companyIds);
 
     /**
      * Retrieves all nodes with no child nodes (i.e. leaf nodes).

@@ -1,11 +1,11 @@
 package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.CategoryMapper;
-import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.dto.CategoryDTO;
 import com.data.dataxer.models.dto.CategoryNestedDTO;
 import com.data.dataxer.services.CategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,6 +26,7 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.all()));
     }
 
+    @Transactional
     @GetMapping("/nested")
     public ResponseEntity<List<CategoryNestedDTO>> nested() {
         return ResponseEntity.ok(categoryMapper.toCategoryNestedDTOs(categoryService.nested()));
@@ -37,7 +38,12 @@ public class CategoryController {
     }
 
     @PostMapping("/updateTree")
-    public void updateTree(@RequestBody List<CategoryDTO> categoryDTOS) {
-        categoryService.updateTree(categoryMapper.toCategories(categoryDTOS), null);
+    public void updateTree(@RequestBody List<CategoryNestedDTO> categoryDTOS) {
+        categoryService.updateTree(categoryMapper.CategoryNestedDTOsToCategories(categoryDTOS), null);
+    }
+
+    @GetMapping("/destroy/{id}")
+    public void destroy(@PathVariable Long id) {
+        categoryService.delete(id);
     }
 }

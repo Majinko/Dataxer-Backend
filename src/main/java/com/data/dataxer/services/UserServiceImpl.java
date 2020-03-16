@@ -2,13 +2,15 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.DataxerUser;
 import com.data.dataxer.repositories.DataxerUserRepository;
 import com.data.dataxer.securityContextUtils.SecurityContextUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private DataxerUserRepository userRepository;
+    private final DataxerUserRepository userRepository;
+
+    public UserServiceImpl(DataxerUserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public DataxerUser loggedUser() {

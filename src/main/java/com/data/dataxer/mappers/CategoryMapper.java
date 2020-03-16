@@ -17,12 +17,15 @@ public interface CategoryMapper {
 
     List<Category> toCategories(List<CategoryDTO> categoryDTOS);
 
+    List<Category> CategoryNestedDTOsToCategories(List<CategoryNestedDTO> categoryDTOS);
+
     CategoryDTO toCategoryDTO(Category category);
 
     CategoryNestedDTO toCategoryNestedDTO(Category category);
 
     List<CategoryNestedDTO> toCategoryNestedDTOs(List<Category> categories);
 
+    @Mapping(target = "children", source = "")
     Category toCategory(CategoryDTO categoryDTO);
 }
 

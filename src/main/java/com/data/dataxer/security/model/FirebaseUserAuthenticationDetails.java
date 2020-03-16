@@ -2,6 +2,7 @@ package com.data.dataxer.security.model;
 
 import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.domain.DataxerUser;
+import com.data.dataxer.repositories.CompanyRepository;
 import lombok.Getter;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -16,14 +17,11 @@ import java.util.stream.Collectors;
 @Getter
 public class FirebaseUserAuthenticationDetails implements UserDetails {
     private DataxerUser user;
-    private List<Long> companyIds = new ArrayList<Long>();
+    private List<Company> companies;
 
-    public FirebaseUserAuthenticationDetails(DataxerUser user) {
+    public FirebaseUserAuthenticationDetails(DataxerUser user, CompanyRepository companyRepository) {
         this.user = user;
-
-        if (!user.getCompanies().isEmpty()) {
-            this.companyIds = this.user.getCompanies().stream().map(Company::getId).collect(Collectors.toList());
-        }
+        this.companies = companyRepository.findByDataxerUserId(this.user.getId());
     }
 
     public DataxerUser getLoggedUser() {

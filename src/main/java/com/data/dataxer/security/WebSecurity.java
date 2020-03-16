@@ -13,14 +13,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(securedEnabled = true)
 public class WebSecurity extends WebSecurityConfigurerAdapter {
-    private final EntryPointUnauthorizedHandler unauthorizedHandler;
-    private final FirebaseUserDetailService firebaseUserDetailService;
-    private final FirebaseAuth firebaseAuth;
+    private  EntryPointUnauthorizedHandler unauthorizedHandler;
+    private  FirebaseUserDetailService firebaseUserDetailService;
+    private  FirebaseAuth firebaseAuth;
 
     public WebSecurity(EntryPointUnauthorizedHandler unauthorizedHandler, FirebaseUserDetailService firebaseUserDetailService, FirebaseAuth firebaseAuth) {
         this.unauthorizedHandler = unauthorizedHandler;
@@ -34,6 +32,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     }
 
 
+    @Bean
     public FirebaseAuthenticationTokenFilter authenticationTokenFilterBean() throws Exception {
         FirebaseAuthenticationTokenFilter authenticationTokenFilter = new FirebaseAuthenticationTokenFilter(firebaseUserDetailService, firebaseAuth);
         authenticationTokenFilter.setAuthenticationManager(authenticationManager());

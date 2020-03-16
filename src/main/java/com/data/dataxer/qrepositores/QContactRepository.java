@@ -9,7 +9,7 @@ import java.util.List;
 public interface QContactRepository {
     public List<Contact> filtering(Predicate predicate);
 
-    public List<Contact> all(List<Long> companyIds);
+    public List<Contact> allWithProjects(List<Long> companyIds);
 
     public Contact getById(Long id);
 

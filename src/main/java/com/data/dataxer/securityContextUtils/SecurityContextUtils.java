@@ -20,10 +20,12 @@ public class SecurityContextUtils {
     }
 
     public static List<Long> CompanyIds() {
-        return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getCompanyIds();
+        return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getCompanies().stream().map(Company::getId).collect(Collectors.toList());
     }
 
-    public static Company defaultCompany(){
-        return SecurityContextUtils.loggedUser().getCompanies().get(0);
+    public static Company defaultCompany() {
+        return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
+                .getCompanies().get(0);
     }
 }

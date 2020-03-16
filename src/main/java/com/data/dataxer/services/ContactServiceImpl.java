@@ -35,19 +35,19 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public List<Contact> findAll() {
-        return qContactRepository.all(SecurityContextUtils.CompanyIds());
+        return contactRepository.findAllByCompanyIdIn(SecurityContextUtils.CompanyIds()).orElse(null);
     }
 
     @Override
     public List<Contact> findByFirstNameAndLastName(String firstName, String lastName) {
         return contactRepository
-                .findFirst5ByFirstNameContainingAndLastNameContainingAndDeletedAtIsNull(firstName, lastName)
+                .findFirst5ByFirstNameContainingAndLastNameContaining(firstName, lastName)
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 
     @Override
     public Page<Contact> paginate(Pageable pageable, String email) {
-        return contactRepository.findAllByDeletedAtIsNullAndEmailContainingAndAndCompanyIdIn(pageable, email, SecurityContextUtils.CompanyIds())
+        return contactRepository.findAllByEmailContainingAndAndCompanyIdIn(pageable, email, SecurityContextUtils.CompanyIds())
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 

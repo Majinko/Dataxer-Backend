@@ -1,5 +1,6 @@
 package com.data.dataxer.security.model;
 
+import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.domain.DataxerUser;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,9 @@ public class Role {
     private Long id;
 
     private String name;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Company company;
 
     @ManyToMany(mappedBy = "roles")
     private Collection<DataxerUser> users = new ArrayList<DataxerUser>();

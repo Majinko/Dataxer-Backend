@@ -15,13 +15,12 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ContactRepository extends JpaRepository<Contact, Long>, QuerydslPredicateExecutor<Contact>, QuerydslBinderCustomizer<QContact> {
-    List<Contact> findAll(Predicate predicate);
+    Optional<List<Contact>> findAllByCompanyIdIn(List<Long> companyIds);
 
-    Optional<List<Contact>> findAllByDeletedAtIsNull();
 
-    Optional<List<Contact>> findFirst5ByFirstNameContainingAndLastNameContainingAndDeletedAtIsNull(String firstName, String lastName);
+    Optional<List<Contact>> findFirst5ByFirstNameContainingAndLastNameContaining(String firstName, String lastName);
 
-    Optional<Page<Contact>> findAllByDeletedAtIsNullAndEmailContainingAndAndCompanyIdIn(Pageable pageable, String email, List<Long> companyIds);
+    Optional<Page<Contact>> findAllByEmailContainingAndAndCompanyIdIn(Pageable pageable, String email, List<Long> companyIds);
 
     @Override
     default public void customize(QuerydslBindings bindings, QContact root) {

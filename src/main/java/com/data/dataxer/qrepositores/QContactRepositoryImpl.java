@@ -24,7 +24,7 @@ public class QContactRepositoryImpl implements QContactRepository {
     }
 
     @Override
-    public List<Contact> all(List<Long> companyIds) {
+    public List<Contact> allWithProjects(List<Long> companyIds) {
         QProject PROJECT = QProject.project;
 
         return query

@@ -12,9 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @Entity
 @Getter
@@ -28,21 +26,14 @@ public class DataxerUser implements Serializable {
     @Column(unique = true,nullable = false,updatable = false,length = 100)
     private String uid;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @Fetch(value = FetchMode.SUBSELECT)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Company> companies = new ArrayList<>();
-
-/*    @Column(nullable = false)
-    private String firstName;
-
-    @Column(nullable = false)
-    private String lastName;*/
 
     @Column(unique = true, nullable = false, updatable = false, length = 50)
     private String email;
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private Collection<Role> roles = new ArrayList<Role>();
+    private Set<Role> roles = new HashSet<>();
 
     @Column(updatable = false)
     @CreationTimestamp

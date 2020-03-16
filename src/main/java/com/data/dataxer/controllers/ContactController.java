@@ -36,7 +36,6 @@ public class ContactController {
     }
 
     @GetMapping("/{id}")
-    @Transactional
     public ResponseEntity<ContactDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.getById(id)));
     }

@@ -12,4 +12,6 @@ public interface CategoryService {
     Category store(Category category);
 
     void updateTree(List<Category> categories, Category category);
+
+    void delete(Long id);
 }

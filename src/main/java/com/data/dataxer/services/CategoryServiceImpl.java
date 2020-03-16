@@ -18,15 +18,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> all() {
         return categoryRepository
-                .findAllByCompanyIdInAndDeletedAtIsNull(SecurityContextUtils.CompanyIds())
+                .findAllByCompanyIdIn(SecurityContextUtils.CompanyIds())
                 .orElse(null);
     }
 
     @Override
     public List<Category> nested() {
-        return this.categoryRepository
-                .findAllByCompanyIdInAndDeletedAtIsNullAndParentIsNull(SecurityContextUtils.CompanyIds())
-                .orElseThrow(() -> new RuntimeException("Categories not found"));
+        return categoryRepository
+                .findAllByCompanyIdInAndParentIsNull(SecurityContextUtils.CompanyIds()).orElse(null);
     }
 
     @Override
@@ -48,5 +47,11 @@ public class CategoryServiceImpl implements CategoryService {
                 }
             });
         }
+    }
+
+    @Override
+    public void delete(Long id) {
+        Category category = categoryRepository.findByIdAndCompanyIdIn(id, SecurityContextUtils.CompanyIds());
+        categoryRepository.delete(category);
     }
 }

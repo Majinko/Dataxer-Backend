@@ -7,21 +7,23 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
-import javax.annotation.PreDestroy;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Category extends BaseEntity {
+@Where(clause = "deleted_at is null")
+@SQLDelete(sql = "UPDATE category SET deleted_at = now() WHERE id = ?")
+public class Category extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,23 +36,13 @@ public class Category extends BaseEntity {
     private Integer rgt;
 
     @JsonIgnore
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;
 
-    @Fetch(value = FetchMode.SUBSELECT)
+    @JsonIgnore
     @OneToMany(mappedBy = "parent", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
     private List<Category> children = new ArrayList<Category>();
 
     private LocalDateTime deletedAt;
-
-    @PreDestroy
-    private void destroy() {
-        deletedAt = LocalDateTime.now();
-    }
-
-    public Category(final Long id, final String name) {
-        this.id = id;
-        this.name = name;
-    }
 }

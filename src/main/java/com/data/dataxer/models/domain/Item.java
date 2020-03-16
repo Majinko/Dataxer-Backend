@@ -9,7 +9,9 @@ import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -39,17 +41,8 @@ public class Item extends BaseEntity {
     @Column(columnDefinition = "text")
     String text;
 
-    @Column(name = "price", nullable = false)
-    @DecimalMin(value = "0.00", message = "*Price has to be non negative number")
-    private BigDecimal price;
-
-    @Column(name = "wholesalePrice", nullable = false)
-    @DecimalMin(value = "0.00")
-    private BigDecimal wholesalePrice;
-
-    private Integer tax;
-
-    private Integer wholesaleTax;
+    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Set<ItemPrice> itemPrices = new HashSet<>();
 
     @ManyToMany
     private List<Category> categories = new ArrayList<Category>();
