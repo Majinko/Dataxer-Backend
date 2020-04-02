@@ -4,8 +4,6 @@ import com.data.dataxer.security.model.Role;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.UpdateTimestamp;
 
 
@@ -17,7 +15,6 @@ import java.util.*;
 @Entity
 @Getter
 @Setter
-@Table(name = "user")
 public class DataxerUser implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
