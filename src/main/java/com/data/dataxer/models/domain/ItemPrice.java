@@ -24,4 +24,7 @@ public class ItemPrice {
     private Integer tax;
 
     private Integer wholesaleTax;
+
+    private Float marge;
+    private Float surcharge;
 }

@@ -25,6 +25,12 @@ public interface CategoryMapper {
 
     List<CategoryNestedDTO> toCategoryNestedDTOs(List<Category> categories);
 
+    @Mapping(target = "rgt", source = "")
+    @Mapping(target = "lft", source = "")
+    @Mapping(target = "deletedAt", source = "")
+    @Mapping(target = "createdAt", source = "")
+    @Mapping(target = "created", source = "")
+    @Mapping(target = "company", source = "")
     @Mapping(target = "children", source = "")
     Category toCategory(CategoryDTO categoryDTO);
 }
