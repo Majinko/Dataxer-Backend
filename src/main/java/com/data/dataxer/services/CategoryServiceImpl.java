@@ -19,14 +19,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> all() {
         return categoryRepository
-                .findAllByCompanyIdIn(SecurityContextUtils.CompanyIds())
+                .findAllByCompanyIdIn(SecurityContextUtils.companyIds())
                 .orElse(null);
     }
 
     @Override
     public List<Category> nested() {
         return categoryRepository
-                .findAllByCompanyIdInAndParentIsNull(SecurityContextUtils.CompanyIds()).orElse(null);
+                .findAllByCompanyIdInAndParentIsNull(SecurityContextUtils.companyIds()).orElse(null);
     }
 
     @Override
@@ -38,7 +38,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void updateTree(List<Category> categories, Category category) {
         if (!categories.isEmpty()) {
             categories.forEach(c -> {
-                Category cc = categoryRepository.findByIdAndCompanyIdIn(c.getId(), SecurityContextUtils.CompanyIds());
+                Category cc = categoryRepository.findByIdAndCompanyIdIn(c.getId(), SecurityContextUtils.companyIds());
 
                 cc.setParent(category);
                 categoryRepository.save(cc);
@@ -52,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(Long id) {
-        Category category = categoryRepository.findByIdAndCompanyIdIn(id, SecurityContextUtils.CompanyIds());
+        Category category = categoryRepository.findByIdAndCompanyIdIn(id, SecurityContextUtils.companyIds());
         categoryRepository.delete(category);
     }
 }

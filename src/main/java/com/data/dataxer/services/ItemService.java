@@ -1,19 +1,14 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Item;
-import com.data.dataxer.repositories.ItemRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-@Service
-public class ItemService implements ItemServiceImpl {
-    private final ItemRepository itemRepository;
+public interface ItemService  {
+    Item store(Item item);
 
-    public ItemService(ItemRepository itemRepository) {
-        this.itemRepository = itemRepository;
-    }
+    Page<Item> paginate(Pageable pageable);
 
-    @Override
-    public Item store(Item item) {
-        return this.itemRepository.save(item);
-    }
+    void delete(Long id);
 }

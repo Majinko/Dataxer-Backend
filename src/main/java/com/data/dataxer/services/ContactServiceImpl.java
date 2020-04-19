@@ -35,7 +35,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public List<Contact> findAll() {
-        return contactRepository.findAllByCompanyIdIn(SecurityContextUtils.CompanyIds()).orElse(null);
+        return contactRepository.findAllByCompanyIdIn(SecurityContextUtils.companyIds()).orElse(null);
     }
 
     @Override
@@ -47,7 +47,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public Page<Contact> paginate(Pageable pageable, String email) {
-        return contactRepository.findAllByEmailContainingAndAndCompanyIdIn(pageable, email, SecurityContextUtils.CompanyIds())
+        return contactRepository.findAllByEmailContainingAndCompanyIdIn(pageable, email, SecurityContextUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 
@@ -63,7 +63,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public Contact update(Contact c, Long id) {
-        contactRepository.findById(id)
+        contactRepository.findByIdAndCompanyIdIn(id, SecurityContextUtils.companyIds())
                 .map(contact -> {
                     // do mapu mi pride vysledok metody findById cize kontakt
                     contact.setFirstName(c.getFirstName());

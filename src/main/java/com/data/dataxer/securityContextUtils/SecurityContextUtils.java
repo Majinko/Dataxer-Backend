@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class SecurityContextUtils {
+    public static String uid() {
+        return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser().getUid();
+    }
+
     public static Long id() {
         return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUser().getId();
     }
@@ -19,7 +23,7 @@ public class SecurityContextUtils {
         return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getLoggedUser();
     }
 
-    public static List<Long> CompanyIds() {
+    public static List<Long> companyIds() {
         return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
                 .getCompanies().stream().map(Company::getId).collect(Collectors.toList());
     }

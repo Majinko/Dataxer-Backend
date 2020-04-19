@@ -21,7 +21,7 @@ public class DataxerUser implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true,nullable = false,updatable = false,length = 100)
+    @Column(unique = true, nullable = false, updatable = false, length = 100)
     private String uid;
 
     @ManyToMany(fetch = FetchType.LAZY)
