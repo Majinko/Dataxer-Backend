@@ -15,17 +15,14 @@ import java.time.LocalDateTime;
 @Data
 @MappedSuperclass
 public abstract class BaseEntity implements Serializable {
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", referencedColumnName = "id", updatable = false, nullable = true)
+    @JoinColumn(name = "company_id", referencedColumnName = "id", updatable = false)
     private Company company;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "created", referencedColumnName = "uid", updatable = false, nullable = true)
+    @JoinColumn(name = "created", referencedColumnName = "uid", updatable = false)
     private DataxerUser created;
 
-    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "updated", referencedColumnName = "uid", nullable = true)
     private DataxerUser updated;

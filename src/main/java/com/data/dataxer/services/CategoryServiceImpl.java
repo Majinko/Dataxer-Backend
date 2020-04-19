@@ -1,6 +1,7 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
+import com.data.dataxer.models.domain.DataxerUser;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityContextUtils;
 import org.springframework.stereotype.Service;
