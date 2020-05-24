@@ -11,6 +11,7 @@ public class ItemPriceDTO
 {
     private Long id;
     private BigDecimal wholesalePrice;
+    private BigDecimal price;
     private Integer tax;
     private Integer wholesaleTax;
     private Float marge;

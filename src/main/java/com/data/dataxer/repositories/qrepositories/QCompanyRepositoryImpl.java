@@ -1,4 +1,4 @@
-package com.data.dataxer.qrepositores;
+package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.domain.QCompany;

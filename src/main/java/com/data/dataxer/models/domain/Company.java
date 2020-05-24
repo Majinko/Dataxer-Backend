@@ -29,6 +29,7 @@ public class Company implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private DataxerUser dataxerUser;
 
+    // todo spolocnost moze mat len jedny fakturacne udaje prerobit
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BillingInformation> billingInformation = new ArrayList<>();
 

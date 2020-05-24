@@ -19,7 +19,8 @@ public class FirebaseConf {
 
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(classPathResource.getInputStream()))
-                .setDatabaseUrl("https://poto-dev.firebaseio.com").build();
+                .setDatabaseUrl("https://dataxer-aab65.firebaseio.com")
+                .build();
 
         FirebaseApp.initializeApp(options);
 

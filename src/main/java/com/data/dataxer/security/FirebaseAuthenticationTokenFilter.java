@@ -43,8 +43,7 @@ public class FirebaseAuthenticationTokenFilter extends UsernamePasswordAuthentic
 
         if (firebaseToken != null /*&& firebaseToken.isEmailVerified()*/) {
             UserDetails userDetails = firebaseUserDetailService.loadOrCreateUser(firebaseToken);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userDetails, null, userDetails.getAuthorities());
+            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }

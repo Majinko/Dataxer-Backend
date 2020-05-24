@@ -3,7 +3,7 @@ import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.domain.DataxerUser;
 import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.DataxerUserRepository;
-import com.data.dataxer.securityContextUtils.SecurityContextUtils;
+import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
@@ -22,7 +22,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Transactional
     public Company store(Company company) {
         DataxerUser dataxerUser = dataxerUserRepository
-                .findById(SecurityContextUtils.id())
+                .findById(SecurityUtils.id())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         company.setDataxerUser(dataxerUser);
@@ -44,12 +44,12 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> findAll() {
-        return companyRepository.findByDataxerUserId(SecurityContextUtils.id());
+        return companyRepository.findByDataxerUserId(SecurityUtils.id());
     }
 
     @Override
     public Company findById(Long id) {
-        return companyRepository.findAllByIdAndDataxerUserId(id, SecurityContextUtils.id()).orElse(null);
+        return companyRepository.findAllByIdAndDataxerUserId(id, SecurityUtils.id()).orElse(null);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package com.data.dataxer.services;
 import com.data.dataxer.models.domain.DataxerUser;
 import com.data.dataxer.repositories.DataxerUserRepository;
-import com.data.dataxer.securityContextUtils.SecurityContextUtils;
+import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -14,7 +14,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public DataxerUser loggedUser() {
-        return this.userRepository.findById(SecurityContextUtils.id()).orElseThrow(() -> new RuntimeException("Contact not found"));
+        return this.userRepository.findById(SecurityUtils.id()).orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 
     @Override

@@ -29,7 +29,6 @@ public interface CategoryMapper {
     @Mapping(target = "lft", source = "")
     @Mapping(target = "deletedAt", source = "")
     @Mapping(target = "createdAt", source = "")
-    @Mapping(target = "created", source = "")
     @Mapping(target = "company", source = "")
     @Mapping(target = "children", source = "")
     Category toCategory(CategoryDTO categoryDTO);

@@ -1,7 +1,4 @@
 package com.data.dataxer.models.dto;
-
-import com.data.dataxer.models.domain.Category;
-import com.data.dataxer.models.domain.ItemPrice;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,13 +7,11 @@ import lombok.Setter;
 public class ItemDTO {
     private Long id;
 
-    Category category;
     String title;
     String type;
     String shortDescription;
     String description;
     String manufacturer;
-    Integer supplierId;
     String web;
     String unit;
     String code;
@@ -28,5 +23,8 @@ public class ItemDTO {
     String series;
     String color;
     String material;
-    ItemPrice itemPrice;
+
+    ContactDTO supplier;
+    CategoryDTO category;
+    ItemPriceDTO itemPrice;
 }

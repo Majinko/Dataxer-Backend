@@ -1,16 +1,38 @@
 package com.data.dataxer.mappers;
 
 import com.data.dataxer.models.domain.Item;
+import com.data.dataxer.models.domain.ItemPrice;
 import com.data.dataxer.models.dto.ItemDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import com.data.dataxer.models.dto.ItemPriceDTO;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface ItemMapper {
     ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
 
-    ItemDTO toItemDto(Item item);
+    ItemPriceDTO toItemPriceDto(ItemPrice itemPrice);
 
+    @Mapping(target = "itemPrice", expression = "java(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null))")
+    @Mapping(target = "category.parent", ignore = true)
+    ItemDTO itemToItemDto(Item item);
+
+    @Mapping(target = "category.parent", ignore = true)
     Item toItem(ItemDTO itemDTO);
+
+    @Named(value = "useWithoutPrice")
+    @Mapping(target = "itemPrice", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    @Mapping(target = "supplier", ignore = true)
+    ItemDTO itemToItemDtoSimple(Item item);
+
+    @IterableMapping(qualifiedByName = "useWithoutPrice")
+    List<ItemDTO> itemsToItemsDtoSimple(List<Item> items);
+    
+    /*@AfterMapping
+    default void set(@MappingTarget ItemDTO itemDTO, Item item) {
+        itemDTO.setItemPrice(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null));
+    }*/
 }

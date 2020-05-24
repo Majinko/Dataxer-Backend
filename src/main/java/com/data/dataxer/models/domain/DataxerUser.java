@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.Set;
 
 @Entity
 @Getter
@@ -30,7 +31,7 @@ public class DataxerUser implements Serializable {
     @Column(unique = true, nullable = false, updatable = false, length = 50)
     private String email;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.LAZY)
     private Set<Role> roles = new HashSet<>();
 
     @Column(updatable = false)

@@ -7,24 +7,24 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Getter
 @Setter
+@Getter
 @Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE contact SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE item SET deleted_at = now() WHERE id = ?")
 public class Item extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Category category;
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Set<ItemPrice> itemPrices = new HashSet<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
+    private List<ItemPrice> itemPrices = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")

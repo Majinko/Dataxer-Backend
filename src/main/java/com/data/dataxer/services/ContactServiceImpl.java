@@ -2,18 +2,14 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Contact;
 
-import com.data.dataxer.models.domain.DataxerUser;
-import com.data.dataxer.models.domain.Project;
-import com.data.dataxer.qrepositores.QContactRepository;
 import com.data.dataxer.repositories.ContactRepository;
 
-import com.data.dataxer.securityContextUtils.SecurityContextUtils;
+import com.data.dataxer.repositories.qrepositories.QContactRepository;
+import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,7 +31,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public List<Contact> findAll() {
-        return contactRepository.findAllByCompanyIdIn(SecurityContextUtils.companyIds()).orElse(null);
+        return contactRepository.findAllByCompanyIdIn(SecurityUtils.companyIds()).orElse(null);
     }
 
     @Override
@@ -47,7 +43,7 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public Page<Contact> paginate(Pageable pageable, String email) {
-        return contactRepository.findAllByEmailContainingAndCompanyIdIn(pageable, email, SecurityContextUtils.companyIds())
+        return contactRepository.findAllByEmailContainingAndCompanyIdIn(pageable, email, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 
@@ -63,8 +59,9 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public Contact update(Contact c, Long id) {
-        contactRepository.findByIdAndCompanyIdIn(id, SecurityContextUtils.companyIds())
+        contactRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds())
                 .map(contact -> {
+
                     // do mapu mi pride vysledok metody findById cize kontakt
                     contact.setFirstName(c.getFirstName());
                     contact.setLastName(c.getLastName());
@@ -76,7 +73,7 @@ public class ContactServiceImpl implements ContactService {
                     contact.setRegNumber(c.getRegNumber());
                     contact.setEmail(c.getEmail());
                     contact.setPhone(c.getPhone());
-                    //contact.setCompany(SecurityContextUtils.loggedUser().getCompanies().get(0));
+                    //contact.setCompany(SecurityUtils.loggedUser().getCompanies().get(0));
 
                     return contactRepository.save(contact);
                 });

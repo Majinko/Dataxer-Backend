@@ -10,6 +10,6 @@ import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
     Optional<Item> findByIdAndCompanyIdIn(Long id, List<Long> companyIds);
-    Optional<List<Item>> findAllByCompanyIdIn(List<Long> companyIds);
+    Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String title, List<Long> companyIds);
     Optional<Page<Item>> findAllByCompanyIdIn(Pageable pageable, List<Long> companyIds);
 }

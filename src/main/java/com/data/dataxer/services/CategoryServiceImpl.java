@@ -1,9 +1,8 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
-import com.data.dataxer.models.domain.DataxerUser;
 import com.data.dataxer.repositories.CategoryRepository;
-import com.data.dataxer.securityContextUtils.SecurityContextUtils;
+import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,14 +18,14 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> all() {
         return categoryRepository
-                .findAllByCompanyIdIn(SecurityContextUtils.companyIds())
+                .findAllByCompanyIdIn(SecurityUtils.companyIds())
                 .orElse(null);
     }
 
     @Override
     public List<Category> nested() {
         return categoryRepository
-                .findAllByCompanyIdInAndParentIsNull(SecurityContextUtils.companyIds()).orElse(null);
+                .findAllByCompanyIdInAndParentIsNull(SecurityUtils.companyIds()).orElse(null);
     }
 
     @Override
@@ -38,7 +37,7 @@ public class CategoryServiceImpl implements CategoryService {
     public void updateTree(List<Category> categories, Category category) {
         if (!categories.isEmpty()) {
             categories.forEach(c -> {
-                Category cc = categoryRepository.findByIdAndCompanyIdIn(c.getId(), SecurityContextUtils.companyIds());
+                Category cc = categoryRepository.findByIdAndCompanyIdIn(c.getId(), SecurityUtils.companyIds());
 
                 cc.setParent(category);
                 categoryRepository.save(cc);
@@ -52,7 +51,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(Long id) {
-        Category category = categoryRepository.findByIdAndCompanyIdIn(id, SecurityContextUtils.companyIds());
+        Category category = categoryRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds());
         categoryRepository.delete(category);
     }
 }
