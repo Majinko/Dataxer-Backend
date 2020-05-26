@@ -16,7 +16,7 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "user")
+@Table(name = "app_user")
 public class DataxerUser implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
