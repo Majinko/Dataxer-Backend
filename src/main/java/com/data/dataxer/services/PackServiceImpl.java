@@ -12,12 +12,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class PackServiceImpl implements PackService {
     private final PackRepository packRepository;
-    private final PackItemRepository packItemRepository;
     private final QPackRepository qPackRepository;
 
-    public PackServiceImpl(PackRepository packRepository, PackItemRepository packItemRepository, QPackRepository qPackRepository) {
+    public PackServiceImpl(PackRepository packRepository, QPackRepository qPackRepository) {
         this.packRepository = packRepository;
-        this.packItemRepository = packItemRepository;
         this.qPackRepository = qPackRepository;
     }
 

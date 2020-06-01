@@ -2,8 +2,6 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -24,7 +22,7 @@ public class Time extends BaseEntity {
     Project project;
 
     @OneToOne
-    DataxerUser user;
+    AppUser user;
 
     @OneToOne
     Category category;

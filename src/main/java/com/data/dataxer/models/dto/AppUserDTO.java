@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class DataxerUserDTO {
+public class AppUserDTO {
     private Long id;
     private String uid;
     private String email;

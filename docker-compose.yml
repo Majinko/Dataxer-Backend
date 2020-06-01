@@ -1,25 +1,14 @@
-version: '3.3'
+version: '3.1'
+
 services:
-  db:
-    image: mysql:5.7
+  cpm_dp:
+    image: postgres
     restart: always
-    environment:
-      MYSQL_DATABASE: 'dataxer'
-      # So you don't have to use root, but you can if you like
-      MYSQL_USER: 'root'
-      # You can use whatever password you like
-      MYSQL_PASSWORD: '123456'
-      # Password for root access
-      MYSQL_ROOT_PASSWORD: '123456'
+    container_name: dataxer_db
     ports:
-      # <Port exposed> : < MySQL Port running inside container>
-      - '3306:3306'
-    expose:
-      # Opens port 3306 on the container
-      - '3306'
-      # Where our data will be persisted
-    volumes:
-      - my-db:/var/lib/mysql
-# Names our volume
-volumes:
-  my-db:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: root
+      POSTGRES_USER: root
+      POSTGRES_DB: dataxer
+      POSTGRES_PORT: 5432

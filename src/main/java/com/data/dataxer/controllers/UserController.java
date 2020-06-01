@@ -1,8 +1,7 @@
 package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.UserMapper;
-import com.data.dataxer.models.dto.ContactDTO;
-import com.data.dataxer.models.dto.DataxerUserDTO;
+import com.data.dataxer.models.dto.AppUserDTO;
 import com.data.dataxer.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,12 +18,12 @@ public class UserController {
     }
 
     @GetMapping("/logged")
-    public ResponseEntity<DataxerUserDTO> getLoggedUser() {
-        return ResponseEntity.ok(userMapper.toDataxerUserDTO(this.userService.loggedUser()));
+    public ResponseEntity<AppUserDTO> getLoggedUser() {
+        return ResponseEntity.ok(userMapper.appUserToAppUserDTO(this.userService.loggedUser()));
     }
 
     @PostMapping("/store")
-    public void store(@RequestBody DataxerUserDTO dataxerUserDTO) {
-        ResponseEntity.ok(userMapper.toDataxerUserDTO(userService.store(userMapper.toDataxerUser(dataxerUserDTO))));
+    public void store(@RequestBody AppUserDTO appUserDTO) {
+        ResponseEntity.ok(userMapper.appUserToAppUserDTO(userService.store(userMapper.appUserDTOtoAppUser(appUserDTO))));
     }
 }

@@ -1,8 +1,8 @@
 package com.data.dataxer.services;
+import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Company;
-import com.data.dataxer.models.domain.DataxerUser;
 import com.data.dataxer.repositories.CompanyRepository;
-import com.data.dataxer.repositories.DataxerUserRepository;
+import com.data.dataxer.repositories.AppUserRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,27 +11,27 @@ import java.util.List;
 @Service
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
-    private final DataxerUserRepository dataxerUserRepository;
+    private final AppUserRepository appUserRepository;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, DataxerUserRepository dataxerUserRepository) {
+    public CompanyServiceImpl(CompanyRepository companyRepository, AppUserRepository appUserRepository) {
         this.companyRepository = companyRepository;
-        this.dataxerUserRepository = dataxerUserRepository;
+        this.appUserRepository = appUserRepository;
     }
 
     @Override
     @Transactional
     public Company store(Company company) {
-        DataxerUser dataxerUser = dataxerUserRepository
+        AppUser appUser = appUserRepository
                 .findById(SecurityUtils.id())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        company.setDataxerUser(dataxerUser);
+        company.setAppUser(appUser);
         this.companySetBi(company);
 
         Company c = this.companyRepository.save(company);
 
-        dataxerUser.getCompanies().add(c);
-        dataxerUserRepository.save(dataxerUser);
+        appUser.getCompanies().add(c);
+        appUserRepository.save(appUser);
 
         return c;
     }
@@ -44,12 +44,12 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> findAll() {
-        return companyRepository.findByDataxerUserId(SecurityUtils.id());
+        return companyRepository.findByAppUserId(SecurityUtils.id());
     }
 
     @Override
     public Company findById(Long id) {
-        return companyRepository.findAllByIdAndDataxerUserId(id, SecurityUtils.id()).orElse(null);
+        return companyRepository.findAllByIdAndAppUserId(id, SecurityUtils.id()).orElse(null);
     }
 
     @Override

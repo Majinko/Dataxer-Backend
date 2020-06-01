@@ -1,9 +1,9 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.DataxerUser;
+import com.data.dataxer.models.domain.AppUser;
 
 public interface UserService {
-    DataxerUser loggedUser();
+    AppUser loggedUser();
 
-    DataxerUser store(DataxerUser dataxerUser);
+    AppUser store(AppUser appUser);
 }

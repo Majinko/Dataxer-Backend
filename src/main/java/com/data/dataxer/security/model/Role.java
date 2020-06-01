@@ -1,12 +1,11 @@
 package com.data.dataxer.security.model;
 
+import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Company;
-import com.data.dataxer.models.domain.DataxerUser;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -24,7 +23,7 @@ public class Role {
     private Company company;
 
     @ManyToMany(mappedBy = "roles")
-    private Collection<DataxerUser> users = new ArrayList<DataxerUser>();
+    private Collection<AppUser> users = new ArrayList<AppUser>();
 
     @ManyToMany
     private Collection<Privilege> privileges = new ArrayList<Privilege>();
