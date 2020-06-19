@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class QItemRepositoryImpl implements QItemRepository {
@@ -16,7 +17,7 @@ public class QItemRepositoryImpl implements QItemRepository {
     }
 
     @Override
-    public Item getById(long id,  List<Long> companyIds) {
+    public Item getById(long id, List<Long> companyIds) {
         QItem qItem = QItem.item;
         QItemPrice qItemPrice = QItemPrice.itemPrice;
         QCategory qCategory = QCategory.category;
@@ -30,5 +31,17 @@ public class QItemRepositoryImpl implements QItemRepository {
                 .leftJoin(qItem.category, qCategory).fetchJoin()
                 .leftJoin(qItem.supplier, qContact).fetchJoin()
                 .fetchOne();
+    }
+
+    @Override
+    public Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String q, List<Long> companyIds) {
+        QItem qItem = QItem.item;
+
+        return Optional.ofNullable(query
+                .selectFrom(qItem)
+                .where(qItem.company.id.in(companyIds))
+                .where(qItem.title.containsIgnoreCase(q))
+                .leftJoin(qItem.itemPrices).fetchJoin()
+                .fetch());
     }
 }

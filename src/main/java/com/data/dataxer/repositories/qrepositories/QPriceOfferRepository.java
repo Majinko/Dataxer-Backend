@@ -11,4 +11,6 @@ public interface QPriceOfferRepository {
     Page<PriceOffer> paginate(Pageable pageable, List<Long> companyIds);
 
     Optional<PriceOffer> getById(Long id, List<Long> companyIds);
+
+    Optional<PriceOffer> getByIdSimple(Long id, List<Long> companyIds);
 }

@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/pack")
 public class PackController {
@@ -24,7 +26,6 @@ public class PackController {
     public void store(@RequestBody PackDTO packDTO) {
         this.packService.store(packMapper.packDTOtoPack(packDTO));
     }
-
 
     @PostMapping("/update")
     public void update(@RequestBody PackDTO packDTO) {
@@ -42,8 +43,13 @@ public class PackController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<PackDTO> getById(@PathVariable Long id){
+    public ResponseEntity<PackDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(packMapper.packToPackDTO(this.packService.getById(id)));
+    }
+
+    @GetMapping("/search/{q}")
+    public ResponseEntity<List<PackDTO>> search(@PathVariable String q) {
+        return ResponseEntity.ok(packMapper.packToPackDTOsSimple(packService.search(q)));
     }
 
     @GetMapping("/destroy/{id}")

@@ -2,6 +2,7 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
+
 import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,11 +17,6 @@ public class Pack extends BaseEntity {
 
     private String title;
 
-    @OneToMany(
-            mappedBy = "pack",
-            orphanRemoval = true,
-            cascade = CascadeType.ALL,
-            fetch = FetchType.LAZY
-    )
+    @OneToMany(mappedBy = "pack", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<PackItem> items = new HashSet<>();
 }

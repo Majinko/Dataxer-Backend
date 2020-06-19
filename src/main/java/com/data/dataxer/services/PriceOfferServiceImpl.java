@@ -1,6 +1,8 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.PriceOffer;
+import com.data.dataxer.models.domain.PriceOfferPack;
+import com.data.dataxer.models.domain.PriceOfferPackItem;
 import com.data.dataxer.repositories.PriceOfferRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -20,12 +22,36 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public void store(PriceOffer priceOffer) {
-        this.priceOfferRepository.save(priceOffer);
+        PriceOffer p = this.setPriceOfferPackAndItems(priceOffer);
+
+        this.priceOfferRepository.save(p);
+    }
+
+    private PriceOffer setPriceOfferPackAndItems(PriceOffer priceOffer) {
+        int packPosition = 0;
+
+        for (PriceOfferPack priceOfferPack : priceOffer.getPacks()) {
+            priceOfferPack.setPriceOffer(priceOffer);
+            priceOfferPack.setPosition(packPosition);
+            packPosition++;
+
+            int packItemPosition = 0;
+            for (PriceOfferPackItem priceOfferPackItem : priceOfferPack.getItems()) {
+                priceOfferPackItem.setPriceOfferPack(priceOfferPack);
+                priceOfferPackItem.setPosition(packItemPosition);
+
+                packItemPosition++;
+            }
+        }
+
+        return priceOffer;
     }
 
     @Override
     public void update(PriceOffer priceOffer) {
-        this.priceOfferRepository.save(priceOffer);
+        PriceOffer p = this.setPriceOfferPackAndItems(priceOffer);
+
+        this.priceOfferRepository.save(p);
     }
 
     @Override
@@ -41,7 +67,14 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
+    public PriceOffer getByIdSimple(Long id) {
+        return this.qPriceOfferRepository
+                .getByIdSimple(id, SecurityUtils.companyIds())
+                .orElseThrow(() -> new RuntimeException("Price offer not found"));
+    }
+
+    @Override
     public void destroy(Long id) {
-        priceOfferRepository.delete(this.getById(id));
+        priceOfferRepository.delete(this.getByIdSimple(id));
     }
 }

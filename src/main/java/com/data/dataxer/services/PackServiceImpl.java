@@ -1,6 +1,7 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Pack;
+import com.data.dataxer.models.domain.PackItem;
 import com.data.dataxer.repositories.PackItemRepository;
 import com.data.dataxer.repositories.PackRepository;
 import com.data.dataxer.repositories.qrepositories.QPackRepository;
@@ -8,6 +9,8 @@ import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class PackServiceImpl implements PackService {
@@ -35,6 +38,11 @@ public class PackServiceImpl implements PackService {
         });
 
         this.packRepository.save(pack);
+    }
+
+    @Override
+    public List<Pack> search(String q) {
+        return qPackRepository.search(q, SecurityUtils.companyIds());
     }
 
     @Override

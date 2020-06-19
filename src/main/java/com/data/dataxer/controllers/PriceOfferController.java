@@ -38,7 +38,7 @@ public class PriceOfferController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(priceOfferService.paginate(pageable).map(priceOfferMapper::priceOfferToPriceOfferDTO));
+        return ResponseEntity.ok(priceOfferService.paginate(pageable).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
     }
 
     @GetMapping("/{id}")

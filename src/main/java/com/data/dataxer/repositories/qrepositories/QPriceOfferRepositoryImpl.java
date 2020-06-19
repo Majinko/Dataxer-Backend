@@ -1,7 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.models.domain.PriceOffer;
-import com.data.dataxer.models.domain.QPriceOffer;
+import com.data.dataxer.models.domain.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -20,23 +19,49 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         this.query = new JPAQueryFactory(entityManager);
     }
 
+    private Long total() {
+        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
+
+        return query.selectFrom(qPriceOffer).fetchCount();
+    }
+
     @Override
     public Page<PriceOffer> paginate(Pageable pageable, List<Long> companyIds) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
 
         List<PriceOffer> priceOffers = query.selectFrom(qPriceOffer)
-                .join(qPriceOffer.contact).fetchJoin()
+                .leftJoin(qPriceOffer.contact).fetchJoin()
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .orderBy(qPriceOffer.id.desc())
                 .fetch();
 
-        return new PageImpl<PriceOffer>(priceOffers, pageable, priceOffers.size());
+        return new PageImpl<PriceOffer>(priceOffers, pageable, total());
     }
 
     @Override
     public Optional<PriceOffer> getById(Long id, List<Long> companyIds) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
+        QPriceOfferPack qPriceOfferPack = QPriceOfferPack.priceOfferPack;
+        QPriceOfferPackItem qPriceOfferPackItem = QPriceOfferPackItem.priceOfferPackItem;
+        QItem qItem = QItem.item;
 
         return Optional.ofNullable(query.selectFrom(qPriceOffer)
-                .join(qPriceOffer.contact).fetchJoin()
+                .leftJoin(qPriceOffer.contact).fetchJoin()
+                .leftJoin(qPriceOffer.packs, qPriceOfferPack).fetchJoin()
+                .leftJoin(qPriceOfferPack.items, qPriceOfferPackItem).fetchJoin()
+                .leftJoin(qPriceOfferPackItem.item, qItem).fetchJoin()
+                .where(qPriceOffer.id.eq(id))
+                .where(qPriceOffer.company.id.in(companyIds))
+                .orderBy(qPriceOfferPack.position.desc(), qPriceOfferPackItem.position.desc())
+                .fetchOne());
+    }
+
+    @Override
+    public Optional<PriceOffer> getByIdSimple(Long id, List<Long> companyIds) {
+        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
+
+        return Optional.ofNullable(query.selectFrom(qPriceOffer)
                 .where(qPriceOffer.id.eq(id))
                 .where(qPriceOffer.company.id.in(companyIds))
                 .fetchOne());

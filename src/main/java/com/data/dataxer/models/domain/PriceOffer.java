@@ -7,9 +7,12 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 @Entity
 @Setter
@@ -20,6 +23,9 @@ public class PriceOffer extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @OneToMany(mappedBy = "priceOffer", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<PriceOfferPack> packs = new HashSet<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
@@ -35,6 +41,10 @@ public class PriceOffer extends BaseEntity {
 
     @Column(columnDefinition = "text")
     private String note;
+
+    private BigDecimal price;
+
+    private BigDecimal totalPrice;
 
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)

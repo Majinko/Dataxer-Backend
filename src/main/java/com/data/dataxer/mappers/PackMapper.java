@@ -6,9 +6,13 @@ import com.data.dataxer.models.domain.ItemPrice;
 import com.data.dataxer.models.dto.PackDTO;
 import com.data.dataxer.models.dto.PackItemDTO;
 import com.data.dataxer.models.dto.ItemPriceDTO;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
+
+import java.util.List;
 
 @Mapper
 public interface PackMapper {
@@ -16,8 +20,10 @@ public interface PackMapper {
 
     Pack packDTOtoPack(PackDTO packDTO);
 
+    @Named(value = "packToPackDTO")
     PackDTO packToPackDTO(Pack pack);
 
+    @Named(value = "packToPackDTOSimple")
     @Mapping(target = "items", ignore = true)
     PackDTO packToPackDTOSimple(Pack pack);
 
@@ -34,4 +40,7 @@ public interface PackMapper {
     @Mapping(target = "item.category", ignore = true)
     @Mapping(target = "item.supplier", ignore = true)
     PackItemDTO packItemToPackItemDTO(PackItem packItem);
+
+    @IterableMapping(qualifiedByName = "packToPackDTOSimple")
+    List<PackDTO> packToPackDTOsSimple(List<Pack> packItems);
 }

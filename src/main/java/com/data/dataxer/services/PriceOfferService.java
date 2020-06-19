@@ -14,5 +14,7 @@ public interface PriceOfferService {
 
     PriceOffer getById(Long id);
 
+    PriceOffer getByIdSimple(Long id);
+
     void destroy(Long id);
 }
