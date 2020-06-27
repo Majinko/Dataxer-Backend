@@ -4,14 +4,14 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Setter
 @Getter
 public class PriceOfferPackDTO {
     private Long id;
-    Set<PriceOfferPackItemDTO> items = new HashSet<>();
+    List<PriceOfferPackItemDTO> items = new ArrayList<>();
     String title;
     Integer tax;
     private BigDecimal totalPrice;

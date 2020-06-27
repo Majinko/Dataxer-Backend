@@ -10,9 +10,7 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Setter
@@ -25,7 +23,7 @@ public class PriceOffer extends BaseEntity {
     private Long id;
 
     @OneToMany(mappedBy = "priceOffer", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Set<PriceOfferPack> packs = new HashSet<>();
+    List<PriceOfferPack> packs = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")

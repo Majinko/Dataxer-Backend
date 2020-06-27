@@ -7,8 +7,8 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -24,7 +24,7 @@ public class PriceOfferPack implements Serializable {
     PriceOffer priceOffer;
 
     @OneToMany(mappedBy = "priceOfferPack", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Set<PriceOfferPackItem> items = new HashSet<>();
+    List<PriceOfferPackItem> items = new ArrayList<>();
 
     Integer position;
 
