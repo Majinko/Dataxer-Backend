@@ -12,6 +12,7 @@ public class PriceOfferPackItemDTO {
     private ItemDTO item;
     private String title;
     private Float qty;
+    private BigDecimal discount;
     private BigDecimal price;
     private Integer tax;
     private BigDecimal totalPrice;

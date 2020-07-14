@@ -19,6 +19,7 @@ public class PriceOfferDTO {
     private LocalDate createdDate;
     private LocalDate deliveredDate;
     private LocalDate dueDate;
+    private BigDecimal discount;
     private BigDecimal price;
     private BigDecimal totalPrice;
 

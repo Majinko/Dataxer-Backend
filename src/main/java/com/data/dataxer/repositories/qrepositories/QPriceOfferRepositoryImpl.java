@@ -33,7 +33,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .leftJoin(qPriceOffer.contact).fetchJoin()
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
-                .orderBy(qPriceOffer.id.asc())
+                .orderBy(qPriceOffer.id.desc())
                 .fetch();
 
         return new PageImpl<PriceOffer>(priceOffers, pageable, total());

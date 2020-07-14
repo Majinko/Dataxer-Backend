@@ -31,6 +31,8 @@ public class PriceOfferPackItem implements Serializable {
 
     Integer position;
 
+    private BigDecimal discount;
+
     private BigDecimal price;
 
     private Integer tax;

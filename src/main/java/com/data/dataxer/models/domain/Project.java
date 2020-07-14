@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -16,14 +17,27 @@ public class Project extends BaseEntity{
     private Long id;
 
     @JsonIgnore
-    @JoinColumn(name = "contact_id")
+    @JoinColumn(name = "client_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Contact contact;
 
     @OneToOne
-    AppUser user;
+    private AppUser user;
 
-    String name;
+    private String title;
 
-    String number;
+    private String number;
+
+    @Column(columnDefinition = "text")
+    private String description;
+
+    private String state;
+
+    private String address;
+
+    private Float area;
+
+    private LocalDateTime startedAt;
+
+    private LocalDateTime finishedAt;
 }

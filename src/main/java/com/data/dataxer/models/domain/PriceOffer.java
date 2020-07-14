@@ -40,6 +40,8 @@ public class PriceOffer extends BaseEntity {
     @Column(columnDefinition = "text")
     private String note;
 
+    private BigDecimal discount;
+
     private BigDecimal price;
 
     private BigDecimal totalPrice;
