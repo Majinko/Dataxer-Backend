@@ -33,11 +33,11 @@ public class DemandServiceImpl implements DemandService {
         return qDemandRepository.paginate(pageable, SecurityUtils.companyIds());
     }
 
-    private Demand getByIdSimple(Long id) {
+ /*   private Demand getByIdSimple(Long id) {
         return this.demandRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds()).orElseThrow(() -> {
             throw new RuntimeException("Dopyt nenajdeny.");
         });
-    }
+    }*/
 
     @Override
     public Demand getById(Long id) {
