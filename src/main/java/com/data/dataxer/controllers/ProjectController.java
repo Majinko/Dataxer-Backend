@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/project")
 public class ProjectController {
@@ -33,14 +35,13 @@ public class ProjectController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(projectService.paginate(pageable).map(projectMapper::projectToProjectDto));
+        return ResponseEntity.ok(projectService.paginate(pageable).map(projectMapper::projectToProjectDTO));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(projectMapper.projectToProjectDto(this.projectService.getById(id)));
+        return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.getById(id)));
     }
-
 
     @PostMapping("/update")
     public void update(@RequestBody ProjectDTO projectDTO) {
@@ -50,5 +51,10 @@ public class ProjectController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.projectService.destroy(id);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ProjectDTO>> all() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.all()));
     }
 }

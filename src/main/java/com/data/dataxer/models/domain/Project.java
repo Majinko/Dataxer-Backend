@@ -16,7 +16,6 @@ public class Project extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @JsonIgnore
     @JoinColumn(name = "client_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Contact contact;

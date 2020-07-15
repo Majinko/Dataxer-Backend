@@ -8,6 +8,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
@@ -41,5 +43,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void destroy(Long id) {
         this.projectRepository.delete(this.qProjectRepository.getById(id, SecurityUtils.companyIds()));
+    }
+
+    @Override
+    public List<Project> all() {
+        return this.projectRepository.findAllByCompanyIdIn(SecurityUtils.companyIds());
     }
 }
