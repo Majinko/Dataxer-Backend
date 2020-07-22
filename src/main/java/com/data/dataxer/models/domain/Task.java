@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -21,7 +22,7 @@ public class Task extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Category category;
 
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_uid", referencedColumnName = "uid")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private AppUser user;
 
@@ -33,4 +34,6 @@ public class Task extends BaseEntity {
     private String completion;
 
     private String state;
+
+    private LocalDateTime finishedAt;
 }

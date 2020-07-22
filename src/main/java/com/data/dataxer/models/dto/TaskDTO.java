@@ -19,5 +19,6 @@ public class TaskDTO {
     private String description;
     private String completion;
     private String state;
+    private boolean sendEmail;
     private LocalDateTime finishedAt;
 }

@@ -6,6 +6,8 @@ import com.data.dataxer.services.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -15,6 +17,11 @@ public class UserController {
     public UserController(UserService userService, UserMapper userMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<AppUserDTO>> all() {
+        return ResponseEntity.ok(userMapper.appUserToAppUserDTOs(this.userService.all()));
     }
 
     @GetMapping("/logged")
