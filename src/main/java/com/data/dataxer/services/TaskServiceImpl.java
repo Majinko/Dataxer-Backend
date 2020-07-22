@@ -3,6 +3,7 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.Task;
 import com.data.dataxer.repositories.TaskRepository;
 import com.data.dataxer.repositories.qrepositories.QTaskRepository;
+import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,8 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public void store(Task task) {
+        task.setUserFrom(SecurityUtils.loggedUser());
+
         this.taskRepository.save(task);
     }
 
@@ -29,16 +32,16 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task getById(Long id) {
-        return null;
+        return this.qTaskRepository.getById(id, SecurityUtils.companyIds());
     }
 
     @Override
     public Page<Task> paginate(Pageable pageable) {
-        return null;
+        return this.qTaskRepository.paginate(pageable, SecurityUtils.companyIds());
     }
 
     @Override
     public void destroy(Long id) {
-
+        this.taskRepository.delete(this.getById(id));
     }
 }

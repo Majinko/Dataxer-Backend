@@ -15,6 +15,7 @@ public class TaskDTO {
     private Project project;
     private Category category;
     private AppUser user;
+    private AppUser userFrom;
     private String title;
     private String description;
     private String completion;

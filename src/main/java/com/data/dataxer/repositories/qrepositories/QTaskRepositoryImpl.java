@@ -33,6 +33,7 @@ public class QTaskRepositoryImpl implements QTaskRepository {
                 .where(qTask.company.id.in(companyIds))
                 .where(qTask.id.eq(id))
                 .join(qTask.user).fetchJoin()
+                .join(qTask.userFrom).fetchJoin()
                 .join(qTask.project).fetchJoin()
                 .join(qTask.category).fetchJoin()
                 .fetchOne();
@@ -46,8 +47,11 @@ public class QTaskRepositoryImpl implements QTaskRepository {
         List<Task> tasks = query
                 .selectFrom(qTask)
                 .join(qTask.user).fetchJoin()
+                .join(qTask.userFrom).fetchJoin()
                 .join(qTask.project).fetchJoin()
-                .join(qTask.category).fetchJoin().fetch();
+                .join(qTask.category).fetchJoin()
+                .orderBy(qTask.id.desc())
+                .fetch();
 
         return new PageImpl<>(tasks, pageable, total());
     }

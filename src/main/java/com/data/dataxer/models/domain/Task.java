@@ -26,6 +26,10 @@ public class Task extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private AppUser user;
 
+    @JoinColumn(name = "user_from_uid", referencedColumnName = "uid")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    private AppUser userFrom;
+
     private String title;
 
     @Column(columnDefinition = "text")
