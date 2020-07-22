@@ -2,6 +2,7 @@ package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QDocument;
+import com.data.dataxer.models.domain.QDocumentPack;
 import com.data.dataxer.models.domain.QDocumentPackItem;
 import com.data.dataxer.models.domain.QPriceOffer;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -45,13 +46,13 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     @Override
     public Optional<PriceOffer> getById(Long id, List<Long> companyIds) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-        QDocument qDocument = QDocument.document;
+        QDocumentPack qDocumentPack = QDocumentPack.documentPack;
 
         PriceOffer priceOffer = query.selectFrom(qPriceOffer)
                 .leftJoin(qPriceOffer.contact).fetchJoin()
-                .leftJoin(qDocument.documentPack).on(qPriceOffer.id.eq(qDocument.documentId))
+                .leftJoin(qPriceOffer.packs, qDocumentPack).fetchJoin()
                 .where(qPriceOffer.id.eq(id))
-                .orderBy(qDocument.documentPack.position.asc())
+                .orderBy(qDocumentPack.position.asc())
                 .fetchOne();
 
         // price offer pack set items

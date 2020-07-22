@@ -28,15 +28,15 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     private PriceOffer setPriceOfferPackAndItems(PriceOffer priceOffer) {
         int packPosition = 0;
 
-        for(Document document : priceOffer.getPacks()) {
-            document.setDocumentId(priceOffer.getId());
-            document.getDocumentPack().setPosition(packPosition);
+        for(DocumentPack documentPack : priceOffer.getPacks()) {
+            documentPack.getDocument().setDocumentId(priceOffer.getId());
+            documentPack.setPosition(packPosition);
             packPosition++;
 
             int packItemPosition = 0;
 
-            for(DocumentPackItem packItem : document.getDocumentPack().getPackItems()) {
-                packItem.setPack(document.getDocumentPack());
+            for(DocumentPackItem packItem : documentPack.getPackItems()) {
+                packItem.setPack(documentPack);
                 packItem.setPosition(packItemPosition);
 
                 packItemPosition++;
