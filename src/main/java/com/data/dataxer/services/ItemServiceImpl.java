@@ -73,7 +73,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<Item> search(String q) {
-        return this.itemRepository.findAllByTitleContainsAndCompanyIdIn(q, SecurityUtils.companyIds())
+        return this.qItemRepository.findAllByTitleContainsAndCompanyIdIn(q, SecurityUtils.companyIds())
                 .orElse(null);
     }
 }

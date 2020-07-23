@@ -1,24 +1,24 @@
 package com.data.dataxer.services;
-import com.data.dataxer.models.domain.DataxerUser;
-import com.data.dataxer.repositories.DataxerUserRepository;
+import com.data.dataxer.models.domain.AppUser;
+import com.data.dataxer.repositories.AppUserRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.stereotype.Service;
 
 @Service
 public class UserServiceImpl implements UserService {
-    private final DataxerUserRepository userRepository;
+    private final AppUserRepository userRepository;
 
-    public UserServiceImpl(DataxerUserRepository userRepository) {
+    public UserServiceImpl(AppUserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
     @Override
-    public DataxerUser loggedUser() {
+    public AppUser loggedUser() {
         return this.userRepository.findById(SecurityUtils.id()).orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 
     @Override
-    public DataxerUser store(DataxerUser dataxerUser) {
-        return this.userRepository.save(dataxerUser);
+    public AppUser store(AppUser appUser) {
+        return this.userRepository.save(appUser);
     }
 }

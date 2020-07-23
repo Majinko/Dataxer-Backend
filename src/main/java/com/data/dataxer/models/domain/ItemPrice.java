@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.DecimalMin;
 import java.math.BigDecimal;
 
 @Entity
@@ -21,11 +20,10 @@ public class ItemPrice {
     private Item item;
 
     @Column(name = "price", nullable = false)
-    @DecimalMin(value = "0.00", message = "*Price has to be non negative number")
+    /*@DecimalMin(value = "0.00", message = "*Price has to be non negative number")*/
     private BigDecimal price;
 
     @Column(name = "wholesalePrice", nullable = false)
-    @DecimalMin(value = "0.00")
     private BigDecimal wholesalePrice;
 
     private Integer tax;

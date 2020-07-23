@@ -8,7 +8,6 @@ import java.util.List;
 
 public class QCompanyRepositoryImpl implements QCompanyRepository {
     private final JPAQueryFactory query;
-    private QCompany COMAPNY = QCompany.company;
 
     public QCompanyRepositoryImpl(JPAQueryFactory query) {
         this.query = query;

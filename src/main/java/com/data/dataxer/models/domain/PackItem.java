@@ -24,5 +24,5 @@ public class PackItem implements Serializable {
     @JoinColumn(name = "pack_id", referencedColumnName = "id")
     Pack pack;
 
-    float qty;
+    private Float qty;
 }

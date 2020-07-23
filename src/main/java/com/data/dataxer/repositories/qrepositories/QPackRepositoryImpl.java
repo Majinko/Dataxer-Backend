@@ -44,4 +44,14 @@ public class QPackRepositoryImpl implements QPackRepository {
                 .leftJoin(qItem.itemPrices, qItemPrice).fetchJoin()
                 .fetchOne();
     }
+
+    @Override
+    public List<Pack> search(String q, List<Long> companyIds) {
+        QPack qPack = QPack.pack;
+
+        return query.selectFrom(qPack)
+                .where(qPack.company.id.in(companyIds))
+                .where(qPack.title.containsIgnoreCase(q))
+                .fetch();
+    }
 }

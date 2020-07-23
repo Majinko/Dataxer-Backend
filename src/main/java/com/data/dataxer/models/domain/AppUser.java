@@ -16,8 +16,8 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@Table(name = "user")
-public class DataxerUser implements Serializable {
+@Table(name = "app_user")
+public class AppUser implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

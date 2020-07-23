@@ -54,7 +54,7 @@ public class ItemController {
 
     @GetMapping("/search/{q}")
     public ResponseEntity<List<ItemDTO>> search(@PathVariable String q) {
-        return ResponseEntity.ok(itemMapper.itemsToItemsDtoSimple(itemService.search(q)));
+        return ResponseEntity.ok(itemMapper.itemsToItemsDTOsWithPrice(itemService.search(q)));
     }
 
     @GetMapping("/destroy/{id}")
