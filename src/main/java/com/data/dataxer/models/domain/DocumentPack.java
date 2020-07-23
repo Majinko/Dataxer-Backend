@@ -1,6 +1,6 @@
 package com.data.dataxer.models.domain;
 
-import com.data.dataxer.Enums.DocumentType;
+import com.data.dataxer.models.enums.DocumentType;
 import lombok.Getter;
 import lombok.Setter;
 

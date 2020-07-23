@@ -23,12 +23,6 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         this.query = new JPAQueryFactory(entityManager);
     }
 
-    private Long total() {
-        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-
-        return query.selectFrom(qPriceOffer).fetchCount();
-    }
-
     @Override
     public Page<PriceOffer> paginate(Pageable pageable, List<Long> companyIds) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
@@ -63,6 +57,22 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         return Optional.ofNullable(priceOffer);
     }
 
+    @Override
+    public Optional<PriceOffer> getByIdSimple(Long id, List<Long> companyIds) {
+        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
+
+        return Optional.ofNullable(query.selectFrom(qPriceOffer)
+                .where(qPriceOffer.id.eq(id))
+                .where(qPriceOffer.company.id.in(companyIds))
+                .fetchOne());
+    }
+
+    private Long total() {
+        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
+
+        return query.selectFrom(qPriceOffer).fetchCount();
+    }
+
     private void priceOfferPackSetItems(PriceOffer priceOffer) {
         QDocumentPackItem qDocumentPackItem = QDocumentPackItem.documentPackItem;
         QItem qItem = QItem.item;
@@ -78,16 +88,6 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         priceOffer.getPacks().forEach(documentPack -> documentPack.setPackItems(
                 priceOfferPackItems.stream().filter(
                         priceOfferPackItem -> priceOfferPackItem.getPack().getDocumentPackId().equals(documentPack.getDocumentPackId())).collect(Collectors.toList())
-                ));
-    }
-
-    @Override
-    public Optional<PriceOffer> getByIdSimple(Long id, List<Long> companyIds) {
-        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-
-        return Optional.ofNullable(query.selectFrom(qPriceOffer)
-                .where(qPriceOffer.id.eq(id))
-                .where(qPriceOffer.company.id.in(companyIds))
-                .fetchOne());
+        ));
     }
 }

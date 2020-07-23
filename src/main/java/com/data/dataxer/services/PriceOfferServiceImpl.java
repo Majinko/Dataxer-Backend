@@ -1,6 +1,6 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.Enums.DocumentType;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.repositories.PriceOfferRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PriceOfferServiceImpl implements PriceOfferService {
+
     private final PriceOfferRepository priceOfferRepository;
     private final QPriceOfferRepository qPriceOfferRepository;
 
@@ -24,27 +25,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         PriceOffer p = this.setPriceOfferPackAndItems(priceOffer);
 
         this.priceOfferRepository.save(p);
-    }
-
-    private PriceOffer setPriceOfferPackAndItems(PriceOffer priceOffer) {
-        int packPosition = 0;
-
-        for(DocumentPack documentPack : priceOffer.getPacks()) {
-            documentPack.setDocumentId(priceOffer.getId());
-            documentPack.setType(DocumentType.PRICE_OFFER);
-            documentPack.setPosition(packPosition);
-            packPosition++;
-
-            int packItemPosition = 0;
-
-            for(DocumentPackItem packItem : documentPack.getPackItems()) {
-                packItem.setPack(documentPack);
-                packItem.setPosition(packItemPosition);
-
-                packItemPosition++;
-            }
-        }
-        return priceOffer;
     }
 
     @Override
@@ -76,5 +56,26 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     @Override
     public void destroy(Long id) {
         priceOfferRepository.delete(this.getByIdSimple(id));
+    }
+
+    private PriceOffer setPriceOfferPackAndItems(PriceOffer priceOffer) {
+        int packPosition = 0;
+
+        for(DocumentPack documentPack : priceOffer.getPacks()) {
+            documentPack.setDocumentId(priceOffer.getId());
+            documentPack.setType(DocumentType.PRICE_OFFER);
+            documentPack.setPosition(packPosition);
+            packPosition++;
+
+            int packItemPosition = 0;
+
+            for(DocumentPackItem packItem : documentPack.getPackItems()) {
+                packItem.setPack(documentPack);
+                packItem.setPosition(packItemPosition);
+
+                packItemPosition++;
+            }
+        }
+        return priceOffer;
     }
 }

@@ -1,4 +1,4 @@
-package com.data.dataxer.Enums;
+package com.data.dataxer.models.enums;
 
 public enum DocumentType {
     PRICE_OFFER,
