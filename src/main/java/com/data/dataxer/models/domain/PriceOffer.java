@@ -22,8 +22,8 @@ public class PriceOffer extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(mappedBy = "priceOffer", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    List<PriceOfferPack> packs = new ArrayList<>();
+    @OneToMany(mappedBy = "documentPackId", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY )
+    List<DocumentPack> packs = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")

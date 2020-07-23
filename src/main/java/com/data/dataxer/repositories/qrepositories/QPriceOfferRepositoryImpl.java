@@ -1,6 +1,10 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QDocument;
+import com.data.dataxer.models.domain.QDocumentPack;
+import com.data.dataxer.models.domain.QDocumentPackItem;
+import com.data.dataxer.models.domain.QPriceOffer;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -42,42 +46,30 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     @Override
     public Optional<PriceOffer> getById(Long id, List<Long> companyIds) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-        QPriceOfferPack qPriceOfferPack = QPriceOfferPack.priceOfferPack;
+        QDocumentPack qDocumentPack = QDocumentPack.documentPack;
 
         PriceOffer priceOffer = query.selectFrom(qPriceOffer)
                 .leftJoin(qPriceOffer.contact).fetchJoin()
-                .leftJoin(qPriceOffer.packs, qPriceOfferPack).fetchJoin()
+                .leftJoin(qPriceOffer.packs, qDocumentPack).fetchJoin()
                 .where(qPriceOffer.id.eq(id))
-                .orderBy(qPriceOfferPack.position.asc())
+                .orderBy(qDocumentPack.position.asc())
                 .fetchOne();
 
         // price offer pack set items
-        if (priceOffer != null)
+        if (priceOffer != null){
             priceOfferPackSetItems(priceOffer);
+        }
 
         return Optional.ofNullable(priceOffer);
     }
 
-    // set price offer pack and pack items
+    //WIP
     private void priceOfferPackSetItems(PriceOffer priceOffer) {
-        QPriceOfferPackItem qPriceOfferPackItem = QPriceOfferPackItem.priceOfferPackItem;
-        QItem qItem = QItem.item;
+        QDocumentPackItem qDocumentPackItem = QDocumentPackItem.documentPackItem;
 
-        // get all pack items by pack id in
-        List<PriceOfferPackItem> priceOfferPackItems = query.selectFrom(qPriceOfferPackItem)
-                .where(QPriceOfferPackItem.priceOfferPackItem.priceOfferPack.id.in(priceOffer.getPacks().stream().map(PriceOfferPack::getId).collect(Collectors.toList())))
-                .leftJoin(qPriceOfferPackItem.item, qItem).fetchJoin()
-                .orderBy(qPriceOfferPackItem.position.asc())
+        List<DocumentPackItem> documentPackItems = query.selectFrom(qDocumentPackItem)
                 .fetch();
 
-
-        // price offer pack set items
-        priceOffer.getPacks().forEach(priceOfferPack -> {
-            priceOfferPack.setItems(
-                    priceOfferPackItems.stream().filter(
-                            priceOfferPackItem -> priceOfferPackItem.getPriceOfferPack().getId().equals(priceOfferPack.getId())).collect(Collectors.toList())
-            );
-        });
     }
 
     @Override

@@ -1,8 +1,6 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.PriceOffer;
-import com.data.dataxer.models.domain.PriceOfferPack;
-import com.data.dataxer.models.domain.PriceOfferPackItem;
+import com.data.dataxer.models.domain.*;
 import com.data.dataxer.repositories.PriceOfferRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -30,20 +28,20 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     private PriceOffer setPriceOfferPackAndItems(PriceOffer priceOffer) {
         int packPosition = 0;
 
-        for (PriceOfferPack priceOfferPack : priceOffer.getPacks()) {
-            priceOfferPack.setPriceOffer(priceOffer);
-            priceOfferPack.setPosition(packPosition);
+        for(DocumentPack documentPack : priceOffer.getPacks()) {
+            documentPack.getDocument().setDocumentId(priceOffer.getId());
+            documentPack.setPosition(packPosition);
             packPosition++;
 
             int packItemPosition = 0;
-            for (PriceOfferPackItem priceOfferPackItem : priceOfferPack.getItems()) {
-                priceOfferPackItem.setPriceOfferPack(priceOfferPack);
-                priceOfferPackItem.setPosition(packItemPosition);
+
+            for(DocumentPackItem packItem : documentPack.getPackItems()) {
+                packItem.setPack(documentPack);
+                packItem.setPosition(packItemPosition);
 
                 packItemPosition++;
             }
         }
-
         return priceOffer;
     }
 
