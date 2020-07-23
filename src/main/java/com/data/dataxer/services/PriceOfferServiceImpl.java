@@ -1,5 +1,6 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.Enums.DocumentType;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.repositories.PriceOfferRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
@@ -30,6 +31,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
         for(DocumentPack documentPack : priceOffer.getPacks()) {
             documentPack.setDocumentId(priceOffer.getId());
+            documentPack.setType(DocumentType.PRICE_OFFER);
             documentPack.setPosition(packPosition);
             packPosition++;
 

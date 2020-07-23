@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.Enums.DocumentType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,7 +22,7 @@ public class DocumentPack implements Serializable {
     @Column(nullable = false)
     private Long documentId;
 
-    private String type;
+    private Enum<DocumentType> type;
 
     @OneToMany(mappedBy = "pack", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPackItem> packItems = new ArrayList<>();
