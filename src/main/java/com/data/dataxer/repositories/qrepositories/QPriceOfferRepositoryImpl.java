@@ -4,7 +4,9 @@ import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QDocument;
 import com.data.dataxer.models.domain.QDocumentPack;
 import com.data.dataxer.models.domain.QDocumentPackItem;
+import com.data.dataxer.models.domain.QItem;
 import com.data.dataxer.models.domain.QPriceOffer;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -63,13 +65,22 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         return Optional.ofNullable(priceOffer);
     }
 
-    //WIP
     private void priceOfferPackSetItems(PriceOffer priceOffer) {
         QDocumentPackItem qDocumentPackItem = QDocumentPackItem.documentPackItem;
+        QItem qItem = QItem.item;
 
-        List<DocumentPackItem> documentPackItems = query.selectFrom(qDocumentPackItem)
+        List<DocumentPackItem> priceOfferPackItems = query.selectFrom(qDocumentPackItem)
+                .where(qDocumentPackItem.pack.documentPackId.in(priceOffer.getPacks().stream().map(DocumentPack::getDocumentPackId).collect(Collectors.toList())))
+                .leftJoin(qDocumentPackItem.item, qItem).fetchJoin()
+                .orderBy(qDocumentPackItem.position.asc())
                 .fetch();
 
+
+        // price offer pack set items
+        priceOffer.getPacks().forEach(documentPack -> documentPack.setPackItems(
+                priceOfferPackItems.stream().filter(
+                        priceOfferPackItem -> priceOfferPackItem.getPack().getDocumentPackId().equals(documentPack.getDocumentPackId())).collect(Collectors.toList())
+                ));
     }
 
     @Override

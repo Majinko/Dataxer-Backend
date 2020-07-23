@@ -1,7 +1,7 @@
 package com.data.dataxer.mappers;
 
+import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.PriceOffer;
-import com.data.dataxer.models.domain.PriceOfferPackItem;
 import com.data.dataxer.models.dto.PriceOfferDTO;
 import com.data.dataxer.models.dto.PriceOfferPackItemDTO;
 import org.mapstruct.Mapper;
@@ -18,5 +18,5 @@ public interface PriceOfferMapper {
 
     @Mapping(target = "item.category", ignore = true)
     @Mapping(target = "item.supplier", ignore = true)
-    PriceOfferPackItemDTO priceOfferPackItemToPriceOfferPackItem(PriceOfferPackItem priceOfferPackItem);
+    PriceOfferPackItemDTO priceOfferPackItemToPriceOfferPackItem(DocumentPackItem documentPackItem);
 }
