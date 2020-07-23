@@ -29,7 +29,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         int packPosition = 0;
 
         for(DocumentPack documentPack : priceOffer.getPacks()) {
-            documentPack.getDocument().setDocumentId(priceOffer.getId());
+            documentPack.setDocumentId(priceOffer.getId());
             documentPack.setPosition(packPosition);
             packPosition++;
 

@@ -18,8 +18,10 @@ public class DocumentPack implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long documentPackId;
 
-    @ManyToOne
-    Document document;
+    @Column(nullable = false)
+    private Long documentId;
+
+    private String type;
 
     @OneToMany(mappedBy = "pack", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPackItem> packItems = new ArrayList<>();
