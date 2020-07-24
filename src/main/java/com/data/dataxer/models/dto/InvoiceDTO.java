@@ -1,5 +1,6 @@
 package com.data.dataxer.models.dto;
 
+import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,7 +17,7 @@ public class InvoiceDTO {
     private Long invoiceId;
     private String title;
     private String number;
-    private String state;
+    private DocumentState.InvoiceStates state;
     private String note;
     private BigDecimal priceWithoutTax;
     private Map<String, Object> invoiceData;

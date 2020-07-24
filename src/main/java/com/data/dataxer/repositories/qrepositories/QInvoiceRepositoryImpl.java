@@ -5,6 +5,7 @@ import com.data.dataxer.models.domain.QDocumentPack;
 import com.data.dataxer.models.domain.QDocumentPackItem;
 import com.data.dataxer.models.domain.QInvoice;
 import com.data.dataxer.models.domain.QItem;
+import com.data.dataxer.models.enums.DocumentState;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -65,6 +66,11 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(qInvoice.invoiceId.eq(id))
                 .where(qInvoice.company.id.in(companyIds))
                 .fetchOne());
+    }
+
+    @Override
+    public Page<Invoice> getByState(Pageable pageable, DocumentState.InvoiceStates state, List<Long> companyIds) {
+        return null;
     }
 
     private Long total() {

@@ -32,6 +32,11 @@ public class InvoiceController {
         this.invoiceService.update(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
     }
 
+    @PostMapping("/changeState")
+    public void changeState(@RequestBody InvoiceDTO invoiceDTO) {
+        this.invoiceService.changeState(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
+    }
+
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
     public ResponseEntity<Page<InvoiceDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -45,6 +50,20 @@ public class InvoiceController {
     @GetMapping("/{id}")
     public ResponseEntity<InvoiceDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.getById(id)));
+    }
+
+    /**
+     * docasna verzia loadu invoicov podla stavu
+     */
+    @RequestMapping(value = "/getAllByState", method = RequestMethod.GET)
+    public ResponseEntity<Page<InvoiceDTO>> getByState(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "15") int size,
+            @RequestParam(value = "state", defaultValue = "approved") String state
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+
+        return ResponseEntity.ok(this.invoiceService.getByState(pageable, state).map(invoiceMapper::invoiceToInvoiceDTOSimple));
     }
 
     @GetMapping("/destroy/{id}")

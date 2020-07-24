@@ -1,6 +1,7 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.mappers.HashMapConverter;
+import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -38,7 +39,7 @@ public class Invoice extends  BaseEntity{
     @Column(nullable = false)
     private String number;
 
-    private String state;
+    private DocumentState.InvoiceStates state;
 
     @Column(columnDefinition = "text")
     private String note;

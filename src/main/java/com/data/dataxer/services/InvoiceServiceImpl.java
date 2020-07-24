@@ -3,6 +3,7 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
@@ -56,8 +57,20 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    public Page<Invoice> getByState(Pageable pageable, String state) {
+        return this.qInvoiceRepository.getByState(pageable, DocumentState.InvoiceStates.getStateByCode(state), SecurityUtils.companyIds());
+    }
+
+    @Override
     public void destroy(Long id) {
         this.invoiceRepository.delete(this.getByIdSimple(id));
+    }
+
+    @Override
+    public void changeState(Invoice invoice) {
+        this.qInvoiceRepository.getByIdSimple(invoice.getInvoiceId(), SecurityUtils.companyIds())
+                .orElseThrow(() -> new RuntimeException("Invoice not found"))
+                .setState(invoice.getState());
     }
 
     private Invoice setInvoicePackAndItems(Invoice invoice) {

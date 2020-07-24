@@ -16,5 +16,9 @@ public interface InvoiceService {
 
     Invoice getByIdSimple(Long id);
 
+    Page<Invoice> getByState(Pageable pageable, String state);
+
     void destroy(Long id);
+
+    void changeState(Invoice invoice);
 }
