@@ -73,6 +73,11 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .setState(invoice.getState());
     }
 
+    @Override
+    public Page<Invoice> getByClient(Pageable pageable, Long contactId) {
+        return this.qInvoiceRepository.getByClient(pageable, contactId, SecurityUtils.companyIds());
+    }
+
     private Invoice setInvoicePackAndItems(Invoice invoice) {
         int packPosition = 0;
 

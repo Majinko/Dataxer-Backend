@@ -44,7 +44,9 @@ public class Invoice extends  BaseEntity{
     @Column(columnDefinition = "text")
     private String note;
 
-    private BigDecimal priceWithoutTax;
+    private BigDecimal price;
+
+    private BigDecimal priceTotal;
 
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)

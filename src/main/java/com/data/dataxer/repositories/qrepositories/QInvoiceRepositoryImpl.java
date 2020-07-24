@@ -70,7 +70,32 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
     @Override
     public Page<Invoice> getByState(Pageable pageable, DocumentState.InvoiceStates state, List<Long> companyIds) {
-        return null;
+        QInvoice qInvoice = QInvoice.invoice;
+
+
+        List<Invoice> invoices = query.selectFrom(qInvoice)
+                .leftJoin(qInvoice.contact).fetchJoin()
+                .where(qInvoice.state.eq(state))
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .orderBy(qInvoice.invoiceId.desc())
+                .fetch();
+
+        return new PageImpl<Invoice>(invoices, pageable, total());
+    }
+
+    @Override
+    public Page<Invoice> getByClient(Pageable pageable, Long contactId, List<Long> companyIds) {
+        QInvoice qInvoice = QInvoice.invoice;
+
+        List<Invoice> invoices = query.selectFrom(qInvoice)
+                .leftJoin(qInvoice.contact).fetchJoin()
+                .where(qInvoice.contact.id.eq(contactId))
+                .limit(pageable.getPageSize())
+                .offset(pageable.getOffset())
+                .orderBy(qInvoice.invoiceId.desc())
+                .fetch();
+        return new PageImpl<Invoice>(invoices, pageable, total());
     }
 
     private Long total() {

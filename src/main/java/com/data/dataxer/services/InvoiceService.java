@@ -18,6 +18,8 @@ public interface InvoiceService {
 
     Page<Invoice> getByState(Pageable pageable, String state);
 
+    Page<Invoice> getByClient(Pageable pageable, Long contactId);
+
     void destroy(Long id);
 
     void changeState(Invoice invoice);

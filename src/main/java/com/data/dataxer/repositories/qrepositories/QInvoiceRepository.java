@@ -18,4 +18,5 @@ public interface QInvoiceRepository {
 
     Page<Invoice> getByState(Pageable pageable, DocumentState.InvoiceStates state, List<Long> companyIds);
 
+    Page<Invoice> getByClient(Pageable pageable, Long contactId, List<Long> companyIds);
 }

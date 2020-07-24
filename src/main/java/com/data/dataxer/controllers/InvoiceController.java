@@ -61,9 +61,21 @@ public class InvoiceController {
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "state", defaultValue = "approved") String state
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("invoiceId")));
 
-        return ResponseEntity.ok(this.invoiceService.getByState(pageable, state).map(invoiceMapper::invoiceToInvoiceDTOSimple));
+        return ResponseEntity.ok(this.invoiceService.getByState(pageable, state).map(this.invoiceMapper::invoiceToInvoiceDTOSimple));
+    }
+
+    @RequestMapping(value = "/getAllByClient", method = RequestMethod.GET)
+    public ResponseEntity<Page<InvoiceDTO>> getByClient(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "15") int size,
+            @RequestParam(value = "contactId") Long contactId
+    ) {
+        // TO-DO: podla coho chceme zoradit - datumu vytvorenia?
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdDate")));
+
+        return ResponseEntity.ok(this.invoiceService.getByClient(pageable, contactId).map(this.invoiceMapper::invoiceToInvoiceDTOSimple));
     }
 
     @GetMapping("/destroy/{id}")
