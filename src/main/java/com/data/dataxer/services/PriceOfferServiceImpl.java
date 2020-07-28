@@ -24,14 +24,16 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     public void store(PriceOffer priceOffer) {
         PriceOffer p = this.setPriceOfferPackAndItems(priceOffer);
 
-        this.priceOfferRepository.save(p);
+        p = this.priceOfferRepository.save(p);
+        this.setPriceOfferDocumentId(p);
     }
 
     @Override
     public void update(PriceOffer priceOffer) {
         PriceOffer p = this.setPriceOfferPackAndItems(priceOffer);
 
-        this.priceOfferRepository.save(p);
+        p = this.priceOfferRepository.save(p);
+        this.setPriceOfferDocumentId(p);
     }
 
     @Override
@@ -62,7 +64,6 @@ public class PriceOfferServiceImpl implements PriceOfferService {
         int packPosition = 0;
 
         for(DocumentPack documentPack : priceOffer.getPacks()) {
-            documentPack.setDocumentId(priceOffer.getId());
             documentPack.setType(DocumentType.PRICE_OFFER);
             documentPack.setPosition(packPosition);
             packPosition++;
@@ -77,5 +78,11 @@ public class PriceOfferServiceImpl implements PriceOfferService {
             }
         }
         return priceOffer;
+    }
+
+    private void setPriceOfferDocumentId(PriceOffer priceOffer) {
+        for (DocumentPack documentPack : priceOffer.getPacks()) {
+            documentPack.setDocumentId(priceOffer.getId());
+        }
     }
 }
