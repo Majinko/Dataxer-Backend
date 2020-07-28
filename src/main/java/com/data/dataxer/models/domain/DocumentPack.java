@@ -14,10 +14,9 @@ import java.util.List;
 @Setter
 @Getter
 public class DocumentPack implements Serializable {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long documentPackId;
+    private Long id;
 
     @Column(nullable = false)
     private Long documentId;

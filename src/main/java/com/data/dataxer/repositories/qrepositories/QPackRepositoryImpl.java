@@ -39,7 +39,7 @@ public class QPackRepositoryImpl implements QPackRepository {
         return query.selectFrom(qPack)
                 .where(qPack.company.id.in(companyIds))
                 .where(qPack.id.eq(id))
-                .leftJoin(qPack.items, qPackItem).fetchJoin()
+                .leftJoin(qPack.packItems, qPackItem).fetchJoin()
                 .leftJoin(qPackItem.item, qItem).fetchJoin()
                 .leftJoin(qItem.itemPrices, qItemPrice).fetchJoin()
                 .fetchOne();

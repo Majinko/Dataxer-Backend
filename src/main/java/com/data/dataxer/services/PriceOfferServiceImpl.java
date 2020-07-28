@@ -46,6 +46,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
                 packItemPosition++;
             }
         }
+
         return priceOffer;
     }
 

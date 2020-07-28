@@ -83,7 +83,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         QItem qItem = QItem.item;
 
         List<DocumentPackItem> priceOfferPackItems = query.selectFrom(qDocumentPackItem)
-                .where(qDocumentPackItem.pack.documentPackId.in(priceOffer.getPacks().stream().map(DocumentPack::getDocumentPackId).collect(Collectors.toList())))
+                .where(qDocumentPackItem.pack.id.in(priceOffer.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
                 .leftJoin(qDocumentPackItem.item, qItem).fetchJoin()
                 .orderBy(qDocumentPackItem.position.asc())
                 .fetch();
@@ -91,7 +91,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         // price offer pack set items
         priceOffer.getPacks().forEach(documentPack -> documentPack.setPackItems(
                 priceOfferPackItems.stream().filter(
-                        priceOfferPackItem -> priceOfferPackItem.getPack().getDocumentPackId().equals(documentPack.getDocumentPackId())).collect(Collectors.toList())
+                        priceOfferPackItem -> priceOfferPackItem.getPack().getId().equals(documentPack.getId())).collect(Collectors.toList())
         ));
     }
 

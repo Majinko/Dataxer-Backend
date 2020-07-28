@@ -1,6 +1,5 @@
 package com.data.dataxer.models.dto;
 
-import com.data.dataxer.Enums.DocumentType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,9 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class DocumentPackDTO {
-    private Long documentPackId;
-    private Long documentId;
-    private Enum<DocumentType> type;
+    private Long id;
     List<DocumentPackItemDTO> packItems = new ArrayList<>();
     Integer position;
     String title;
