@@ -9,6 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 @Service
 public class PriceOfferServiceImpl implements PriceOfferService {
     private final PriceOfferRepository priceOfferRepository;
@@ -55,8 +57,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public Page<PriceOffer> paginate(Pageable pageable) {
-        return this.qPriceOfferRepository.paginate(pageable, SecurityUtils.companyIds());
+    public Page<PriceOffer> paginate(Pageable pageable, Map<String, String> filter) {
+        return this.qPriceOfferRepository.paginate(pageable, filter, SecurityUtils.companyIds());
     }
 
     @Override

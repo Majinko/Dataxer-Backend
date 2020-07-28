@@ -5,12 +5,14 @@ import com.google.common.io.Files;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.Map;
+
 public interface PriceOfferService {
     void store(PriceOffer priceOffer);
 
     void update(PriceOffer priceOffer);
 
-    Page<PriceOffer> paginate(Pageable pageable);
+    Page<PriceOffer> paginate(Pageable pageable, Map<String, String> filter);
 
     PriceOffer getById(Long id);
 
