@@ -109,13 +109,13 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
          QItem qItem = QItem.item;
 
          List<DocumentPackItem> invoicePackItems = query.selectFrom(qDocumentPackItem)
-                 .where(qDocumentPackItem.pack.documentPackId.in(invoice.getPacks().stream().map(DocumentPack::getDocumentPackId).collect(Collectors.toList())))
+                 .where(qDocumentPackItem.pack.id.in(invoice.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
                  .leftJoin(qDocumentPackItem.item, qItem).fetchJoin()
                  .orderBy(qDocumentPackItem.position.asc())
                  .fetch();
          invoice.getPacks().forEach(documentPack -> documentPack.setPackItems(
                  invoicePackItems.stream().filter(
-                         invoicePackItem -> invoicePackItem.getPack().getDocumentPackId().equals(documentPack.getDocumentPackId())).collect(Collectors.toList())
+                         invoicePackItem -> invoicePackItem.getPack().getId().equals(documentPack.getId())).collect(Collectors.toList())
          ));
     }
 }
