@@ -18,7 +18,6 @@ public class DocumentPack implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
     private Long documentId;
 
     private Enum<DocumentType> type;

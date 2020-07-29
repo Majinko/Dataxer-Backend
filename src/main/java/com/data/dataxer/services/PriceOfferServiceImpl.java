@@ -8,6 +8,7 @@ import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
@@ -22,16 +23,17 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
+    @Transactional
     public void store(PriceOffer priceOffer) {
-        PriceOffer p = this.setPriceOfferPackAndItems(priceOffer);
+        PriceOffer p = this.priceOfferRepository.save(priceOffer);
 
-        this.priceOfferRepository.save(p);
+        this.setPriceOfferPackAndItems(p);
     }
 
     private PriceOffer setPriceOfferPackAndItems(PriceOffer priceOffer) {
         int packPosition = 0;
 
-        for(DocumentPack documentPack : priceOffer.getPacks()) {
+        for (DocumentPack documentPack : priceOffer.getPacks()) {
             documentPack.setDocumentId(priceOffer.getId());
             documentPack.setType(DocumentType.PRICE_OFFER);
             documentPack.setPosition(packPosition);
@@ -39,7 +41,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
             int packItemPosition = 0;
 
-            for(DocumentPackItem packItem : documentPack.getPackItems()) {
+            for (DocumentPackItem packItem : documentPack.getPackItems()) {
                 packItem.setPack(documentPack);
                 packItem.setPosition(packItemPosition);
 
