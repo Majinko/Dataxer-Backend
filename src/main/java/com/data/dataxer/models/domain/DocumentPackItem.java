@@ -12,14 +12,13 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class DocumentPackItem implements Serializable {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long documentPackItemId;
+    private Long id;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "document_pack_id", referencedColumnName = "documentPackId")
+    @JoinColumn(name = "document_pack_id", referencedColumnName = "id")
     DocumentPack pack;
 
     @OneToOne(fetch = FetchType.LAZY)

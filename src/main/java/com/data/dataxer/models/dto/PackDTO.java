@@ -10,5 +10,5 @@ import java.util.List;
 public class PackDTO {
     private Long id;
     private String title;
-    private List<PackItemDTO> items;
+    private List<PackItemDTO> packItems;
 }

@@ -8,8 +8,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class DocumentPackItemDTO {
-    private Long documentPackItemId;
-    private DocumentPackDTO pack;
+    private Long id;
     private ItemDTO item;
     private Float qty;
     private String title;

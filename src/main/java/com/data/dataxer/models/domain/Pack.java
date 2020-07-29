@@ -18,5 +18,5 @@ public class Pack extends BaseEntity {
     private String title;
 
     @OneToMany(mappedBy = "pack", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Set<PackItem> items = new HashSet<>();
+    Set<PackItem> packItems = new HashSet<>();
 }
