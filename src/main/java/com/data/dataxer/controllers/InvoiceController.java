@@ -40,11 +40,13 @@ public class InvoiceController {
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
     public ResponseEntity<Page<InvoiceDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "15") int size
+            @RequestParam(value = "size", defaultValue = "15") int size,
+            @RequestParam(value = "filter", defaultValue = "") String filter,
+            @RequestParam(value = "sort", defaultValue = "id") String sortColumn
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
 
-        return ResponseEntity.ok(invoiceService.paginate(pageable).map(invoiceMapper::invoiceToInvoiceDTOSimple));
+        return ResponseEntity.ok(invoiceService.paginate(pageable, filter).map(invoiceMapper::invoiceToInvoiceDTOSimple));
     }
 
     @GetMapping("/{id}")
@@ -52,28 +54,14 @@ public class InvoiceController {
         return ResponseEntity.ok(invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.getById(id)));
     }
 
-    /**
-     * docasna verzia loadu invoicov podla stavu
-     */
-    @RequestMapping(value = "/getAllByState", method = RequestMethod.GET)
-    public ResponseEntity<Page<InvoiceDTO>> getByState(
-            @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "state", defaultValue = "approved") String state
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("invoiceId")));
-
-        return ResponseEntity.ok(this.invoiceService.getByState(pageable, state).map(this.invoiceMapper::invoiceToInvoiceDTOSimple));
-    }
-
     @RequestMapping(value = "/getAllByClient", method = RequestMethod.GET)
     public ResponseEntity<Page<InvoiceDTO>> getByClient(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "contactId") Long contactId
+            @RequestParam(value = "contactId") Long contactId,
+            @RequestParam(value = "sort", defaultValue = "id") String sortColumn
     ) {
-        // TO-DO: podla coho chceme zoradit - datumu vytvorenia?
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdDate")));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
 
         return ResponseEntity.ok(this.invoiceService.getByClient(pageable, contactId).map(this.invoiceMapper::invoiceToInvoiceDTOSimple));
     }

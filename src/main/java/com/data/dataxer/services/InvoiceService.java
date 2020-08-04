@@ -10,13 +10,11 @@ public interface InvoiceService {
 
     void update(Invoice invoice);
 
-    Page<Invoice> paginate(Pageable pageable);
+    Page<Invoice> paginate(Pageable pageable, String filter);
 
     Invoice getById(Long id);
 
     Invoice getByIdSimple(Long id);
-
-    Page<Invoice> getByState(Pageable pageable, String state);
 
     Page<Invoice> getByClient(Pageable pageable, Long contactId);
 

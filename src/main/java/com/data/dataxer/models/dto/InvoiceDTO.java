@@ -14,7 +14,7 @@ import java.util.Map;
 @Getter
 @Setter
 public class InvoiceDTO {
-    private Long invoiceId;
+    private Long id;
     private String title;
     private String number;
     private DocumentState.InvoiceStates state;

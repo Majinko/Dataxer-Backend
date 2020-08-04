@@ -1,11 +1,13 @@
 package com.data.dataxer.repositories.qrepositories;
 
+import com.data.dataxer.filters.Filter;
+import com.data.dataxer.filters.SearchableDates;
+import com.data.dataxer.filters.SearchableDecimals;
+import com.data.dataxer.filters.SearchableStrings;
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QDocumentPack;
-import com.data.dataxer.models.domain.QDocumentPackItem;
-import com.data.dataxer.models.domain.QInvoice;
-import com.data.dataxer.models.domain.QItem;
-import com.data.dataxer.models.enums.DocumentState;
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -13,6 +15,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -27,14 +31,22 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable, List<Long> companyIds) {
+    public Page<Invoice> paginate(Pageable pageable, String filter, List<Long> companyIds) {
         QInvoice qInvoice = QInvoice.invoice;
+        BooleanOperation filterCondition = null;
+
+        if (!filter.isEmpty()) {
+            Filter invoicesFilter = new Filter(filter);
+            filterCondition = this.buildFilteredResult(invoicesFilter);
+        }
+
 
         List<Invoice> invoices = query.selectFrom(qInvoice)
                 .leftJoin(qInvoice.contact).fetchJoin()
+                .where(filterCondition)
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
-                .orderBy(qInvoice.invoiceId.desc())
+                .orderBy(qInvoice.id.desc())
                 .fetch();
 
         return new PageImpl<Invoice>(invoices, pageable, total());
@@ -48,7 +60,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         Invoice invoice = query.selectFrom(qInvoice)
                 .leftJoin(qInvoice.contact).fetchJoin()
                 .leftJoin(qInvoice.packs, qDocumentPack).fetchJoin()
-                .where(qInvoice.invoiceId.eq(id))
+                .where(qInvoice.id.eq(id))
                 .orderBy(qDocumentPack.position.asc())
                 .fetchOne();
 
@@ -63,25 +75,9 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         QInvoice qInvoice = QInvoice.invoice;
 
         return Optional.ofNullable(query.selectFrom(qInvoice)
-                .where(qInvoice.invoiceId.eq(id))
+                .where(qInvoice.id.eq(id))
                 .where(qInvoice.company.id.in(companyIds))
                 .fetchOne());
-    }
-
-    @Override
-    public Page<Invoice> getByState(Pageable pageable, DocumentState.InvoiceStates state, List<Long> companyIds) {
-        QInvoice qInvoice = QInvoice.invoice;
-
-
-        List<Invoice> invoices = query.selectFrom(qInvoice)
-                .leftJoin(qInvoice.contact).fetchJoin()
-                .where(qInvoice.state.eq(state))
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .orderBy(qInvoice.invoiceId.desc())
-                .fetch();
-
-        return new PageImpl<Invoice>(invoices, pageable, total());
     }
 
     @Override
@@ -93,7 +89,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(qInvoice.contact.id.eq(contactId))
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
-                .orderBy(qInvoice.invoiceId.desc())
+                .orderBy(qInvoice.id.desc())
                 .fetch();
         return new PageImpl<Invoice>(invoices, pageable, total());
     }
@@ -117,5 +113,34 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                  invoicePackItems.stream().filter(
                          invoicePackItem -> invoicePackItem.getPack().getId().equals(documentPack.getId())).collect(Collectors.toList())
          ));
+    }
+
+    //ak funguje presunut do Filter classy -> zglobalizovanie
+    //Mozny TO-DO: poriesit co ak je tam nieco co nie je searchable (nepadne do ziadnej vetvy)
+    private BooleanOperation buildFilteredResult(Filter filter) throws RuntimeException {
+        Path<Invoice> invoice = Expressions.path(Invoice.class, "invoice");
+
+        if (SearchableStrings.isSearchableString(filter.getColumnId())) {
+            Path<String> stringBase = Expressions.path(String.class, invoice, filter.getColumnId());
+            Expression<String> value = Expressions.constant(filter.getValues().get(0));
+            return Expressions.predicate(filter.resolveOperator(), stringBase, value);
+        } else if (SearchableDecimals.isSearchableString(filter.getColumnId())) {
+            Path<BigDecimal> bigDecimalBase = Expressions.path(BigDecimal.class, invoice, filter.getColumnId());
+            Expression<BigDecimal> value = Expressions.constant(new BigDecimal(filter.getValues().get(0)));
+            if (filter.getValues().size() > 1) {
+                Expression<BigDecimal> value2 = Expressions.constant(new BigDecimal(filter.getValues().get(1)));
+                return Expressions.predicate(filter.resolveOperator(), bigDecimalBase, value, value2);
+            }
+            return Expressions.predicate(filter.resolveOperator(), bigDecimalBase, value);
+        } else if (SearchableDates.isSearchableString(filter.getColumnId())) {
+            Path<LocalDate> dateBase = Expressions.path(LocalDate.class, invoice, filter.getColumnId());
+            Expression<LocalDate> value = Expressions.constant(LocalDate.parse(filter.getValues().get(0)));
+            if (filter.getValues().size() > 1) {
+                Expression<LocalDate> value2 = Expressions.constant(LocalDate.parse(filter.getValues().get(1)));
+                return Expressions.predicate(filter.resolveOperator(), dateBase, value, value2);
+            }
+            return Expressions.predicate(filter.resolveOperator(), dateBase, value);
+        }
+        throw new RuntimeException("Not valid filter!");
     }
 }

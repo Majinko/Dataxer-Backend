@@ -3,7 +3,6 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
-import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
@@ -38,8 +37,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable) {
-        return this.qInvoiceRepository.paginate(pageable, SecurityUtils.companyIds());
+    public Page<Invoice> paginate(Pageable pageable, String filter) {
+        return this.qInvoiceRepository.paginate(pageable, filter, SecurityUtils.companyIds());
     }
 
     @Override
@@ -57,18 +56,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Page<Invoice> getByState(Pageable pageable, String state) {
-        return this.qInvoiceRepository.getByState(pageable, DocumentState.InvoiceStates.getStateByCode(state), SecurityUtils.companyIds());
-    }
-
-    @Override
     public void destroy(Long id) {
         this.invoiceRepository.delete(this.getByIdSimple(id));
     }
 
     @Override
     public void changeState(Invoice invoice) {
-        this.qInvoiceRepository.getByIdSimple(invoice.getInvoiceId(), SecurityUtils.companyIds())
+        this.qInvoiceRepository.getByIdSimple(invoice.getId(), SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"))
                 .setState(invoice.getState());
     }
@@ -82,7 +76,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         int packPosition = 0;
 
         for(DocumentPack documentPack : invoice.getPacks()) {
-            documentPack.setDocumentId(invoice.getInvoiceId());
+            documentPack.setDocumentId(invoice.getId());
             documentPack.setType(DocumentType.INVOICE);
             documentPack.setPosition(packPosition);
             packPosition++;

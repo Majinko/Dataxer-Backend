@@ -10,13 +10,11 @@ import java.util.Optional;
 
 public interface QInvoiceRepository {
 
-    Page<Invoice> paginate(Pageable pageable, List<Long> companyIds);
+    Page<Invoice> paginate(Pageable pageable, String filter, List<Long> companyIds);
 
     Optional<Invoice> getById(Long id, List<Long> companyIds);
 
     Optional<Invoice> getByIdSimple(Long id, List<Long> companyIds);
-
-    Page<Invoice> getByState(Pageable pageable, DocumentState.InvoiceStates state, List<Long> companyIds);
 
     Page<Invoice> getByClient(Pageable pageable, Long contactId, List<Long> companyIds);
 }

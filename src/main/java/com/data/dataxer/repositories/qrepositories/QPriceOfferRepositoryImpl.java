@@ -104,4 +104,6 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .where(qPriceOffer.company.id.in(companyIds))
                 .fetchOne());
     }
+
+
 }

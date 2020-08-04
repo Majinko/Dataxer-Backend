@@ -24,7 +24,7 @@ public class Invoice extends  BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long invoiceId;
+    private Long id;
 
     @OneToMany(mappedBy = "documentPackId", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY )
     List<DocumentPack> packs = new ArrayList<>();
