@@ -10,6 +10,7 @@ import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
@@ -23,10 +24,11 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public void store(Invoice invoice) {
-        Invoice invoiceUpdated = this.setInvoicePackAndItems(invoice);
+        Invoice i = this.invoiceRepository.save(invoice);
 
-        this.invoiceRepository.save(invoiceUpdated);
+        this.setInvoicePackAndItems(i);
     }
 
     @Override
