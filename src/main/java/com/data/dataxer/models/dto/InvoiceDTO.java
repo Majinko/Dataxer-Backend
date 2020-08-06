@@ -19,7 +19,8 @@ public class InvoiceDTO {
     private String number;
     private DocumentState.InvoiceStates state;
     private String note;
-    private BigDecimal priceWithoutTax;
+    private BigDecimal price;
+    private BigDecimal priceTotal;
     private Map<String, Object> invoiceData;
     private LocalDate createdDate;
     private LocalDate deliveryDate;

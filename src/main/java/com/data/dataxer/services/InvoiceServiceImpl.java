@@ -1,5 +1,6 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
@@ -7,6 +8,7 @@ import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.google.api.client.json.Json;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -39,7 +41,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable, String filter) {
+    public Page<Invoice> paginate(Pageable pageable, Filter filter) {
         return this.qInvoiceRepository.paginate(pageable, filter, SecurityUtils.companyIds());
     }
 

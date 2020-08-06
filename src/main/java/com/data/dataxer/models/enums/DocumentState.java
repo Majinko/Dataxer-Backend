@@ -16,6 +16,10 @@ public class DocumentState {
             return  InvoiceStates.valueOf(stateCode);
         }
 
+        public String getStateCode() {
+            return this.stateCode;
+        }
+
         @Override
         public String toString() {
             return this.stateCode;

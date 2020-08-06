@@ -1,8 +1,11 @@
 package com.data.dataxer.controllers;
 
+import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.InvoiceMapper;
 import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.services.InvoiceService;
+import com.google.api.client.json.Json;
+import jdk.nashorn.api.scripting.JSObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -41,8 +44,8 @@ public class InvoiceController {
     public ResponseEntity<Page<InvoiceDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "filter", defaultValue = "") String filter,
-            @RequestParam(value = "sort", defaultValue = "id") String sortColumn
+            @RequestParam(value = "sort", defaultValue = "id") String sortColumn,
+            @RequestBody Filter filter
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
 
