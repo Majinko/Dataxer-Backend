@@ -45,7 +45,7 @@ public class InvoiceController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "sort", defaultValue = "id") String sortColumn,
-            @RequestBody Filter filter
+            @RequestBody(required = false) Filter filter
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
 

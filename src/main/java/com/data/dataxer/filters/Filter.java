@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -27,9 +28,9 @@ public class Filter {
     public static final String NOT_EQUAL = "NE";
     public static final String LIKE = "L";
 
-    private String columnId;
-    private String operator;
-    private List<String> values;
+    private String columnId = "";
+    private String operator = "";
+    private List<String> values = new ArrayList<>();
 
     private Ops resolveOperator() {
         switch (this.operator) {
@@ -51,6 +52,10 @@ public class Filter {
             default:
                 return Ops.EQ;
         }
+    }
+
+    public boolean isEmpty() {
+        return this.columnId.isEmpty() && this.operator.isEmpty() && this.values.isEmpty();
     }
 
     public BooleanBuilder buildFilterPredicate() throws RuntimeException {

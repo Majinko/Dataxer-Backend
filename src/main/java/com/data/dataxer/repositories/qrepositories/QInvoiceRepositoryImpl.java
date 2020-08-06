@@ -28,7 +28,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         QInvoice qInvoice = QInvoice.invoice;
         BooleanBuilder filterCondition = new BooleanBuilder();
 
-        if (filter != null) {
+        if (!filter.isEmpty()) {
             filterCondition = filter.buildFilterPredicate();
         }
 
