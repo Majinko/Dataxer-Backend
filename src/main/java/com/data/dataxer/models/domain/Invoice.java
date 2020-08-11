@@ -26,7 +26,7 @@ public class Invoice extends  BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY )
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPack> packs = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,5 +66,33 @@ public class Invoice extends  BaseEntity{
     private LocalDate dueDate;
 
     private LocalDateTime deletedAt;
+
+    public Invoice() {}
+    public Invoice(Invoice invoice) {
+        if (invoice.getPacks() != null && !invoice.getPacks().isEmpty()){
+            this.duplicatePacks(invoice.getPacks());
+        }
+        this.contact = invoice.getContact();
+        this.title = invoice.getTitle();
+        this.number = invoice.getNumber();
+        this.state = invoice.getState();
+        this.note = invoice.getNote();
+        this.price = invoice.getPrice();
+        this.priceTotal = invoice.getPriceTotal();
+        if (invoice.getInvoiceData() != null && !invoice.getInvoiceData().isEmpty()){
+            this.invoiceData.putAll(invoice.getInvoiceData());
+        }
+        this.createdDate = invoice.getCreatedDate();
+        this.deliveryDate = invoice.getDeliveryDate();
+        this.paymentDate = invoice.getPaymentDate();
+        this.dueDate = invoice.getDueDate();
+        this.deletedAt = invoice.getDeletedAt();
+    }
+
+    private void duplicatePacks(List<DocumentPack> packs) {
+        for (DocumentPack pack : packs) {
+            this.packs.add(new DocumentPack(pack));
+        }
+    }
 
 }

@@ -22,7 +22,7 @@ public class DocumentPack implements Serializable {
 
     private Enum<DocumentType> type;
 
-    @OneToMany(mappedBy = "pack", orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "pack", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPackItem> packItems = new ArrayList<>();
 
     Integer position;
@@ -32,5 +32,25 @@ public class DocumentPack implements Serializable {
     Integer tax;
 
     private BigDecimal totalPrice;
+
+    public DocumentPack() {}
+
+    public DocumentPack(DocumentPack pack) {
+        this.documentId = null;
+        this.type = pack.getType();
+        this.position = pack.getPosition();
+        this.title = pack.getTitle();
+        this.tax = pack.getTax();
+        this.totalPrice = pack.getTotalPrice();
+        if (pack.getPackItems() != null && !pack.getPackItems().isEmpty()) {
+            this.setDuplicatedDocumentPackItems(pack.getPackItems(), this);
+        }
+    }
+
+    private void setDuplicatedDocumentPackItems(List<DocumentPackItem> packItems, DocumentPack pack) {
+        for (DocumentPackItem packItem : packItems) {
+            this.packItems.add(new DocumentPackItem(packItem, pack));
+        }
+    }
 
 }

@@ -8,7 +8,6 @@ import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
-import com.google.api.client.json.Json;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -69,6 +68,15 @@ public class InvoiceServiceImpl implements InvoiceService {
         this.qInvoiceRepository.getByIdSimple(invoice.getId(), SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"))
                 .setState(invoice.getState());
+    }
+
+    @Transactional
+    @Override
+    public Invoice duplicate(Long id) {
+        Invoice originalInvoice = this.getById(id);
+        Invoice duplicatedInvoice = this.invoiceRepository.save(new Invoice(originalInvoice));
+        this.setInvoicePackAndItems(duplicatedInvoice);
+        return duplicatedInvoice;
     }
 
     @Override

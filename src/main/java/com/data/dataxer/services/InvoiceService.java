@@ -2,8 +2,6 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Invoice;
-import com.google.api.client.json.Json;
-import jdk.nashorn.api.scripting.JSObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,4 +22,6 @@ public interface InvoiceService {
     void destroy(Long id);
 
     void changeState(Invoice invoice);
+
+    Invoice duplicate(Long id);
 }

@@ -69,6 +69,11 @@ public class InvoiceController {
         return ResponseEntity.ok(this.invoiceService.getByClient(pageable, contactId).map(this.invoiceMapper::invoiceToInvoiceDTOSimple));
     }
 
+    @RequestMapping(value = "/duplicate/{id}", method = RequestMethod.POST)
+    public ResponseEntity<InvoiceDTO> duplicate(@PathVariable Long id) {
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.duplicate(id)));
+    }
+
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.invoiceService.destroy(id);
