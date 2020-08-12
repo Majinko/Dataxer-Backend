@@ -1,7 +1,7 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.Enums.DocumentType;
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.PriceOfferRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
