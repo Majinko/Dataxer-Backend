@@ -21,8 +21,10 @@ public class DocumentNumberGenerator extends BaseEntity {
     @Column(nullable = false)
     private String format;
 
+    @Enumerated(EnumType.STRING)
     private DocumentType type;
 
+    @Enumerated(EnumType.STRING)
     private Periods period;
 
     private Integer isDefault;
