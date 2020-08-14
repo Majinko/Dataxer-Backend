@@ -11,4 +11,6 @@ public interface DocumentNumberGeneratorMapper {
 
     DocumentNumberGeneratorDTO documentNumberGeneratorToDocumentNumberGeneratorDTO(DocumentNumberGenerator documentNumberGenerator);
 
+    DocumentNumberGeneratorDTO documentNumberGeneratorToDocumentNumberGeneratorDTOSimple(DocumentNumberGenerator documentNumberGenerator);
+
 }

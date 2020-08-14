@@ -19,4 +19,5 @@ public interface DocumentNumberGeneratorService {
 
     void destroy(Long id);
 
+    String generateNextNumber(Long id);
 }
