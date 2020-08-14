@@ -2,7 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
-import com.data.dataxer.models.enums.Periods;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.DocumentNumberGeneratorRepository;
 import com.data.dataxer.repositories.qrepositories.QDocumentNumberGeneratorRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -61,68 +61,134 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     public String generateNextNumber(Long id) {
         DocumentNumberGenerator documentNumberGenerator = this.getByIdSimple(id);
 
-        return this.generateNextDocumentNumber(documentNumberGenerator.getLastNumber(),
-                documentNumberGenerator.getFormat(), documentNumberGenerator.getPeriod());
+        return this.generateNextDocumentNumber(documentNumberGenerator);
     }
 
-    private String generateNextDocumentNumber(String lastNumber, String format, Periods period) {
-        switch(period) {
+    @Override
+    public String generateNextNumberByDocumentType(String documentType) {
+        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
+                .getByDocumentType(documentType, SecurityUtils.companyIds());
+        if (documentNumberGenerator == null) {
+            throw new RuntimeException("Number generator for given type not found");
+        }
+
+        return this.generateNextDocumentNumber(documentNumberGenerator);
+    }
+
+    private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator) {
+        LocalDate currentDate = LocalDate.now();
+        String generatedNumber = this.replaceYear(documentNumberGenerator.getFormat(), currentDate);
+        switch(documentNumberGenerator.getPeriod()) {
             case MONTHLY:
-                return this.generateNextDocumentNumberMonthly(lastNumber, format);
+                generatedNumber = this.replaceMonth(documentNumberGenerator.getFormat(), currentDate);
+                break;
             case QUARTER:
-                return this.generateNextDocumentNumberQuarter(lastNumber, format);
+                generatedNumber = this.replaceQuarter(documentNumberGenerator.getFormat(), currentDate);
+                break;
             case HALF_YEAR:
-                return this.generateNextDocumentNumberHalfYear(lastNumber, format);
+                generatedNumber = this.replaceHalfYear(documentNumberGenerator.getFormat(), currentDate);
+                break;
             case YEAR:
             default:
-                return this.generateNextDocumentNumberYear(lastNumber, format);
+                break;
+        }
+        String nextNumber = this.getNextNumber(documentNumberGenerator.getFormat(), documentNumberGenerator.getLastNumber());
+        generatedNumber = this.replaceNumber(documentNumberGenerator.getFormat(), nextNumber);
+        documentNumberGenerator.setLastNumber(nextNumber);
+        this.update(documentNumberGenerator);
+
+        return generatedNumber;
+    }
+
+    private String replaceYear(String format, LocalDate currentDate) {
+        String generatedNumber = format;
+        int indexOfYear = format.indexOf('Y');
+        int countOfYear = (int) format.chars().filter(ch -> ch == 'Y').count();
+
+        String year = String.valueOf(currentDate.getYear());
+        String yearFormat = generatedNumber.substring(indexOfYear, (indexOfYear + countOfYear));
+        if (countOfYear < 4) {
+            return generatedNumber.replace(yearFormat, year.substring(2));
+        } else {
+            return generatedNumber.replace(yearFormat, year);
         }
     }
 
-    private String generateNextDocumentNumberMonthly(String lastNumber, String format) {
+    private String replaceMonth(String format, LocalDate currentDate) {
         String generatedNumber = format;
-
-        long countOfYear = format.chars().filter(ch -> ch == 'Y').count();
         int indexOfMonth = format.indexOf('M');
         int countOfMonth = (int) format.chars().filter(ch -> ch == 'M').count();
+        int month = currentDate.getMonthValue();
+
+        String monthPart = generatedNumber.substring(indexOfMonth, (indexOfMonth + countOfMonth));
+        if (month < 10) {
+            return generatedNumber.replace(monthPart, "0" + month);
+        } else {
+            return generatedNumber.replace(monthPart, String.valueOf(month));
+        }
+    }
+
+    private String getNextNumber(String format, String lastNumber) {
+        String generatedNumber = format;
+        int countOfNumber = (int) format.chars().filter(ch -> ch == 'N').count();
+
+        String nextNumber = String.valueOf((Integer.valueOf(lastNumber).intValue() + 1));
+        for (int i = nextNumber.length(); i <= countOfNumber; i++) {
+            nextNumber = "0" + nextNumber;
+        }
+        return nextNumber;
+    }
+
+    private String replaceNumber(String format, String newNumber) {
+        String generatedNumber = format;
         int indexOfNumber = format.indexOf('N');
         int countOfNumber = (int) format.chars().filter(ch -> ch == 'N').count();
 
-        LocalDate currentDate = LocalDate.now();
-        String year = String.valueOf(currentDate.getYear());
+        return generatedNumber.replace(generatedNumber.substring(indexOfNumber, (indexOfNumber + countOfNumber)), newNumber);
+    }
+
+    private String replaceQuarter(String format, LocalDate currentDate) {
+        String generatedNumber = format;
+        int indexOfQuarter = format.indexOf('Q');
+        int countOfQuarter = (int) format.chars().filter(ch -> ch == 'Q').count();
         int month = currentDate.getMonthValue();
 
-        if (countOfYear < 4) {
-            generatedNumber.replace("YY", year.substring(2));
-        } else {
-            generatedNumber.replace("YYYY", year);
+        String quarter = "";
+        if (month < 4) {
+            quarter = "1";
+        }
+        if (month >= 4 && month < 7) {
+            quarter = "2";
+        }
+        if (month >= 7 && month < 10) {
+            quarter = "3";
+        }
+        if (month >= 10) {
+            quarter = "4";
         }
 
-        String replaceableMonth = "";
-        if (month < 10) {
-            replaceableMonth = "0" + String.valueOf(month);
-        } else {
-            replaceableMonth = String.valueOf(month);
+        if (countOfQuarter > 1) {
+            quarter = "0" + quarter;
         }
-        generatedNumber.replace(generatedNumber.substring(indexOfMonth, (indexOfMonth + countOfMonth)), replaceableMonth);
 
-        int nextValue = Integer.valueOf(lastNumber).intValue() + 1;
-
-        return generatedNumber;
+        return generatedNumber.replace(generatedNumber.substring(indexOfQuarter, (indexOfQuarter + countOfQuarter)), quarter);
     }
 
-    private String generateNextDocumentNumberQuarter(String lastNumber, String format) {
-        String generatedNumber = "";
-        return generatedNumber;
-    }
+    private String replaceHalfYear(String format, LocalDate currentDate) {
+        String generatedNumber = format;
+        int indexOfHalfYear = format.indexOf('H');
+        int countOfHalfYear = (int) format.chars().filter(ch -> ch == 'H').count();
+        int month = currentDate.getMonthValue();
 
-    private String generateNextDocumentNumberHalfYear(String lastNumber, String format) {
-        String generatedNumber = "";
-        return generatedNumber;
-    }
+        String halfYear = "2";
+        if (month < 7) {
+            halfYear = "1";
+        }
 
-    private String generateNextDocumentNumberYear(String lastNumber, String format) {
-        String generatedNumber = "";
-        return generatedNumber;
+        if (countOfHalfYear > 1) {
+            halfYear = "0" + halfYear;
+        }
+
+        return generatedNumber.replace(generatedNumber.substring(indexOfHalfYear, (indexOfHalfYear + countOfHalfYear)), halfYear);
     }
 }

@@ -2,6 +2,7 @@ package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
+import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -15,5 +16,7 @@ public interface QDocumentNumberGeneratorRepository {
     Optional<DocumentNumberGenerator> getById(Long id, List<Long> companyIds);
 
     Optional<DocumentNumberGenerator> getByIdSimple(Long id, List<Long> companyIds);
+
+    DocumentNumberGenerator getByDocumentType(String documentType, List<Long> companyIds);
 
 }

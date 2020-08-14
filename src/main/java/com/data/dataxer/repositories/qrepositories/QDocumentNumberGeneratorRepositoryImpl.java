@@ -1,9 +1,9 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QDocumentNumberGenerator;
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
+import com.data.dataxer.models.enums.DocumentType;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
@@ -66,6 +66,17 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
                 .where(qDocumentNumberGenerator.id.eq(id))
                 .where(qDocumentNumberGenerator.company.id.in(companyIds))
                 .fetchOne());
+    }
+
+    @Override
+    public DocumentNumberGenerator getByDocumentType(String documentType, List<Long> companyIds) {
+        QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
+
+        return this.query
+                .selectFrom(qDocumentNumberGenerator)
+                .where(qDocumentNumberGenerator.type.eq(DocumentType.getTypeByName(documentType)))
+                .where(qDocumentNumberGenerator.company.id.in(companyIds))
+                .fetchOne();
     }
 
     private Long total() {

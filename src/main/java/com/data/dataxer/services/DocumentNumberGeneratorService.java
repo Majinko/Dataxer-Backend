@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
+import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,4 +21,6 @@ public interface DocumentNumberGeneratorService {
     void destroy(Long id);
 
     String generateNextNumber(Long id);
+
+    String generateNextNumberByDocumentType(String documentType);
 }

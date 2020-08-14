@@ -3,7 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.DocumentNumberGeneratorMapper;
 import com.data.dataxer.models.dto.DocumentNumberGeneratorDTO;
-import com.data.dataxer.models.dto.InvoiceDTO;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.services.DocumentNumberGeneratorService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -49,6 +49,13 @@ public class DocumentNumberGeneratorController {
     @GetMapping("/generateNext/{id}")
     public ResponseEntity<String> generateNextNumber(@PathVariable Long id) {
         return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumber(id));
+    }
+
+    @GetMapping("/generateNextByType/{documentType}")
+    public ResponseEntity<String> generateNextNumberByDocumentType(
+            @PathVariable String documentType
+    ) {
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType));
     }
 
     @GetMapping("/destroy/{id}")
