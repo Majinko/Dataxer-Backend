@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Service
 public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGeneratorService{
@@ -25,13 +26,15 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public void store(DocumentNumberGenerator documentNumberGenerator) {
-        this.documentNumberGeneratorRepository.save(documentNumberGenerator);
-    }
-
-    @Override
-    public void update(DocumentNumberGenerator documentNumberGenerator) {
-        this.documentNumberGeneratorRepository.save(documentNumberGenerator);
+    public DocumentNumberGenerator storeOrUpdate(DocumentNumberGenerator documentNumberGenerator) {
+        DocumentNumberGenerator existedDocumentNumberGenerator = this.qDocumentNumberGeneratorRepository
+                .getByDocumentType(documentNumberGenerator.getType(), SecurityUtils.companyIds());
+        if (existedDocumentNumberGenerator != null) {
+            return this.documentNumberGeneratorRepository.save(documentNumberGenerator);
+        } else {
+            documentNumberGenerator.setId(existedDocumentNumberGenerator.getId());
+            return this.documentNumberGeneratorRepository.save(documentNumberGenerator);
+        }
     }
 
     @Override
@@ -59,7 +62,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public String generateNextNumberByDocumentType(String documentType) {
+    public String generateNextNumberByDocumentType(DocumentType documentType) {
         DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
                 .getByDocumentType(documentType, SecurityUtils.companyIds());
         if (documentNumberGenerator == null) {
@@ -74,6 +77,27 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         }
 
         return this.generateNextDocumentNumber(documentNumberGenerator);
+    }
+
+    @Override
+    public void resetGenerationByType(DocumentType documentType) {
+        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
+                .getByDocumentType(documentType, SecurityUtils.companyIds());
+        documentNumberGenerator.setLastNumber("0");
+        this.documentNumberGeneratorRepository.save(documentNumberGenerator);
+    }
+
+    @Override
+    public void resetGenerationById(Long id) {
+        Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
+                .getByIdSimple(id, SecurityUtils.companyIds());
+        if (documentNumberGeneratorOptional.isPresent()) {
+            DocumentNumberGenerator documentNumberGenerator = documentNumberGeneratorOptional.get();
+            documentNumberGenerator.setLastNumber("0");
+            this.documentNumberGeneratorRepository.save(documentNumberGenerator);
+        } else {
+            throw new RuntimeException("Number generator with id {" + id + "} not found");
+        }
     }
 
     private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator) {
@@ -94,11 +118,25 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
                 break;
         }
         String nextNumber = this.getNextNumber(documentNumberGenerator.getFormat(), documentNumberGenerator.getLastNumber());
+        if (nextNumber.length() > documentNumberGenerator.getFormat().chars().filter(ch -> ch == 'N').count()) {
+            documentNumberGenerator.setFormat(this.extendFormat(documentNumberGenerator.getFormat()));
+        }
         generatedNumber = this.replaceNumber(documentNumberGenerator.getFormat(), nextNumber);
         documentNumberGenerator.setLastNumber(nextNumber);
         this.update(documentNumberGenerator);
 
         return generatedNumber;
+    }
+
+    private String extendFormat(String shorterFormat) {
+        int countOfNumber = (int) shorterFormat.chars().filter(ch -> ch == 'N').count();
+        int indexOfNumber = shorterFormat.indexOf("N");
+
+        String newFormat = shorterFormat.substring(0, indexOfNumber)
+                + shorterFormat.substring(indexOfNumber, (indexOfNumber + countOfNumber))
+                + "N"
+                + shorterFormat.substring((indexOfNumber + countOfNumber), shorterFormat.length());
+        return newFormat;
     }
 
     private String replaceYear(String format, LocalDate currentDate) {
@@ -134,7 +172,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         int countOfNumber = (int) format.chars().filter(ch -> ch == 'N').count();
 
         String nextNumber = String.valueOf((Integer.valueOf(lastNumber).intValue() + 1));
-        for (int i = nextNumber.length(); i <= countOfNumber; i++) {
+        for (int i = nextNumber.length(); i < countOfNumber; i++) {
             nextNumber = "0" + nextNumber;
         }
         return nextNumber;

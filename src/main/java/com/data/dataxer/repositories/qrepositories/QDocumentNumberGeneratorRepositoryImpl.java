@@ -69,12 +69,12 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     }
 
     @Override
-    public DocumentNumberGenerator getByDocumentType(String documentType, List<Long> companyIds) {
+    public DocumentNumberGenerator getByDocumentType(DocumentType documentType, List<Long> companyIds) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
         return this.query
                 .selectFrom(qDocumentNumberGenerator)
-                .where(qDocumentNumberGenerator.type.eq(DocumentType.getTypeByName(documentType)))
+                .where(qDocumentNumberGenerator.type.eq(documentType))
                 .where(qDocumentNumberGenerator.company.id.in(companyIds))
                 .fetchOne();
     }

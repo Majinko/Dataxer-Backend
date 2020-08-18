@@ -24,14 +24,9 @@ public class DocumentNumberGeneratorController {
         this.documentNumberGeneratorMapper = documentNumberGeneratorMapper;
     }
 
-    @PostMapping("/store")
-    public void store(@RequestBody DocumentNumberGeneratorDTO documentNumberGeneratorDTO) {
-        this.documentNumberGeneratorService.store(this.documentNumberGeneratorMapper.documentNumberGeneratorDTOToDocumentNumberGenerator(documentNumberGeneratorDTO));
-    }
-
-    @PostMapping("/update")
-    public void update(@RequestBody DocumentNumberGeneratorDTO documentNumberGeneratorDTO) {
-        this.documentNumberGeneratorService.update(this.documentNumberGeneratorMapper.documentNumberGeneratorDTOToDocumentNumberGenerator(documentNumberGeneratorDTO));
+    @PostMapping("/storeOrUpdate")
+    public void storeOrUpdate(@RequestBody DocumentNumberGeneratorDTO documentNumberGeneratorDTO) {
+        this.documentNumberGeneratorService.storeOrUpdate(this.documentNumberGeneratorMapper.documentNumberGeneratorDTOToDocumentNumberGenerator(documentNumberGeneratorDTO));
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
@@ -48,7 +43,7 @@ public class DocumentNumberGeneratorController {
 
     @GetMapping("/generateNextByType/{documentType}")
     public ResponseEntity<String> generateNextNumberByDocumentType(
-            @PathVariable String documentType
+            @PathVariable DocumentType documentType
     ) {
         return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType));
     }
@@ -56,6 +51,16 @@ public class DocumentNumberGeneratorController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.documentNumberGeneratorService.destroy(id);
+    }
+
+    @GetMapping("/resetGenerationByType/{documentType}")
+    public void resetGenerationByType(@PathVariable DocumentType documentType) {
+        this.documentNumberGeneratorService.resetGenerationByType(documentType);
+    }
+
+    @GetMapping("/resetGenerationById/{id}")
+    public void resetGenerationById(@PathVariable Long id) {
+        this.documentNumberGeneratorService.resetGenerationById(id);
     }
 
 }
