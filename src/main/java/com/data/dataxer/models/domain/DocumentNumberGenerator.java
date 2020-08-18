@@ -21,14 +21,29 @@ public class DocumentNumberGenerator extends BaseEntity {
     @Column(nullable = false)
     private String format;
 
-    @Enumerated(EnumType.STRING)
     private DocumentType type;
 
-    @Enumerated(EnumType.STRING)
     private Periods period;
 
-    private Integer isDefault;
+    private boolean isDefault;
 
     private String lastNumber;
+
+    public DocumentNumberGenerator() {}
+
+    public DocumentNumberGenerator(
+            String title,
+            String format,
+            DocumentType type,
+            Periods period,
+            boolean isDefault,
+            String lastNumber) {
+        this.title = title;
+        this.format = format;
+        this.type = type;
+        this.period = period;
+        this.isDefault = isDefault;
+        this.lastNumber = lastNumber;
+    }
 
 }

@@ -6,6 +6,7 @@ import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.DocumentNumberGeneratorRepository;
 import com.data.dataxer.repositories.qrepositories.QDocumentNumberGeneratorRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.data.dataxer.utils.DefaultInvoiceNumberGenerator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -58,18 +59,18 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public String generateNextNumber(Long id) {
-        DocumentNumberGenerator documentNumberGenerator = this.getByIdSimple(id);
-
-        return this.generateNextDocumentNumber(documentNumberGenerator);
-    }
-
-    @Override
     public String generateNextNumberByDocumentType(String documentType) {
         DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
                 .getByDocumentType(documentType, SecurityUtils.companyIds());
         if (documentNumberGenerator == null) {
-            throw new RuntimeException("Number generator for given type not found");
+            documentNumberGenerator = new DocumentNumberGenerator(
+                    DefaultInvoiceNumberGenerator.title,
+                    DefaultInvoiceNumberGenerator.format,
+                    DefaultInvoiceNumberGenerator.type,
+                    DefaultInvoiceNumberGenerator.period,
+                    DefaultInvoiceNumberGenerator.isDefault,
+                    DefaultInvoiceNumberGenerator.lastNumber
+            );
         }
 
         return this.generateNextDocumentNumber(documentNumberGenerator);

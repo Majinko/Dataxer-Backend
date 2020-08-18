@@ -1,2 +1,0 @@
-INSERT INTO document_number_generator(id,title, format, type, period, is_default, last_number, created_at, updated_at)
-VALUES (1, 'Default invoice generator', 'YYYYNNNN', 'INVOICE', 'YEAR', 1, '0000', now(), now()) ON CONFLICT DO NOTHING;

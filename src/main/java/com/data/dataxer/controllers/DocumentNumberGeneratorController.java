@@ -46,11 +46,6 @@ public class DocumentNumberGeneratorController {
         return ResponseEntity.ok(this.documentNumberGeneratorService.paginate(pageable, filter).map(this.documentNumberGeneratorMapper::documentNumberGeneratorToDocumentNumberGeneratorDTOSimple));
     }
 
-    @GetMapping("/generateNext/{id}")
-    public ResponseEntity<String> generateNextNumber(@PathVariable Long id) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumber(id));
-    }
-
     @GetMapping("/generateNextByType/{documentType}")
     public ResponseEntity<String> generateNextNumberByDocumentType(
             @PathVariable String documentType
