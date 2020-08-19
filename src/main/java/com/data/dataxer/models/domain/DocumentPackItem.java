@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 @Entity
 @Getter
 @Setter
-public class DocumentPackItem implements Serializable {
+public class DocumentPackItem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -38,5 +38,19 @@ public class DocumentPackItem implements Serializable {
     private Integer tax;
 
     private BigDecimal totalPrice;
+
+    public DocumentPackItem() {}
+
+    public DocumentPackItem(DocumentPackItem packItem, DocumentPack pack) {
+        this.pack = pack;
+        this.item = packItem.getItem();
+        this.qty = packItem.getQty();
+        this.title = packItem.getTitle();
+        this.position = packItem.getPosition();
+        this.discount = packItem.getDiscount();
+        this.price = packItem.getPrice();
+        this.tax = packItem.getTax();
+        this.totalPrice = packItem.getTotalPrice();
+    }
 
 }
