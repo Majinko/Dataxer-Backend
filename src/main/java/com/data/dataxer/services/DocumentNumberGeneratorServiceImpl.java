@@ -192,7 +192,6 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             throw new RuntimeException("Not valid format! Missed at least one symbol N");
         }
 
-        System.out.println(lastNumber);
         String nextNumber = String.valueOf((Integer.valueOf(lastNumber).intValue() + 1));
         for (int i = nextNumber.length(); i < countOfNumber; i++) {
             nextNumber = "0" + nextNumber;
