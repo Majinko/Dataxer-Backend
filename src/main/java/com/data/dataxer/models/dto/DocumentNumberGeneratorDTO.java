@@ -13,5 +13,5 @@ public class DocumentNumberGeneratorDTO {
     private String format;
     private DocumentType type;
     private Periods period;
-    private Integer isDefault;
+    private Boolean isDefault;
 }

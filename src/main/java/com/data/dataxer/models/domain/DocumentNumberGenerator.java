@@ -25,7 +25,7 @@ public class DocumentNumberGenerator extends BaseEntity {
 
     private Periods period;
 
-    private boolean isDefault;
+    private Boolean isDefault;
 
     private String lastNumber;
 

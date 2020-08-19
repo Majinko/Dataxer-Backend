@@ -27,12 +27,14 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     @Override
     public DocumentNumberGenerator storeOrUpdate(DocumentNumberGenerator documentNumberGenerator) {
-        DocumentNumberGenerator existedDocumentNumberGenerator = this.qDocumentNumberGeneratorRepository
+        Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
                 .getByDocumentType(documentNumberGenerator.getType(), SecurityUtils.companyIds());
-        if (existedDocumentNumberGenerator != null) {
+        if (documentNumberGeneratorOptional.isPresent()) {
+            documentNumberGenerator.setId(documentNumberGeneratorOptional.get().getId());
+            documentNumberGenerator.setLastNumber(documentNumberGeneratorOptional.get().getLastNumber());
             return this.documentNumberGeneratorRepository.save(documentNumberGenerator);
         } else {
-            documentNumberGenerator.setId(existedDocumentNumberGenerator.getId());
+            documentNumberGenerator.setLastNumber("0");
             return this.documentNumberGeneratorRepository.save(documentNumberGenerator);
         }
     }
@@ -63,9 +65,11 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     @Override
     public String generateNextNumberByDocumentType(DocumentType documentType) {
-        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
+        Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
                 .getByDocumentType(documentType, SecurityUtils.companyIds());
-        if (documentNumberGenerator == null) {
+
+        DocumentNumberGenerator documentNumberGenerator;
+        if (!documentNumberGeneratorOptional.isPresent()) {
             documentNumberGenerator = new DocumentNumberGenerator(
                     DefaultInvoiceNumberGenerator.title,
                     DefaultInvoiceNumberGenerator.format,
@@ -74,6 +78,8 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
                     DefaultInvoiceNumberGenerator.isDefault,
                     DefaultInvoiceNumberGenerator.lastNumber
             );
+        } else {
+            documentNumberGenerator = documentNumberGeneratorOptional.get();
         }
 
         return this.generateNextDocumentNumber(documentNumberGenerator);
@@ -81,10 +87,13 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     @Override
     public void resetGenerationByType(DocumentType documentType) {
-        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
+        Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
                 .getByDocumentType(documentType, SecurityUtils.companyIds());
-        documentNumberGenerator.setLastNumber("0");
-        this.documentNumberGeneratorRepository.save(documentNumberGenerator);
+        if (documentNumberGeneratorOptional.isPresent()) {
+            DocumentNumberGenerator documentNumberGenerator = documentNumberGeneratorOptional.get();
+            documentNumberGenerator.setLastNumber("0");
+            this.documentNumberGeneratorRepository.save(documentNumberGenerator);
+        }
     }
 
     @Override
@@ -105,13 +114,13 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         String generatedNumber = this.replaceYear(documentNumberGenerator.getFormat(), currentDate);
         switch(documentNumberGenerator.getPeriod()) {
             case MONTHLY:
-                generatedNumber = this.replaceMonth(documentNumberGenerator.getFormat(), currentDate);
+                generatedNumber = this.replaceMonth(generatedNumber, currentDate);
                 break;
             case QUARTER:
-                generatedNumber = this.replaceQuarter(documentNumberGenerator.getFormat(), currentDate);
+                generatedNumber = this.replaceQuarter(generatedNumber, currentDate);
                 break;
             case HALF_YEAR:
-                generatedNumber = this.replaceHalfYear(documentNumberGenerator.getFormat(), currentDate);
+                generatedNumber = this.replaceHalfYear(generatedNumber, currentDate);
                 break;
             case YEAR:
             default:
@@ -121,9 +130,9 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         if (nextNumber.length() > documentNumberGenerator.getFormat().chars().filter(ch -> ch == 'N').count()) {
             documentNumberGenerator.setFormat(this.extendFormat(documentNumberGenerator.getFormat()));
         }
-        generatedNumber = this.replaceNumber(documentNumberGenerator.getFormat(), nextNumber);
+        generatedNumber = this.replaceNumber(generatedNumber, nextNumber);
         documentNumberGenerator.setLastNumber(nextNumber);
-        this.update(documentNumberGenerator);
+        this.documentNumberGeneratorRepository.save(documentNumberGenerator);
 
         return generatedNumber;
     }
@@ -144,6 +153,10 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         int indexOfYear = format.indexOf('Y');
         int countOfYear = (int) format.chars().filter(ch -> ch == 'Y').count();
 
+        if (countOfYear < 1) {
+            throw new RuntimeException("Not valid format! Missing YY or YYYY");
+        }
+
         String year = String.valueOf(currentDate.getYear());
         String yearFormat = generatedNumber.substring(indexOfYear, (indexOfYear + countOfYear));
         if (countOfYear < 4) {
@@ -159,6 +172,10 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         int countOfMonth = (int) format.chars().filter(ch -> ch == 'M').count();
         int month = currentDate.getMonthValue();
 
+        if (countOfMonth < 1) {
+            throw new RuntimeException("Not valid format! Missed at least one symbol M");
+        }
+
         String monthPart = generatedNumber.substring(indexOfMonth, (indexOfMonth + countOfMonth));
         if (month < 10) {
             return generatedNumber.replace(monthPart, "0" + month);
@@ -171,6 +188,11 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         String generatedNumber = format;
         int countOfNumber = (int) format.chars().filter(ch -> ch == 'N').count();
 
+        if (countOfNumber < 1) {
+            throw new RuntimeException("Not valid format! Missed at least one symbol N");
+        }
+
+        System.out.println(lastNumber);
         String nextNumber = String.valueOf((Integer.valueOf(lastNumber).intValue() + 1));
         for (int i = nextNumber.length(); i < countOfNumber; i++) {
             nextNumber = "0" + nextNumber;
@@ -191,6 +213,10 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         int indexOfQuarter = format.indexOf('Q');
         int countOfQuarter = (int) format.chars().filter(ch -> ch == 'Q').count();
         int month = currentDate.getMonthValue();
+
+        if (countOfQuarter < 1) {
+            throw new RuntimeException("Not valid format! Missed at least one symbol Q");
+        }
 
         String quarter = "";
         if (month < 4) {
