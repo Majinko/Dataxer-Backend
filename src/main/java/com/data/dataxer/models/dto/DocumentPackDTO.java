@@ -7,11 +7,12 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-@Setter
 @Getter
-public class PriceOfferPackDTO {
+@Setter
+public class DocumentPackDTO {
     private Long id;
-    List<PriceOfferPackItemDTO> items = new ArrayList<>();
+    List<DocumentPackItemDTO> packItems = new ArrayList<>();
+    Integer position;
     String title;
     Integer tax;
     private BigDecimal totalPrice;

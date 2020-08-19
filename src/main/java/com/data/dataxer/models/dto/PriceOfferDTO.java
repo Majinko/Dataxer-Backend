@@ -24,5 +24,5 @@ public class PriceOfferDTO {
     private BigDecimal totalPrice;
 
     private ContactDTO contact;
-    List<PriceOfferPackDTO> packs = new ArrayList<>();
+    List<DocumentPackDTO> packs = new ArrayList<>();
 }
