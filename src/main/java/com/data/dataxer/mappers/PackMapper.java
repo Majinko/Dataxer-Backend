@@ -24,7 +24,7 @@ public interface PackMapper {
     PackDTO packToPackDTO(Pack pack);
 
     @Named(value = "packToPackDTOSimple")
-    @Mapping(target = "items", ignore = true)
+    @Mapping(target = "packItems", ignore = true)
     PackDTO packToPackDTOSimple(Pack pack);
 
     @Mapping(target = "wholesalePrice", ignore = true)

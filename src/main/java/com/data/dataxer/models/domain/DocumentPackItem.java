@@ -9,17 +9,17 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
-@Setter
 @Getter
-public class PriceOfferPackItem implements Serializable {
+@Setter
+public class DocumentPackItem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "price_offer_pack_id", referencedColumnName = "id")
-    PriceOfferPack priceOfferPack;
+    @JoinColumn(name = "document_pack_id", referencedColumnName = "id")
+    DocumentPack pack;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", referencedColumnName = "id")
@@ -38,4 +38,19 @@ public class PriceOfferPackItem implements Serializable {
     private Integer tax;
 
     private BigDecimal totalPrice;
+
+    public DocumentPackItem() {}
+
+    public DocumentPackItem(DocumentPackItem packItem, DocumentPack pack) {
+        this.pack = pack;
+        this.item = packItem.getItem();
+        this.qty = packItem.getQty();
+        this.title = packItem.getTitle();
+        this.position = packItem.getPosition();
+        this.discount = packItem.getDiscount();
+        this.price = packItem.getPrice();
+        this.tax = packItem.getTax();
+        this.totalPrice = packItem.getTotalPrice();
+    }
+
 }

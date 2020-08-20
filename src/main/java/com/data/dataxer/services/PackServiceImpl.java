@@ -24,7 +24,7 @@ public class PackServiceImpl implements PackService {
 
     @Override
     public void store(Pack pack) {
-        pack.getItems().forEach(groupItem -> {
+        pack.getPackItems().forEach(groupItem -> {
             groupItem.setPack(pack);
         });
 
@@ -33,7 +33,7 @@ public class PackServiceImpl implements PackService {
 
     @Override
     public void update(Pack pack) {
-        pack.getItems().forEach(groupItem -> {
+        pack.getPackItems().forEach(groupItem -> {
             groupItem.setPack(pack);
         });
 
