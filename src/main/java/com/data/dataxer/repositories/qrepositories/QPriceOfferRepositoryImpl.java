@@ -1,5 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
+import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QDocumentPack;
 import com.data.dataxer.models.domain.QDocumentPackItem;
@@ -31,31 +32,23 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     @Override
-    public Page<PriceOffer> paginate(Pageable pageable, Map<String, String> filter, List<Long> companyIds) {
+    public Page<PriceOffer> paginate(Pageable pageable, Filter filter, List<Long> companyIds) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
+        BooleanBuilder filterCondition = new BooleanBuilder();
+
+        if (!filter.isEmpty()) {
+            filterCondition = filter.buildPriceOfferFilterPredicate();
+        }
 
         List<PriceOffer> priceOffers = query.selectFrom(qPriceOffer)
                 .leftJoin(qPriceOffer.contact).fetchJoin()
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .orderBy(qPriceOffer.id.desc())
-                .where(search(qPriceOffer, filter))
+                .where(filterCondition)
                 .fetch();
 
         return new PageImpl<PriceOffer>(priceOffers, pageable, total());
-    }
-
-    // search by condition
-    private BooleanBuilder search(QPriceOffer qPriceOffer, Map<String, String> filter) {
-        BooleanBuilder where = new BooleanBuilder();
-
-        if (!filter.isEmpty()) {
-            if (filter.get("state") != null) {
-                where.or(qPriceOffer.state.eq(filter.get("state")));
-            }
-        }
-
-        return where;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.PriceOfferRepository;
@@ -60,7 +61,7 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public Page<PriceOffer> paginate(Pageable pageable, Map<String, String> filter) {
+    public Page<PriceOffer> paginate(Pageable pageable, Filter filter) {
         return this.qPriceOfferRepository.paginate(pageable, filter, SecurityUtils.companyIds());
     }
 
