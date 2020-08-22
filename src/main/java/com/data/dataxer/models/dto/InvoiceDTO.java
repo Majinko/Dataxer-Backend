@@ -23,7 +23,7 @@ public class InvoiceDTO {
     private BigDecimal priceTotal;
     private Map<String, Object> invoiceData;
     private LocalDate createdDate;
-    private LocalDate deliveryDate;
+    private LocalDate deliveredDate;
     private LocalDate paymentDate;
     private LocalDate dueDate;
     private LocalDateTime deletedAt;

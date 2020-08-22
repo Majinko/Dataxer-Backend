@@ -56,7 +56,7 @@ public class Invoice extends  BaseEntity{
     private LocalDate createdDate;
 
     @Column(nullable = false)
-    private LocalDate deliveryDate;
+    private LocalDate deliveredDate;
 
     //represent date when invoice was changed to payed state
     private LocalDate paymentDate;
@@ -83,7 +83,7 @@ public class Invoice extends  BaseEntity{
             this.invoiceData.putAll(invoice.getInvoiceData());
         }
         this.createdDate = invoice.getCreatedDate();
-        this.deliveryDate = invoice.getDeliveryDate();
+        this.deliveredDate = invoice.getDeliveredDate();
         this.paymentDate = invoice.getPaymentDate();
         this.dueDate = invoice.getDueDate();
         this.deletedAt = invoice.getDeletedAt();
