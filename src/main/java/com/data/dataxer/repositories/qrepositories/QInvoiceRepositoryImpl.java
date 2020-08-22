@@ -2,6 +2,10 @@ package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QDocumentPack;
+import com.data.dataxer.models.domain.QDocumentPackItem;
+import com.data.dataxer.models.domain.QInvoice;
+import com.data.dataxer.models.domain.QItem;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
@@ -29,7 +33,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         BooleanBuilder filterCondition = new BooleanBuilder();
 
         if (!filter.isEmpty()) {
-            filterCondition = filter.buildFilterPredicate();
+            filterCondition = filter.buildInvoiceFilterPredicate();
         }
 
 

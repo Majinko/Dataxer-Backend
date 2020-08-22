@@ -3,7 +3,8 @@ package com.data.dataxer.filters;
 public enum SearchableDecimals {
 
     PRICE("price"),
-    PRICE_TOTAL("priceTotal");
+    PRICE_TOTAL("priceTotal"),
+    DISCOUNT("discount");
 
     private String value;
 
@@ -11,7 +12,7 @@ public enum SearchableDecimals {
         this.value = value;
     }
 
-    public static boolean isSearchableString(String columnId) {
+    public static boolean isSearchableDecimal(String columnId) {
         for (SearchableDecimals searchableDecimals : values()) {
             if (searchableDecimals.getValue().equals(columnId)) {
                 return true;
