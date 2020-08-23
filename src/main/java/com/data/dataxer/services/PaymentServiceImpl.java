@@ -4,7 +4,9 @@ import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Payment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
+@Service
 public class PaymentServiceImpl implements PaymentService {
     @Override
     public void store(Payment payment) {

@@ -2,7 +2,6 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.PaymentMapper;
-import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.models.dto.PaymentDTO;
 import com.data.dataxer.services.PaymentService;
 import org.springframework.data.domain.Page;
