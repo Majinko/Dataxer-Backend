@@ -14,6 +14,4 @@ public interface QPaymentRepository {
 
     Optional<Payment> getById(Long id, List<Long> companyIds);
 
-    Optional<Payment> getByIdSimple(Long id, List<Long> companyIds);
-
 }

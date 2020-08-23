@@ -13,6 +13,8 @@ public interface PaymentService {
 
     Page<Payment> paginate(Pageable pageable, Filter filter);
 
+    Payment getById(Long id);
+
     void destroy(Long id);
 
 }
