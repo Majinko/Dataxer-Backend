@@ -2,8 +2,11 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Payment;
+import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.math.BigDecimal;
 
 public interface PaymentService {
 
@@ -17,4 +20,5 @@ public interface PaymentService {
 
     void destroy(Long id);
 
+    BigDecimal getRestToPay(Long documentId, DocumentType documentType);
 }

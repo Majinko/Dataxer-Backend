@@ -2,12 +2,15 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Payment;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.PaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -45,5 +48,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void destroy(Long id) {
         this.paymentRepository.delete(this.getById(id));
+    }
+
+    @Override
+    public BigDecimal getRestToPay(Long documentId, DocumentType documentType) {
+        BigDecimal documentTotalPrice = this.qPaymentRepository.getDocumentTotalPrice(documentId, documentType);
+        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(documentId);
+
+        return documentTotalPrice.subtract(payedTotalPrice);
     }
 }

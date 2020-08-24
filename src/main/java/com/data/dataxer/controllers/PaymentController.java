@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.PaymentMapper;
 import com.data.dataxer.models.dto.PaymentDTO;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.services.PaymentService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -43,6 +46,14 @@ public class PaymentController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
 
         return ResponseEntity.ok(this.paymentService.paginate(pageable, filter).map(this.paymentMapper::paymentToPaymentDTOSimple));
+    }
+
+    @RequestMapping(value = "/restToPay", method = RequestMethod.GET)
+    public BigDecimal getRestToPay(
+            @RequestParam(value = "id") Long documentId,
+            @RequestParam(value = "documentType") DocumentType documentType
+    ) {
+        return this.paymentService.getRestToPay(documentId, documentType);
     }
 
     @GetMapping("/destroy/{id}")

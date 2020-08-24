@@ -24,6 +24,7 @@ public class Payment extends BaseEntity {
 
     private Long documentId;
 
+    //is added for better filtering option - it's optional
     private DocumentType documentType;
 
     private BigDecimal payedValue;
