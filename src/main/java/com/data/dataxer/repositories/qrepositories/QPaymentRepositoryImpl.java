@@ -99,7 +99,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
         BigDecimal payedTotalPrice = BigDecimal.valueOf(0);
         for (Payment payment : payments) {
-            payedTotalPrice.add(payment.getPayedValue());
+            payedTotalPrice = payedTotalPrice.add(payment.getPayedValue());
         }
         return payedTotalPrice;
     }
