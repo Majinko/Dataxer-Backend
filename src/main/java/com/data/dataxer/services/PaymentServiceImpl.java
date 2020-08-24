@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import javax.print.Doc;
 import java.math.BigDecimal;
 
 @Service
@@ -17,15 +18,33 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final QPaymentRepository qPaymentRepository;
+    private final InvoiceService invoiceService;
+    private final PriceOfferService priceOfferService;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, QPaymentRepository qPaymentRepository) {
+    public PaymentServiceImpl(
+            PaymentRepository paymentRepository,
+            QPaymentRepository qPaymentRepository,
+            InvoiceService invoiceService,
+            PriceOfferService priceOfferService
+    ) {
         this.paymentRepository = paymentRepository;
         this.qPaymentRepository = qPaymentRepository;
+        this.invoiceService = invoiceService;
+        this.priceOfferService = priceOfferService;
     }
 
     @Override
     public void store(Payment payment) {
         this.paymentRepository.save(payment);
+        if (this.documentIsPayed(payment)) {
+            if (payment.getDocumentType().equals(DocumentType.INVOICE)) {
+                this.invoiceService.setPayed(payment.getDocumentId());
+            }
+            if (payment.getDocumentType().equals(DocumentType.PRICE_OFFER)) {
+                //not implemented now
+                //this.priceOfferService.setPayed(payment.getDocumentId());
+            }
+        }
     }
 
     @Override
@@ -56,5 +75,9 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(documentId);
 
         return documentTotalPrice.subtract(payedTotalPrice);
+    }
+
+    private boolean documentIsPayed(Payment payment) {
+        return this.getRestToPay(payment.getDocumentId(), payment.getDocumentType()).compareTo(BigDecimal.ZERO) == 0;
     }
 }

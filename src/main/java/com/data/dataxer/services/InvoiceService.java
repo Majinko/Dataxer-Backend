@@ -24,4 +24,6 @@ public interface InvoiceService {
     void changeState(Invoice invoice);
 
     Invoice duplicate(Long id);
+
+    Invoice setPayed(Long id);
 }
