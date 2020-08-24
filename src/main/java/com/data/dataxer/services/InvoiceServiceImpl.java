@@ -64,12 +64,13 @@ public class InvoiceServiceImpl implements InvoiceService {
         this.invoiceRepository.delete(this.getByIdSimple(id));
     }
 
-    //need be redesign
     @Override
-    public void changeState(Invoice invoice) {
-        this.qInvoiceRepository.getByIdSimple(invoice.getId(), SecurityUtils.companyIds())
-                .orElseThrow(() -> new RuntimeException("Invoice not found"))
-                .setState(invoice.getState());
+    public void changeState(Long id, DocumentState.InvoiceStates documentState) {
+        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds())
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+
+        invoice.setState(documentState);
+        this.update(invoice);
     }
 
     @Transactional
@@ -79,15 +80,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice duplicatedInvoice = this.invoiceRepository.save(new Invoice(originalInvoice));
         this.setInvoicePackAndItems(duplicatedInvoice);
         return duplicatedInvoice;
-    }
-
-    @Override
-    public Invoice setPayed(Long id) {
-        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds())
-                .orElseThrow(() -> new RuntimeException("Invoice not found"));
-        invoice.setState(DocumentState.InvoiceStates.PAYED);
-        this.update(invoice);
-        return invoice;
     }
 
     @Override

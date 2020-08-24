@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.InvoiceMapper;
 import com.data.dataxer.models.dto.InvoiceDTO;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.services.InvoiceService;
 import com.google.api.client.json.Json;
 import jdk.nashorn.api.scripting.JSObject;
@@ -35,9 +36,12 @@ public class InvoiceController {
         this.invoiceService.update(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
     }
 
-    @PostMapping("/changeState")
-    public void changeState(@RequestBody InvoiceDTO invoiceDTO) {
-        this.invoiceService.changeState(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
+    @RequestMapping(value = "/changeState", method = RequestMethod.PUT)
+    public void changeState(
+            @RequestParam(value = "id") Long id,
+            @RequestParam(value = "documentState") DocumentState.InvoiceStates newState
+            ) {
+        this.invoiceService.changeState(id, newState);
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)

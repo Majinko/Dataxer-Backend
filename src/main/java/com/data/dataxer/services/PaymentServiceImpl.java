@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Payment;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.PaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
@@ -38,7 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
         this.paymentRepository.save(payment);
         if (this.documentIsPayed(payment)) {
             if (payment.getDocumentType().equals(DocumentType.INVOICE)) {
-                this.invoiceService.setPayed(payment.getDocumentId());
+                this.invoiceService.changeState(payment.getDocumentId(), DocumentState.InvoiceStates.PAYED);
             }
             if (payment.getDocumentType().equals(DocumentType.PRICE_OFFER)) {
                 //not implemented now
