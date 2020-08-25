@@ -3,7 +3,7 @@ package com.data.dataxer.filters;
 public enum SearchableDecimals {
 
     PRICE("price"),
-    PRICE_TOTAL("priceTotal"),
+    TOTAL_PRICE("totalPrice"),
     DISCOUNT("discount");
 
     private String value;

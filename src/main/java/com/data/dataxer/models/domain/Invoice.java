@@ -46,7 +46,7 @@ public class Invoice extends  BaseEntity{
 
     private BigDecimal price;
 
-    private BigDecimal priceTotal;
+    private BigDecimal totalPrice;
 
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)
@@ -78,7 +78,7 @@ public class Invoice extends  BaseEntity{
         this.state = invoice.getState();
         this.note = invoice.getNote();
         this.price = invoice.getPrice();
-        this.priceTotal = invoice.getPriceTotal();
+        this.totalPrice = invoice.getTotalPrice();
         if (invoice.getInvoiceData() != null && !invoice.getInvoiceData().isEmpty()){
             this.invoiceData.putAll(invoice.getInvoiceData());
         }
