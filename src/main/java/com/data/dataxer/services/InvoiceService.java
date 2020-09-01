@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Invoice;
+import com.data.dataxer.models.enums.DocumentState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -21,7 +22,8 @@ public interface InvoiceService {
 
     void destroy(Long id);
 
-    void changeState(Invoice invoice);
+    void changeState(Long id, DocumentState.InvoiceStates documentState);
 
     Invoice duplicate(Long id);
+
 }

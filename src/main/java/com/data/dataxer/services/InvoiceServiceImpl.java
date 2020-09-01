@@ -4,6 +4,7 @@ import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
@@ -64,10 +65,12 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void changeState(Invoice invoice) {
-        this.qInvoiceRepository.getByIdSimple(invoice.getId(), SecurityUtils.companyIds())
-                .orElseThrow(() -> new RuntimeException("Invoice not found"))
-                .setState(invoice.getState());
+    public void changeState(Long id, DocumentState.InvoiceStates documentState) {
+        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds())
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+
+        invoice.setState(documentState);
+        this.update(invoice);
     }
 
     @Transactional

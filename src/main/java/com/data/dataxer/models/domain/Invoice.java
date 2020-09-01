@@ -19,7 +19,7 @@ import java.util.Map;
 @Setter
 @Getter
 @Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE price_offer SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE invoice SET deleted_at = now() WHERE id = ?")
 public class Invoice extends  BaseEntity{
 
     @Id
