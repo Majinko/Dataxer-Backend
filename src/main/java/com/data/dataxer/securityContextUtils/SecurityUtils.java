@@ -27,6 +27,12 @@ public class SecurityUtils {
     }
 
     public static Company defaultCompany() {
-        return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getCompanies().get(0);
+        Company defCompany = null;
+        List<Company> companies = ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getCompanies();
+        if (!companies.isEmpty()) {
+            return companies.get(0);
+        }
+        //return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getCompanies().get(0);
+        return null;
     }
 }
