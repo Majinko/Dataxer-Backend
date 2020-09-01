@@ -3,7 +3,7 @@ package com.data.dataxer.filters;
 public enum SearchableDates {
 
     CREATED("createdDate"),
-    DELIVERY("deliveryDate"),
+    DELIVERY("deliveredDate"),
     PAYMENT("paymentDate"),
     DUE("dueDate"),
     DELETED("deletedAt");
@@ -14,7 +14,7 @@ public enum SearchableDates {
         this.value = value;
     }
 
-    public static boolean isSearchableString(String columnId) {
+    public static boolean isSearchableDate(String columnId) {
         for (SearchableDates searchableDates : values()) {
             if (searchableDates.getValue().equals(columnId)) {
                 return true;

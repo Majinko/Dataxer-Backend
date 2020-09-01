@@ -1,5 +1,6 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.PriceOffer;
 import com.google.common.io.Files;
 import org.springframework.data.domain.Page;
@@ -12,7 +13,7 @@ public interface PriceOfferService {
 
     void update(PriceOffer priceOffer);
 
-    Page<PriceOffer> paginate(Pageable pageable, Map<String, String> filter);
+    Page<PriceOffer> paginate(Pageable pageable, Filter filter);
 
     PriceOffer getById(Long id);
 
