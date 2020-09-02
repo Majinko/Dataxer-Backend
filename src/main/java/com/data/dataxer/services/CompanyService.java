@@ -15,6 +15,4 @@ public interface CompanyService {
 
     Company update(Company company, Long id);
 
-    void createSettingsForCompany(Company company) throws IOException;
-
 }

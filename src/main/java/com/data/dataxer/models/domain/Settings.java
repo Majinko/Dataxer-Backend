@@ -9,12 +9,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import java.time.LocalDate;
 
 @Entity
 @Getter
 @Setter
-@Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE settings SET deleted_at = now() WHERE id = ?")
 public class Settings extends BaseEntity {
 
     @Id

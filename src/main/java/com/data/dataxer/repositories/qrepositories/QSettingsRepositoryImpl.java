@@ -61,6 +61,15 @@ public class QSettingsRepositoryImpl implements QSettingsRepository {
         );
     }
 
+    @Override
+    public List<Settings> getByCompanyId(Long id) {
+        QSettings qSettings = QSettings.settings;
+
+        return this.query.selectFrom(qSettings)
+                .where(qSettings.company.id.eq(id))
+                .fetch();
+    }
+
     private long total(List<Long> companyIds) {
         QSettings qSettings = QSettings.settings;
 

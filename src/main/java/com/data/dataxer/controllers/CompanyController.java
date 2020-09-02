@@ -36,13 +36,7 @@ public class CompanyController {
 
     @PostMapping("/store")
     public ResponseEntity<CompanyDTO> store(@RequestBody CompanyDTO companyDTO) {
-        Company companyResponse = this.companyService.store(companyMapper.toCompanyWithBillingInfo(companyDTO));
-        try {
-            this.companyService.createSettingsForCompany(companyResponse);
-        } catch (IOException e) {
-            return new ResponseEntity<>(new CompanyDTO(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return ResponseEntity.ok(companyMapper.toCompanyDTO(companyResponse));
+        return ResponseEntity.ok(companyMapper.toCompanyDTO(this.companyService.store(companyMapper.toCompanyWithBillingInfo(companyDTO))));
     }
 
     @Transactional

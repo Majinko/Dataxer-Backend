@@ -16,4 +16,5 @@ public interface QSettingsRepository {
 
     Optional<Settings> getByName(String name, List<Long> companyIds);
 
+    List<Settings> getByCompanyId(Long id);
 }

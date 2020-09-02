@@ -27,16 +27,13 @@ public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
     private final AppUserRepository appUserRepository;
-    private final SettingsRepository settingsRepository;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, AppUserRepository appUserRepository, SettingsRepository settingsRepository) {
+    public CompanyServiceImpl(CompanyRepository companyRepository, AppUserRepository appUserRepository) {
         this.companyRepository = companyRepository;
         this.appUserRepository = appUserRepository;
-        this.settingsRepository = settingsRepository;
     }
 
     @Override
-    @Transactional
     public Company store(Company company) {
         AppUser appUser = appUserRepository
                 .findById(SecurityUtils.id())
@@ -96,29 +93,5 @@ public class CompanyServiceImpl implements CompanyService {
         companyRepository.save(c);
 
         return c;
-    }
-
-    @Override
-    @Transactional
-    public void createSettingsForCompany(Company company) {
-        try {
-            String fileUploadDirectory = this.createUploadFileDirectory(StringUtils.removeWhiteLetters(company.getName()).trim());
-            Settings settings = new Settings(
-                    CompanySettings.FILE_UPLOAD_DIRECTORY.getName(),
-                    fileUploadDirectory
-            );
-            this.settingsRepository.save(settings);
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot create settings for company: " + company.getName() + e.getMessage());
-        }
-    }
-
-    private String createUploadFileDirectory(String companyName) throws IOException {
-        String uploadDir = this.basePath + File.separator + companyName + File.separator;
-        if(!Files.exists(Paths.get(uploadDir))) {
-            Files.createDirectories(Paths.get(uploadDir), PosixFilePermissions.asFileAttribute(
-                    PosixFilePermissions.fromString("rwxrwxrwx")));
-        }
-        return uploadDir;
     }
 }
