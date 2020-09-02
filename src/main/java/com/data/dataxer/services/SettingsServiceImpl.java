@@ -16,7 +16,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -51,6 +50,17 @@ public class SettingsServiceImpl implements SettingsService{
     public Settings getByName(String name) {
         return this.qSettingsRepository.getByName(name, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Setting does not exists!"));
+    }
+
+    @Override
+    public void destroyAllCompanySettings(Long companyId) {
+        this.qSettingsRepository.deleteAllSettingsByCompany(companyId);
+    }
+
+    @Override
+    public void regenerateCompanySettings(Long companyId) {
+        this.destroyAllCompanySettings(companyId);
+        this.makeSettingsForCompany(companyId);
     }
 
     private void createSettingsForCompany(Company company) {

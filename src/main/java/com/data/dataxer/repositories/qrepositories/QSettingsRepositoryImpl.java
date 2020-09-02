@@ -1,12 +1,8 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.QSettings;
 import com.data.dataxer.models.domain.Settings;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -23,33 +19,6 @@ public class QSettingsRepositoryImpl implements QSettingsRepository {
     }
 
     @Override
-    public Page<Settings> paginate(Pageable pageable, Filter filter, List<Long> companyIds) {
-        QSettings qSettings = QSettings.settings;
-
-        List<Settings> allSettings = this.query.selectFrom(qSettings)
-                .where(qSettings.company.id.in(companyIds))
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .orderBy(qSettings.id.desc())
-                .fetch();
-
-
-        return new PageImpl<Settings>(allSettings, pageable, total(companyIds));
-    }
-
-    @Override
-    public Optional<Settings> getById(Long id, List<Long> companyIds) {
-        QSettings qSettings = QSettings.settings;
-
-        return Optional.ofNullable(
-            this.query.selectFrom(qSettings)
-                .where(qSettings.id.eq(id))
-                .where(qSettings.company.id.in(companyIds))
-                .fetchOne()
-        );
-    }
-
-    @Override
     public Optional<Settings> getByName(String name, List<Long> companyIds) {
         QSettings qSettings = QSettings.settings;
 
@@ -62,19 +31,20 @@ public class QSettingsRepositoryImpl implements QSettingsRepository {
     }
 
     @Override
-    public List<Settings> getByCompanyId(Long id) {
+    public List<Settings> getByCompanyId(Long companyId) {
         QSettings qSettings = QSettings.settings;
 
         return this.query.selectFrom(qSettings)
-                .where(qSettings.company.id.eq(id))
+                .where(qSettings.company.id.eq(companyId))
                 .fetch();
     }
 
-    private long total(List<Long> companyIds) {
+    @Override
+    public void deleteAllSettingsByCompany(Long companyId) {
         QSettings qSettings = QSettings.settings;
 
-        return this.query.selectFrom(qSettings)
-                .where(qSettings.company.id.in(companyIds))
-                .fetchCount();
+        this.query.delete(qSettings)
+                .where(qSettings.company.id.eq(companyId))
+                .execute();
     }
 }

@@ -12,4 +12,8 @@ public interface SettingsService {
 
     Settings getByName(String name);
 
+    void destroyAllCompanySettings(Long companyId);
+
+    void regenerateCompanySettings(Long companyId);
 }
+
