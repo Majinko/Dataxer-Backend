@@ -1,29 +1,16 @@
 package com.data.dataxer.services;
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Company;
-import com.data.dataxer.models.domain.Settings;
-import com.data.dataxer.models.enums.CompanySettings;
 import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.AppUserRepository;
-import com.data.dataxer.repositories.SettingsRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
-import com.data.dataxer.utils.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
-
-    @Value("${upload.path}")
-    private String basePath;
 
     private final CompanyRepository companyRepository;
     private final AppUserRepository appUserRepository;
@@ -34,6 +21,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    @Transactional
     public Company store(Company company) {
         AppUser appUser = appUserRepository
                 .findById(SecurityUtils.id())

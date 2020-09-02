@@ -1,15 +1,12 @@
 package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.CompanyMapper;
-import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.dto.CompanyDTO;
 import com.data.dataxer.services.CompanyService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.List;
 
 @RestController
