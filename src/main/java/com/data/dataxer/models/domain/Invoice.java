@@ -21,7 +21,6 @@ import java.util.Map;
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE price_offer SET deleted_at = now() WHERE id = ?")
 public class Invoice extends  BaseEntity{
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -94,5 +93,4 @@ public class Invoice extends  BaseEntity{
             this.packs.add(new DocumentPack(pack));
         }
     }
-
 }
