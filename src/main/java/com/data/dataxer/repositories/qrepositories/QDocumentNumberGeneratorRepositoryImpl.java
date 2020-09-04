@@ -29,8 +29,8 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
 
         BooleanBuilder filterCondition = new BooleanBuilder();
 
-        if (filter != null && !filter.isEmpty()) {
-            filterCondition = filter.buildFilterPredicate();
+        if (!filter.isEmpty()) {
+            filterCondition = filter.buildNumberGeneratorFilterPredicate();
         }
 
         List<DocumentNumberGenerator> documentNumberGenerators = this.query

@@ -19,9 +19,8 @@ import java.util.Map;
 @Setter
 @Getter
 @Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE price_offer SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE invoice SET deleted_at = now() WHERE id = ?")
 public class Invoice extends  BaseEntity{
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -46,7 +45,7 @@ public class Invoice extends  BaseEntity{
 
     private BigDecimal price;
 
-    private BigDecimal priceTotal;
+    private BigDecimal totalPrice;
 
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)
@@ -56,7 +55,7 @@ public class Invoice extends  BaseEntity{
     private LocalDate createdDate;
 
     @Column(nullable = false)
-    private LocalDate deliveryDate;
+    private LocalDate deliveredDate;
 
     //represent date when invoice was changed to payed state
     private LocalDate paymentDate;
@@ -78,12 +77,12 @@ public class Invoice extends  BaseEntity{
         this.state = invoice.getState();
         this.note = invoice.getNote();
         this.price = invoice.getPrice();
-        this.priceTotal = invoice.getPriceTotal();
+        this.totalPrice = invoice.getTotalPrice();
         if (invoice.getInvoiceData() != null && !invoice.getInvoiceData().isEmpty()){
             this.invoiceData.putAll(invoice.getInvoiceData());
         }
         this.createdDate = invoice.getCreatedDate();
-        this.deliveryDate = invoice.getDeliveryDate();
+        this.deliveredDate = invoice.getDeliveredDate();
         this.paymentDate = invoice.getPaymentDate();
         this.dueDate = invoice.getDueDate();
         this.deletedAt = invoice.getDeletedAt();
@@ -94,5 +93,4 @@ public class Invoice extends  BaseEntity{
             this.packs.add(new DocumentPack(pack));
         }
     }
-
 }

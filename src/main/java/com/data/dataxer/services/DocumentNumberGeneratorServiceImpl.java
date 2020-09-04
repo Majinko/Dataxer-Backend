@@ -86,7 +86,12 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             documentNumberGenerator = documentNumberGeneratorOptional.get();
         }
 
-        return this.generateNextDocumentNumber(documentNumberGenerator);
+        return this.generateNextDocumentNumber(documentNumberGenerator, true);
+    }
+
+    @Override
+    public String getNextNumber(DocumentNumberGenerator documentNumberGenerator) {
+        return this.generateNextDocumentNumber(documentNumberGenerator, false);
     }
 
     @Override
@@ -113,7 +118,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         }
     }
 
-    private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator) {
+    private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator, boolean storeGenerated) {
         LocalDate currentDate = LocalDate.now();
         String generatedNumber = this.replaceYear(documentNumberGenerator.getFormat(), currentDate);
         switch(documentNumberGenerator.getPeriod()) {
@@ -135,8 +140,10 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             documentNumberGenerator.setFormat(this.extendFormat(documentNumberGenerator.getFormat()));
         }
         generatedNumber = this.replaceNumber(generatedNumber, nextNumber);
-        documentNumberGenerator.setLastNumber(nextNumber);
-        this.documentNumberGeneratorRepository.save(documentNumberGenerator);
+        if (storeGenerated) {
+            documentNumberGenerator.setLastNumber(nextNumber);
+            this.documentNumberGeneratorRepository.save(documentNumberGenerator);
+        }
 
         return generatedNumber;
     }

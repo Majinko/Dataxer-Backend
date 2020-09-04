@@ -8,10 +8,13 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DocumentNumberGeneratorDTO {
+
     private Long id;
     private String title;
     private String format;
     private DocumentType type;
     private Periods period;
     private Boolean isDefault;
+    private String nextNumber;
+
 }

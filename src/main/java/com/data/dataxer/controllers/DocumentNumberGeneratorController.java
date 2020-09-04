@@ -2,6 +2,7 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.DocumentNumberGeneratorMapper;
+import com.data.dataxer.models.domain.DocumentNumberGenerator;
 import com.data.dataxer.models.dto.DocumentNumberGeneratorDTO;
 import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.models.enums.DocumentType;
@@ -49,7 +50,8 @@ public class DocumentNumberGeneratorController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
 
-        return ResponseEntity.ok(this.documentNumberGeneratorService.paginate(pageable, filter).map(this.documentNumberGeneratorMapper::documentNumberGeneratorToDocumentNumberGeneratorDTOSimple));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.paginate(pageable, filter)
+                .map(this::convertToDocumentNumberGeneratorDTO));
     }
 
     @GetMapping("/generateNextByType/{documentType}")
@@ -73,4 +75,11 @@ public class DocumentNumberGeneratorController {
     public void resetGenerationById(@PathVariable Long id) {
         this.documentNumberGeneratorService.resetGenerationById(id);
     }
+
+    private DocumentNumberGeneratorDTO convertToDocumentNumberGeneratorDTO(DocumentNumberGenerator documentNumberGenerator) {
+        DocumentNumberGeneratorDTO documentNumberGeneratorDTO = this.documentNumberGeneratorMapper.documentNumberGeneratorToDocumentNumberGeneratorDTO(documentNumberGenerator);
+        documentNumberGeneratorDTO.setNextNumber(this.documentNumberGeneratorService.getNextNumber(documentNumberGenerator));
+        return documentNumberGeneratorDTO;
+    }
+
 }

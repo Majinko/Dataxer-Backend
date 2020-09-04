@@ -4,7 +4,9 @@ public enum SearchableStrings {
 
     TITLE("title"),
     NUMBER("number"),
-    NOTE("note");
+    NOTE("note"),
+    FORMAT("format"),
+    LAST_NUMBER("lastNumber");
 
     private String value;
 
