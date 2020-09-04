@@ -4,7 +4,8 @@ public class DocumentState {
     public enum InvoiceStates {
         WAITING("waiting"),
         APPROVED("approved"),
-        REJECTED("rejected");
+        REJECTED("rejected"),
+        PAYED("payed");
 
         private String stateCode;
 

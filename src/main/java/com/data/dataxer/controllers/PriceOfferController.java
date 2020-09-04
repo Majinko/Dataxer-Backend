@@ -1,5 +1,6 @@
 package com.data.dataxer.controllers;
 
+import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.PriceOfferMapper;
 import com.data.dataxer.models.dto.PriceOfferDTO;
 import com.data.dataxer.models.filter.DocumentFilter;
@@ -38,10 +39,11 @@ public class PriceOfferController {
     public ResponseEntity<Page<PriceOfferDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam Map<String, String> filter
+            @RequestParam(value = "sort", defaultValue = "id") String sortColumn,
+            @RequestBody(required = false) Filter filter
     ) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
 
         return ResponseEntity.ok(priceOfferService.paginate(pageable, filter).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
     }
