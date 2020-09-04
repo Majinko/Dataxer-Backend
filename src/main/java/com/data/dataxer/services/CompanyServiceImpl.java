@@ -80,4 +80,9 @@ public class CompanyServiceImpl implements CompanyService {
 
         return c;
     }
+
+    @Override
+    public Company getDefaultCompany() {
+        return this.companyRepository.findByIsDefaultAndAppUserId(SecurityUtils.id()).orElseThrow(() -> new RuntimeException("Default company not exist, please set default company"));
+    }
 }

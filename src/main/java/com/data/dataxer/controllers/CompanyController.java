@@ -41,4 +41,9 @@ public class CompanyController {
     public ResponseEntity<CompanyDTO> update(@RequestBody CompanyDTO companyDTO, @PathVariable Long id) {
         return ResponseEntity.ok(companyMapper.toCompanyWithBillingInfoDTO(this.companyService.update(companyMapper.toCompany(companyDTO), id)));
     }
+
+    @GetMapping("/default")
+    public ResponseEntity<CompanyDTO> defaultCompany() {
+        return ResponseEntity.ok(companyMapper.toCompanyDTO(this.companyService.getDefaultCompany()));
+    }
 }

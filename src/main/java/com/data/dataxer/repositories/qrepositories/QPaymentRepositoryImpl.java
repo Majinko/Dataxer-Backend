@@ -75,7 +75,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
                 return this.query.selectFrom(qInvoice)
                         .where(qInvoice.id.eq(documentId))
-                        .fetchOne().getPriceTotal();
+                        .fetchOne().getTotalPrice();
             case PRICE_OFFER:
             default :
                 QPriceOffer qPriceOffer = QPriceOffer.priceOffer;

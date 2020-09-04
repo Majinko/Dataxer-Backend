@@ -33,6 +33,8 @@ public class Company implements Serializable {
     @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BillingInformation> billingInformation = new ArrayList<>();
 
+    private boolean IsDefault;
+
     private String logoUrl;
 
     private String legalForm;
