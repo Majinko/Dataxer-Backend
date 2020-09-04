@@ -11,5 +11,5 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     Optional<Company> findAllByIdAndAppUserId(Long companyId, Long userId);
 
-    Optional<Company> findByIsDefaultAndAppUserId(Long userId);
+    Optional<Company> findByDefaultCompanyAndAppUserId(boolean isDefault, Long userId);
 }

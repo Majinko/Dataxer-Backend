@@ -1,4 +1,5 @@
 package com.data.dataxer.services;
+
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.repositories.CompanyRepository;
@@ -6,6 +7,7 @@ import com.data.dataxer.repositories.AppUserRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -83,6 +85,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public Company getDefaultCompany() {
-        return this.companyRepository.findByIsDefaultAndAppUserId(SecurityUtils.id()).orElseThrow(() -> new RuntimeException("Default company not exist, please set default company"));
+        return this.companyRepository.findByDefaultCompanyAndAppUserId(true, SecurityUtils.id())
+                .orElseThrow(() -> new RuntimeException("Document number generator not found"));
     }
 }
