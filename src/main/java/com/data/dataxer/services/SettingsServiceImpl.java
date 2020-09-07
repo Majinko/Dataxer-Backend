@@ -11,15 +11,16 @@ import com.data.dataxer.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.PosixFilePermissions;
 import java.util.List;
 
 @Service
 public class SettingsServiceImpl implements SettingsService{
+
+    @Value("${file.upload-dir}")
+    private String uploadDirectory;
 
     private final SettingsRepository settingsRepository;
     private final QSettingsRepository qSettingsRepository;
@@ -30,9 +31,6 @@ public class SettingsServiceImpl implements SettingsService{
         this.qSettingsRepository = qSettingsRepository;
         this.companyRepository = companyRepository;
     }
-
-    @Value("${upload.path}")
-    private String basePath;
 
     @Override
     public void makeSettingsForCompany(Long id) {
@@ -64,25 +62,25 @@ public class SettingsServiceImpl implements SettingsService{
     }
 
     private void createSettingsForCompany(Company company) {
-        try {
-            String fileUploadDirectory = this.createUploadFileDirectory(StringUtils.removeWhiteLetters(company.getName()).trim());
+            String fileUploadDirectory = this.createUploadDirectory(
+                    StringUtils.removeWhiteLetters(company.getName()).trim()
+            );
             Settings settings = new Settings(
                     CompanySettings.FILE_UPLOAD_DIRECTORY.getName(),
                     fileUploadDirectory
             );
             settings.setCompany(company);
             this.settingsRepository.save(settings);
-        } catch (IOException e) {
-            throw new RuntimeException("Cannot create settings for company: " + company.getName() + e.getMessage());
-        }
     }
 
-    private String createUploadFileDirectory(String companyName) throws IOException {
-        String uploadDir = this.basePath + File.separator + companyName + File.separator;
-        if(!Files.exists(Paths.get(uploadDir))) {
-            Files.createDirectories(Paths.get(uploadDir), PosixFilePermissions.asFileAttribute(
-                    PosixFilePermissions.fromString("rwxrwxrwx")));
+    private String createUploadDirectory(String companyName) {
+        Path fileStorageLocation = Paths.get(this.uploadDirectory + java.io.File.separator + companyName)
+                .toAbsolutePath().normalize();
+        try {
+            Files.createDirectories(fileStorageLocation);
+            return fileStorageLocation.toString();
+        } catch (Exception ex) {
+            throw new RuntimeException("Could not create the directory where the uploaded files will be stored.", ex);
         }
-        return uploadDir;
     }
 }
