@@ -48,16 +48,21 @@ public class FileServiceImpl implements FileService {
             }
 
             // Copy file to the target location (Replacing existing file with the same name)
-            Path targetLocation = Paths.get(loadCompanyUploadDirectory()).resolve(String.valueOf(file.getResource().hashCode()));
+            Path targetLocation = Paths.get(loadCompanyUploadDirectory()).resolve(fileName);
 
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-                    .path("/downloadFile/")
-                    .path(file.getName())
+                    .path("/api/file/downloadFile/")
+                    .path(fileName)
                     .toUriString();
 
-            return  this.fileRepository.save(new File(file, isDefault, fileDownloadUri));
+            String fileShowUri = ServletUriComponentsBuilder.fromCurrentContextPath()
+                    .path("/api/file/show/")
+                    .path(fileName)
+                    .toUriString();
+
+            return  this.fileRepository.save(new File(file, isDefault, fileDownloadUri, fileShowUri));
         } catch (IOException ex) {
             throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
         }
@@ -70,7 +75,7 @@ public class FileServiceImpl implements FileService {
                     .getByName(fileName, SecurityUtils.companyIds())
                     .orElseThrow(() -> new RuntimeException("File not found " + fileName));
             Path uploadDirectory = Paths.get(loadCompanyUploadDirectory())
-                    .resolve(String.valueOf(file.getFileHash()))
+                    .resolve(fileName)
                     .normalize();
             Resource resource = new UrlResource(uploadDirectory.toUri());
             if (resource.exists()) {

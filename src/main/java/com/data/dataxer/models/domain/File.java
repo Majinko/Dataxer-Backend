@@ -17,8 +17,6 @@ import java.net.URL;
 @Entity
 @Setter
 @Getter
-@Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE file SET deleted_at = now() WHERE id = ?")
 public class File extends BaseEntity{
 
     @Id
@@ -33,7 +31,9 @@ public class File extends BaseEntity{
 
     private BigDecimal size;
 
-    private String fileUrl;
+    private String downloadURL;
+
+    private String showURL;
 
     private Boolean isDefault;
 
@@ -41,13 +41,14 @@ public class File extends BaseEntity{
 
     }
 
-    public File(MultipartFile file, Boolean isDefault, String fileUrl) {
+    public File(MultipartFile file, Boolean isDefault, String downloadURL, String showURL) {
         this.name = file.getOriginalFilename();
         this.extension = file.getContentType();
         this.size = BigDecimal.valueOf(file.getSize());
         this.isDefault = isDefault;
         this.fileHash = file.getResource().hashCode();
-        this.fileUrl = fileUrl;
+        this.downloadURL = downloadURL;
+        this.showURL = showURL;
     }
 
 }

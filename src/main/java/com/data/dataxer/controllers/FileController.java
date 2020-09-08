@@ -6,6 +6,7 @@ import com.data.dataxer.models.domain.File;
 import com.data.dataxer.models.dto.FileDTO;
 import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.services.FileService;
+import lombok.SneakyThrows;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
@@ -80,6 +82,12 @@ public class FileController {
                 .contentType(MediaType.parseMediaType(contentType))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
                 .body(resource);
+    }
+
+    @ResponseBody
+    @GetMapping("/show/{fileName:.+}")
+    public Resource getFile(@PathVariable String fileName) {
+        return this.fileService.loadFileAsResource(fileName);
     }
 
     @GetMapping("/getFileByName/{fileName}")

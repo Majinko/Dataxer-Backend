@@ -12,7 +12,8 @@ public class FileDTO {
     private String name;
     private String extension;
     private BigDecimal size;
-    private String fileUrl;
+    private String downloadURL;
+    private String showURL;
     private Boolean isDefault;
 
 }
