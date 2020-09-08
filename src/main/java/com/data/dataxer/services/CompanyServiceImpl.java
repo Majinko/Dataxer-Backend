@@ -86,6 +86,6 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public Company getDefaultCompany() {
         return this.companyRepository.findByDefaultCompanyAndAppUserId(true, SecurityUtils.id())
-                .orElseThrow(() -> new RuntimeException("Document number generator not found"));
+                .orElseThrow(() -> new RuntimeException("Default company not exist, please set it"));
     }
 }

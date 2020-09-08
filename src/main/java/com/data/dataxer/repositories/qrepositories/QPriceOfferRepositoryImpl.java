@@ -36,7 +36,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
         BooleanBuilder filterCondition = new BooleanBuilder();
 
-        if (!filter.isEmpty()) {
+        if (filter != null && !filter.isEmpty()) {
             filterCondition = filter.buildPriceOfferFilterPredicate();
         }
 

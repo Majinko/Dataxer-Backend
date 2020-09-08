@@ -12,14 +12,13 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-
+    @Mapping(target = "companies", ignore = true)
     AppUserDTO appUserToAppUserDTO(AppUser user);
 
-    @Mapping(target = "updatedAt", source = "")
-    @Mapping(target = "roles", source = "")
-    @Mapping(target = "deletedAt", source = "")
-    @Mapping(target = "createdAt", source = "")
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     AppUser appUserDTOtoAppUser(AppUserDTO userDTO);
 
     @Named(value = "appUserToAppUserDTOSimple")

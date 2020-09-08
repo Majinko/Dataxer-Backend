@@ -40,12 +40,11 @@ public class PriceOfferController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "sort", defaultValue = "id") String sortColumn,
-            @RequestBody(required = false) Filter filter
+            @RequestBody(required = false) Filter params
     ) {
-
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
 
-        return ResponseEntity.ok(priceOfferService.paginate(pageable, filter).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
+        return ResponseEntity.ok(priceOfferService.paginate(pageable, params).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
     }
 
     @GetMapping("/{id}")

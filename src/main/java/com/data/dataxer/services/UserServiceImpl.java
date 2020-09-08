@@ -20,7 +20,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUser loggedUser() {
-        return this.userRepository.findById(SecurityUtils.id()).orElseThrow(() -> new RuntimeException("Contact not found"));
+        return this.userRepository.findById(SecurityUtils.id()).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     @Override
