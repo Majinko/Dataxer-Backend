@@ -12,6 +12,7 @@ import java.util.List;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
+
     private final CompanyRepository companyRepository;
     private final AppUserRepository appUserRepository;
 
