@@ -52,5 +52,4 @@ public class DocumentPack implements Serializable {
             this.packItems.add(new DocumentPackItem(packItem, pack));
         }
     }
-
 }
