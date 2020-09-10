@@ -1,7 +1,10 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.mappers.HashMapConverter;
+import com.data.dataxer.models.enums.DeliveryMethod;
 import com.data.dataxer.models.enums.DocumentState;
+import com.data.dataxer.models.enums.PaymentMethod;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -25,6 +28,7 @@ public class Invoice extends  BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Transient
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPack> packs = new ArrayList<>();
 
@@ -38,10 +42,25 @@ public class Invoice extends  BaseEntity{
     @Column(nullable = false)
     private String number;
 
+    @Column(nullable = false)
+    private String variableSymbol;
+
+    @Column(nullable = false)
+    private String specificSymbol;
+
+    private DeliveryMethod deliveryMethod;
+
+    private PaymentMethod paymentMethod;
+
+    @Column(columnDefinition = "text")
+    private String headerComment;
+
     private DocumentState.InvoiceStates state;
 
     @Column(columnDefinition = "text")
     private String note;
+
+    private BigDecimal discount;
 
     private BigDecimal price;
 
@@ -67,6 +86,7 @@ public class Invoice extends  BaseEntity{
     private LocalDateTime deletedAt;
 
     public Invoice() {}
+
     public Invoice(Invoice invoice) {
         if (invoice.getPacks() != null && !invoice.getPacks().isEmpty()){
             this.duplicatePacks(invoice.getPacks());
