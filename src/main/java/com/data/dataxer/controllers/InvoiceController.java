@@ -39,7 +39,7 @@ public class InvoiceController {
     @RequestMapping(value = "/changeState", method = RequestMethod.PUT)
     public void changeState(
             @RequestParam(value = "id") Long id,
-            @RequestParam(value = "documentState") DocumentState.InvoiceStates newState
+            @RequestParam(value = "documentState") DocumentState newState
             ) {
         this.invoiceService.changeState(id, newState);
     }

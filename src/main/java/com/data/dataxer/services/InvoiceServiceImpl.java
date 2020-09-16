@@ -65,7 +65,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void changeState(Long id, DocumentState.InvoiceStates documentState) {
+    public void changeState(Long id, DocumentState documentState) {
         Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
 

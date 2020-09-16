@@ -90,15 +90,15 @@ public class Filter {
             return builder.or(Expressions.predicate(resolveOperator(), dateBase, value));
         }
         if (this.columnId.equals("state")) {
-            Path<DocumentState.InvoiceStates> stateBase = Expressions.path(DocumentState.InvoiceStates.class, invoice, this.columnId);
+            Path<DocumentState> stateBase = Expressions.path(DocumentState.class, invoice, this.columnId);
             if (this.values.size() > 1) {
                 for (String state : this.values) {
-                    Expression<DocumentState.InvoiceStates> value = Expressions.constant(DocumentState.InvoiceStates.getStateByCode(state));
+                    Expression<DocumentState> value = Expressions.constant(DocumentState.getStateByCode(state));
                     builder.or(Expressions.predicate(Ops.EQ, stateBase, value));
                 }
                 return builder;
             }
-            Expression<DocumentState.InvoiceStates> value = Expressions.constant(DocumentState.InvoiceStates.getStateByCode(this.values.get(0)));
+            Expression<DocumentState> value = Expressions.constant(DocumentState.getStateByCode(this.values.get(0)));
             return builder.or(Expressions.predicate(resolveOperator(), stateBase, value));
         }
         throw new RuntimeException("Not valid filter!");
@@ -132,15 +132,15 @@ public class Filter {
             return builder.or(Expressions.predicate(resolveOperator(), dateBase, value));
         }
         if (this.columnId.equals("state")) {
-            Path<DocumentState.InvoiceStates> stateBase = Expressions.path(DocumentState.InvoiceStates.class, priceOffer, this.columnId);
+            Path<DocumentState> stateBase = Expressions.path(DocumentState.class, priceOffer, this.columnId);
             if (this.values.size() > 1) {
                 for (String state : this.values) {
-                    Expression<DocumentState.InvoiceStates> value = Expressions.constant(DocumentState.InvoiceStates.getStateByCode(state));
+                    Expression<DocumentState> value = Expressions.constant(DocumentState.getStateByCode(state));
                     builder.or(Expressions.predicate(Ops.EQ, stateBase, value));
                 }
                 return builder;
             }
-            Expression<DocumentState.InvoiceStates> value = Expressions.constant(DocumentState.InvoiceStates.getStateByCode(this.values.get(0)));
+            Expression<DocumentState> value = Expressions.constant(DocumentState.getStateByCode(this.values.get(0)));
             return builder.or(Expressions.predicate(resolveOperator(), stateBase, value));
         }
         throw new RuntimeException("Not valid filter!");
