@@ -27,10 +27,7 @@ public class Contact extends BaseEntity {
     private List<Project> projects = new ArrayList<>();
 
     @NotNull
-    private String firstName;
-
-    @NotNull
-    private String lastName;
+    private String name;
 
     private String photoUrl;
 

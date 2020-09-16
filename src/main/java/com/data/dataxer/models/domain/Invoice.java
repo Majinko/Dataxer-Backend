@@ -28,7 +28,6 @@ public class Invoice extends  BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Transient
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPack> packs = new ArrayList<>();
 
