@@ -63,8 +63,7 @@ public class ContactServiceImpl implements ContactService {
                 .map(contact -> {
 
                     // do mapu mi pride vysledok metody findById cize kontakt
-                    contact.setFirstName(c.getFirstName());
-                    contact.setLastName(c.getLastName());
+                    contact.setName(c.getName());
                     contact.setPhotoUrl(c.getPhotoUrl());
                     contact.setStreet(c.getStreet());
                     contact.setCity(c.getCity());
