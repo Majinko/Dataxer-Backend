@@ -2,7 +2,6 @@ package com.data.dataxer.models.domain;
 
 import com.data.dataxer.mappers.HashMapConverter;
 import com.data.dataxer.models.enums.DocumentState;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -19,19 +18,17 @@ import java.util.Map;
 @Entity
 @Getter
 @Setter
-@Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE invoice SET deleted_at = now() WHERE id = ?")
 @Inheritance(strategy= InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(name="DISCRIMINATOR", discriminatorType= DiscriminatorType.STRING)
+@DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("DOCUMENT")
+@Where(clause = "deleted_at is null")
+@SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
 @Table(name="DOCUMENT_BASE")
 public class DocumentBase extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    protected Long id;
 
-    @JsonIgnore
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPack> packs = new ArrayList<>();
 
@@ -39,29 +36,33 @@ public class DocumentBase extends BaseEntity {
     @JoinColumn(name = "client_id")
     Contact contact;
 
-    private String title;
+    protected String title;
 
-    private String number;
+    protected String number;
 
-    private DocumentState state;
+    protected DocumentState state;
 
     @Column(columnDefinition = "text")
-    private String note;
+    protected String note;
 
-    private BigDecimal price;
+    protected BigDecimal discount;
 
-    private BigDecimal totalPrice;
+    protected BigDecimal price;
+
+    protected BigDecimal totalPrice;
 
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)
-    private Map<String, Object> documentData;
+    protected Map<String, Object> documentData;
 
-    private LocalDate createdDate;
+    protected LocalDate createdDate;
 
-    private LocalDate deliveredDate;
+    protected LocalDate deliveredDate;
 
-    private LocalDate dueDate;
+    protected LocalDate dueDate;
 
-    private LocalDateTime deletedAt;
+    protected LocalDateTime deletedAt;
 
 }
+
+

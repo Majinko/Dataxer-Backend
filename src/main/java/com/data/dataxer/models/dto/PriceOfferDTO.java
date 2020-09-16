@@ -15,7 +15,7 @@ public class PriceOfferDTO {
     private String number;
     private String state;
     private String note;
-    private Map<String, Object> priceOfferData;
+    private Map<String, Object> documentData;
     private LocalDate createdDate;
     private LocalDate deliveredDate;
     private LocalDate dueDate;

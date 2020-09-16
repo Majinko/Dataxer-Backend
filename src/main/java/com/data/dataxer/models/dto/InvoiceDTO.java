@@ -25,12 +25,12 @@ public class InvoiceDTO {
     private DeliveryMethod deliveryMethod;
     private PaymentMethod paymentMethod;
     private String headerComment;
-    private DocumentState.InvoiceStates state;
+    private DocumentState state;
     private String note;
     private BigDecimal discount;
     private BigDecimal price;
     private BigDecimal totalPrice;
-    private Map<String, Object> invoiceData;
+    private Map<String, Object> documentData;
     private LocalDate createdDate;
     private LocalDate deliveredDate;
     private LocalDate paymentDate;
