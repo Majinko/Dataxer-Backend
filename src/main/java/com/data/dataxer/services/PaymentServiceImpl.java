@@ -39,7 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
         this.paymentRepository.save(payment);
         if (this.documentIsPayed(payment)) {
             if (payment.getDocumentType().equals(DocumentType.INVOICE)) {
-                this.invoiceService.changeState(payment.getDocumentId(), DocumentState.InvoiceStates.PAYED);
+                this.invoiceService.changeState(payment.getDocumentId(), DocumentState.PAYED);
             }
             if (payment.getDocumentType().equals(DocumentType.PRICE_OFFER)) {
                 //not implemented now

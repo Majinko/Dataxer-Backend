@@ -1,9 +1,12 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.mappers.HashMapConverter;
+import com.data.dataxer.models.enums.DocumentState;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -16,18 +19,20 @@ import java.util.Map;
 @Entity
 @Getter
 @Setter
+@Where(clause = "deleted_at is null")
+@SQLDelete(sql = "UPDATE invoice SET deleted_at = now() WHERE id = ?")
 @Inheritance(strategy= InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name="DISCRIMINATOR", discriminatorType= DiscriminatorType.STRING)
 @DiscriminatorValue("DOCUMENT")
-@Table(name="BASIC_DOCUMENT")
+@Table(name="DOCUMENT_BASE")
 public class DocumentBase extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected String id;
+    private Long id;
 
     @JsonIgnore
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPack> packs = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -38,7 +43,7 @@ public class DocumentBase extends BaseEntity {
 
     private String number;
 
-    private String state;
+    private DocumentState state;
 
     @Column(columnDefinition = "text")
     private String note;
