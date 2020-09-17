@@ -28,8 +28,22 @@ public class AppUser implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Company> companies = new ArrayList<>();
 
+    private String firstName;
+
+    private String lastName;
+
     @Column(unique = true, nullable = false, updatable = false, length = 50)
     private String email;
+
+    private String phone;
+
+    private String street;
+
+    private String city;
+
+    private String postalCode;
+
+    private String country;
 
     @ManyToMany(fetch = FetchType.LAZY)
     private Set<Role> roles = new HashSet<>();
