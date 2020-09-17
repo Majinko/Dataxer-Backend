@@ -19,5 +19,4 @@ public interface InvoiceMapper {
     @Mapping(target = "item.category", ignore = true)
     @Mapping(target = "item.supplier", ignore = true)
     DocumentPackItemDTO documentPackItemToDocumentPackItemDTO(DocumentPackItem documentPackItem);
-
 }

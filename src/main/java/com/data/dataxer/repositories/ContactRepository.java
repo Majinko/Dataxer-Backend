@@ -19,7 +19,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long>, Queryds
 
     Optional<List<Contact>> findAllByCompanyIdIn(List<Long> companyIds);
 
-    Optional<List<Contact>> findFirst5ByFirstNameContainingAndLastNameContaining(String firstName, String lastName);
+    Optional<List<Contact>> findFirst5ByNameContaining(String name);
 
     Optional<Page<Contact>> findAllByEmailContainingAndCompanyIdIn(Pageable pageable, String email, List<Long> companyIds);
 

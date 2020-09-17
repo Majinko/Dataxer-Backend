@@ -45,18 +45,17 @@ public class ContactController {
     }
 
     @RequestMapping(value = "/search", method = RequestMethod.GET)
-    public ResponseEntity<List<ContactDTO>> findByFirstNameAndLastName(@RequestParam(value = "firstName", defaultValue = "") String firstName, @RequestParam(value = "lastName", defaultValue = "") String lastName) {
-        return ResponseEntity.ok(contactMapper.toContactDTOs(contactService.findByFirstNameAndLastName(firstName, lastName)));
+    public ResponseEntity<List<ContactDTO>> findByName(@RequestParam(value = "name", defaultValue = "") String name) {
+        return ResponseEntity.ok(contactMapper.toContactDTOs(contactService.findByName(name)));
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
     public ResponseEntity<Page<ContactDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "sort", defaultValue = "firstName") String sort,
             @RequestParam(value = "email", defaultValue = "") String email
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
 
         return ResponseEntity.ok(contactService.paginate(pageable, email).map(contactMapper::toContactDto));
     }

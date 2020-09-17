@@ -35,9 +35,9 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public List<Contact> findByFirstNameAndLastName(String firstName, String lastName) {
+    public List<Contact> findByName(String name) {
         return contactRepository
-                .findFirst5ByFirstNameContainingAndLastNameContaining(firstName, lastName)
+                .findFirst5ByNameContaining(name)
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 

@@ -12,7 +12,7 @@ public interface ContactService {
 
     List<Contact> findAll();
 
-    List<Contact> findByFirstNameAndLastName(String firstName, String lastName);
+    List<Contact> findByName(String name);
 
     Page<Contact> paginate(Pageable pageable, String email);
 
