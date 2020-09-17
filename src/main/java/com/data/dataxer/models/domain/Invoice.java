@@ -4,6 +4,8 @@ import com.data.dataxer.models.enums.DeliveryMethod;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -13,6 +15,8 @@ import java.util.List;
 @Setter
 @Getter
 @DiscriminatorValue("INVOICE")
+@Where(clause = "deleted_at is null")
+@SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
 public class Invoice extends DocumentBase {
 
     private String variableSymbol;
@@ -46,9 +50,14 @@ public class Invoice extends DocumentBase {
         }
         this.createdDate = invoice.getCreatedDate();
         this.deliveredDate = invoice.getDeliveredDate();
-        this.paymentDate = invoice.getPaymentDate();
         this.dueDate = invoice.getDueDate();
         this.deletedAt = invoice.getDeletedAt();
+        this.variableSymbol = invoice.getVariableSymbol();
+        this.specificSymbol = invoice.getSpecificSymbol();
+        this.deliveryMethod = invoice.getDeliveryMethod();
+        this.paymentMethod = invoice.getPaymentMethod();
+        this.headerComment = invoice.getHeaderComment();
+        this.paymentDate = invoice.getPaymentDate();
     }
 
     private void duplicatePacks(List<DocumentPack> packs) {

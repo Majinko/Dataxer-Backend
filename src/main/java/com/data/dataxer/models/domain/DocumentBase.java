@@ -4,8 +4,6 @@ import com.data.dataxer.mappers.HashMapConverter;
 import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -21,8 +19,6 @@ import java.util.Map;
 @Inheritance(strategy= InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
 @DiscriminatorValue("DOCUMENT")
-@Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
 @Table(name="DOCUMENT_BASE")
 public class DocumentBase extends BaseEntity {
     @Id

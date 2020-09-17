@@ -1,5 +1,6 @@
 package com.data.dataxer.models.dto;
 
+import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,7 +14,7 @@ public class PriceOfferDTO {
     private Long id;
     private String title;
     private String number;
-    private String state;
+    private DocumentState state;
     private String note;
     private Map<String, Object> documentData;
     private LocalDate createdDate;

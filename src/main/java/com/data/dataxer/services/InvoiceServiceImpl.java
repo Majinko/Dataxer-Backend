@@ -70,7 +70,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
 
         invoice.setState(documentState);
-        this.update(invoice);
+        this.invoiceRepository.save(invoice);
     }
 
     @Transactional
