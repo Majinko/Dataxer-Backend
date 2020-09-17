@@ -15,7 +15,7 @@ public interface CompanyMapper {
     CompanyMapper INSTANCE = Mappers.getMapper(CompanyMapper.class);
 
     @Named(value = "useMe")
-    @Mapping(target = "billingInformation", ignore = true)
+    /*@Mapping(target = "billingInformation", ignore = true)*/
     CompanyDTO toCompanyDTO(Company company);
 
     CompanyDTO toCompanyWithBillingInfoDTO(Company company);

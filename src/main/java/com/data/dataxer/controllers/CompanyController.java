@@ -37,13 +37,18 @@ public class CompanyController {
     }
 
     @Transactional
-    @PostMapping("/update/{id}")
-    public ResponseEntity<CompanyDTO> update(@RequestBody CompanyDTO companyDTO, @PathVariable Long id) {
-        return ResponseEntity.ok(companyMapper.toCompanyWithBillingInfoDTO(this.companyService.update(companyMapper.toCompany(companyDTO), id)));
+    @PostMapping("/update")
+    public ResponseEntity<CompanyDTO> update(@RequestBody CompanyDTO companyDTO) {
+        return ResponseEntity.ok(companyMapper.toCompanyWithBillingInfoDTO(this.companyService.update(companyMapper.toCompany(companyDTO))));
     }
 
     @GetMapping("/default")
     public ResponseEntity<CompanyDTO> defaultCompany() {
         return ResponseEntity.ok(companyMapper.toCompanyDTO(this.companyService.getDefaultCompany()));
+    }
+
+    @GetMapping("/destroy/{id}")
+    public void destroy(@PathVariable Long id){
+        this.companyService.destroy(id);
     }
 }

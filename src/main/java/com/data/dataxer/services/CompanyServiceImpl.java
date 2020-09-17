@@ -29,7 +29,7 @@ public class CompanyServiceImpl implements CompanyService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         company.setAppUser(appUser);
-        this.companySetBi(company);
+ /*       this.companySetBi(company);*/
 
         Company c = this.companyRepository.save(company);
 
@@ -39,11 +39,11 @@ public class CompanyServiceImpl implements CompanyService {
         return c;
     }
 
-    public void companySetBi(Company company) {
+ /*   public void companySetBi(Company company) {
         company.getBillingInformation().forEach(billingInformation -> {
             billingInformation.setCompany(company);
         });
-    }
+    }*/
 
     @Override
     public List<Company> findAll() {
@@ -56,37 +56,24 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    @Transactional
-    public Company update(Company company, Long id) {
-        Company c = this.findById(id);
-
-        c.setName(company.getName());
-        c.setLegalForm(company.getLegalForm());
-        c.setStreet(company.getStreet());
-        c.setCity(company.getCity());
-        c.setPostalCode(company.getPostalCode());
-        c.setCountry(company.getCountry());
-        c.setEmail(company.getEmail());
-        c.setPhone(company.getPhone());
-        c.setWeb(company.getWeb());
-        c.setIdentifyingNumber(company.getIdentifyingNumber());
-        c.setVat(company.getVat());
-        c.setNetOfVat(company.getNetOfVat());
-        c.setIban(company.getIban());
-
-        // company set bi
-        c.getBillingInformation().clear();
-        c.getBillingInformation().addAll(company.getBillingInformation());
-        companySetBi(c);
-
-        companyRepository.save(c);
-
-        return c;
+    public Company update(Company company) {
+        return this.store(company);
     }
 
     @Override
     public Company getDefaultCompany() {
         return this.companyRepository.findByDefaultCompanyAndAppUserId(true, SecurityUtils.id())
                 .orElseThrow(() -> new RuntimeException("Default company not exist, please set it"));
+    }
+
+    @Override
+    public void destroy(Long id) {
+        Company c = this.findById(id);
+
+        if (c.getDefaultCompany() != null){
+            throw new RuntimeException("Default company cannot destroy");
+        }
+
+        this.companyRepository.delete(c);
     }
 }

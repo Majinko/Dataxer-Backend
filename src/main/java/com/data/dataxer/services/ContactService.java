@@ -20,7 +20,7 @@ public interface ContactService {
 
     Contact store(Contact contactDTO);
 
-    Contact update(Contact contactDTO, Long id);
+    Contact update(Contact contactDTO);
 
     void delete(Long id);
 }

@@ -11,7 +11,9 @@ public interface CompanyService {
 
     Company findById(Long id);
 
-    Company update(Company company, Long id);
+    Company update(Company company);
 
     Company getDefaultCompany();
+
+    void destroy(Long id);
 }

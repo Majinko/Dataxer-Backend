@@ -16,4 +16,7 @@ public class ContactDTO {
     private String regNumber;
     private String email;
     private String phone;
+    private String cin;
+    private String tin;
+    private String vatin;
 }

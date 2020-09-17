@@ -58,34 +58,14 @@ public class ContactServiceImpl implements ContactService {
     }
 
     @Override
-    public Contact update(Contact c, Long id) {
-        contactRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds())
-                .map(contact -> {
-
-                    // do mapu mi pride vysledok metody findById cize kontakt
-                    contact.setName(c.getName());
-                    contact.setPhotoUrl(c.getPhotoUrl());
-                    contact.setStreet(c.getStreet());
-                    contact.setCity(c.getCity());
-                    contact.setCountry(c.getCountry());
-                    contact.setPostalCode(c.getPostalCode());
-                    contact.setRegNumber(c.getRegNumber());
-                    contact.setEmail(c.getEmail());
-                    contact.setPhone(c.getPhone());
-                    //contact.setCompany(SecurityUtils.loggedUser().getCompanies().get(0));
-
-                    return contactRepository.save(contact);
-                });
+    public Contact update(Contact c) {
+        this.contactRepository.save(c);
 
         return c;
     }
 
     @Override
     public void delete(Long id) {
-        contactRepository.findById(id).map(contact -> {
-            contact.setDeletedAt(LocalDateTime.now());
-
-            return contactRepository.save(contact);
-        });
+        contactRepository.delete(this.getById(id));
     }
 }

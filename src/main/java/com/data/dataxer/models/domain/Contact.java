@@ -48,5 +48,12 @@ public class Contact extends BaseEntity {
     @Column(columnDefinition = "text")
     private String note;
 
+    @Column(length = 10)
+    private String cin;
+
+    private String tin;
+
+    private String vatin;
+
     private LocalDateTime deletedAt;
 }

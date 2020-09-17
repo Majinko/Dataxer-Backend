@@ -16,7 +16,7 @@ import java.util.List;
 @Setter
 @Entity
 @Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE contact SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE company SET deleted_at = now() WHERE id = ?")
 public class Company implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,9 +29,8 @@ public class Company implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private AppUser appUser;
 
-    // todo spolocnost moze mat len jedny fakturacne udaje prerobit
-    @OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BillingInformation> billingInformation = new ArrayList<>();
+    /*@OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BillingInformation> billingInformation = new ArrayList<>();*/
 
     private Boolean defaultCompany;
 
@@ -53,13 +52,14 @@ public class Company implements Serializable {
 
     private String web;
 
-    private String identifyingNumber;
-
-    private String vat;
-
-    private String netOfVat;
-
     private String iban;
+
+    @Column(length = 10)
+    private String cin;
+
+    private String tin;
+
+    private String vatin;
 
     private LocalDateTime deletedAt;
 }

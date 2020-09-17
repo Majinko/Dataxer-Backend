@@ -65,9 +65,9 @@ public class ContactController {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.store(contactMapper.toContact(contactDto))));
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<ContactDTO> update(@RequestBody ContactDTO contactDto, @PathVariable Long id) {
-        return ResponseEntity.ok(contactMapper.toContactDto(contactService.update(contactMapper.toContact(contactDto), id)));
+    @PutMapping("/update")
+    public ResponseEntity<ContactDTO> update(@RequestBody ContactDTO contactDto) {
+        return ResponseEntity.ok(contactMapper.toContactDto(contactService.update(contactMapper.toContact(contactDto))));
     }
 
     @GetMapping("/destroy/{id}")
