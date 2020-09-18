@@ -22,7 +22,7 @@ public interface InvoiceService {
 
     void destroy(Long id);
 
-    void changeState(Long id, DocumentState.InvoiceStates documentState);
+    void changeState(Long id, DocumentState documentState);
 
     Invoice duplicate(Long id);
 
