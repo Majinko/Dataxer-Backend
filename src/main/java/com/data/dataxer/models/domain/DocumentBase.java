@@ -1,0 +1,64 @@
+package com.data.dataxer.models.domain;
+
+import com.data.dataxer.mappers.HashMapConverter;
+import com.data.dataxer.models.enums.DocumentState;
+import lombok.Getter;
+import lombok.Setter;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+@Entity
+@Getter
+@Setter
+@Inheritance(strategy= InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "DISCRIMINATOR", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("DOCUMENT")
+@Table(name="DOCUMENT_BASE")
+public class DocumentBase extends BaseEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected Long id;
+
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    List<DocumentPack> packs = new ArrayList<>();
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id")
+    Contact contact;
+
+    protected String title;
+
+    protected String number;
+
+    protected DocumentState state;
+
+    @Column(columnDefinition = "text")
+    protected String note;
+
+    protected BigDecimal discount;
+
+    protected BigDecimal price;
+
+    protected BigDecimal totalPrice;
+
+    @Column(columnDefinition = "text")
+    @Convert(converter = HashMapConverter.class)
+    protected Map<String, Object> documentData;
+
+    protected LocalDate createdDate;
+
+    protected LocalDate deliveredDate;
+
+    protected LocalDate dueDate;
+
+    protected LocalDateTime deletedAt;
+
+}
+
+
