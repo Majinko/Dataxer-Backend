@@ -10,4 +10,6 @@ public interface UserService {
     AppUser store(AppUser appUser);
 
     List<AppUser> all();
+
+    AppUser update(AppUser appUserDTOtoAppUser);
 }

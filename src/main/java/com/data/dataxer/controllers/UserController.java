@@ -33,4 +33,9 @@ public class UserController {
     public void store(@RequestBody AppUserDTO appUserDTO) {
         ResponseEntity.ok(userMapper.appUserToAppUserDTO(userService.store(userMapper.appUserDTOtoAppUser(appUserDTO))));
     }
+
+    @PostMapping("/update")
+    public void update(@RequestBody AppUserDTO appUserDTO) {
+        ResponseEntity.ok(userMapper.appUserToAppUserDTO(userService.update(userMapper.appUserDTOtoAppUser(appUserDTO))));
+    }
 }

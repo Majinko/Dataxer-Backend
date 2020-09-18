@@ -32,10 +32,10 @@ public class QTaskRepositoryImpl implements QTaskRepository {
                 .selectFrom(qTask)
                 .where(qTask.company.id.in(companyIds))
                 .where(qTask.id.eq(id))
-                .join(qTask.user).fetchJoin()
-                .join(qTask.userFrom).fetchJoin()
-                .join(qTask.project).fetchJoin()
-                .join(qTask.category).fetchJoin()
+                .leftJoin(qTask.user).fetchJoin()
+                .leftJoin(qTask.userFrom).fetchJoin()
+                .leftJoin(qTask.project).fetchJoin()
+                .leftJoin(qTask.category).fetchJoin()
                 .fetchOne();
     }
 
@@ -46,10 +46,10 @@ public class QTaskRepositoryImpl implements QTaskRepository {
 
         List<Task> tasks = query
                 .selectFrom(qTask)
-                .join(qTask.user).fetchJoin()
-                .join(qTask.userFrom).fetchJoin()
-                .join(qTask.project).fetchJoin()
-                .join(qTask.category).fetchJoin()
+                .leftJoin(qTask.user).fetchJoin()
+                .leftJoin(qTask.userFrom).fetchJoin()
+                .leftJoin(qTask.project).fetchJoin()
+                .leftJoin(qTask.category).fetchJoin()
                 .orderBy(qTask.id.desc())
                 .fetch();
 

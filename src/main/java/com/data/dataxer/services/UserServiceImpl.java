@@ -32,4 +32,9 @@ public class UserServiceImpl implements UserService {
     public List<AppUser> all() {
         return this.qAppUserRepository.all(SecurityUtils.companyIds());
     }
+
+    @Override
+    public AppUser update(AppUser appUser) {
+        return this.userRepository.save(appUser);
+    }
 }
