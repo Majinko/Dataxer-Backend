@@ -121,31 +121,31 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator, boolean storeGenerated) {
         LocalDate currentDate = LocalDate.now();
         String generatedNumber = this.replaceYear(documentNumberGenerator.getFormat(), currentDate);
-        switch(documentNumberGenerator.getPeriod()) {
-            case MONTHLY:
-                generatedNumber = this.replaceMonth(generatedNumber, currentDate);
-                break;
-            case QUARTER:
-                generatedNumber = this.replaceQuarter(generatedNumber, currentDate);
-                break;
-            case HALF_YEAR:
-                generatedNumber = this.replaceHalfYear(generatedNumber, currentDate);
-                break;
-            case YEAR:
-            default:
-                break;
-        }
+        generatedNumber = this.replaceMonth(generatedNumber, currentDate);
+        generatedNumber = this.replaceQuarter(generatedNumber, currentDate);
+        generatedNumber = this.replaceHalfYear(generatedNumber, currentDate);
+        generatedNumber = this.replaceDay(generatedNumber, currentDate);
+
+        return this.replaceNumber(generatedNumber, getAndStoreNextNumber(documentNumberGenerator, storeGenerated));
+    }
+
+    private String getAndStoreNextNumber(DocumentNumberGenerator documentNumberGenerator, boolean storeGenerated) {
+        boolean generatorChanged = false;
         String nextNumber = this.getNextNumber(documentNumberGenerator.getFormat(), documentNumberGenerator.getLastNumber());
+
+        if(storeGenerated) {
+            documentNumberGenerator.setLastNumber(nextNumber);
+            generatorChanged = true;
+        }
         if (nextNumber.length() > documentNumberGenerator.getFormat().chars().filter(ch -> ch == 'N').count()) {
             documentNumberGenerator.setFormat(this.extendFormat(documentNumberGenerator.getFormat()));
+            generatorChanged = true;
         }
-        generatedNumber = this.replaceNumber(generatedNumber, nextNumber);
-        if (storeGenerated) {
-            documentNumberGenerator.setLastNumber(nextNumber);
+        if (generatorChanged) {
             this.documentNumberGeneratorRepository.save(documentNumberGenerator);
         }
 
-        return generatedNumber;
+        return nextNumber;
     }
 
     private String extendFormat(String shorterFormat) {
@@ -159,14 +159,14 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return newFormat;
     }
 
-    private String replaceYear(String format, LocalDate currentDate) {
-        String generatedNumber = format;
-        int indexOfYear = format.indexOf('Y');
-        int countOfYear = (int) format.chars().filter(ch -> ch == 'Y').count();
+    private String replaceYear(String generatedNumber, LocalDate currentDate) {
+        int countOfYear = (int) generatedNumber.chars().filter(ch -> ch == 'Y').count();
 
-        if (countOfYear < 1) {
-            throw new RuntimeException("Not valid format! Missing YY or YYYY");
+        if (countOfYear == 0) {
+            return generatedNumber;
         }
+
+        int indexOfYear = generatedNumber.indexOf('Y');
 
         String year = String.valueOf(currentDate.getYear());
         String yearFormat = generatedNumber.substring(indexOfYear, (indexOfYear + countOfYear));
@@ -177,15 +177,15 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         }
     }
 
-    private String replaceMonth(String format, LocalDate currentDate) {
-        String generatedNumber = format;
-        int indexOfMonth = format.indexOf('M');
-        int countOfMonth = (int) format.chars().filter(ch -> ch == 'M').count();
-        int month = currentDate.getMonthValue();
+    private String replaceMonth(String generatedNumber, LocalDate currentDate) {
+        int countOfMonth = (int) generatedNumber.chars().filter(ch -> ch == 'M').count();
 
-        if (countOfMonth < 1) {
-            throw new RuntimeException("Not valid format! Missed at least one symbol M");
+        if (countOfMonth == 0) {
+            return generatedNumber;
         }
+
+        int indexOfMonth = generatedNumber.indexOf('M');
+        int month = currentDate.getMonthValue();
 
         String monthPart = generatedNumber.substring(indexOfMonth, (indexOfMonth + countOfMonth));
         if (month < 10) {
@@ -195,12 +195,11 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         }
     }
 
-    private String getNextNumber(String format, String lastNumber) {
-        String generatedNumber = format;
-        int countOfNumber = (int) format.chars().filter(ch -> ch == 'N').count();
+    private String getNextNumber(String generatedNumber, String lastNumber) {
+        int countOfNumber = (int) generatedNumber.chars().filter(ch -> ch == 'N').count();
 
-        if (countOfNumber < 1) {
-            throw new RuntimeException("Not valid format! Missed at least one symbol N");
+        if (countOfNumber == 0) {
+            return "";
         }
 
         String nextNumber = String.valueOf((Integer.valueOf(lastNumber).intValue() + 1));
@@ -210,23 +209,27 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return nextNumber;
     }
 
-    private String replaceNumber(String format, String newNumber) {
-        String generatedNumber = format;
-        int indexOfNumber = format.indexOf('N');
-        int countOfNumber = (int) format.chars().filter(ch -> ch == 'N').count();
+    private String replaceNumber(String generatedNumber, String newNumber) {
+        int countOfNumber = (int) generatedNumber.chars().filter(ch -> ch == 'N').count();
+
+        if (countOfNumber == 0 || newNumber.isEmpty()) {
+            return generatedNumber;
+        }
+
+        int indexOfNumber = generatedNumber.indexOf('N');
 
         return generatedNumber.replace(generatedNumber.substring(indexOfNumber, (indexOfNumber + countOfNumber)), newNumber);
     }
 
-    private String replaceQuarter(String format, LocalDate currentDate) {
-        String generatedNumber = format;
-        int indexOfQuarter = format.indexOf('Q');
-        int countOfQuarter = (int) format.chars().filter(ch -> ch == 'Q').count();
-        int month = currentDate.getMonthValue();
+    private String replaceQuarter(String generatedNumber, LocalDate currentDate) {
+        int countOfQuarter = (int) generatedNumber.chars().filter(ch -> ch == 'Q').count();
 
-        if (countOfQuarter < 1) {
-            throw new RuntimeException("Not valid format! Missed at least one symbol Q");
+        if (countOfQuarter == 0) {
+            return generatedNumber;
         }
+
+        int indexOfQuarter = generatedNumber.indexOf('Q');
+        int month = currentDate.getMonthValue();
 
         String quarter = "";
         if (month < 4) {
@@ -249,10 +252,14 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return generatedNumber.replace(generatedNumber.substring(indexOfQuarter, (indexOfQuarter + countOfQuarter)), quarter);
     }
 
-    private String replaceHalfYear(String format, LocalDate currentDate) {
-        String generatedNumber = format;
-        int indexOfHalfYear = format.indexOf('H');
-        int countOfHalfYear = (int) format.chars().filter(ch -> ch == 'H').count();
+    private String replaceHalfYear(String generatedNumber, LocalDate currentDate) {
+        int countOfHalfYear = (int) generatedNumber.chars().filter(ch -> ch == 'H').count();
+
+        if (countOfHalfYear == 0) {
+            return generatedNumber;
+        }
+
+        int indexOfHalfYear = generatedNumber.indexOf('H');
         int month = currentDate.getMonthValue();
 
         String halfYear = "2";
@@ -265,5 +272,22 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         }
 
         return generatedNumber.replace(generatedNumber.substring(indexOfHalfYear, (indexOfHalfYear + countOfHalfYear)), halfYear);
+    }
+
+    private String replaceDay(String generatedNumber, LocalDate currentDate) {
+        int countOfDay = (int) generatedNumber.chars().filter(ch -> ch == 'D').count();
+
+        if (countOfDay == 0) {
+            return generatedNumber;
+        }
+
+        int indexOfDay = generatedNumber.indexOf('H');
+        String day = String.valueOf(currentDate.getDayOfMonth());
+
+        if (day.length() < 2) {
+            day = "0" + day;
+        }
+
+        return generatedNumber.replace(generatedNumber.substring(indexOfDay, (indexOfDay + countOfDay)), day);
     }
 }
