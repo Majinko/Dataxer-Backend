@@ -51,6 +51,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/file/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

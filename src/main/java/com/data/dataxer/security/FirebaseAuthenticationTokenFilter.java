@@ -33,19 +33,21 @@ public class FirebaseAuthenticationTokenFilter extends UsernamePasswordAuthentic
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
         String authToken = httpRequest.getHeader("Authorization");
 
-        FirebaseToken firebaseToken = null;
+        if (authToken != null) {
+            FirebaseToken firebaseToken = null;
 
-        try {
-            firebaseToken = firebaseAuth.verifyIdToken(authToken);
-        } catch (FirebaseAuthException e) {
-            e.printStackTrace();
-        }
+            try {
+                firebaseToken = firebaseAuth.verifyIdToken(authToken);
+            } catch (FirebaseAuthException e) {
+                e.printStackTrace();
+            }
 
-        if (firebaseToken != null /*&& firebaseToken.isEmailVerified()*/) {
-            UserDetails userDetails = firebaseUserDetailService.loadOrCreateUser(firebaseToken);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-            authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (firebaseToken != null /*&& firebaseToken.isEmailVerified()*/) {
+                UserDetails userDetails = firebaseUserDetailService.loadOrCreateUser(firebaseToken);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(httpRequest));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            }
         }
 
         chain.doFilter(request, response);

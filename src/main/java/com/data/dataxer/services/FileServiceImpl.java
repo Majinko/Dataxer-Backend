@@ -22,6 +22,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class FileServiceImpl implements FileService {
@@ -37,13 +39,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public File storeFile(MultipartFile file, Boolean isDefault, Long companyId) {
+    public File storeFile(MultipartFile file, Boolean isDefault) {
         // Normalize file name
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
 
         try {
             // Check if the file's name contains invalid characters
-            if(fileName.contains("..")) {
+            if (fileName.contains("..")) {
                 throw new RuntimeException("Sorry! Filename contains invalid path sequence " + fileName);
             }
 
@@ -62,7 +64,7 @@ public class FileServiceImpl implements FileService {
                     .path(fileName)
                     .toUriString();
 
-            return  this.fileRepository.save(new File(file, isDefault, fileDownloadUri, fileShowUri));
+            return this.fileRepository.save(new File(file, isDefault, fileDownloadUri, fileShowUri));
         } catch (IOException ex) {
             throw new RuntimeException("Could not store file " + fileName + ". Please try again!", ex);
         }
@@ -71,8 +73,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public Resource loadFileAsResource(String fileName) {
         try {
-            File file = this.qFileRepository
-                    .getByName(fileName, SecurityUtils.companyIds())
+            File file = this.fileRepository.findByName(fileName)
                     .orElseThrow(() -> new RuntimeException("File not found " + fileName));
             Path uploadDirectory = Paths.get(loadCompanyUploadDirectory())
                     .resolve(fileName)
@@ -81,16 +82,16 @@ public class FileServiceImpl implements FileService {
             if (resource.exists()) {
                 return resource;
             }
-            throw new RuntimeException("File not found "+ fileName);
+            throw new RuntimeException("File not found " + fileName);
         } catch (MalformedURLException e) {
-            throw new RuntimeException("File not found "+ fileName);
+            throw new RuntimeException("File not found " + fileName);
         }
     }
 
     @Override
     public File getFileByName(String fileName) {
         return this.qFileRepository
-                .getByName(fileName, SecurityUtils.companyIds())
+                .getByNameAndCompanyIds(fileName, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("File not found " + fileName));
     }
 
@@ -106,5 +107,4 @@ public class FileServiceImpl implements FileService {
                         + CompanySettings.FILE_UPLOAD_DIRECTORY.getName()));
         return settings.getValue();
     }
-
 }

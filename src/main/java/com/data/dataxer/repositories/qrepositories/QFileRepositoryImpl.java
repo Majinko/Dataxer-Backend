@@ -22,7 +22,7 @@ public class QFileRepositoryImpl implements QFileRepository{
     }
 
     @Override
-    public Optional<File> getByName(String fileName, List<Long> companyIds) {
+    public Optional<File> getByNameAndCompanyIds(String fileName, List<Long> companyIds) {
         QFile qFile = QFile.file;
 
         return Optional.ofNullable(this.query.selectFrom(qFile)

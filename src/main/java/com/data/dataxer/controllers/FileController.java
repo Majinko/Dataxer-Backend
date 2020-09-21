@@ -1,12 +1,9 @@
 package com.data.dataxer.controllers;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.FileMapper;
 import com.data.dataxer.models.domain.File;
 import com.data.dataxer.models.dto.FileDTO;
-import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.services.FileService;
-import lombok.SneakyThrows;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,8 +14,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.Arrays;
@@ -28,7 +23,6 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/file")
 public class FileController {
-
     private final FileService fileService;
     private final FileMapper fileMapper;
 
@@ -40,10 +34,9 @@ public class FileController {
     @PostMapping("/uploadFile")
     public ResponseEntity<FileDTO> uploadFile(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("isDefault") Boolean isDefault,
-            @RequestParam("companyId") Long companyId
+            @RequestParam(defaultValue = "true") Boolean isDefault
     ) {
-        File storedFile = this.fileService.storeFile(file, isDefault, companyId);
+        File storedFile = this.fileService.storeFile(file, isDefault);
 
         return ResponseEntity.ok(this.fileMapper.fileToFileDTO(storedFile));
     }
@@ -54,9 +47,8 @@ public class FileController {
             @RequestParam("companyId") Long companyId
     ) {
         return ResponseEntity.ok(
-                Arrays.asList(files)
-                        .stream()
-                        .map(file -> uploadFile(file, false, companyId).getBody())
+                Arrays.stream(files)
+                        .map(file -> uploadFile(file, false).getBody())
                         .collect(Collectors.toList()));
     }
 
@@ -107,5 +99,4 @@ public class FileController {
 
         return ResponseEntity.ok(this.fileService.paginate(pageable).map(this.fileMapper::fileToFileDTO));
     }
-
 }

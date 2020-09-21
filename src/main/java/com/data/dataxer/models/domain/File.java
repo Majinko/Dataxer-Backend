@@ -6,10 +6,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -18,7 +15,6 @@ import java.net.URL;
 @Setter
 @Getter
 public class File extends BaseEntity{
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -50,5 +46,4 @@ public class File extends BaseEntity{
         this.downloadURL = downloadURL;
         this.showURL = showURL;
     }
-
 }

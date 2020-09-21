@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface QFileRepository {
 
-    Optional<File> getByName(String fileName, List<Long> companyIds);
+    Optional<File> getByNameAndCompanyIds(String fileName, List<Long> companyIds);
 
     Page<File> paginate(Pageable pageable, List<Long> companyIds);
 }
