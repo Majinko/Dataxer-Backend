@@ -2,6 +2,7 @@ package com.data.dataxer.models.dto;
 
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Contact;
+import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,5 +15,5 @@ public class DemandDTO {
     private String title;
     private String description;
     private String source;
-    private String state;
+    DocumentState state;
 }

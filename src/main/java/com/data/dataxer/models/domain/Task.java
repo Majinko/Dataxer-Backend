@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -37,7 +38,7 @@ public class Task extends BaseEntity {
 
     private String completion;
 
-    private String state;
+    DocumentState state;
 
     private LocalDateTime finishedAt;
 }

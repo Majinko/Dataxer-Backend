@@ -3,6 +3,7 @@ package com.data.dataxer.models.dto;
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
+import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +20,7 @@ public class TaskDTO {
     private String title;
     private String description;
     private String completion;
-    private String state;
+    DocumentState state;
     private boolean sendEmail;
     private LocalDateTime finishedAt;
 }

@@ -45,7 +45,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
                 .selectFrom(qProject)
                 .where(qProject.company.id.in(companyIds))
                 .where(qProject.id.eq(id))
-                .join(qProject.contact)
+                .leftJoin(qProject.contact)
                 .fetchJoin()
                 .fetchOne();
 

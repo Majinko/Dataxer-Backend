@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.ProjectState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -28,7 +29,7 @@ public class Project extends BaseEntity{
     @Column(columnDefinition = "text")
     private String description;
 
-    private String state;
+    private ProjectState state;
 
     private String address;
 

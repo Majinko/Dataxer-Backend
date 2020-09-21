@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -32,7 +33,7 @@ public class Demand extends BaseEntity {
 
     String source;
 
-    String state;
+    DocumentState state;
 
     private LocalDateTime deletedAt;
 }
