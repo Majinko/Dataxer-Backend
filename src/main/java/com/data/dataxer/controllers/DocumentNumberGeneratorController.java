@@ -58,7 +58,14 @@ public class DocumentNumberGeneratorController {
     public ResponseEntity<String> generateNextNumberByDocumentType(
             @PathVariable DocumentType documentType
     ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, false));
+    }
+
+    @GetMapping("/generateAndSaveNextByType/{documentType}")
+    public ResponseEntity<String> generateAndSaveNextNumberByDocumentType(
+            @PathVariable DocumentType documentType
+    ) {
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, true));
     }
 
     @GetMapping("/destroy/{id}")

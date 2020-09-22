@@ -6,4 +6,8 @@ public class StringUtils {
         return input.replaceAll("\\s+","");
     }
 
+    public static int countCharacters(String source, char toCheck) {
+        return (int) source.chars().filter(ch -> ch == toCheck).count();
+    }
+
 }

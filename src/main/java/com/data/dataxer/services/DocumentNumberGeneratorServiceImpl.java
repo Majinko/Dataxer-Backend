@@ -1,18 +1,22 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.Exceptions.ValidationException;
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
 import com.data.dataxer.models.enums.DocumentType;
+import com.data.dataxer.models.enums.Periods;
 import com.data.dataxer.repositories.DocumentNumberGeneratorRepository;
 import com.data.dataxer.repositories.qrepositories.QDocumentNumberGeneratorRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.DefaultInvoiceNumberGenerator;
+import com.data.dataxer.utils.FormatValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Service
 public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGeneratorService{
@@ -27,6 +31,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     @Override
     public void storeOrUpdate(DocumentNumberGenerator documentNumberGenerator) {
+        FormatValidator.validateFormat(documentNumberGenerator.getFormat(), documentNumberGenerator.getPeriod());
         Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
                 .getByDocumentType(documentNumberGenerator.getType(), SecurityUtils.companyIds());
         if (documentNumberGeneratorOptional.isPresent()) {
@@ -68,7 +73,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public String generateNextNumberByDocumentType(DocumentType documentType) {
+    public String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated) {
         Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
                 .getByDocumentType(documentType, SecurityUtils.companyIds());
 
@@ -86,7 +91,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             documentNumberGenerator = documentNumberGeneratorOptional.get();
         }
 
-        return this.generateNextDocumentNumber(documentNumberGenerator, true);
+        return this.generateNextDocumentNumber(documentNumberGenerator, storeGenerated);
     }
 
     @Override
@@ -290,4 +295,5 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
         return generatedNumber.replace(generatedNumber.substring(indexOfDay, (indexOfDay + countOfDay)), day);
     }
+
 }

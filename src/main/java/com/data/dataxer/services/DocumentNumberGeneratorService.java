@@ -20,7 +20,7 @@ public interface DocumentNumberGeneratorService {
 
     void destroy(Long id);
 
-    String generateNextNumberByDocumentType(DocumentType documentType);
+    String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated);
 
     String getNextNumber(DocumentNumberGenerator documentNumberGenerator);
 
