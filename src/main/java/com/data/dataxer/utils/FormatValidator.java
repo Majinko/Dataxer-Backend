@@ -6,9 +6,10 @@ import com.data.dataxer.models.enums.Periods;
 public class FormatValidator {
 
     public static void validateFormat(String format, Periods period) {
-        if (format.length() > 0) {
+        if (format.length() <= 0) {
             throw new ValidationException("Format is empty");
         }
+        checkNumberInFormat(format);
         switch (period) {
             case YEAR:
                 checkYearInFormat(format, true);
@@ -48,6 +49,16 @@ public class FormatValidator {
         }
     }
 
+    private static void checkNumberInFormat(String format) {
+        int countOfNumber = StringUtils.countCharacters(format, 'N');
+        String subNumber = StringUtils.generateString("N", countOfNumber);
+
+        String restOfFormat = format.replace(subNumber, "");
+        if (restOfFormat.contains("N")) {
+            throw new ValidationException("Not correctly used symbol N");
+        }
+    }
+
     private static void checkDailyInFormat(String format, boolean isDailyPeriod) {
         int countOfDaily = StringUtils.countCharacters(format, 'D');
         if (isDailyPeriod && countOfDaily == 0) {
@@ -56,12 +67,10 @@ public class FormatValidator {
         if (countOfDaily > 2) {
             throw new ValidationException("Format contain too much D symbols");
         }
-        String subDay = "";
-        for (int i = 0; i < countOfDaily; i++) {
-            subDay += "D";
-        }
-        format.replace(subDay, "");
-        if (format.contains("D")) {
+        String subDay = StringUtils.generateString("D", countOfDaily);
+
+        String restOfFormat = format.replace(subDay, "");
+        if (restOfFormat.contains("D")) {
             throw new ValidationException("Not correctly used symbol D");
         }
     }
@@ -74,12 +83,10 @@ public class FormatValidator {
         if (countOfMonths > 2) {
             throw new ValidationException("Format contain too much M symbols");
         }
-        String subMonth = "";
-        for (int i = 0; i < countOfMonths; i++) {
-            subMonth += "M";
-        }
-        format.replace(subMonth, "");
-        if (format.contains("M")) {
+        String subMonth = StringUtils.generateString("M", countOfMonths);
+
+        String restOfFormat = format.replace(subMonth, "");
+        if (restOfFormat.contains("M")) {
             throw new ValidationException("Not correctly used symbol M");
         }
     }
@@ -89,12 +96,10 @@ public class FormatValidator {
         if (isQuarterPeriod && countOfQuarter == 0) {
             throw new ValidationException("Missing symbol Q");
         }
-        String subQuarter = "";
-        for (int i = 0; i < countOfQuarter; i++) {
-            subQuarter += "Q";
-        }
-        format.replace(subQuarter, "");
-        if (format.contains("Q")) {
+        String subQuarter = StringUtils.generateString("Q", countOfQuarter);
+
+        String restOfFormat = format.replace(subQuarter, "");
+        if (restOfFormat.contains("Q")) {
             throw new ValidationException("Not correctly used symbol Q");
         }
     }
@@ -104,17 +109,16 @@ public class FormatValidator {
         if (isHalfYearPeriod && countOfHalfYear == 0) {
             throw new ValidationException("Missing symbol H");
         }
-        String subHalfYear = "";
-        for (int i = 0; i < countOfHalfYear; i++) {
-            subHalfYear += "H";
-        }
-        format.replace(subHalfYear, "");
-        if (format.contains("H")) {
+        String subHalfYear = StringUtils.generateString("H", countOfHalfYear);
+
+        String restOfFormat = format.replace(subHalfYear, "");
+        if (restOfFormat.contains("H")) {
             throw new ValidationException("Not correctly used symbol H");
         }
     }
 
     private static void checkYearInFormat(String format, boolean isYearPeriod) {
+        String restOfFormat = "";
         switch (StringUtils.countCharacters(format, 'Y')) {
             case 0:
                 if (isYearPeriod) {
@@ -122,15 +126,15 @@ public class FormatValidator {
                 }
                 break;
             case 2:
-                format.replace("YY", "");
+                restOfFormat = format.replace("YY", "");
                 break;
             case 4:
-                format.replace("YYYY", "");
+                restOfFormat = format.replace("YYYY", "");
                 break;
             default:
                 throw new ValidationException("Not correct number Y symbols");
         }
-        if (format.contains("Y")) {
+        if (restOfFormat.contains("Y")) {
             throw new ValidationException("Not correctly used symbol Y");
         }
     }

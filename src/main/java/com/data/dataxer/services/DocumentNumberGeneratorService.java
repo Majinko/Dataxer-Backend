@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface DocumentNumberGeneratorService {
 
-    void storeOrUpdate(DocumentNumberGenerator documentNumberGenerator);
+    void store(DocumentNumberGenerator documentNumberGenerator);
 
     DocumentNumberGenerator update(DocumentNumberGenerator documentNumberGenerator);
 
@@ -27,4 +27,6 @@ public interface DocumentNumberGeneratorService {
     void resetGenerationByType(DocumentType documentType);
 
     void resetGenerationById(Long id);
+
+    String generateNextNumberByDocumentId(Long id, boolean storeGenerated);
 }

@@ -10,4 +10,12 @@ public class StringUtils {
         return (int) source.chars().filter(ch -> ch == toCheck).count();
     }
 
+    public static String generateString(String base, int length) {
+        String generated = "";
+        while (generated.length() < length) {
+            generated += base;
+        }
+        return generated;
+    }
+
 }

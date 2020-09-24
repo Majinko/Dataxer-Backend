@@ -1,22 +1,20 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.Exceptions.ValidationException;
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
 import com.data.dataxer.models.enums.DocumentType;
-import com.data.dataxer.models.enums.Periods;
 import com.data.dataxer.repositories.DocumentNumberGeneratorRepository;
 import com.data.dataxer.repositories.qrepositories.QDocumentNumberGeneratorRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.DefaultInvoiceNumberGenerator;
 import com.data.dataxer.utils.FormatValidator;
+import com.data.dataxer.utils.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 @Service
 public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGeneratorService{
@@ -30,21 +28,27 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public void storeOrUpdate(DocumentNumberGenerator documentNumberGenerator) {
+    public void store(DocumentNumberGenerator documentNumberGenerator) {
         FormatValidator.validateFormat(documentNumberGenerator.getFormat(), documentNumberGenerator.getPeriod());
-        Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
-                .getByDocumentType(documentNumberGenerator.getType(), SecurityUtils.companyIds());
-        if (documentNumberGeneratorOptional.isPresent()) {
-            documentNumberGenerator.setId(documentNumberGeneratorOptional.get().getId());
-            documentNumberGenerator.setLastNumber(documentNumberGeneratorOptional.get().getLastNumber());
-        } else {
-            documentNumberGenerator.setLastNumber("0");
+        if (documentNumberGenerator.getIsDefault()) {
+            this.handleIfDefaultAlreadyExist(documentNumberGenerator, false);
         }
+
+        documentNumberGenerator.setLastNumber("0");
         this.documentNumberGeneratorRepository.save(documentNumberGenerator);
     }
 
     @Override
     public DocumentNumberGenerator update(DocumentNumberGenerator documentNumberGenerator) {
+        FormatValidator.validateFormat(documentNumberGenerator.getFormat(), documentNumberGenerator.getPeriod());
+        if (documentNumberGenerator.getIsDefault()) {
+            this.handleIfDefaultAlreadyExist(documentNumberGenerator, true);
+        }
+        Optional<DocumentNumberGenerator> oldDocumentNumberGenerator = this.qDocumentNumberGeneratorRepository
+                .getById(documentNumberGenerator.getId(), SecurityUtils.companyIds());
+        if (oldDocumentNumberGenerator.isPresent()) {
+            documentNumberGenerator.setLastNumber(oldDocumentNumberGenerator.get().getLastNumber());
+        }
         return this.documentNumberGeneratorRepository.save(documentNumberGenerator);
     }
 
@@ -75,7 +79,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     @Override
     public String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated) {
         Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
-                .getByDocumentType(documentType, SecurityUtils.companyIds());
+                .getDefaultByDocumentType(documentType, SecurityUtils.companyIds());
 
         DocumentNumberGenerator documentNumberGenerator;
         if (!documentNumberGeneratorOptional.isPresent()) {
@@ -87,10 +91,19 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
                     DefaultInvoiceNumberGenerator.isDefault,
                     DefaultInvoiceNumberGenerator.lastNumber
             );
+            this.documentNumberGeneratorRepository.save(documentNumberGenerator);
         } else {
             documentNumberGenerator = documentNumberGeneratorOptional.get();
         }
 
+        return this.generateNextDocumentNumber(documentNumberGenerator, storeGenerated);
+    }
+
+    @Override
+    public String generateNextNumberByDocumentId(Long id, boolean storeGenerated) {
+        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
+                .getById(id, SecurityUtils.companyIds())
+                .orElseThrow(() ->new RuntimeException("Generator not found"));
         return this.generateNextDocumentNumber(documentNumberGenerator, storeGenerated);
     }
 
@@ -102,7 +115,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     @Override
     public void resetGenerationByType(DocumentType documentType) {
         Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
-                .getByDocumentType(documentType, SecurityUtils.companyIds());
+                .getDefaultByDocumentType(documentType, SecurityUtils.companyIds());
         if (documentNumberGeneratorOptional.isPresent()) {
             DocumentNumberGenerator documentNumberGenerator = documentNumberGeneratorOptional.get();
             documentNumberGenerator.setLastNumber("0");
@@ -142,7 +155,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             documentNumberGenerator.setLastNumber(nextNumber);
             generatorChanged = true;
         }
-        if (nextNumber.length() > documentNumberGenerator.getFormat().chars().filter(ch -> ch == 'N').count()) {
+        if (nextNumber.length() > StringUtils.countCharacters(documentNumberGenerator.getFormat(), 'N')) {
             documentNumberGenerator.setFormat(this.extendFormat(documentNumberGenerator.getFormat()));
             generatorChanged = true;
         }
@@ -165,43 +178,38 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     private String replaceYear(String generatedNumber, LocalDate currentDate) {
-        int countOfYear = (int) generatedNumber.chars().filter(ch -> ch == 'Y').count();
+        int countOfYear = StringUtils.countCharacters(generatedNumber, 'Y');
 
-        if (countOfYear == 0) {
+        if (countOfYear <= 0) {
             return generatedNumber;
         }
 
-        int indexOfYear = generatedNumber.indexOf('Y');
-
-        String year = String.valueOf(currentDate.getYear());
-        String yearFormat = generatedNumber.substring(indexOfYear, (indexOfYear + countOfYear));
-        if (countOfYear < 4) {
-            return generatedNumber.replace(yearFormat, year.substring(2));
-        } else {
-            return generatedNumber.replace(yearFormat, year);
+        String yearForReplace = String.valueOf(currentDate.getYear());
+        if (countOfYear == 2) {
+            yearForReplace = yearForReplace.substring(2);
         }
+        String forReplace = StringUtils.generateString("Y", countOfYear);
+        return generatedNumber.replace(forReplace, yearForReplace);
     }
 
     private String replaceMonth(String generatedNumber, LocalDate currentDate) {
-        int countOfMonth = (int) generatedNumber.chars().filter(ch -> ch == 'M').count();
+        int countOfMonth = StringUtils.countCharacters(generatedNumber, 'M');
 
-        if (countOfMonth == 0) {
+        if (countOfMonth <= 0) {
             return generatedNumber;
         }
 
-        int indexOfMonth = generatedNumber.indexOf('M');
-        int month = currentDate.getMonthValue();
-
-        String monthPart = generatedNumber.substring(indexOfMonth, (indexOfMonth + countOfMonth));
-        if (month < 10) {
-            return generatedNumber.replace(monthPart, "0" + month);
-        } else {
-            return generatedNumber.replace(monthPart, String.valueOf(month));
+        String monthForReplace = String.valueOf(currentDate.getMonthValue());
+        while (monthForReplace.length() < countOfMonth) {
+            monthForReplace = "0" + monthForReplace;
         }
+        String forReplace = StringUtils.generateString("M", countOfMonth);
+
+        return generatedNumber.replace(forReplace, monthForReplace);
     }
 
     private String getNextNumber(String generatedNumber, String lastNumber) {
-        int countOfNumber = (int) generatedNumber.chars().filter(ch -> ch == 'N').count();
+        int countOfNumber = StringUtils.countCharacters(generatedNumber, 'N');
 
         if (countOfNumber == 0) {
             return "";
@@ -215,85 +223,94 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     private String replaceNumber(String generatedNumber, String newNumber) {
-        int countOfNumber = (int) generatedNumber.chars().filter(ch -> ch == 'N').count();
+        int countOfNumber = StringUtils.countCharacters(generatedNumber, 'N');
 
         if (countOfNumber == 0 || newNumber.isEmpty()) {
             return generatedNumber;
         }
 
-        int indexOfNumber = generatedNumber.indexOf('N');
+        String forReplace = StringUtils.generateString("N", countOfNumber);
 
-        return generatedNumber.replace(generatedNumber.substring(indexOfNumber, (indexOfNumber + countOfNumber)), newNumber);
+        return generatedNumber.replace(forReplace, newNumber);
     }
 
     private String replaceQuarter(String generatedNumber, LocalDate currentDate) {
-        int countOfQuarter = (int) generatedNumber.chars().filter(ch -> ch == 'Q').count();
+        int countOfQuarter = StringUtils.countCharacters(generatedNumber, 'Q');
 
         if (countOfQuarter == 0) {
             return generatedNumber;
         }
 
-        int indexOfQuarter = generatedNumber.indexOf('Q');
         int month = currentDate.getMonthValue();
+        String quarterForReplace = "";
 
-        String quarter = "";
         if (month < 4) {
-            quarter = "1";
+            quarterForReplace = "1";
         }
         if (month >= 4 && month < 7) {
-            quarter = "2";
+            quarterForReplace = "2";
         }
         if (month >= 7 && month < 10) {
-            quarter = "3";
+            quarterForReplace = "3";
         }
         if (month >= 10) {
-            quarter = "4";
+            quarterForReplace = "4";
         }
 
-        if (countOfQuarter > 1) {
-            quarter = "0" + quarter;
+        while (quarterForReplace.length() < countOfQuarter) {
+            quarterForReplace = "0" + quarterForReplace;
         }
+        String forReplace = StringUtils.generateString("Q", countOfQuarter);
 
-        return generatedNumber.replace(generatedNumber.substring(indexOfQuarter, (indexOfQuarter + countOfQuarter)), quarter);
+        return generatedNumber.replace(forReplace, quarterForReplace);
     }
 
     private String replaceHalfYear(String generatedNumber, LocalDate currentDate) {
-        int countOfHalfYear = (int) generatedNumber.chars().filter(ch -> ch == 'H').count();
+        int countOfHalfYear = StringUtils.countCharacters(generatedNumber, 'H');
 
-        if (countOfHalfYear == 0) {
+        if (countOfHalfYear <= 0) {
             return generatedNumber;
         }
 
-        int indexOfHalfYear = generatedNumber.indexOf('H');
-        int month = currentDate.getMonthValue();
-
-        String halfYear = "2";
-        if (month < 7) {
-            halfYear = "1";
+        String halfYearForReplace = "2";
+        if (currentDate.getMonthValue() < 7) {
+            halfYearForReplace = "1";
         }
-
-        if (countOfHalfYear > 1) {
-            halfYear = "0" + halfYear;
+        while (halfYearForReplace.length() < countOfHalfYear) {
+            halfYearForReplace = "0" + halfYearForReplace;
         }
+        String forReplace = StringUtils.generateString("H", countOfHalfYear);
 
-        return generatedNumber.replace(generatedNumber.substring(indexOfHalfYear, (indexOfHalfYear + countOfHalfYear)), halfYear);
+        return generatedNumber.replace(forReplace, halfYearForReplace);
     }
 
     private String replaceDay(String generatedNumber, LocalDate currentDate) {
-        int countOfDay = (int) generatedNumber.chars().filter(ch -> ch == 'D').count();
+        int countOfDay = StringUtils.countCharacters(generatedNumber, 'D');
 
-        if (countOfDay == 0) {
+        if (countOfDay <= 0) {
             return generatedNumber;
         }
 
-        int indexOfDay = generatedNumber.indexOf('H');
-        String day = String.valueOf(currentDate.getDayOfMonth());
-
-        if (day.length() < 2) {
-            day = "0" + day;
+        String dayForReplace = String.valueOf(currentDate.getDayOfMonth());
+        while (dayForReplace.length() < countOfDay) {
+            dayForReplace = "0" + dayForReplace;
         }
+        String forReplace = StringUtils.generateString("D", countOfDay);
 
-        return generatedNumber.replace(generatedNumber.substring(indexOfDay, (indexOfDay + countOfDay)), day);
+        return generatedNumber.replace(forReplace, dayForReplace);
+    }
+
+    private void handleIfDefaultAlreadyExist(DocumentNumberGenerator documentNumberGenerator, boolean isUpdated) {
+        Optional<DocumentNumberGenerator> defaultNumberGenerator = this.qDocumentNumberGeneratorRepository
+                .getDefaultByDocumentType(documentNumberGenerator.getType(), SecurityUtils.companyIds());
+        if (defaultNumberGenerator.isPresent()) {
+            DocumentNumberGenerator oldDefaultNumberGenerator = defaultNumberGenerator.get();
+            if (isUpdated && documentNumberGenerator.getId() == oldDefaultNumberGenerator.getId()) {
+                return;
+            }
+            oldDefaultNumberGenerator.setIsDefault(Boolean.FALSE);
+            update(oldDefaultNumberGenerator);
+        }
     }
 
 }
