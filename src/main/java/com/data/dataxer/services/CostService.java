@@ -9,9 +9,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface CostService {
-    void store(Cost cost);
+
+    Cost store(Cost cost);
 
     Cost update(Cost cost);
 
-    Page<Cost> paginate(Pageable pageable, List<Filter> costFilters);
+    Page<Cost> paginate(Pageable pageable, String filters);
 }

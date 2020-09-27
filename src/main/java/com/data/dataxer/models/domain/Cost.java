@@ -15,8 +15,8 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE invoice SET deleted_at = now() WHERE id = ?")
-public class Cost extends BaseEntity{
+@SQLDelete(sql = "UPDATE cost SET deleted_at = now() WHERE id = ?")
+public class Cost extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
