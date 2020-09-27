@@ -1,5 +1,6 @@
 package com.data.dataxer.controllers;
 
+import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.CostMapper;
 import com.data.dataxer.models.dto.CostDTO;
 import com.data.dataxer.services.CostService;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/costs")
@@ -42,6 +45,7 @@ public class CostController {
             @RequestParam(value = "order", defaultValue = "desc") String order,
             @RequestParam(value = "filters", defaultValue = "") String filters
     ) {
+        List<Filter> listOfFilters = Filter.resolveFiltersFromString(filters);
         Pageable pageable;
         if (order.equals("desc")) {
             pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
@@ -50,7 +54,7 @@ public class CostController {
         }
 
         return ResponseEntity.ok(this.costService
-                .paginate(pageable, filters).map(this.costMapper::costToCostDTO));
+                .paginate(pageable, listOfFilters).map(this.costMapper::costToCostDTO));
     }
 
 }

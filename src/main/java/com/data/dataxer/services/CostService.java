@@ -14,5 +14,5 @@ public interface CostService {
 
     Cost update(Cost cost);
 
-    Page<Cost> paginate(Pageable pageable, String filters);
+    Page<Cost> paginate(Pageable pageable, List<Filter> filters);
 }
