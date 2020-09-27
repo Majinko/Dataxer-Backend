@@ -33,7 +33,7 @@ public class QCostRepositoryImpl implements QCostRepository{
 
         if (!costFilters.isEmpty()) {
             for (Filter filter : costFilters) {
-                filterConditions.or(filter.buildCostFilterPredicate());
+                //filterConditions.or(filter.buildCostFilterPredicate());
             }
         }
 
