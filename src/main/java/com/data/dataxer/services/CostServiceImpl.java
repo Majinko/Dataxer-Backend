@@ -5,11 +5,13 @@ import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.data.dataxer.utils.MandatoryValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -25,6 +27,10 @@ public class CostServiceImpl implements CostService{
 
     @Override
     public Cost store(Cost cost) {
+        if (cost.getIsRepeated()) {
+            MandatoryValidator.validateRepeatedCostMandatory(cost);
+            cost.setNextRepeatedCost(this.getNextRepeat(cost));
+        }
         return this.costRepository.save(cost);
     }
 
@@ -47,5 +53,12 @@ public class CostServiceImpl implements CostService{
         return new PageImpl<>(costs, pageable, costs.size());
     }
 
+    @Override
+    public void taskExecute() {
+        //do task
+    }
 
+    private LocalDate getNextRepeat(Cost cost) {
+        return null;
+    }
 }

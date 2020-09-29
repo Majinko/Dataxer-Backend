@@ -1,6 +1,7 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.models.enums.CostType;
+import com.data.dataxer.models.enums.CostsPeriods;
 import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,9 +37,19 @@ public class Cost extends BaseEntity {
 
     private Boolean isInternal;
 
+    private Boolean isRepeated;
+
+    private CostsPeriods period;
+
     private BigDecimal price;
 
     private BigDecimal totalPrice;
+
+    private LocalDate repeatedFrom;
+
+    private LocalDate repeatedTo;
+
+    private LocalDate nextRepeatedCost;
 
     //datum vystavenia
     private LocalDate dateOfCreate;
