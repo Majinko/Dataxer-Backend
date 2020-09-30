@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.CostMapper;
 import com.data.dataxer.models.dto.CostDTO;
+import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.services.CostService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -55,6 +56,16 @@ public class CostController {
 
         return ResponseEntity.ok(this.costService
                 .paginate(pageable, listOfFilters).map(this.costMapper::costToCostDTO));
+    }
+
+    @GetMapping("/changeState")
+    public ResponseEntity<CostDTO> changeState(@RequestParam Long id, @RequestParam CostState state) {
+        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.changeState(id, state)));
+    }
+
+    @GetMapping("/destroy")
+    public void destroy(@RequestParam Long id) {
+        this.costService.destroy(id);
     }
 
 }

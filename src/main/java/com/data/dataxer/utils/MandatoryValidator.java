@@ -9,12 +9,6 @@ public class MandatoryValidator {
         if (cost.getPeriod() == null) {
             throw new MandatoryException("period");
         }
-        if (cost.getRepeatedFrom() == null) {
-            throw new MandatoryException("repeatedFrom");
-        }
-        if (cost.getRepeatedTo() == null) {
-            throw new MandatoryException("repeatedTo");
-        }
     }
 
 }

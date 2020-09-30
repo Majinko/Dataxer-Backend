@@ -4,17 +4,16 @@ import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.QCost;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.QueryFactory;
 import com.querydsl.core.QueryResults;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.support.Querydsl;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class QCostRepositoryImpl implements QCostRepository{
@@ -47,5 +46,17 @@ public class QCostRepositoryImpl implements QCostRepository{
                 .fetchResults();
 
         return new PageImpl<>(costResults.getResults(), pageable, costResults.getTotal());
+    }
+
+    @Override
+    public Optional<Cost> getById(Long id, List<Long> companyIds) {
+        QCost qCost = QCost.cost;
+
+        return Optional.ofNullable(
+                this.query.selectFrom(qCost)
+                .where(qCost.company.id.in(companyIds))
+                .where(qCost.id.eq(id))
+                .fetchOne()
+        );
     }
 }

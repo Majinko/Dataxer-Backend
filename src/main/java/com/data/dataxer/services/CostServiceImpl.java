@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Cost;
+import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -29,7 +30,12 @@ public class CostServiceImpl implements CostService{
     public Cost store(Cost cost) {
         if (cost.getIsRepeated()) {
             MandatoryValidator.validateRepeatedCostMandatory(cost);
+            if (cost.getRepeatedFrom() == null) {
+                cost.setRepeatedFrom(LocalDate.now());
+            }
+            Cost fromRepeatedCost = this.generateNewCostFromRepeated(cost);
             cost.setNextRepeatedCost(this.getNextRepeat(cost));
+            this.costRepository.save(fromRepeatedCost);
         }
         return this.costRepository.save(cost);
     }
@@ -55,10 +61,83 @@ public class CostServiceImpl implements CostService{
 
     @Override
     public void taskExecute() {
-        //do task
+        LocalDate currentDay = LocalDate.now();
+        List<Cost> repeatedCosts = this.costRepository.findAllRepeated();
+        for (Cost repeatedCost : repeatedCosts) {
+            if (repeatedCost.getNextRepeatedCost().toEpochDay() == currentDay.toEpochDay()) {
+                this.costRepository.save(this.generateNewCostFromRepeated(repeatedCost));
+            }
+            LocalDate nextRepeat = getNextRepeat(repeatedCost);
+            if (nextRepeat != null) {
+                repeatedCost.setNextRepeatedCost(nextRepeat);
+            }
+        }
+    }
+
+    @Override
+    public Cost changeState(Long id, CostState state) {
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
+                .orElseThrow(() -> new RuntimeException("Cost not found"));
+        oldCost.setState(state);
+        return this.update(oldCost);
+    }
+
+    @Override
+    public void destroy(Long id) {
+        this.costRepository.delete(this.getById(id));
+    }
+
+    @Override
+    public Cost getById(Long id) {
+        return this.qCostRepository.getById(id, SecurityUtils.companyIds())
+                .orElseThrow(() -> new RuntimeException("Cost not found"));
+    }
+
+    private Cost generateNewCostFromRepeated(Cost repeatedCost) {
+        Cost cost = new Cost();
+        cost.setTitle(repeatedCost.getTitle());
+        cost.setCostOrder(repeatedCost.getCostOrder());
+        cost.setCategory(repeatedCost.getCategory());
+        cost.setContact(repeatedCost.getContact());
+        cost.setIsInternal(repeatedCost.getIsInternal());
+        cost.setDateOfCreate(LocalDate.now());
+        if (repeatedCost.getDueDate() != null) {
+            cost.setDueDate(repeatedCost.getDueDate());
+        } else {
+            cost.setDueDate(LocalDate.now());
+        }
+        cost.setIsRepeated(Boolean.FALSE);
+        cost.setPrice(repeatedCost.getPrice());
+        cost.setTotalPrice(repeatedCost.getTotalPrice());
+        cost.setState(CostState.UNPAID);
+        cost.setType(repeatedCost.getType());
+        cost.setCompany(repeatedCost.getCompany());
+        return cost;
     }
 
     private LocalDate getNextRepeat(Cost cost) {
-        return null;
+        LocalDate nextRepeatedCost = cost.getNextRepeatedCost();
+        if (nextRepeatedCost != null) {
+            switch (cost.getPeriod()) {
+                case DAY:
+                    nextRepeatedCost = nextRepeatedCost.plusDays(1);
+                    break;
+                case WEEK:
+                    nextRepeatedCost = nextRepeatedCost.plusWeeks(1);
+                    break;
+                case MONTH:
+                    nextRepeatedCost = nextRepeatedCost.plusMonths(1);
+                    break;
+                case YEAR:
+                    nextRepeatedCost = nextRepeatedCost.plusYears(1);
+                    break;
+            }
+            if (nextRepeatedCost.toEpochDay() > cost.getRepeatedTo().toEpochDay()) {
+                this.costRepository.deleteById(cost.getId());
+                return null;
+            }
+            return nextRepeatedCost;
+        }
+        return LocalDate.now();
     }
 }

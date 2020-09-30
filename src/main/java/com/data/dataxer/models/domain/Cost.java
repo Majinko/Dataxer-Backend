@@ -1,8 +1,8 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.models.enums.CostType;
 import com.data.dataxer.models.enums.CostsPeriods;
-import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -29,7 +29,9 @@ public class Cost extends BaseEntity {
 
     private String title;
 
-    private DocumentState state;
+    private String costOrder;
+
+    private CostState state;
 
     private String category;
 

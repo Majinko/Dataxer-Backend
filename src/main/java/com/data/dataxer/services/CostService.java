@@ -2,7 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Cost;
-import com.google.common.io.Files;
+import com.data.dataxer.models.enums.CostState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,4 +17,10 @@ public interface CostService {
     Page<Cost> paginate(Pageable pageable, List<Filter> filters);
 
     void taskExecute();
+
+    Cost changeState(Long id, CostState state);
+
+    void destroy(Long id);
+
+    Cost getById(Long id);
 }
