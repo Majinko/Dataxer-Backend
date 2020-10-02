@@ -79,6 +79,18 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
                 .fetchOne());
     }
 
+    @Override
+    public Optional<DocumentNumberGenerator> getDefaultByDocumentType(DocumentType documentType, List<Long> companyIds) {
+        QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
+
+        return Optional.ofNullable(this.query
+        .selectFrom(qDocumentNumberGenerator)
+        .where(qDocumentNumberGenerator.type.eq(documentType))
+        .where(qDocumentNumberGenerator.isDefault.eq(true))
+        .where(qDocumentNumberGenerator.company.id.in(companyIds))
+        .fetchOne());
+    }
+
     private Long total() {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 

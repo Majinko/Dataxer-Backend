@@ -4,5 +4,6 @@ public enum Periods {
     YEAR,
     QUARTER,
     HALF_YEAR,
-    MONTHLY
+    MONTHLY,
+    DAILY
 }
