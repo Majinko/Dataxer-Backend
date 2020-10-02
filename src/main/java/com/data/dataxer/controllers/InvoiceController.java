@@ -52,7 +52,7 @@ public class InvoiceController {
     public void changeState(
             @RequestParam(value = "id") Long id,
             @RequestParam(value = "documentState") DocumentState newState
-            ) {
+    ) {
         this.invoiceService.changeState(id, newState);
     }
 
@@ -93,4 +93,8 @@ public class InvoiceController {
         return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateSummaryInvoice(id)));
     }
 
+    @GetMapping("/pdf/{id}")
+    public void pdf(@PathVariable Long id) {
+
+    }
 }
