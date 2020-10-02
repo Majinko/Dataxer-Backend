@@ -55,7 +55,7 @@ public class ContactController {
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "email", defaultValue = "") String email
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
         return ResponseEntity.ok(contactService.paginate(pageable, email).map(contactMapper::toContactDto));
     }

@@ -27,7 +27,7 @@ public class DocumentBase extends BaseEntity {
 
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPack> packs = new ArrayList<>();
-
+ 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
     Contact contact;
@@ -58,7 +58,6 @@ public class DocumentBase extends BaseEntity {
     protected LocalDate dueDate;
 
     protected LocalDateTime deletedAt;
-
 }
 
 
