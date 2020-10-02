@@ -63,8 +63,13 @@ public class CostController {
         return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.changeState(id, state)));
     }
 
-    @GetMapping("/destroy")
-    public void destroy(@RequestParam Long id) {
+    @RequestMapping(value = "/duplicate/{id}")
+    public ResponseEntity<CostDTO> duplicate(@PathVariable Long id) {
+        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.duplicate(id)));
+    }
+
+    @GetMapping("/destroy/{id}")
+    public void destroy(@PathVariable Long id) {
         this.costService.destroy(id);
     }
 

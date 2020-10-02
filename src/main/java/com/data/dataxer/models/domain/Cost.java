@@ -60,4 +60,23 @@ public class Cost extends BaseEntity {
 
     private LocalDate deletedAt;
 
+    public Cost() {}
+
+    public Cost(Cost existedCost) {
+        this.title = existedCost.getTitle();
+        this.costOrder = existedCost.getCostOrder();
+        this.state = existedCost.getState();
+        this.category = existedCost.getCategory();
+        this.type = existedCost.getType();
+        this.isInternal = existedCost.getIsInternal();
+        this.isRepeated = existedCost.getIsRepeated();
+        this.period = existedCost.getPeriod();
+        this.price = existedCost.getTotalPrice();
+        this.repeatedFrom = existedCost.getRepeatedFrom();
+        this.repeatedTo = existedCost.getRepeatedTo();
+        this.nextRepeatedCost = existedCost.getNextRepeatedCost();
+        this.dateOfCreate = LocalDate.now();
+        this.dueDate = existedCost.getDueDate();
+    }
+
 }

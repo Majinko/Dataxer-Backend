@@ -23,4 +23,6 @@ public interface CostService {
     void destroy(Long id);
 
     Cost getById(Long id);
+
+    Cost duplicate(Long id);
 }

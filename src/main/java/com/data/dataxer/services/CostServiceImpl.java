@@ -93,6 +93,14 @@ public class CostServiceImpl implements CostService{
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
     }
 
+    @Override
+    public Cost duplicate(Long id) {
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
+                .orElseThrow(() -> new RuntimeException("Cost not found"));
+        Cost newCost = new Cost(oldCost);
+        return this.store(newCost);
+    }
+
     private Cost generateNewCostFromRepeated(Cost repeatedCost) {
         Cost cost = new Cost();
         cost.setTitle(repeatedCost.getTitle());
