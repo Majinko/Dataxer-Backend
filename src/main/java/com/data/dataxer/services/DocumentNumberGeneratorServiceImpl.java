@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 @Service
-public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGeneratorService{
+public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGeneratorService {
 
     private final DocumentNumberGeneratorRepository documentNumberGeneratorRepository;
     private final QDocumentNumberGeneratorRepository qDocumentNumberGeneratorRepository;
@@ -78,8 +78,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     @Override
     public String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated) {
-        Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
-                .getDefaultByDocumentType(documentType, SecurityUtils.companyIds());
+        Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.companyIds());
 
         DocumentNumberGenerator documentNumberGenerator;
         if (!documentNumberGeneratorOptional.isPresent()) {
@@ -103,7 +102,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     public String generateNextNumberByDocumentId(Long id, boolean storeGenerated) {
         DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
                 .getById(id, SecurityUtils.companyIds())
-                .orElseThrow(() ->new RuntimeException("Generator not found"));
+                .orElseThrow(() -> new RuntimeException("Generator not found"));
         return this.generateNextDocumentNumber(documentNumberGenerator, storeGenerated);
     }
 
@@ -151,7 +150,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         boolean generatorChanged = false;
         String nextNumber = this.getNextNumber(documentNumberGenerator.getFormat(), documentNumberGenerator.getLastNumber());
 
-        if(storeGenerated) {
+        if (storeGenerated) {
             documentNumberGenerator.setLastNumber(nextNumber);
             generatorChanged = true;
         }

@@ -1,0 +1,162 @@
+@page {
+    size: letter;
+}
+
+body {
+    font-family: 'DejaVu Sans', 'sans-serif';
+    background: red;
+}
+
+*, div, span, li, p, section, td, th, a {
+    line-height: 1.2em;
+    font-size: 10.8px;
+    font-weight: 300;
+}
+
+*, :after, :before {
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+p {
+    margin-bottom: 0px;
+    padding-bottom: 0;
+    font-weight: normal;
+    line-height: 1.1em;
+}
+
+.box header h1, header .h1 {
+    font-size: 24px;
+    font-family: 'sans-serif';
+    font-weight: bold;
+}
+
+.open-sans {
+    font-family: 'sans-serif';
+}
+
+.clear {
+    clear: both;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.text-left {
+    text-align: left !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+table td, table th {
+    vertical-align: top;
+}
+
+.row:after, .row:before {
+    display: table;
+    content: " ";
+}
+
+.row:after {
+    clear: both;
+}
+
+.col-md-6 {
+    width: 50%;
+    float: left;
+}
+
+ul, ol, p {
+    padding-bottom: 10px;
+}
+
+table {
+    width: 100%;
+}
+
+table.table-data thead, table.table-data tbody {
+    border-bottom: 2px solid #000;
+}
+
+table.table-data tbody td {
+    border-bottom: 1px dotted #000;
+    vertical-align: middle;
+}
+
+table tbody tr:last-of-type td {
+    border: none !important;
+}
+
+table.table-data thead th, table.table-data tbody td {
+    padding: 5px 4px 5px 4px;
+    font-size: 8.4px;
+    line-height: 1em;
+    vertical-align: middle;
+}
+
+table.table-data thead th {
+    font-size: 7.8px;
+    vertical-align: middle;
+    font-weight: bold;
+    text-align: right;
+    line-height: 1em;
+    padding-bottom: 0px;
+}
+
+table tbody td:first-child, table.table-data thead th:first-child {
+    padding-left: 0px;
+}
+
+table tbody td:last-child, table.table-data thead th:last-child {
+    padding-right: 0px;
+}
+
+table .set td:first-child {
+    font-weight: bold;
+    padding-left: 4px !important;
+}
+
+table .set td {
+    font-weight: bold;
+}
+
+table td {
+    white-space: nowrap;
+}
+
+table.table-data tbody tr td:first-child {
+    padding-left: 10px;
+}
+
+.table-invoice-summary td {
+    font-size: 11px;
+}
+
+.four_box_wrapper .text_box {
+    float: left;
+    width: 25%;
+}
+
+table span {
+    font-size: 8.4px;
+}
+
+.footer-wrap .table-invoice-items span {
+    font-size: 10.8px;
+}
+
+.table-invoice-items td {
+    font-size: 10.8px;
+}
+
+.small-font {
+    font-size: 8.4px;
+}
+
+.white-space-normal {
+    white-space: normal !important;
+}

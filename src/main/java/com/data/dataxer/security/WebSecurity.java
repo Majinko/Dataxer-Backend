@@ -52,6 +52,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/file/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/pdf/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

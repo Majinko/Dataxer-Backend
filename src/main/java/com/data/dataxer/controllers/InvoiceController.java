@@ -40,7 +40,7 @@ public class InvoiceController {
     public void changeState(
             @RequestParam(value = "id") Long id,
             @RequestParam(value = "documentState") DocumentState newState
-            ) {
+    ) {
         this.invoiceService.changeState(id, newState);
     }
 
@@ -83,4 +83,8 @@ public class InvoiceController {
         this.invoiceService.destroy(id);
     }
 
+    @GetMapping("/pdf/{id}")
+    public void pdf(@PathVariable Long id) {
+
+    }
 }

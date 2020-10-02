@@ -102,5 +102,4 @@ public class DocumentNumberGeneratorController {
         documentNumberGeneratorDTO.setNextNumber(this.documentNumberGeneratorService.getNextNumber(documentNumberGenerator));
         return documentNumberGeneratorDTO;
     }
-
 }
