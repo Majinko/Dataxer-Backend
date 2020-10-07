@@ -1,6 +1,9 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Invoice;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.spring5.SpringTemplateEngine;
@@ -35,6 +38,7 @@ public class PdfService {
         File file = File.createTempFile("students", ".pdf");
         OutputStream outputStream = new FileOutputStream(file);
         ITextRenderer renderer = new ITextRenderer(20f * 4f / 3f, 20);
+        renderer.getFontResolver().addFont("/fonts/OpenSans.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
         renderer.setDocumentFromString(html, new ClassPathResource(PDF_RESOURCES).getURL().toExternalForm());
         renderer.layout();
         renderer.createPDF(outputStream);
@@ -44,7 +48,7 @@ public class PdfService {
     }
 
     private Context getContext() {
-        Invoice invoice = this.invoiceService.getById(4L);
+        Invoice invoice = this.invoiceService.getById(3L);
 
         Context context = new Context();
         context.setVariable("invoice", invoice);
