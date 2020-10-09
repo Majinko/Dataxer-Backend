@@ -11,8 +11,8 @@ public class RepeatedCosts {
     @Autowired
     private CostService costService;
 
-    //@Scheduled(cron = "0 0 0 * * *")
-    @Scheduled(cron = "0 * * * * *")
+    ///every day at 01:00 am
+    @Scheduled(cron = "0 0 1 * * *")
     void execute() {
         costService.taskExecute();
     }

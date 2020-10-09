@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.mappers.HashMapConverter;
 import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.models.enums.CostType;
 import com.data.dataxer.models.enums.CostsPeriods;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.Where;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Map;
 
 @Entity
 @Getter
@@ -42,6 +44,10 @@ public class Cost extends BaseEntity {
     private Boolean isRepeated;
 
     private CostsPeriods period;
+
+    @Column(columnDefinition = "text")
+    @Convert(converter = HashMapConverter.class)
+    protected Map<String, Object> documentData;
 
     private BigDecimal price;
 
