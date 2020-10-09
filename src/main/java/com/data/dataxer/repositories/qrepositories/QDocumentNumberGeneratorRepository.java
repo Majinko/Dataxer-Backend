@@ -19,4 +19,6 @@ public interface QDocumentNumberGeneratorRepository {
 
     Optional<DocumentNumberGenerator> getByDocumentType(DocumentType documentType, List<Long> companyIds);
 
+    Optional<DocumentNumberGenerator> getDefaultByDocumentType(DocumentType documentType, List<Long> companyIds);
+
 }

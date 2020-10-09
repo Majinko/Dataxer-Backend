@@ -31,9 +31,9 @@ public class DocumentNumberGeneratorController {
         return ResponseEntity.ok(documentNumberGeneratorMapper.documentNumberGeneratorToDocumentNumberGeneratorDTO(this.documentNumberGeneratorService.getById(id)));
     }
 
-    @PostMapping("/storeOrUpdate")
-    public void storeOrUpdate(@RequestBody DocumentNumberGeneratorDTO documentNumberGeneratorDTO) {
-        this.documentNumberGeneratorService.storeOrUpdate(this.documentNumberGeneratorMapper.documentNumberGeneratorDTOToDocumentNumberGenerator(documentNumberGeneratorDTO));
+    @PostMapping("/store")
+    public void store(@RequestBody DocumentNumberGeneratorDTO documentNumberGeneratorDTO) {
+        this.documentNumberGeneratorService.store(this.documentNumberGeneratorMapper.documentNumberGeneratorDTOToDocumentNumberGenerator(documentNumberGeneratorDTO));
     }
 
     @PostMapping("/update")
@@ -58,7 +58,28 @@ public class DocumentNumberGeneratorController {
     public ResponseEntity<String> generateNextNumberByDocumentType(
             @PathVariable DocumentType documentType
     ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, false));
+    }
+
+    @GetMapping("/generateAndSaveNextByType/{documentType}")
+    public ResponseEntity<String> generateAndSaveNextNumberByDocumentType(
+            @PathVariable DocumentType documentType
+    ) {
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, true));
+    }
+
+    @GetMapping("/generateNextById/{id}")
+    public ResponseEntity<String> generateNextNumberByDocumentId(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentId(id, false));
+    }
+
+    @GetMapping("/generateAndSaveNextById/{id}")
+    public ResponseEntity<String> generateAndSaveNextNumberByDocumentId(
+            @PathVariable Long id
+    ) {
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentId(id, true));
     }
 
     @GetMapping("/destroy/{id}")
