@@ -70,6 +70,7 @@ public class Cost extends BaseEntity {
 
     public Cost(Cost existedCost) {
         this.title = existedCost.getTitle();
+        this.contact = existedCost.getContact();
         this.costOrder = existedCost.getCostOrder();
         this.state = existedCost.getState();
         this.category = existedCost.getCategory();
@@ -77,7 +78,9 @@ public class Cost extends BaseEntity {
         this.isInternal = existedCost.getIsInternal();
         this.isRepeated = existedCost.getIsRepeated();
         this.period = existedCost.getPeriod();
-        this.price = existedCost.getTotalPrice();
+        this.documentData = existedCost.getDocumentData();
+        this.price = existedCost.getPrice();
+        this.totalPrice = existedCost.getTotalPrice();
         this.repeatedFrom = existedCost.getRepeatedFrom();
         this.repeatedTo = existedCost.getRepeatedTo();
         this.nextRepeatedCost = existedCost.getNextRepeatedCost();

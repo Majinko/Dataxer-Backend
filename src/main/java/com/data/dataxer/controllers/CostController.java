@@ -59,7 +59,9 @@ public class CostController {
     }
 
     @GetMapping("/changeState")
-    public ResponseEntity<CostDTO> changeState(@RequestParam Long id, @RequestParam CostState state) {
+    public ResponseEntity<CostDTO> changeState(
+            @RequestParam(value = "id") Long id,
+            @RequestParam(value = "state", defaultValue = "PAYED") CostState state) {
         return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.changeState(id, state)));
     }
 
