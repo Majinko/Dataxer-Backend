@@ -5,8 +5,6 @@ import com.data.dataxer.mappers.InvoiceMapper;
 import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.services.InvoiceService;
-import com.google.api.client.json.Json;
-import jdk.nashorn.api.scripting.JSObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

@@ -58,6 +58,16 @@ public class Filter {
         }
     }
 
+    public static List<Filter> resolveFiltersFromString(String stringFilters) {
+        List<Filter> filters = new ArrayList<>();
+        return filters;
+    }
+
+    public static String buildConditionsFromFilters(List<Filter> filters, String alias) {
+        String condition = "";
+        return condition;
+    }
+
     public boolean isEmpty() {
         return this.columnId.isEmpty() && this.operator.isEmpty() && this.values.isEmpty();
     }
