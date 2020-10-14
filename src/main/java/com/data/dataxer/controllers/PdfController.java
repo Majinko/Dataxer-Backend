@@ -38,8 +38,7 @@ public class PdfController {
             Path file = Paths.get(pdfService.generatePdf().getAbsolutePath());
             if (Files.exists(file)) {
                 response.setContentType("application/pdf");
-                response.addHeader("Content-Disposition",
-                        "attachment; filename=" + file.getFileName());
+                response.addHeader("Content-Disposition", "attachment; filename=" + file.getFileName());
                 Files.copy(file, response.getOutputStream());
                 response.getOutputStream().flush();
             }

@@ -3,12 +3,7 @@
 }
 
 * {
-    font-family: 'Open Sans';
-}
-
-body {
-    font-family: 'DejaVu Sans', 'sans-serif';
-    background: red;
+    font-family: 'DejaVu Sans', sans-serif;
 }
 
 *, div, span, li, p, section, td, th, a {
