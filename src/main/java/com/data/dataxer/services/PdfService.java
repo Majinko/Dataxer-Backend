@@ -6,6 +6,7 @@ import com.lowagie.text.FontFactory;
 import com.lowagie.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
 import com.lowagie.text.DocumentException;
 
@@ -26,10 +27,12 @@ public class PdfService {
     public PdfService(SpringTemplateEngine templateEngine, InvoiceService invoiceService) {
         this.templateEngine = templateEngine;
         this.invoiceService = invoiceService;
+
+        this.templateEngine.addDialect(new Java8TimeDialect());
     }
 
-    public File generatePdf() throws IOException, DocumentException {
-        Context context = getContext();
+    public File generatePdf(Long id) throws IOException, DocumentException {
+        Context context = getContext(id);
         String html = loadAndFillTemplate(context);
         return renderPdf(html);
     }
@@ -39,6 +42,7 @@ public class PdfService {
         OutputStream outputStream = new FileOutputStream(file);
         ITextRenderer renderer = new ITextRenderer(20f * 4f / 3f, 20);
         renderer.getFontResolver().addFont("/fonts/OpenSans.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
+        renderer.getFontResolver().addFont("/fonts/DejaVuSans.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
         renderer.setDocumentFromString(html, new ClassPathResource(PDF_RESOURCES).getURL().toExternalForm());
         renderer.layout();
         renderer.createPDF(outputStream);
@@ -47,15 +51,19 @@ public class PdfService {
         return file;
     }
 
-    private Context getContext() {
-        Invoice invoice = this.invoiceService.getById(3L);
+    private Context getContext(Long id) {
+        Invoice invoice = this.invoiceService.getById(id);
 
         Context context = new Context();
         context.setVariable("invoice", invoice);
+        context.setVariable("createdName", "Janko Hrasko");
+        context.setVariable("createdPhone", "0905123456");
+        context.setVariable("createdWeb", "www.example.com");
+        context.setVariable("createdEmail", "janko.hrasko@example.com");
         return context;
     }
 
     private String loadAndFillTemplate(Context context) {
-        return templateEngine.process("view/invoice/pdf", context);
+        return templateEngine.process("view/invoice/invoice_template", context);
     }
 }

@@ -55,6 +55,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         Invoice invoice = query.selectFrom(qInvoice)
                 .leftJoin(qInvoice.contact).fetchJoin()
+                .leftJoin(qInvoice.company).fetchJoin()
                 .leftJoin(qInvoice.packs, qDocumentPack).fetchJoin()
                 .where(qInvoice.id.eq(id))
                 .orderBy(qDocumentPack.position.asc())
@@ -88,6 +89,18 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .orderBy(qInvoice.id.desc())
                 .fetch();
         return new PageImpl<Invoice>(invoices, pageable, total());
+    }
+
+    @Override
+    public Optional<Invoice> getByIdContactAndCompany(Long id) {
+        QInvoice qInvoice = QInvoice.invoice;
+
+        return Optional.ofNullable(
+                query.selectFrom(qInvoice)
+                .leftJoin(qInvoice.contact).fetchJoin()
+                .leftJoin(qInvoice.company).fetchJoin()
+                .where(qInvoice.id.eq(id))
+                .fetchOne());
     }
 
     private Long total() {

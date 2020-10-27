@@ -6,9 +6,12 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import com.lowagie.text.DocumentException;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -32,10 +35,11 @@ public class PdfController {
         return modelAndView;
     }
 
-    @GetMapping("/download-pdf")
-    public void downloadPDFResource(HttpServletResponse response) {
+    @RequestMapping(value = "/download-pdf", method = RequestMethod.GET)
+    public void downloadPDFResource(@RequestParam(value = "id") Long id,
+            HttpServletResponse response) {
         try {
-            Path file = Paths.get(pdfService.generatePdf().getAbsolutePath());
+            Path file = Paths.get(pdfService.generatePdf(id).getAbsolutePath());
             if (Files.exists(file)) {
                 response.setContentType("application/pdf");
                 response.addHeader("Content-Disposition",

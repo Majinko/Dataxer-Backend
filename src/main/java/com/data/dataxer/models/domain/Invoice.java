@@ -8,8 +8,11 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Setter
@@ -64,5 +67,33 @@ public class Invoice extends DocumentBase {
         for (DocumentPack pack : packs) {
             this.packs.add(new DocumentPack(pack));
         }
+    }
+
+    public BigDecimal countDiscountTotalPrice() {
+        System.out.println("TP:" + totalPrice + " D: " + discount);
+        return this.totalPrice.multiply(this.discount.divide(BigDecimal.valueOf(100)));
+    }
+
+    public Map<Integer, BigDecimal> getTaxesAndValues() {
+        Map<Integer, BigDecimal> taxesAndValues = new HashMap<>();
+
+        for (DocumentPack pack: this.packs) {
+            Map<Integer, BigDecimal> packTaxesAndValues = pack.getPackItemsTaxesAndValues();
+            for (Integer key : packTaxesAndValues.keySet()) {
+                if (taxesAndValues.containsKey(key)) {
+                    BigDecimal value = taxesAndValues.get(key);
+                    value = value.add(packTaxesAndValues.get(key));
+                    taxesAndValues.replace(key, value);
+                } else {
+                    taxesAndValues.put(key, packTaxesAndValues.get(key));
+                }
+            }
+        }
+
+        return  taxesAndValues;
+    }
+
+    public BigDecimal countTaxPrice(BigDecimal price, Integer tax) {
+        return price.multiply(new BigDecimal(tax.floatValue()/100));
     }
 }
