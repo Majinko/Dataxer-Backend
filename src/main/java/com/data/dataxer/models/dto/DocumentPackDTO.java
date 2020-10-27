@@ -15,5 +15,6 @@ public class DocumentPackDTO {
     Integer position;
     String title;
     Integer tax;
+    private BigDecimal price;
     private BigDecimal totalPrice;
 }

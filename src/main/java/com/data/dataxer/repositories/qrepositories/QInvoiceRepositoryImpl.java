@@ -79,6 +79,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         Invoice invoice = query.selectFrom(qInvoice)
                 .leftJoin(qInvoice.contact).fetchJoin()
+                .leftJoin(qInvoice.company).fetchJoin()
                 .leftJoin(qInvoice.packs, qDocumentPack).fetchJoin()
                 .where(qInvoice.id.eq(id))
                 .orderBy(qDocumentPack.position.asc())
