@@ -105,6 +105,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                  .leftJoin(qDocumentPackItem.item, qItem).fetchJoin()
                  .orderBy(qDocumentPackItem.position.asc())
                  .fetch();
+
          invoice.getPacks().forEach(documentPack -> documentPack.setPackItems(
                  invoicePackItems.stream().filter(
                          invoicePackItem -> invoicePackItem.getPack().getId().equals(documentPack.getId())).collect(Collectors.toList())
