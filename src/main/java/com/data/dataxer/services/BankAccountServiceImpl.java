@@ -17,7 +17,11 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public BankAccount store(BankAccount bankAccount) {
-        return bankAccountRepository.save(bankAccount);
+        BankAccount bank = bankAccountRepository.save(bankAccount);
+
+        this.setDefaultBankAccount(bank.getId());
+
+        return bank;
     }
 
     @Override

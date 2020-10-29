@@ -27,6 +27,6 @@ public class BankAccount extends BaseEntitySoftDelete {
     @Column(length = 50)
     String swift;
 
-    @Column(columnDefinition = "boolean default false", name = "isDefaultBankAccount")
+    @Column(columnDefinition = "boolean default false")
     Boolean isDefault;
 }

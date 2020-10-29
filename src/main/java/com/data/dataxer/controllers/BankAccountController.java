@@ -53,4 +53,9 @@ public class BankAccountController {
     public ResponseEntity<BankAccountDTO> getDefault() {
         return ResponseEntity.ok(bankAccountMapper.bankAccountToBankAccountDTO(bankAccountService.getDefaultBankAccount()));
     }
+
+    @GetMapping("/get-all")
+    public ResponseEntity<List<BankAccountDTO>> getAll() {
+        return ResponseEntity.ok(bankAccountMapper.bankAccountsToBankAccountDTOs(bankAccountService.findAll()));
+    }
 }
