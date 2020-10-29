@@ -2,8 +2,13 @@
     size: letter;
 }
 
+<<<<<<< HEAD
 * {
     font-family: 'DejaVu Sans', sans-serif;
+=======
+body {
+    font-family: 'DejaVu Sans', 'sans-serif';
+>>>>>>> 25977f33789e397fe98b9d6e9f6994fbc4e046ce
 }
 
 *, div, span, li, p, section, td, th, a {

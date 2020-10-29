@@ -18,4 +18,5 @@ public interface QInvoiceRepository {
 
     Page<Invoice> getByClient(Pageable pageable, Long contactId, List<Long> companyIds);
 
+    Optional<Invoice> getByIdContactAndCompany(Long id);
 }

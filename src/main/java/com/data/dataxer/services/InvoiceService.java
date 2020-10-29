@@ -18,6 +18,8 @@ public interface InvoiceService {
 
     Invoice getByIdSimple(Long id);
 
+    Invoice getByIdWithContactAndCompany(Long id);
+
     Page<Invoice> getByClient(Pageable pageable, Long contactId);
 
     void destroy(Long id);
