@@ -29,7 +29,6 @@ public class CompanyServiceImpl implements CompanyService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         company.setAppUser(appUser);
- /*       this.companySetBi(company);*/
 
         Company c = this.companyRepository.save(company);
 
@@ -38,12 +37,6 @@ public class CompanyServiceImpl implements CompanyService {
 
         return c;
     }
-
- /*   public void companySetBi(Company company) {
-        company.getBillingInformation().forEach(billingInformation -> {
-            billingInformation.setCompany(company);
-        });
-    }*/
 
     @Override
     public List<Company> findAll() {
