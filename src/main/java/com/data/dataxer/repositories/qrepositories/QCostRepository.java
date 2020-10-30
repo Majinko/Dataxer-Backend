@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QCostRepository {
-
     Page<Cost> paginate(Pageable pageable, List<Filter> costFilters, List<Long> companyIds);
 
     Optional<Cost> getById(Long id, List<Long> companyIds);
