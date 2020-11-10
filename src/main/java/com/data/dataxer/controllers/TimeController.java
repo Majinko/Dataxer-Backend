@@ -56,5 +56,4 @@ public class TimeController {
     ) {
         this.timeService.destroy(id);
     }
-
 }

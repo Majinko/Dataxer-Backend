@@ -36,7 +36,7 @@ public class BankAccountController {
 
     @PostMapping("/update")
     public ResponseEntity<BankAccountDTO> update(@RequestBody BankAccountDTO bankAccountDTO) {
-        return ResponseEntity.ok(bankAccountMapper.bankAccountToBankAccountDTO(bankAccountService.store(bankAccountMapper.bankAccountDTOtoBankAccount(bankAccountDTO))));
+        return ResponseEntity.ok(bankAccountMapper.bankAccountToBankAccountDTO(bankAccountService.update(bankAccountMapper.bankAccountDTOtoBankAccount(bankAccountDTO))));
     }
 
     @GetMapping("/destroy/{id}")

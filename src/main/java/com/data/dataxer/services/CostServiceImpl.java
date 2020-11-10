@@ -108,7 +108,7 @@ public class CostServiceImpl implements CostService{
         cost.setCategory(repeatedCost.getCategory());
         cost.setContact(repeatedCost.getContact());
         cost.setIsInternal(repeatedCost.getIsInternal());
-        cost.setDateOfCreate(LocalDate.now());
+        cost.setCreatedDate(LocalDate.now());
         if (repeatedCost.getDueDate() != null) {
             cost.setDueDate(repeatedCost.getDueDate());
         } else {

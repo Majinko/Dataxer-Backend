@@ -50,4 +50,12 @@ public class QProjectRepositoryImpl implements QProjectRepository {
                 .fetchOne();
 
     }
+
+    @Override
+    public List<Project> search(List<Long> companyIds, String queryString) {
+        return query.selectFrom(QProject.project)
+                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.title.containsIgnoreCase(queryString))
+                .fetch();
+    }
 }

@@ -24,8 +24,8 @@ public class ProjectController {
     }
 
     @PostMapping("/store")
-    public void store(@RequestBody ProjectDTO projectDTO) {
-        this.projectService.store(projectMapper.projectDTOtoProject(projectDTO));
+    public ResponseEntity<ProjectDTO> store(@RequestBody ProjectDTO projectDTO) {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.store(projectMapper.projectDTOtoProject(projectDTO))));
     }
 
     @GetMapping("/paginate")
@@ -43,9 +43,14 @@ public class ProjectController {
         return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.getById(id)));
     }
 
+    @GetMapping("/search/{queryString}")
+    public ResponseEntity<List<ProjectDTO>> search(@PathVariable String queryString) {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.search(queryString)));
+    }
+
     @PostMapping("/update")
-    public void update(@RequestBody ProjectDTO projectDTO) {
-        this.projectService.update(projectMapper.projectDTOtoProject(projectDTO));
+    public ResponseEntity<ProjectDTO> update(@RequestBody ProjectDTO projectDTO) {
+        return ResponseEntity.ok(this.projectMapper.projectToProjectDTO(this.projectService.update(projectMapper.projectDTOtoProject(projectDTO))));
     }
 
     @GetMapping("/destroy/{id}")

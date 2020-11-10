@@ -21,8 +21,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void store(Project project) {
-        this.projectRepository.save(project);
+    public Project store(Project project) {
+        return this.projectRepository.save(project);
     }
 
     @Override
@@ -31,8 +31,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void update(Project project) {
-        this.projectRepository.save(project);
+    public Project update(Project project) {
+        return this.projectRepository.save(project);
     }
 
     @Override
@@ -48,5 +48,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<Project> all() {
         return this.projectRepository.findAllByCompanyIdIn(SecurityUtils.companyIds());
+    }
+
+    @Override
+    public List<Project> search(String queryString) {
+        return this.qProjectRepository.search(SecurityUtils.companyIds(), queryString);
     }
 }

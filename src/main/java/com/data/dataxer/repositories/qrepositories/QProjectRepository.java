@@ -10,4 +10,6 @@ public interface QProjectRepository {
     Page<Project> paginate(Pageable pageable, List<Long> companyIds);
 
     Project getById(Long id, List<Long> companyIds);
+
+    List<Project> search(List<Long> companyIds, String queryString);
 }

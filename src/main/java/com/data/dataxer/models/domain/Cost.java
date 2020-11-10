@@ -4,6 +4,7 @@ import com.data.dataxer.mappers.HashMapConverter;
 import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.models.enums.CostType;
 import com.data.dataxer.models.enums.CostsPeriods;
+import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -17,10 +18,7 @@ import java.util.Map;
 @Entity
 @Getter
 @Setter
-@Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE cost SET deleted_at = now() WHERE id = ?")
-public class Cost extends BaseEntity {
-
+public class Cost extends BaseEntitySoftDelete {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -29,27 +27,50 @@ public class Cost extends BaseEntity {
     @JoinColumn(name = "client_id")
     Contact contact;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    Project project;
+
     private String title;
 
     private String costOrder;
 
-    private CostState state;
-
     private String category;
 
+    protected String number;
+
+    private String variableSymbol;
+
+    private String constantSymbol;
+
+    private String currency;
+
+    @Column(columnDefinition = "text")
+    private String note;
+
+    @Enumerated(EnumType.STRING)
+    private CostState state;
+
+    @Enumerated(EnumType.STRING)
     private CostType type;
+
+    @Enumerated(EnumType.STRING)
+    private CostsPeriods period;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
 
     private Boolean isInternal;
 
     private Boolean isRepeated;
 
-    private CostsPeriods period;
-
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)
-    protected Map<String, Object> documentData;
+    protected Map<String, Object> costData;
 
     private BigDecimal price;
+
+    private Integer tax;
 
     private BigDecimal totalPrice;
 
@@ -59,33 +80,40 @@ public class Cost extends BaseEntity {
 
     private LocalDate nextRepeatedCost;
 
-    //datum vystavenia
-    private LocalDate dateOfCreate;
+    private LocalDate createdDate; //datum vystavenia
 
     private LocalDate dueDate;
 
-    private LocalDate deletedAt;
+    protected LocalDate deliveredDate;
 
-    public Cost() {}
+    protected LocalDate taxableSupply; // datum uplatnenia DPH
+
+    public Cost() {
+    }
 
     public Cost(Cost existedCost) {
         this.title = existedCost.getTitle();
         this.contact = existedCost.getContact();
+        this.project = existedCost.getProject();
         this.costOrder = existedCost.getCostOrder();
         this.state = existedCost.getState();
+        this.currency = existedCost.getCurrency();
         this.category = existedCost.getCategory();
         this.type = existedCost.getType();
+        this.note = existedCost.getNote();
         this.isInternal = existedCost.getIsInternal();
         this.isRepeated = existedCost.getIsRepeated();
         this.period = existedCost.getPeriod();
-        this.documentData = existedCost.getDocumentData();
+        this.costData = existedCost.getCostData();
         this.price = existedCost.getPrice();
+        this.tax = existedCost.getTax();
         this.totalPrice = existedCost.getTotalPrice();
         this.repeatedFrom = existedCost.getRepeatedFrom();
         this.repeatedTo = existedCost.getRepeatedTo();
         this.nextRepeatedCost = existedCost.getNextRepeatedCost();
-        this.dateOfCreate = LocalDate.now();
+        this.createdDate = LocalDate.now();
         this.dueDate = existedCost.getDueDate();
+        this.deliveredDate = existedCost.getDeliveredDate();
+        this.taxableSupply = existedCost.getTaxableSupply();
     }
-
 }

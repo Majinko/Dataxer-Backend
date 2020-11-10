@@ -7,9 +7,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ProjectService {
-    void store(Project project);
+    Project store(Project project);
 
-    void update(Project project);
+    Project update(Project project);
 
     Project getById(Long id);
 
@@ -18,4 +18,6 @@ public interface ProjectService {
     void destroy(Long id);
 
     List<Project> all();
+
+    List<Project> search(String queryString);
 }
