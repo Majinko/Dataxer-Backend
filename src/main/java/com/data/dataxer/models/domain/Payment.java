@@ -29,6 +29,9 @@ public class Payment extends BaseEntity {
 
     private BigDecimal payedValue;
 
+    @Column(columnDefinition = "boolean default false")
+    private Boolean taxDocumentCreated;
+
     private PaymentMethod paymentMethod;
 
     private LocalDate payedDate;

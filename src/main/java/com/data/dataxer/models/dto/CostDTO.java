@@ -1,5 +1,6 @@
 package com.data.dataxer.models.dto;
 
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.models.enums.CostType;
@@ -19,7 +20,7 @@ public class CostDTO {
     private String costOrder;
     private CostState state;
     private CostType type;
-    private String category;
+    private Category category;
     private Boolean isInternal;
     private Boolean isRepeated;
     private CostsPeriods period;
