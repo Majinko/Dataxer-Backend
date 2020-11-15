@@ -291,13 +291,13 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             return generatedNumber;
         }
 
-        String dayForReplace = String.valueOf(currentDate.getDayOfMonth());
+        StringBuilder dayForReplace = new StringBuilder(String.valueOf(currentDate.getDayOfMonth()));
         while (dayForReplace.length() < countOfDay) {
-            dayForReplace = "0" + dayForReplace;
+            dayForReplace.insert(0, "0");
         }
         String forReplace = StringUtils.generateString("D", countOfDay);
 
-        return generatedNumber.replace(forReplace, dayForReplace);
+        return generatedNumber.replace(forReplace, dayForReplace.toString());
     }
 
     private void handleIfDefaultAlreadyExist(DocumentNumberGenerator documentNumberGenerator, boolean isUpdated) {

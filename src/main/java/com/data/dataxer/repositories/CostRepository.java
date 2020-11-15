@@ -10,7 +10,6 @@ import java.util.List;
 
 @Repository
 public interface CostRepository extends CrudRepository<Cost, Long> {
-
     @Query(value = "SELECT * FROM cost c WHERE c.company_id IN ?1 AND c.deleted_at IS NULL", nativeQuery = true)
     public List<Cost> findDefault(List<Long> companyIds, Pageable pageable);
 
@@ -19,5 +18,4 @@ public interface CostRepository extends CrudRepository<Cost, Long> {
 
     @Query(value = "SELECT * FROM cost c WHERE c.is_repeated = true AND c.deleted_at IS NULL", nativeQuery = true)
     public List<Cost> findAllRepeated();
-
 }

@@ -15,9 +15,6 @@ public class Time extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Company company;
-
     @OneToOne
     Project project;
 
