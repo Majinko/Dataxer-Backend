@@ -5,6 +5,7 @@ import com.data.dataxer.repositories.DocumentRelationsRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,7 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     }
 
     @Override
+    @Transactional
     public void store(DocumentRelations documentRelations) {
         this.documentRelationsRepository.save(documentRelations);
     }
@@ -44,7 +46,7 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     @Override
     public List<Long> getAllRelationDocuments(Long originalDocumentId) {
         List<Long> result = new ArrayList<>();
-        List<DocumentRelations> documentRelations = this.documentRelationsRepository.findAllRelationDocuments(originalDocumentId, SecurityUtils.companyIds());
+        List<DocumentRelations> documentRelations = this.documentRelationsRepository.findAllRelationDocuments(originalDocumentId);
         for (DocumentRelations documentRelation : documentRelations) {
             result.add(documentRelation.getRelationDocumentId());
         }

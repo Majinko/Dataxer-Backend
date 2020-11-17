@@ -1,7 +1,7 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.models.enums.DeliveryMethod;
-import com.data.dataxer.models.enums.InvoiceType;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
@@ -10,7 +10,6 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
 @Setter
@@ -36,11 +35,6 @@ public class Invoice extends DocumentBase {
     private LocalDate paymentDate;
 
     @Enumerated(EnumType.STRING)
-    private InvoiceType invoiceType;
+    private DocumentType documentType;
 
-    /*private void duplicatePacks(List<DocumentPack> packs) {
-        for (DocumentPack pack : packs) {
-            this.packs.add(new DocumentPack(pack));
-        }
-    }*/
 }

@@ -4,7 +4,6 @@ import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
-import com.data.dataxer.models.enums.InvoiceType;
 import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.PaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
@@ -49,6 +48,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public Invoice storeTaxDocument(Invoice taxDocument, Long proformaInvoiceId) {
         Invoice i = this.invoiceRepository.save(taxDocument);
 
@@ -59,6 +59,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    @Transactional
     public Invoice storeSummaryInvoice(Invoice summaryInvoice, Long taxDocumentId, Long proformaId) {
         Invoice i = this.invoiceRepository.save(summaryInvoice);
 
@@ -118,7 +119,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         taxDocument.setState(DocumentState.PAYED);
         taxDocument.setDiscount(BigDecimal.ZERO);
         taxDocument.setCreatedDate(LocalDate.now());
-        taxDocument.setInvoiceType(InvoiceType.TAX_DOCUMENT);
+        taxDocument.setDocumentType(DocumentType.TAX_DOCUMENT);
         this.setPropertiesForTaxDocument(invoice, taxDocument);
         return taxDocument;
     }
@@ -134,7 +135,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 "paymentMethod", "invoiceType");
         summaryInvoice.setState(DocumentState.PAYED);
         summaryInvoice.setCreatedDate(LocalDate.now());
-        summaryInvoice.setInvoiceType(InvoiceType.SUMMARY_INVOICE);
+        taxDocument.setDocumentType(DocumentType.SUMMARY_INVOICE);
         this.setPropertiesForSummaryInvoice(proformaInvoice, taxDocument, summaryInvoice);
         return summaryInvoice;
     }
