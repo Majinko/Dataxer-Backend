@@ -34,7 +34,4 @@ public class Invoice extends DocumentBase {
 
     private LocalDate paymentDate;
 
-    @Enumerated(EnumType.STRING)
-    private DocumentType documentType;
-
 }

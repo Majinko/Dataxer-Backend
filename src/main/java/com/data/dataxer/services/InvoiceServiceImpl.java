@@ -243,7 +243,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         this.storeRelation(proformaInvoiceId, taxDocumentId);
         this.storeRelation(taxDocumentId, proformaInvoiceId);
 
-        List<Long> allRelationDocumentIds = this.documentRelationService.getAllRelationDocuments(proformaInvoiceId);
+        List<Long> allRelationDocumentIds = this.documentRelationService.getAllRelationDocumentIds(proformaInvoiceId);
         for (Long relationDocumentId : allRelationDocumentIds) {
             this.storeRelation(taxDocumentId, relationDocumentId);
         }
@@ -260,7 +260,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         DocumentRelations documentRelation = new DocumentRelations();
         documentRelation.setDocumentId(documentId);
         documentRelation.setRelationDocumentId(relationDocumentId);
-        this.documentRelationService.store(documentRelation);
+        this.documentRelationService.storeDocumentRelation(documentRelation);
     }
 
     private void updatePaymentsOfTaxDocument(Long proformaInvoiceId) {
