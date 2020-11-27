@@ -15,5 +15,5 @@ public class DemandDTO {
     private String title;
     private String description;
     private String source;
-    DocumentState state;
+    private String state;
 }
