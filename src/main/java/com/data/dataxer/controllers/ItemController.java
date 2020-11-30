@@ -3,15 +3,21 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.ItemMapper;
 import com.data.dataxer.mappers.ItemPriceMapper;
 import com.data.dataxer.models.dto.ItemDTO;
+import com.data.dataxer.models.dto.StorageFileDTO;
+import com.data.dataxer.models.dto.UploadContextDTO;
 import com.data.dataxer.services.ItemService;
+import com.data.dataxer.services.storage.StorageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/item")
@@ -19,11 +25,13 @@ public class ItemController {
     private final ItemService itemService;
     private final ItemMapper itemMapper;
     private final ItemPriceMapper itemPriceMapper;
+    private final StorageService storageService;
 
-    public ItemController(ItemService itemService, ItemMapper itemMapper, ItemPriceMapper itemPriceMapper) {
+    public ItemController(ItemService itemService, ItemMapper itemMapper, ItemPriceMapper itemPriceMapper, StorageService storageService) {
         this.itemService = itemService;
         this.itemMapper = itemMapper;
         this.itemPriceMapper = itemPriceMapper;
+        this.storageService = storageService;
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
@@ -38,8 +46,16 @@ public class ItemController {
     }
 
     @PostMapping("/store")
-    public void store(@RequestBody ItemDTO itemDTO) {
-        this.itemService.store(itemMapper.toItem(itemDTO), itemPriceMapper.toItemPrice(itemDTO.getItemPrice()));
+    public void store(
+            @RequestBody UploadContextDTO<ItemDTO> uploadContext
+    ) {
+        ItemDTO item = itemMapper.itemToItemDto(this.itemService.store(itemMapper.toItem(uploadContext.getObject()), itemPriceMapper.toItemPrice(uploadContext.getObject().getItemPrice())));
+
+        if (uploadContext.getFiles().size() > 0) {
+            uploadContext.getFiles().forEach(file -> {
+                this.storageService.store(file, item.getId(), "item");
+            });
+        }
     }
 
     @PostMapping("/update")

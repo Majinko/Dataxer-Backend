@@ -1,0 +1,26 @@
+server:
+  port: 8080
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/dataxer?useUnicode=yes&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: root
+    sql-script-encoding: UTF-8
+  liquibase:
+    change-log: classpath:db/changelog/liquibase-changelog.master.xml
+    enabled: true
+    user: root
+    password: root
+  jpa:
+    show-sql: false
+    open-in-view: false
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+        format_sql: true
+      enalbe_lazy_load_no_trans: false

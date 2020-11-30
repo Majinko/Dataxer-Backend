@@ -1,0 +1,779 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+    <changeSet author="marek (generated)" id="1606494860631-27">
+        <createTable tableName="app_user">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="app_user_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="deleted_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="email" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="uid" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="country" type="VARCHAR(255)"/>
+            <column name="first_name" type="VARCHAR(255)"/>
+            <column name="last_name" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(255)"/>
+            <column name="postal_code" type="VARCHAR(255)"/>
+            <column name="street" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-28">
+        <createTable tableName="app_user_companies">
+            <column name="app_user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="companies_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-29">
+        <createTable tableName="app_user_roles">
+            <column name="users_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="roles_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-30">
+        <createTable tableName="bank_account">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="bank_account_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delete_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="account_number" type="INT"/>
+            <column name="bank_code" type="INT"/>
+            <column name="bank_name" type="VARCHAR(255)"/>
+            <column name="currency" type="VARCHAR(255)"/>
+            <column name="iban" type="VARCHAR(50)"/>
+            <column defaultValueBoolean="false" name="is_default" type="BOOL"/>
+            <column name="swift" type="VARCHAR(50)"/>
+            <column name="company_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-31">
+        <createTable tableName="billing_information">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="billing_information_pkey"/>
+            </column>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="country" type="VARCHAR(255)"/>
+            <column name="postal_code" type="VARCHAR(255)"/>
+            <column name="street" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-32">
+        <createTable tableName="categories">
+            <column name="id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category_type" type="VARCHAR(255)"/>
+            <column name="category_id" type="BIGINT"/>
+            <column name="company_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-33">
+        <createTable tableName="category">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="category_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="lft" type="INT"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="rgt" type="INT"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="parent_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-34">
+        <createTable tableName="company">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="company_pkey"/>
+            </column>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="country" type="VARCHAR(255)"/>
+            <column name="deleted_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="iban" type="VARCHAR(255)"/>
+            <column name="identifying_number" type="VARCHAR(255)"/>
+            <column name="legal_form" type="VARCHAR(255)"/>
+            <column name="logo_url" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="net_of_vat" type="VARCHAR(255)"/>
+            <column name="phone" type="VARCHAR(255)"/>
+            <column name="postal_code" type="VARCHAR(255)"/>
+            <column name="street" type="VARCHAR(255)"/>
+            <column name="vat" type="VARCHAR(255)"/>
+            <column name="web" type="VARCHAR(255)"/>
+            <column name="app_user_id" type="BIGINT"/>
+            <column name="default_company" type="BOOL"/>
+            <column name="cin" type="VARCHAR(10)"/>
+            <column name="tin" type="VARCHAR(255)"/>
+            <column name="vatin" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-35">
+        <createTable tableName="contact">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="contact_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="city" type="VARCHAR(255)"/>
+            <column name="country" type="VARCHAR(255)"/>
+            <column name="deleted_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="email" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="note" type="TEXT"/>
+            <column name="phone" type="VARCHAR(255)"/>
+            <column name="photo_url" type="VARCHAR(255)"/>
+            <column name="postal_code" type="VARCHAR(255)"/>
+            <column name="reg_number" type="VARCHAR(255)"/>
+            <column name="street" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="cin" type="VARCHAR(10)"/>
+            <column name="tin" type="VARCHAR(255)"/>
+            <column name="vatin" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-36">
+        <createTable tableName="cost">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="cost_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="category" type="VARCHAR(255)"/>
+            <column name="cost_data" type="TEXT"/>
+            <column name="cost_order" type="VARCHAR(255)"/>
+            <column name="created_date" type="date"/>
+            <column name="deleted_at" type="date"/>
+            <column name="due_date" type="date"/>
+            <column name="is_internal" type="BOOL"/>
+            <column name="is_repeated" type="BOOL"/>
+            <column name="next_repeated_cost" type="date"/>
+            <column name="period" type="VARCHAR(255)"/>
+            <column name="price" type="numeric(19, 2)"/>
+            <column name="repeated_from" type="date"/>
+            <column name="repeated_to" type="date"/>
+            <column name="state" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="total_price" type="numeric(19, 2)"/>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="client_id" type="BIGINT"/>
+            <column name="delete_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="payment_method" type="VARCHAR(255)"/>
+            <column name="constant_symbol" type="VARCHAR(255)"/>
+            <column name="currency" type="VARCHAR(255)"/>
+            <column name="delivered_date" type="date"/>
+            <column name="note" type="TEXT"/>
+            <column name="number" type="VARCHAR(255)"/>
+            <column name="tax" type="INT"/>
+            <column name="taxable_supply" type="date"/>
+            <column name="variable_symbol" type="VARCHAR(255)"/>
+            <column name="project_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-37">
+        <createTable tableName="demand">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="demand_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="description" type="TEXT"/>
+            <column name="source" type="VARCHAR(255)"/>
+            <column name="state" type="VARCHAR(255)"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_id" type="BIGINT"/>
+            <column name="delete_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-38">
+        <createTable tableName="document_base">
+            <column name="discriminator" type="VARCHAR(31)">
+                <constraints nullable="false"/>
+            </column>
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="document_base_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="date"/>
+            <column name="deleted_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="delivered_date" type="date"/>
+            <column name="discount" type="numeric(19, 2)"/>
+            <column name="document_data" type="TEXT"/>
+            <column name="due_date" type="date"/>
+            <column name="note" type="TEXT"/>
+            <column name="number" type="VARCHAR(255)"/>
+            <column name="price" type="numeric(19, 2)"/>
+            <column name="state" type="INT"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="total_price" type="numeric(19, 2)"/>
+            <column name="delivery_method" type="INT"/>
+            <column name="header_comment" type="TEXT"/>
+            <column name="payment_date" type="date"/>
+            <column name="payment_method" type="INT"/>
+            <column name="specific_symbol" type="VARCHAR(255)"/>
+            <column name="variable_symbol" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="client_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-39">
+        <createTable tableName="document_base_packs">
+            <column name="document_base_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="packs_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-40">
+        <createTable tableName="document_number_generator">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="document_number_generator_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="format" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_default" type="BOOL"/>
+            <column name="last_number" type="VARCHAR(255)"/>
+            <column name="period" type="INT"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="type" type="INT"/>
+            <column name="company_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-41">
+        <createTable tableName="document_pack">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="document_pack_pkey"/>
+            </column>
+            <column name="document_id" type="BIGINT"/>
+            <column name="position" type="INT"/>
+            <column name="tax" type="INT"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="total_price" type="numeric(19, 2)"/>
+            <column name="type" type="BYTEA"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-42">
+        <createTable tableName="document_pack_item">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="document_pack_item_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="discount" type="numeric(19, 2)"/>
+            <column name="position" type="INT"/>
+            <column name="price" type="numeric(19, 2)"/>
+            <column name="qty" type="FLOAT4"/>
+            <column name="tax" type="INT"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="total_price" type="numeric(19, 2)"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="item_id" type="BIGINT"/>
+            <column name="document_pack_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-43">
+        <createTable tableName="file">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="file_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="downloadurl" type="VARCHAR(255)"/>
+            <column name="extension" type="VARCHAR(255)"/>
+            <column name="file_hash" type="INT"/>
+            <column name="is_default" type="BOOL"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="showurl" type="VARCHAR(255)"/>
+            <column name="size" type="numeric(19, 2)"/>
+            <column name="company_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-44">
+        <createTable tableName="item">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="item_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="code" type="VARCHAR(255)"/>
+            <column name="color" type="VARCHAR(255)"/>
+            <column name="deleted_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="description" type="TEXT"/>
+            <column name="dimensions" type="VARCHAR(255)"/>
+            <column name="is_part_of_set" type="BOOL"/>
+            <column name="manufacturer" type="VARCHAR(255)"/>
+            <column name="material" type="VARCHAR(255)"/>
+            <column name="model" type="VARCHAR(255)"/>
+            <column name="need_montage" type="BOOL"/>
+            <column name="price_level" type="VARCHAR(255)"/>
+            <column name="series" type="VARCHAR(255)"/>
+            <column name="short_description" type="TEXT"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(255)"/>
+            <column name="unit" type="VARCHAR(255)"/>
+            <column name="web" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="category_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="client_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-45">
+        <createTable tableName="item_price">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="item_price_pkey"/>
+            </column>
+            <column name="marge" type="FLOAT4"/>
+            <column name="price" type="numeric(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="surcharge" type="FLOAT4"/>
+            <column name="tax" type="INT"/>
+            <column name="wholesale_price" type="numeric(19, 2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="wholesale_tax" type="INT"/>
+            <column name="item_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-46">
+        <createTable tableName="pack">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="pack_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-47">
+        <createTable tableName="pack_item">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="pack_item_pkey"/>
+            </column>
+            <column name="qty" type="FLOAT4"/>
+            <column name="item_id" type="BIGINT"/>
+            <column name="pack_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-48">
+        <createTable tableName="payment">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="payment_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="deleted_at" type="date"/>
+            <column name="document_id" type="BIGINT"/>
+            <column name="document_type" type="INT"/>
+            <column name="payed_date" type="date"/>
+            <column name="payed_value" type="numeric(19, 2)"/>
+            <column name="payment_method" type="INT"/>
+            <column name="company_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-49">
+        <createTable tableName="privilege">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="privilege_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-50">
+        <createTable tableName="project">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="project_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="address" type="VARCHAR(255)"/>
+            <column name="area" type="FLOAT4"/>
+            <column name="deleted_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="description" type="TEXT"/>
+            <column name="finished_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="number" type="VARCHAR(255)"/>
+            <column name="started_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="state" type="INT"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="client_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-51">
+        <createTable tableName="role">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="role_pkey"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-52">
+        <createTable tableName="role_privileges">
+            <column name="roles_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="privileges_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-53">
+        <createTable tableName="settings">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="settings_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="value" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-54">
+        <createTable tableName="storage">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="storage_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="delete_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ext" type="VARCHAR(255)"/>
+            <column name="file_able_id" type="BIGINT"/>
+            <column name="file_able_type" type="VARCHAR(255)"/>
+            <column name="file_name" type="VARCHAR(255)"/>
+            <column name="hash_file_name" type="VARCHAR(255)"/>
+            <column name="is_default" type="BOOL"/>
+            <column name="self_link" type="TEXT"/>
+            <column name="size" type="BIGINT"/>
+            <column name="company_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-55">
+        <createTable tableName="task">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="task_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="completion" type="VARCHAR(255)"/>
+            <column name="description" type="TEXT"/>
+            <column name="finished_at" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="state" type="INT"/>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="catergory_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="project_id" type="BIGINT"/>
+            <column name="user_uid" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_from_uid" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-56">
+        <createTable tableName="time">
+            <column autoIncrement="true" name="id" type="BIGSERIAL">
+                <constraints primaryKey="true" primaryKeyName="time_pkey"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP WITHOUT TIME ZONE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="date_work" type="TIMESTAMP WITHOUT TIME ZONE"/>
+            <column name="description" type="TEXT"/>
+            <column name="price" type="numeric(10, 2)"/>
+            <column name="time" type="INT"/>
+            <column name="time_from" type="INT"/>
+            <column name="time_to" type="INT"/>
+            <column name="company_id" type="BIGINT"/>
+            <column name="category_id" type="BIGINT"/>
+            <column name="project_id" type="BIGINT"/>
+            <column name="user_id" type="BIGINT"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-57">
+        <addPrimaryKey columnNames="users_id, roles_id" constraintName="app_user_roles_pkey" tableName="app_user_roles"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-58">
+        <addPrimaryKey columnNames="id" constraintName="categories_pkey" tableName="categories"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-59">
+        <addUniqueConstraint columnNames="email" constraintName="uk_1j9d9a06i600gd43uu3km82jw" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-60">
+        <addUniqueConstraint columnNames="uid" constraintName="uk_4pl20vve2jxwun4ligryr1ant" tableName="app_user"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-61">
+        <addUniqueConstraint columnNames="packs_id" constraintName="uk_nmneedhy3dayi840ctyfyn1os" tableName="document_base_packs"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-62">
+        <addForeignKeyConstraint baseColumnNames="user_from_uid" baseTableName="task" constraintName="fk1tcovuqmxy7lubmek2ndt77wg" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="uid" referencedTableName="app_user"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-63">
+        <addForeignKeyConstraint baseColumnNames="roles_id" baseTableName="app_user_roles" constraintName="fk23e7b5jyl3ql41rk3566gywdd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="role"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-64">
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="item" constraintName="fk2n9w8d0dp4bsfra9dcg0046l4" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-65">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="category" constraintName="fk2twm010w181ypxiegra4o0rgc" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-66">
+        <addForeignKeyConstraint baseColumnNames="parent_id" baseTableName="category" constraintName="fk2y94svpmqttx80mshyny85wqr" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-67">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="time" constraintName="fk4jc3kfspvdoi63jhmruqpgoq6" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-68">
+        <addForeignKeyConstraint baseColumnNames="document_pack_id" baseTableName="document_pack_item" constraintName="fk50ky99xoo7evq5mupa87cf9dq" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="document_pack"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-69">
+        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="app_user_companies" constraintName="fk5cksefd270mdd18djsd8bhpp2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="app_user"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-70">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="document_pack_item" constraintName="fk5xa1clcvfw3fxtg85lgu9toqv" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-71">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="item" constraintName="fk66jg5pmwt79f7mapkn9rhjwo2" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-72">
+        <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="cost" constraintName="fk6ldww2caxqcobw7m80nshms12" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="contact"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-73">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="project" constraintName="fk76fngi71pfr8phbobe5pq0swd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-74">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="project" constraintName="fk88d6ydqumdx1jhuyh3opxnvkt" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="app_user"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-75">
+        <addForeignKeyConstraint baseColumnNames="item_id" baseTableName="pack_item" constraintName="fk892436kh2t9ydcwcfp04wmo8k" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="item"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-76">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="document_base" constraintName="fk8fufjeh6kb07qxyr8ab66q555" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-77">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="cost" constraintName="fk8gyjaiq3fnvvn8sji7df4xotr" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-78">
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="demand" constraintName="fk8l96g5xm83hr0wvxv73qwem7s" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-79">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="categories" constraintName="fk8ly1fms2cxsd842s18qylag87" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-80">
+        <addForeignKeyConstraint baseColumnNames="companies_id" baseTableName="app_user_companies" constraintName="fk9h1ticmyq1vtg4bvfkq0gbw6x" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-81">
+        <addForeignKeyConstraint baseColumnNames="app_user_id" baseTableName="company" constraintName="fk9l1blfyt5ifg76s40i634fooi" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="app_user"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-82">
+        <addForeignKeyConstraint baseColumnNames="roles_id" baseTableName="role_privileges" constraintName="fk9n2w8s3aw0yk00s4nmqvucw6b" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="role"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-83">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="billing_information" constraintName="fka3jnbfrp2fsnmvf4jq5d9nv7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-84">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="payment" constraintName="fkahr1jwmhpvh514p2j0vdg60cw" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-85">
+        <addForeignKeyConstraint baseColumnNames="privileges_id" baseTableName="role_privileges" constraintName="fkas5s9i1itvr8tgocse4xmtwox" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="privilege"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-86">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="cost" constraintName="fkb4f9o95vtyb7ii6qb2hdbih61" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-87">
+        <addForeignKeyConstraint baseColumnNames="user_uid" baseTableName="task" constraintName="fkbhfkt6fv33h3o4swjdb1dy107" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="uid" referencedTableName="app_user"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-88">
+        <addForeignKeyConstraint baseColumnNames="document_base_id" baseTableName="document_base_packs" constraintName="fkbo9li0pp03fexvnmmtlacs9od" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="document_base"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-89">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="storage" constraintName="fkc8ru95f0db582pur7p8sock98" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-90">
+        <addForeignKeyConstraint baseColumnNames="packs_id" baseTableName="document_base_packs" constraintName="fkdx99bb6eow151t6yp6bhrnu20" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="document_pack"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-91">
+        <addForeignKeyConstraint baseColumnNames="item_id" baseTableName="item_price" constraintName="fke6ivp7ms01x65oq2amsv5hrl0" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="item"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-92">
+        <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="item" constraintName="fkevw75aywlhsyi4900yy4fcvyj" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="contact"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-93">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="document_number_generator" constraintName="fkfkoin52y7agclokq17xn3ftu7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-94">
+        <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="document_base" constraintName="fkfkya4niks1v515yqqbif4tlxo" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="contact"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-95">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="settings" constraintName="fkfyf7gjna6dvgenxm2mpbxxb5g" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-96">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="bank_account" constraintName="fkgm6p0ej8mhbakybacuneanald" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-97">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="pack" constraintName="fkgqjpcofolx96ob3iujs483n45" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-98">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="demand" constraintName="fkhsa9fst7ahky8ipfc94ds7rbd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-99">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="file" constraintName="fkipblk8l80i440v7n7be1gnyet" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-100">
+        <addForeignKeyConstraint baseColumnNames="user_id" baseTableName="time" constraintName="fkj0abobqveqg9ujph42byq2v0m" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="app_user"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-101">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="role" constraintName="fkjuqcxi07jmwxksjjokolg6jc7" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-102">
+        <addForeignKeyConstraint baseColumnNames="project_id" baseTableName="task" constraintName="fkk8qrwowg31kx7hp93sru1pdqa" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="project"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-103">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="task" constraintName="fkkovhsjug063l45ggbgdfxp21s" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-104">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="time" constraintName="fkkxvqwnrfg0xaffyvoildxmtd9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-105">
+        <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="demand" constraintName="fkm2sh3i1ogoih7k2if108u59n9" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="contact"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-106">
+        <addForeignKeyConstraint baseColumnNames="users_id" baseTableName="app_user_roles" constraintName="fkme8ah92oermfnxeajb320gb3l" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="app_user"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-107">
+        <addForeignKeyConstraint baseColumnNames="pack_id" baseTableName="pack_item" constraintName="fkmitbfekevmfshjyhh95is22gm" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="pack"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-108">
+        <addForeignKeyConstraint baseColumnNames="category_id" baseTableName="time" constraintName="fknjeqo3e17r85uu6bt195fg2hd" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-109">
+        <addForeignKeyConstraint baseColumnNames="item_id" baseTableName="document_pack_item" constraintName="fkohuftlivmlqnobpem4k4kt92d" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="item"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-110">
+        <addForeignKeyConstraint baseColumnNames="company_id" baseTableName="contact" constraintName="fkpgbqt6dnai52x55o1qvsx1dfn" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="company"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-111">
+        <addForeignKeyConstraint baseColumnNames="catergory_id" baseTableName="task" constraintName="fkr7136w51k4bywxpkyw80iag6e" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="category"/>
+    </changeSet>
+    <changeSet author="marek (generated)" id="1606494860631-112">
+        <addForeignKeyConstraint baseColumnNames="client_id" baseTableName="project" constraintName="fkrsjt74bkti5uc4mq52baf02gp" deferrable="false" initiallyDeferred="false" onDelete="NO ACTION" onUpdate="NO ACTION" referencedColumnNames="id" referencedTableName="contact"/>
+    </changeSet>
+</databaseChangeLog>

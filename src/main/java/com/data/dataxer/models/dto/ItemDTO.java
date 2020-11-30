@@ -1,6 +1,9 @@
 package com.data.dataxer.models.dto;
+import com.data.dataxer.models.domain.Storage;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -27,4 +30,6 @@ public class ItemDTO {
     ContactDTO supplier;
     CategoryDTO category;
     ItemPriceDTO itemPrice;
+
+    private List<Storage> storage;
 }

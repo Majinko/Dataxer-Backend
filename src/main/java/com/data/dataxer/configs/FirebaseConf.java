@@ -20,6 +20,7 @@ public class FirebaseConf {
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials.fromStream(classPathResource.getInputStream()))
                 .setDatabaseUrl("https://dataxer-aab65.firebaseio.com")
+                .setStorageBucket("dataxer-aab65.appspot.com")
                 .build();
 
         FirebaseApp.initializeApp(options);

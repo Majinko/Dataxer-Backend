@@ -6,6 +6,7 @@ import com.data.dataxer.repositories.ItemPriceRepository;
 import com.data.dataxer.repositories.ItemRepository;
 import com.data.dataxer.repositories.qrepositories.QItemRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.data.dataxer.services.storage.StorageService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,7 +27,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public void store(Item item, ItemPrice itemPrice) {
+    public Item store(Item item, ItemPrice itemPrice) {
         this.itemRepository.save(item);
 
         // store item price
@@ -34,12 +35,13 @@ public class ItemServiceImpl implements ItemService {
             itemPrice.setItem(item);
             itemPriceRepository.save(itemPrice);
         }
+
+        return item;
     }
 
     @Override
     public Page<Item> paginate(Pageable pageable) {
-        return itemRepository.findAllByCompanyIdIn(pageable, SecurityUtils.companyIds())
-                .orElseThrow(() -> new RuntimeException("Items not found"));
+        return qItemRepository.paginate(pageable, SecurityUtils.companyIds());
     }
 
     @Override

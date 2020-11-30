@@ -19,10 +19,10 @@ public class QDemandRepositoryImpl implements QDemandRepository {
         this.query = new JPAQueryFactory(entityManager);
     }
 
-    private Long total() {
+    private Long total( List<Long> companyIds) {
         QDemand qDemand = QDemand.demand;
 
-        return query.selectFrom(qDemand).fetchCount();
+        return query.selectFrom(qDemand).where(qDemand.company.id.in(companyIds)).fetchCount();
     }
 
     @Override
@@ -31,11 +31,11 @@ public class QDemandRepositoryImpl implements QDemandRepository {
 
         List<Demand> demandList = query
                 .selectFrom(qDemand)
-                .join(qDemand.category).fetchJoin()
-                .join(qDemand.contact).fetchJoin()
+                .leftJoin(qDemand.category).fetchJoin()
+                .leftJoin(qDemand.contact).fetchJoin()
                 .fetch();
 
-        return new PageImpl<Demand>(demandList, pageable, total());
+        return new PageImpl<Demand>(demandList, pageable, total(companyIds));
     }
 
     @Override
