@@ -10,6 +10,10 @@ public interface InvoiceService {
 
     void store(Invoice invoice);
 
+    Invoice storeTaxDocument(Invoice taxDocument, Long proformaInvoiceId);
+    
+    Invoice storeSummaryInvoice(Invoice summaryInvoice, Long taxDocumentId, Long proformaId);
+
     void update(Invoice invoice);
 
     Page<Invoice> paginate(Pageable pageable, Filter filter);
@@ -26,4 +30,7 @@ public interface InvoiceService {
 
     Invoice duplicate(Long id);
 
+    Invoice generateTaxDocument(Long id);
+
+    Invoice generateSummaryInvoice(Long id);
 }

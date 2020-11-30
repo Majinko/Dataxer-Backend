@@ -35,7 +35,8 @@ public class Cost extends BaseEntitySoftDelete {
 
     private String costOrder;
 
-    private String category;
+    @OneToOne
+    private Category category;
 
     protected String number;
 
@@ -88,32 +89,4 @@ public class Cost extends BaseEntitySoftDelete {
 
     protected LocalDate taxableSupply; // datum uplatnenia DPH
 
-    public Cost() {
-    }
-
-    public Cost(Cost existedCost) {
-        this.title = existedCost.getTitle();
-        this.contact = existedCost.getContact();
-        this.project = existedCost.getProject();
-        this.costOrder = existedCost.getCostOrder();
-        this.state = existedCost.getState();
-        this.currency = existedCost.getCurrency();
-        this.category = existedCost.getCategory();
-        this.type = existedCost.getType();
-        this.note = existedCost.getNote();
-        this.isInternal = existedCost.getIsInternal();
-        this.isRepeated = existedCost.getIsRepeated();
-        this.period = existedCost.getPeriod();
-        this.costData = existedCost.getCostData();
-        this.price = existedCost.getPrice();
-        this.tax = existedCost.getTax();
-        this.totalPrice = existedCost.getTotalPrice();
-        this.repeatedFrom = existedCost.getRepeatedFrom();
-        this.repeatedTo = existedCost.getRepeatedTo();
-        this.nextRepeatedCost = existedCost.getNextRepeatedCost();
-        this.createdDate = LocalDate.now();
-        this.dueDate = existedCost.getDueDate();
-        this.deliveredDate = existedCost.getDeliveredDate();
-        this.taxableSupply = existedCost.getTaxableSupply();
-    }
 }

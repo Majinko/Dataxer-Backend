@@ -1,6 +1,7 @@
 package com.data.dataxer.models.dto;
 
 import com.data.dataxer.models.enums.DocumentState;
+import com.data.dataxer.models.enums.DocumentType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,6 +24,7 @@ public class PriceOfferDTO {
     private BigDecimal discount;
     private BigDecimal price;
     private BigDecimal totalPrice;
+    private DocumentType documentType;
 
     private ContactDTO contact;
     List<DocumentPackDTO> packs = new ArrayList<>();

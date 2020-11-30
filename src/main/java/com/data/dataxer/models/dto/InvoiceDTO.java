@@ -1,8 +1,6 @@
 package com.data.dataxer.models.dto;
 
-import com.data.dataxer.models.enums.DeliveryMethod;
-import com.data.dataxer.models.enums.DocumentState;
-import com.data.dataxer.models.enums.PaymentMethod;
+import com.data.dataxer.models.enums.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,6 +34,7 @@ public class InvoiceDTO {
     private LocalDate paymentDate;
     private LocalDate dueDate;
     private LocalDateTime deletedAt;
+    private DocumentType documentType;
 
     private ContactDTO contact;
     List<DocumentPackDTO> packs = new ArrayList<>();

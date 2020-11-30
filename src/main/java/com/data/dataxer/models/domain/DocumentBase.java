@@ -2,6 +2,7 @@ package com.data.dataxer.models.domain;
 
 import com.data.dataxer.mappers.HashMapConverter;
 import com.data.dataxer.models.enums.DocumentState;
+import com.data.dataxer.models.enums.DocumentType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,7 +37,11 @@ public class DocumentBase extends BaseEntity {
 
     protected String number;
 
+    @Enumerated(EnumType.STRING)
     protected DocumentState state;
+
+    @Enumerated(EnumType.STRING)
+    private DocumentType documentType;
 
     @Column(columnDefinition = "text")
     protected String note;

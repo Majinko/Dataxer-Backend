@@ -45,7 +45,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
                 .orderBy(qPayment.id.desc())
                 .fetch();
 
-        return new PageImpl<Payment>(payments, pageable, total());
+        return new PageImpl<>(payments, pageable, total());
     }
 
     @Override
@@ -60,30 +60,35 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
                 .fetchOne());
     }
 
-    /**
-     * Return totalPrice based on document type
-     *
-     * @param documentId
-     * @param documentType
-     * @return BigDecimal
-     */
     @Override
     public BigDecimal getDocumentTotalPrice(Long documentId, DocumentType documentType) {
         switch(documentType) {
             case INVOICE:
+            case PROFORMA:
+            case TAX_DOCUMENT:
                 QInvoice qInvoice = QInvoice.invoice;
 
-                return this.query.selectFrom(qInvoice)
+                Invoice invoice = this.query.selectFrom(qInvoice)
                         .where(qInvoice.id.eq(documentId))
-                        .fetchOne().getTotalPrice();
+                        .fetchOne();
+                if (invoice != null) {
+                    return invoice.getTotalPrice();
+                } else {
+                    throw new RuntimeException("Invoice with id" + documentId + "not found");
+                }
+
             case PRICE_OFFER:
             default :
                 QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
 
-                return this.query.selectFrom(qPriceOffer)
+                PriceOffer priceOffer = this.query.selectFrom(qPriceOffer)
                         .where(qPriceOffer.id.eq(documentId))
-                        .fetchOne().getTotalPrice();
-
+                        .fetchOne();
+                if (priceOffer != null) {
+                    return priceOffer.getTotalPrice();
+                } else {
+                    throw new RuntimeException("Price offer with id" + documentId + "not found");
+                }
         }
     }
 

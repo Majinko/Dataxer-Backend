@@ -4,8 +4,11 @@ import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.dto.DocumentPackItemDTO;
 import com.data.dataxer.models.dto.InvoiceDTO;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+
+import java.util.List;
 
 @Mapper
 public interface InvoiceMapper {
