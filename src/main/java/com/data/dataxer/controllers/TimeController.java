@@ -39,12 +39,11 @@ public class TimeController {
     public ResponseEntity<Page<TimeDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "sort", defaultValue = "id") String sortColumn,
-            @RequestBody(required = false) Filter filter
+            @RequestParam(value = "sort", defaultValue = "id") String sortColumn
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
 
-        return ResponseEntity.ok(this.timeService.paginate(pageable, filter).map(this.timeMapper::timeToTimeDTO));
+        return ResponseEntity.ok(this.timeService.paginate(pageable).map(this.timeMapper::timeToTimeDTO));
     }
 
     @GetMapping("/{id}")

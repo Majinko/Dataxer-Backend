@@ -47,7 +47,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public Page<Time> paginate(Pageable pageable, Filter filter, Long userId, List<Long> companyIds) {
+    public Page<Time> paginate(Pageable pageable, Long userId, List<Long> companyIds) {
         QTime qTime = QTime.time1;
         BooleanBuilder filterCondition = new BooleanBuilder();
 
