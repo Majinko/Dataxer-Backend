@@ -80,14 +80,13 @@ public class ContactServiceImpl implements ContactService {
     public Iterable<Contact> filteringV2(String search) {
         DefaultFilterParser filterParser = new DefaultFilterParser();
 
-        String rqlFilter = "(contact.name == 'os*') and (contact.id >= '14')";
+        String rqlFilter = "(contact.name == 'os*') and (contact.company.name == 'dataid*')";
 
         Map<String, Path> pathHashMap = ImmutableMap.<String, Path>builder()
                 .put("contact.name", QContact.contact.name)
+                .put("contact.company.name", QContact.contact.company.name)
                 .put("contact.id", QContact.contact.id)
-                .put("contact.country", QContact.contact.country)
                 .build();
-
 
         Predicate predicate = filterParser.parse(rqlFilter, withMapping(pathHashMap));
 
