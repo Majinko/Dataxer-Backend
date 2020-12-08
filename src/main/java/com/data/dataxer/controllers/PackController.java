@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -44,7 +45,11 @@ public class PackController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PackDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(packMapper.packToPackDTO(this.packService.getById(id)));
+        PackDTO packDTO = packMapper.packToPackDTO(this.packService.getById(id));
+
+        Collections.sort(packDTO.getPackItems());
+
+        return ResponseEntity.ok(packDTO);
     }
 
     @GetMapping("/search/{q}")

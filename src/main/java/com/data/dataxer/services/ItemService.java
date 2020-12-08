@@ -12,7 +12,7 @@ public interface ItemService  {
 
     Page<Item> paginate(Pageable pageable);
 
-    void update(Item item, ItemPrice itemPrice);
+    Item update(Item item, ItemPrice itemPrice);
 
     void destroy(long id);
 

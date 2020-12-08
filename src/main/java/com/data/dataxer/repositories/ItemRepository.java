@@ -5,15 +5,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface ItemRepository extends JpaRepository<Item, Long> {
+public interface ItemRepository extends CrudRepository<Item, Long> {
     Optional<Item> findByIdAndCompanyIdIn(Long id, List<Long> companyIds);
 
     Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String title, List<Long> companyIds);
 
-    @Query("select i, s FROM Item i, Storage s left join Storage st on st.fileAbleId = i.id where i.company.id in ?1")
-    Optional<Page<Item>> findAllByCompanyIdIn(Pageable pageable, List<Long> companyIds);
+    @Query("SELECT DISTINCT i, s FROM Item i LEFT JOIN  Storage s ON s.fileAbleId = i.id WHERE i.company.id IN ?1")
+    List<Item> findAllByCompanyIdIn(List<Long> companyIds);
+
+    @Query("select DISTINCT i from Item i left join fetch i.storage where i.company.id in ?1")
+    List<Item> findAllItemWithStorage(Pageable pageable, List<Long> companyIds);
 }

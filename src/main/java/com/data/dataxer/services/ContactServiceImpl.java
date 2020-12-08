@@ -3,7 +3,7 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.Contact;
 
 import com.data.dataxer.repositories.ContactRepository;
-
+import com.data.dataxer.repositories.Predicates.CustomPredicatesBuilder;
 import com.data.dataxer.repositories.qrepositories.QContactRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.querydsl.core.types.Predicate;
@@ -11,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -67,5 +66,12 @@ public class ContactServiceImpl implements ContactService {
     @Override
     public void delete(Long id) {
         contactRepository.delete(this.getById(id));
+    }
+
+    @Override
+    public Iterable<Contact> filteringV2(String search) {
+        CustomPredicatesBuilder<Contact> builder = new CustomPredicatesBuilder<>("contact");
+
+        return qContactRepository.findAll(builder.parsePattern(search));
     }
 }

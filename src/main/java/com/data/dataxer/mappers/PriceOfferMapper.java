@@ -16,7 +16,6 @@ public interface PriceOfferMapper {
     @Mapping(target = "packs", ignore = true)
     PriceOfferDTO priceOfferToPriceOfferDTOSimple(PriceOffer priceOffer);
 
-    @Mapping(target = "item.storage", ignore = true)
     @Mapping(target = "item.category", ignore = true)
     @Mapping(target = "item.supplier", ignore = true)
     DocumentPackItemDTO documentPackItemToDocumentPackItemDTO(DocumentPackItem documentPackItem);

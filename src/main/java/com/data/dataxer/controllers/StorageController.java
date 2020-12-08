@@ -1,5 +1,7 @@
 package com.data.dataxer.controllers;
 
+import com.data.dataxer.mappers.StorageMapper;
+import com.data.dataxer.models.dto.StorageFileDTO;
 import com.data.dataxer.services.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -18,11 +20,21 @@ public class StorageController {
     @Autowired
     StorageService storageService;
 
-    @GetMapping("/{path}")
-    protected ResponseEntity<Resource> avatar(@PathVariable String path) {
+    @Autowired
+    StorageMapper storageMapper;
+
+    @GetMapping("/preview/{id}/{type}")
+    protected ResponseEntity<Resource> preview(@PathVariable Long id, @PathVariable String type) {
+        StorageFileDTO storageFileDTO = storageMapper.storageToStorageFileDTO(storageService.getPreview(id, type, true));
+
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType("fff"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=")
-                .body(new ByteArrayResource(storageService.getFile(path)));
+                .contentType(MediaType.parseMediaType(storageFileDTO.getContentType()))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + storageFileDTO.getFileName() + "\"")
+                .body(new ByteArrayResource(storageFileDTO.getContent()));
+    }
+
+    @GetMapping("/{id}/{type}")
+    protected ResponseEntity<StorageFileDTO> getStoragePreviewFile(@PathVariable Long id, @PathVariable String type){
+        return ResponseEntity.ok(storageMapper.storageToStorageFileDTO(this.storageService.getPreview(id, type, false)));
     }
 }

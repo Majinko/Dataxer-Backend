@@ -34,6 +34,11 @@ public class ContactController {
         return contactService.filtering(predicate);
     }
 
+    @GetMapping("/filter/v2")
+    public Iterable<Contact> filterV2(@RequestParam(required = false, value = "search") String search) {
+        return contactService.filteringV2(search);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ContactDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.getById(id)));

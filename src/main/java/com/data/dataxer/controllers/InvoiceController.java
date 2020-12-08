@@ -29,6 +29,21 @@ public class InvoiceController {
         this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
     }
 
+    @RequestMapping(value = "/storeTaxDocument", method = RequestMethod.POST)
+    public void storeTaxDocument(
+            @RequestParam(value = "id") Long id,
+            @RequestBody InvoiceDTO invoiceDTO) {
+        this.invoiceService.storeTaxDocument(this.invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), id);
+    }
+
+    @RequestMapping(value = "/storeSummaryInvoice", method = RequestMethod.POST)
+    public void storeTaxDocument(
+            @RequestParam(value = "id1") Long taxDocumentId,
+            @RequestParam(value = "id2") Long proformaId,
+            @RequestBody InvoiceDTO invoiceDTO) {
+        this.invoiceService.storeSummaryInvoice(this.invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), taxDocumentId, proformaId);
+    }
+
     @PostMapping("/update")
     public void update(@RequestBody InvoiceDTO invoiceDTO) {
         this.invoiceService.update(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
@@ -79,6 +94,16 @@ public class InvoiceController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.invoiceService.destroy(id);
+    }
+
+    @GetMapping("/tax-invoice/{id}")
+    public ResponseEntity<InvoiceDTO> getTaxDocument(@PathVariable Long id) {
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateTaxDocument(id)));
+    }
+
+    @GetMapping("/summary-invoice/{id}")
+    public ResponseEntity<InvoiceDTO> getSummaryInvoice(@PathVariable Long id) {
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateSummaryInvoice(id)));
     }
 
 }

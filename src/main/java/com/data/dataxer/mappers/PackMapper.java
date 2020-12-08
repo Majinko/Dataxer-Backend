@@ -16,8 +16,6 @@ import java.util.List;
 
 @Mapper
 public interface PackMapper {
-    PackMapper INSTANCE = Mappers.getMapper(PackMapper.class);
-
     Pack packDTOtoPack(PackDTO packDTO);
 
     @Named(value = "packToPackDTO")

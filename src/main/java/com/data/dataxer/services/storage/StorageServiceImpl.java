@@ -1,7 +1,6 @@
 package com.data.dataxer.services.storage;
 
 import com.data.dataxer.models.domain.Storage;
-import com.data.dataxer.models.dto.StorageFileDTO;
 import com.data.dataxer.repositories.StorageRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.google.cloud.storage.Blob;
@@ -27,7 +26,17 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public void store(StorageFileDTO file, Long fileAbleId, String fileAbleType) {
+    public Storage getPreview(Long id, String type, boolean setContent) {
+        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndIsDefault(id, type, true);
+
+        if (storage != null && setContent)
+            storage.setContent(this.getFileContent(storage.getPath()));
+
+        return storage;
+    }
+
+    @Override
+    public void store(Storage file, Long fileAbleId, String fileAbleType) {
         try {
             HashMap<String, String> fileData = this.uploadFileToStorage(file);
 
@@ -35,7 +44,7 @@ public class StorageServiceImpl implements StorageService {
 
             storage.setFileAbleId(fileAbleId);
             storage.setFileAbleType(fileAbleType);
-            storage.setExt(file.getContentType());
+            storage.setContentType(file.getContentType());
             storage.setSize(file.getSize());
             storage.setFileName(file.getFileName());
             storage.setIsDefault(file.getIsDefault());
@@ -50,7 +59,7 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public byte[] getFile(String path) {
+    public byte[] getFileContent(String path) {
         return bucket.get(path).getContent();
     }
 
@@ -59,7 +68,15 @@ public class StorageServiceImpl implements StorageService {
         return bucket.get(path).signUrl(100, TimeUnit.MINUTES).toString();
     }
 
-    private HashMap<String, String> uploadFileToStorage(StorageFileDTO file) throws IOException {
+    @Override
+    public void destroy(Long id, String type) {
+        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndIsDefault(id, type, true);
+
+        if (storage != null)
+            this.storageRepository.delete(storage);
+    }
+
+    private HashMap<String, String> uploadFileToStorage(Storage file) throws IOException {
         HashMap<String, String> fileData = new HashMap<String, String>();
 
         String name = generateFileName(file.getFileName());

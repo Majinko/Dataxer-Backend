@@ -33,6 +33,7 @@ public class QDemandRepositoryImpl implements QDemandRepository {
                 .selectFrom(qDemand)
                 .leftJoin(qDemand.category).fetchJoin()
                 .leftJoin(qDemand.contact).fetchJoin()
+                .where(qDemand.company.id.in(companyIds))
                 .fetch();
 
         return new PageImpl<Demand>(demandList, pageable, total(companyIds));
@@ -45,8 +46,8 @@ public class QDemandRepositoryImpl implements QDemandRepository {
         return query.selectFrom(qDemand)
                 .where(qDemand.company.id.in(companyIds))
                 .where(qDemand.id.eq(id))
-                .join(qDemand.category).fetchJoin()
-                .join(qDemand.contact).fetchJoin()
+                .leftJoin(qDemand.category).fetchJoin()
+                .leftJoin(qDemand.contact).fetchJoin()
                 .fetchOne();
     }
 }

@@ -3,7 +3,9 @@ package com.data.dataxer.models.enums;
 public enum DocumentType {
     PRICE_OFFER("priceOffer"),
     PROFORMA("proforma"),
-    INVOICE("invoice");
+    INVOICE("invoice"),
+    TAX_DOCUMENT("tax_document"),
+    SUMMARY_INVOICE("summary_invoice");
 
     private String name;
 

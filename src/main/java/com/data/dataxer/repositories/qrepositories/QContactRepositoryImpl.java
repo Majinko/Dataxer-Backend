@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.QContact;
 import com.data.dataxer.models.domain.QProject;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
@@ -48,5 +49,10 @@ public class QContactRepositoryImpl implements QContactRepository {
     @Override
     public Contact getByName(String name) {
         return null;
+    }
+
+    @Override
+    public Iterable<Contact> findAll(BooleanExpression exp) {
+        return query.selectFrom(QContact.contact).where(exp).fetch();
     }
 }

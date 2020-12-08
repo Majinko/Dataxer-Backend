@@ -11,8 +11,6 @@ import java.util.List;
 
 @Mapper
 public interface ItemMapper {
-    ItemMapper INSTANCE = Mappers.getMapper(ItemMapper.class);
-
     ItemPriceDTO toItemPriceDto(ItemPrice itemPrice);
 
     @Mapping(target = "itemPrice", expression = "java(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null))")
@@ -23,7 +21,6 @@ public interface ItemMapper {
     Item toItem(ItemDTO itemDTO);
 
     @Named(value = "itemToItemDTOWithPrice")
-    @Mapping(target = "storage", ignore = true)
     @Mapping(target = "category", ignore = true)
     @Mapping(target = "supplier", ignore = true)
     @Mapping(target = "itemPrice", expression = "java(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null))")

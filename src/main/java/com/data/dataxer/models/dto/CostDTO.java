@@ -1,5 +1,6 @@
 package com.data.dataxer.models.dto;
 
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.enums.CostState;
@@ -18,7 +19,7 @@ public class CostDTO {
     private String title;
     private CostState state;
     private CostType type;
-    private String category;
+    private Category category;
     private String note;
     private String number;
     private String currency;

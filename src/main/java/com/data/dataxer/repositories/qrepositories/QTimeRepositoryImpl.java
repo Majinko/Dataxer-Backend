@@ -47,7 +47,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public Page<Time> paginate(Pageable pageable, Filter filter, List<Long> companyIds) {
+    public Page<Time> paginate(Pageable pageable, Filter filter, Long userId, List<Long> companyIds) {
         QTime qTime = QTime.time1;
         BooleanBuilder filterCondition = new BooleanBuilder();
 
@@ -55,10 +55,12 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .leftJoin(qTime.category).fetchJoin()
                 .where(filterCondition)
                 .where(qTime.company.id.in(companyIds))
+                .where(qTime.user.id.eq(userId))
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .orderBy(qTime.id.desc())
                 .fetch();
+
         return new PageImpl<Time>(times, pageable, total());
     }
 

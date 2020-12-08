@@ -26,7 +26,7 @@ public class QItemRepositoryImpl implements QItemRepository {
         QCategory qCategory = QCategory.category;
         QContact qContact = QContact.contact;
 
-        Item item = query
+        return query
                 .selectFrom(qItem)
                 .where(qItem.company.id.in(companyIds))
                 .where(qItem.id.eq(id))
@@ -34,12 +34,6 @@ public class QItemRepositoryImpl implements QItemRepository {
                 .leftJoin(qItem.category, qCategory).fetchJoin()
                 .leftJoin(qItem.supplier, qContact).fetchJoin()
                 .fetchOne();
-
-        if (item != null) {
-            itemSetStorage(item);
-        }
-
-        return item;
     }
 
     @Override
@@ -58,7 +52,7 @@ public class QItemRepositoryImpl implements QItemRepository {
     public Page<Item> paginate(Pageable pageable, List<Long> companyIds) {
         List<Item> items = query.selectFrom(QItem.item)
                 .where(QItem.item.company.id.in(companyIds))
-                .leftJoin(QItem.item.storage, QStorage.storage).fetchJoin()
+                .leftJoin(QItem.item.itemPrices).fetchJoin()
                 .distinct()
                 .fetch();
 
@@ -68,14 +62,5 @@ public class QItemRepositoryImpl implements QItemRepository {
     private long total(List<Long> companyIds) {
         return query.selectFrom(QItem.item)
                 .where(QItem.item.company.id.in(companyIds)).fetchCount();
-    }
-
-    private void itemSetStorage(Item item) {
-        item.setStorage(
-                query.selectFrom(QStorage.storage)
-                        .where(QStorage.storage.fileAbleId.eq(item.getId()))
-                        .where(QStorage.storage.fileAbleType.eq("item"))
-                        .fetch()
-        );
     }
 }

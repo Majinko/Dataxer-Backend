@@ -2,7 +2,8 @@ package com.data.dataxer.filters;
 
 public enum SearchableDates {
 
-    CREATED("createdDate"),
+    CREATEDAT("createdAt"),
+    CREATED("createDate"),
     DELIVERY("deliveredDate"),
     PAYMENT("paymentDate"),
     DUE("dueDate"),

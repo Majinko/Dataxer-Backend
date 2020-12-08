@@ -14,6 +14,6 @@ public interface QTimeRepository {
 
     Optional<Time> getByIdSimple(Long id, List<Long> companyIds);
 
-    Page<Time> paginate(Pageable pageable, Filter filter, List<Long> companyIds);
+    Page<Time> paginate(Pageable pageable, Filter filter, Long userId,  List<Long> companyIds);
 
 }

@@ -2,8 +2,8 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.ItemMapper;
 import com.data.dataxer.mappers.ItemPriceMapper;
+import com.data.dataxer.mappers.StorageMapper;
 import com.data.dataxer.models.dto.ItemDTO;
-import com.data.dataxer.models.dto.StorageFileDTO;
 import com.data.dataxer.models.dto.UploadContextDTO;
 import com.data.dataxer.services.ItemService;
 import com.data.dataxer.services.storage.StorageService;
@@ -13,11 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/item")
@@ -26,12 +23,14 @@ public class ItemController {
     private final ItemMapper itemMapper;
     private final ItemPriceMapper itemPriceMapper;
     private final StorageService storageService;
+    private final StorageMapper storageMapper;
 
-    public ItemController(ItemService itemService, ItemMapper itemMapper, ItemPriceMapper itemPriceMapper, StorageService storageService) {
+    public ItemController(ItemService itemService, ItemMapper itemMapper, ItemPriceMapper itemPriceMapper, StorageService storageService, StorageMapper storageMapper) {
         this.itemService = itemService;
         this.itemMapper = itemMapper;
         this.itemPriceMapper = itemPriceMapper;
         this.storageService = storageService;
+        this.storageMapper = storageMapper;
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
@@ -51,16 +50,19 @@ public class ItemController {
     ) {
         ItemDTO item = itemMapper.itemToItemDto(this.itemService.store(itemMapper.toItem(uploadContext.getObject()), itemPriceMapper.toItemPrice(uploadContext.getObject().getItemPrice())));
 
-        if (uploadContext.getFiles().size() > 0) {
-            uploadContext.getFiles().forEach(file -> {
-                this.storageService.store(file, item.getId(), "item");
-            });
+        if (uploadContext.getObject().getPreview() != null) {
+            this.storageService.store(storageMapper.storageFileDTOtoStorage(uploadContext.getObject().getPreview()), item.getId(), "item");
         }
     }
 
     @PostMapping("/update")
     public void update(@RequestBody ItemDTO itemDTO) {
-        this.itemService.update(itemMapper.toItem(itemDTO), itemPriceMapper.toItemPrice(itemDTO.getItemPrice()));
+        ItemDTO item = itemMapper.itemToItemDto(this.itemService.update(itemMapper.toItem(itemDTO), itemPriceMapper.toItemPrice(itemDTO.getItemPrice())));
+
+        if (itemDTO.getPreview() != null) {
+            this.storageService.destroy(item.getId(), "item"); // destroy old item if exist new
+            this.storageService.store(storageMapper.storageFileDTOtoStorage(itemDTO.getPreview()), item.getId(), "item");
+        }
     }
 
     @GetMapping("/{id}")

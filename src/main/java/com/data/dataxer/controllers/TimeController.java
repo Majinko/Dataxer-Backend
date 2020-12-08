@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @RestController
 @RequestMapping("/api/time")
 public class TimeController {
@@ -24,7 +26,7 @@ public class TimeController {
     }
 
     @PostMapping("/store")
-    public ResponseEntity<TimeDTO> store(@RequestBody TimeDTO timeDTO) {
+    public ResponseEntity<TimeDTO> store(@RequestBody @Valid TimeDTO timeDTO) {
         return ResponseEntity.ok(this.timeMapper.timeToTimeDTO(this.timeService.store(this.timeMapper.timeDTOToTime(timeDTO))));
     }
 

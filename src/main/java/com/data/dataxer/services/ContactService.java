@@ -23,4 +23,6 @@ public interface ContactService {
     Contact update(Contact contactDTO);
 
     void delete(Long id);
+
+    Iterable<Contact> filteringV2(String search);
 }

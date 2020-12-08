@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.securityContextUtils.SecurityUtils;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -36,5 +37,12 @@ public class Time extends BaseEntity {
     @Column(columnDefinition = "text")
     String description;
 
+    float km;
+
     private LocalDateTime dateWork;
+
+    @PrePersist
+    private void persist() {
+        user = SecurityUtils.loggedUser();
+    }
 }

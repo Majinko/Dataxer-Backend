@@ -2,8 +2,6 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -32,9 +30,12 @@ public class Item extends BaseEntity {
     @JoinColumn(name = "client_id")
     Contact supplier;
 
-    @JoinColumn(name = "fileAbleId")
+    @JoinTable(
+            name = "storage",
+            joinColumns = @JoinColumn(name = "fileAbleId"),
+            inverseJoinColumns = @JoinColumn(name = "id")
+    )
     @OneToMany(fetch = FetchType.LAZY)
-    @Where(clause = "file_able_type = 'item'")
     private List<Storage> storage = new ArrayList<>();
 
     String title;

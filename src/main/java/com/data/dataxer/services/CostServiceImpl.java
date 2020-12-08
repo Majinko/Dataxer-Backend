@@ -7,6 +7,7 @@ import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.MandatoryValidator;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -97,7 +98,8 @@ public class CostServiceImpl implements CostService{
     public Cost duplicate(Long id) {
         Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
-        Cost newCost = new Cost(oldCost);
+        Cost newCost = new Cost();
+        BeanUtils.copyProperties(oldCost, newCost, "id");
         return this.store(newCost);
     }
 

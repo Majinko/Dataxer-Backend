@@ -12,7 +12,9 @@ import java.time.LocalDateTime;
 @Entity
 @Setter
 @Getter
-public class Demand extends BaseEntitySoftDelete {
+@Where(clause = "deleted_at is null")
+@SQLDelete(sql = "UPDATE item SET deleted_at = now() WHERE id = ?")
+public class Demand extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,4 +35,6 @@ public class Demand extends BaseEntitySoftDelete {
 
     @Enumerated(EnumType.STRING)
     DocumentState state;
+
+    private LocalDateTime deletedAt;
 }

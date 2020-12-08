@@ -8,11 +8,9 @@ import java.util.List;
 
 @Mapper
 public interface SettingsMapper {
-
     Settings settingsDTOToSettings(SettingsDTO settingsDTO);
 
     SettingsDTO settingsToSettingsDTO(Settings settings);
 
     List<SettingsDTO> settingsListToSettingsDTOList(List<Settings> settingsList);
-
 }

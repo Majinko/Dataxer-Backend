@@ -2,7 +2,6 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Pack;
 import com.data.dataxer.models.domain.PackItem;
-import com.data.dataxer.repositories.PackItemRepository;
 import com.data.dataxer.repositories.PackRepository;
 import com.data.dataxer.repositories.qrepositories.QPackRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -11,6 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class PackServiceImpl implements PackService {
@@ -24,18 +24,14 @@ public class PackServiceImpl implements PackService {
 
     @Override
     public void store(Pack pack) {
-        pack.getPackItems().forEach(groupItem -> {
-            groupItem.setPack(pack);
-        });
+        this.preparePackItems(pack);
 
         this.packRepository.save(pack);
     }
 
     @Override
     public void update(Pack pack) {
-        pack.getPackItems().forEach(groupItem -> {
-            groupItem.setPack(pack);
-        });
+        this.preparePackItems(pack);
 
         this.packRepository.save(pack);
     }
@@ -66,5 +62,16 @@ public class PackServiceImpl implements PackService {
     @Override
     public Pack getById(Long id) {
         return this.qPackRepository.getById(id, SecurityUtils.companyIds());
+    }
+
+    private void preparePackItems(Pack pack){
+        int position = 0;
+
+        for (PackItem packItem : pack.getPackItems()){
+            packItem.setPack(pack);
+            packItem.setPosition(position);
+
+            position++;
+        }
     }
 }
