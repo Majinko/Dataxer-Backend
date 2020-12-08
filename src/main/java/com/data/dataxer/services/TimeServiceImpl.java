@@ -50,8 +50,8 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public Page<Time> paginate(Pageable pageable, Filter filter) {
+    public Page<Time> paginate(Pageable pageable) {
         return this.qTimeRepository
-                .paginate(pageable, filter, SecurityUtils.id(),  SecurityUtils.companyIds());
+                .paginate(pageable, SecurityUtils.id(),  SecurityUtils.companyIds());
     }
 }

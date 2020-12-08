@@ -17,5 +17,5 @@ public interface TimeService {
 
     Time getTimeByIdSimple(Long id);
 
-    Page<Time> paginate(Pageable pageable, Filter filter);
+    Page<Time> paginate(Pageable pageable);
 }
