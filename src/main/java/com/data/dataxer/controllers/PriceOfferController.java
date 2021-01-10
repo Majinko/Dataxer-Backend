@@ -1,9 +1,7 @@
 package com.data.dataxer.controllers;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.PriceOfferMapper;
 import com.data.dataxer.models.dto.PriceOfferDTO;
-import com.data.dataxer.models.filter.DocumentFilter;
 import com.data.dataxer.services.PriceOfferService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -11,8 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/price-offer")
@@ -39,12 +35,12 @@ public class PriceOfferController {
     public ResponseEntity<Page<PriceOfferDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "sort", defaultValue = "id") String sortColumn,
-            @RequestBody(required = false) Filter params
+            @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
+            @RequestParam(value = "sortExpression", defaultValue = "sort(+priceOffer.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(priceOfferService.paginate(pageable, params).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
+        return ResponseEntity.ok(priceOfferService.paginate(pageable, rqlFilter, sortExpression).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
     }
 
     @GetMapping("/{id}")
