@@ -11,6 +11,7 @@ public class MailDataDTO {
 
     private String subject;
     private String content;
+    private Long templateId;
     private Long companyId;
     private List<Long> participantIds;
 

@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.MailAccounts;
+import com.data.dataxer.models.domain.MailTemplates;
 import com.data.dataxer.models.enums.MailAccountState;
 import com.data.dataxer.repositories.MailAccountsRepository;
 import com.data.dataxer.repositories.qrepositories.QMailAccountsRepository;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -23,15 +25,18 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     private final MailAccountsRepository mailAccountsRepository;
     private final QMailAccountsRepository qMailAccountsRepository;
     private final ContactService contactService;
+    private final MailTemplatesService mailTemplatesService;
 
     public MailAccountsServiceImpl(MailAccountsRepository mailAccountsRepository, QMailAccountsRepository qMailAccountsRepository,
-                                   ContactService contactService) {
+                                   ContactService contactService, MailTemplatesService mailTemplatesService) {
         this.mailAccountsRepository = mailAccountsRepository;
         this.qMailAccountsRepository = qMailAccountsRepository;
         this.contactService = contactService;
+        this.mailTemplatesService = mailTemplatesService;
     }
 
     @Override
+    @Transactional
     public void store(MailAccounts mailAccounts) {
         mailAccounts.setState(MailAccountState.PENDING);
         MailAccounts ma = this.mailAccountsRepository.save(mailAccounts);
@@ -39,6 +44,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     }
 
     @Override
+    @Transactional
     public void update(MailAccounts mailAccounts) {
         if (this.qMailAccountsRepository.updateByMailAccounts(mailAccounts, SecurityUtils.companyIds()) != 1) {
             throw new RuntimeException("Update failed!");
@@ -62,6 +68,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     }
 
     @Override
+    @Transactional
     public void activate(Long id) {
         MailAccounts mailAccounts = this.getById(id);
         try {
@@ -75,6 +82,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     }
 
     @Override
+    @Transactional
     public void deactivate(Long id) {
         MailAccounts mailAccounts = this.getById(id);
         mailAccounts.setState(MailAccountState.DEACTIVATED);
@@ -84,7 +92,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     }
 
     @Override
-    public void sendEmail(String emailSubject, String emailContent, List<Long> contactIds, Long companyId) {
+    public void sendEmail(String emailSubject, String emailContent, List<Long> contactIds, Long companyId, Long templateId) {
         try {
             JavaMailSenderImpl mailSender = this.getMailSenderByCompanyId(companyId);
             List<Contact> participants = this.contactService.getContactByIds(contactIds);
@@ -92,8 +100,16 @@ public class MailAccountsServiceImpl implements MailAccountsService {
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
             helper.setFrom(mailSender.getUsername());
-            helper.setSubject(emailSubject);
-            helper.setText(emailContent, true);
+            if (emailSubject != null && emailContent != null && !emailSubject.isEmpty() && !emailContent.isEmpty() ) {
+                helper.setSubject(emailSubject);
+                helper.setText(emailContent, true);
+            } else if (templateId != null) {
+                MailTemplates mailTemplates = this.mailTemplatesService.getById(templateId);
+                helper.setSubject(mailTemplates.getEmailSubject());
+                helper.setText(mailTemplates.getEmailContent(), true);
+            } else {
+                throw new RuntimeException("Missing required mail subject and email content, or template id");
+            }
 
             for (Contact participant: participants) {
                 helper.setTo(participant.getEmail());

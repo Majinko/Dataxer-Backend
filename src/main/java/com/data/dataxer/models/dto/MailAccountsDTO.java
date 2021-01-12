@@ -4,6 +4,8 @@ import com.data.dataxer.models.enums.MailAccountState;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class MailAccountsDTO {
@@ -14,5 +16,6 @@ public class MailAccountsDTO {
     private String userName;
     private String password;
     private MailAccountState state;
+    private LocalDateTime deletedAt;
 
 }

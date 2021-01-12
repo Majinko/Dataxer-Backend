@@ -7,6 +7,7 @@ import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MailTemplatesServiceImpl implements MailTemplatesService {
@@ -20,11 +21,13 @@ public class MailTemplatesServiceImpl implements MailTemplatesService {
     }
 
     @Override
+    @Transactional
     public void store(MailTemplates mailTemplates) {
         this.mailTemplatesRepository.save(mailTemplates);
     }
 
     @Override
+    @Transactional
     public void update(MailTemplates mailTemplates) {
         if (this.qMailTemplatesRepository.updateByMailTemplates(mailTemplates, SecurityUtils.companyIds()) != 1) {
             throw new RuntimeException("Mail template update failed");

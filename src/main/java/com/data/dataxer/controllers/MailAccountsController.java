@@ -68,9 +68,9 @@ public class MailAccountsController {
         this.mailAccountsService.deactivate(id);
     }
 
-    @GetMapping("/sendEmail")
+    @PostMapping("/sendEmail")
     public void sendEmail(@RequestBody MailDataDTO mailDataDTO) {
-        this.mailAccountsService.sendEmail(mailDataDTO.getSubject(), mailDataDTO.getContent(), mailDataDTO.getParticipantIds(), mailDataDTO.getCompanyId());
+        this.mailAccountsService.sendEmail(mailDataDTO.getSubject(), mailDataDTO.getContent(), mailDataDTO.getParticipantIds(), mailDataDTO.getCompanyId(), mailDataDTO.getTemplateId());
     }
 
 }

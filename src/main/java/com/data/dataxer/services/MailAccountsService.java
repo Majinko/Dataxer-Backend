@@ -22,6 +22,6 @@ public interface MailAccountsService {
 
     void deactivate(Long id);
 
-    void sendEmail(String emailSubject, String emailContent, List<Long> contactIds, Long companyId);
+    void sendEmail(String emailSubject, String emailContent, List<Long> contactIds, Long companyId, Long templateId);
 
 }
