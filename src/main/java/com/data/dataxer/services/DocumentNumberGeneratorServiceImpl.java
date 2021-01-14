@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.DocumentNumberGeneratorRepository;
@@ -53,8 +52,8 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public Page<DocumentNumberGenerator> paginate(Pageable pageable, Filter filter) {
-        return this.qDocumentNumberGeneratorRepository.paginate(pageable, filter, SecurityUtils.companyIds());
+    public Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qDocumentNumberGeneratorRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override

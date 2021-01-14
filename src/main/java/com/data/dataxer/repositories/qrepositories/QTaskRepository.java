@@ -9,5 +9,5 @@ import java.util.List;
 public interface QTaskRepository {
     Task getById(Long id, List<Long> companyIds);
 
-    Page<Task> paginate(Pageable pageable, List<Long> companyIds);
+    Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
 }

@@ -7,7 +7,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface QProjectRepository {
-    Page<Project> paginate(Pageable pageable, List<Long> companyIds);
+
+    Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
 
     Project getById(Long id, List<Long> companyIds);
 

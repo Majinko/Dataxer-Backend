@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Payment;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
@@ -11,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import javax.print.Doc;
 import java.math.BigDecimal;
 
 @Service
@@ -54,8 +52,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Page<Payment> paginate(Pageable pageable, Filter filter) {
-        return this.qPaymentRepository.paginate(pageable, filter, SecurityUtils.companyIds());
+    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override

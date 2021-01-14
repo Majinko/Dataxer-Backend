@@ -1,6 +1,5 @@
 package com.data.dataxer.controllers;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.TimeMapper;
 import com.data.dataxer.models.dto.TimeDTO;
 import com.data.dataxer.services.TimeService;
@@ -39,12 +38,12 @@ public class TimeController {
     public ResponseEntity<Page<TimeDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "sort", defaultValue = "id") String sortColumn,
-            @RequestBody(required = false) Filter filter
+            @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
+            @RequestParam(value = "sortExpression", defaultValue = "sort(+time.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.timeService.paginate(pageable, filter).map(this.timeMapper::timeToTimeDTO));
+        return ResponseEntity.ok(this.timeService.paginate(pageable, rqlFilter, sortExpression).map(this.timeMapper::timeToTimeDTO));
     }
 
     @GetMapping("/{id}")

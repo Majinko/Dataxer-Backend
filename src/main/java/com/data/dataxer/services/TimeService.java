@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Time;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,5 +16,5 @@ public interface TimeService {
 
     Time getTimeByIdSimple(Long id);
 
-    Page<Time> paginate(Pageable pageable, Filter filter);
+    Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 }

@@ -7,7 +7,8 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface QDemandRepository {
-   Page<Demand> paginate(Pageable pageable, List<Long> companyIds);
+
+   Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
 
     Demand getById(Long id, List<Long> companyIds);
 }

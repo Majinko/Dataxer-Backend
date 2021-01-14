@@ -11,5 +11,5 @@ public interface QFileRepository {
 
     Optional<File> getByNameAndCompanyIds(String fileName, List<Long> companyIds);
 
-    Page<File> paginate(Pageable pageable, List<Long> companyIds);
+    Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
 }

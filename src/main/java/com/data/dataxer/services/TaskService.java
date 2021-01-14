@@ -11,7 +11,7 @@ public interface TaskService {
 
     Task getById(Long id);
 
-    Page<Task> paginate(Pageable pageable);
+    Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     void destroy(Long id);
 }

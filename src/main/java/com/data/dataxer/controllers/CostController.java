@@ -1,6 +1,5 @@
 package com.data.dataxer.controllers;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.CostMapper;
 import com.data.dataxer.models.dto.CostDTO;
 import com.data.dataxer.models.enums.CostState;
@@ -11,8 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/costs")
@@ -42,20 +39,13 @@ public class CostController {
     public ResponseEntity<Page<CostDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "sort", defaultValue = "id") String sortColumn,
-            @RequestParam(value = "order", defaultValue = "desc") String order,
-            @RequestParam(value = "filters", defaultValue = "") String filters
+            @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
+            @RequestParam(value = "sortExpression", defaultValue = "sort(+cost.id)") String sortExpression
     ) {
-        List<Filter> listOfFilters = Filter.resolveFiltersFromString(filters);
-        Pageable pageable;
-        if (order.equals("desc")) {
-            pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
-        } else {
-            pageable = PageRequest.of(page, size, Sort.by(Sort.Order.asc(sortColumn)));
-        }
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
         return ResponseEntity.ok(this.costService
-                .paginate(pageable, listOfFilters).map(this.costMapper::costToCostDTO));
+                .paginate(pageable, rqlFilter, sortExpression).map(this.costMapper::costToCostDTO));
     }
 
     @GetMapping("/changeState")
