@@ -1,12 +1,21 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QDocumentPack;
 import com.data.dataxer.models.domain.QDocumentPackItem;
 import com.data.dataxer.models.domain.QInvoice;
 import com.data.dataxer.models.domain.QItem;
+import com.github.vineey.rql.filter.parser.DefaultFilterParser;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
+import com.github.vineey.rql.querydsl.sort.OrderSpecifierList;
+import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
+import com.github.vineey.rql.sort.parser.DefaultSortParser;
+import com.google.common.collect.ImmutableMap;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,8 +24,11 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
 @Repository
 public class QInvoiceRepositoryImpl implements QInvoiceRepository {
@@ -28,24 +40,36 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable, Filter filter, List<Long> companyIds) {
+    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+        DefaultSortParser sortParser = new DefaultSortParser();
+        DefaultFilterParser filterParser = new DefaultFilterParser();
+        Predicate predicate = new BooleanBuilder();
+
         QInvoice qInvoice = QInvoice.invoice;
-        BooleanBuilder filterCondition = new BooleanBuilder();
 
-        if (filter != null && !filter.isEmpty()) {
-            filterCondition = filter.buildInvoiceFilterPredicate();
+        Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
+                .put("invoice.id", QInvoice.invoice.id)
+                .put("invoice.state", QInvoice.invoice.state)
+                .put("invoice.contact.id", QInvoice.invoice.contact.id)
+                .put("invoice.contact.name", QInvoice.invoice.contact.name)
+                .build();
+
+        if (!rqlFilter.equals("")) {
+            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
+                    .setMapping(pathMapping)));
         }
+        OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-
-        List<Invoice> invoices = query.selectFrom(qInvoice)
+        List<Invoice> invoiceList = this.query.selectFrom(qInvoice)
                 .leftJoin(qInvoice.contact).fetchJoin()
-                .where(filterCondition)
-                .limit(pageable.getPageSize())
+                .where(predicate)
+                .where(qInvoice.company.id.in(companyIds))
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
-                .orderBy(qInvoice.id.desc())
+                .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<Invoice>(invoices, pageable, total());
+        return new PageImpl<>(invoiceList, pageable, getTotalCount(predicate));
     }
 
     @Override
@@ -76,24 +100,12 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .fetchOne());
     }
 
-    @Override
-    public Page<Invoice> getByClient(Pageable pageable, Long contactId, List<Long> companyIds) {
+    private long getTotalCount(Predicate predicate) {
         QInvoice qInvoice = QInvoice.invoice;
 
-        List<Invoice> invoices = query.selectFrom(qInvoice)
-                .leftJoin(qInvoice.contact).fetchJoin()
-                .where(qInvoice.contact.id.eq(contactId))
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .orderBy(qInvoice.id.desc())
-                .fetch();
-        return new PageImpl<Invoice>(invoices, pageable, total());
-    }
-
-    private Long total() {
-        QInvoice qInvoice = QInvoice.invoice;
-
-        return query.selectFrom(qInvoice).fetchCount();
+        return this.query.selectFrom(qInvoice)
+                .where(predicate)
+                .fetchCount();
     }
 
      private void invoicePackSetItems(Invoice invoice) {

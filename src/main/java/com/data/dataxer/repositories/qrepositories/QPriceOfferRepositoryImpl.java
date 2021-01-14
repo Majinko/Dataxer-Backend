@@ -1,12 +1,22 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QDocumentPack;
 import com.data.dataxer.models.domain.QDocumentPackItem;
+import com.data.dataxer.models.domain.QInvoice;
 import com.data.dataxer.models.domain.QItem;
 import com.data.dataxer.models.domain.QPriceOffer;
+import com.github.vineey.rql.filter.parser.DefaultFilterParser;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
+import com.github.vineey.rql.querydsl.sort.OrderSpecifierList;
+import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
+import com.github.vineey.rql.sort.parser.DefaultSortParser;
+import com.google.common.collect.ImmutableMap;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,6 +27,8 @@ import javax.persistence.EntityManager;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
+
 @Repository
 public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     private final JPAQueryFactory query;
@@ -25,30 +37,36 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         this.query = new JPAQueryFactory(entityManager);
     }
 
-    private Long total() {
-        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-
-        return query.selectFrom(qPriceOffer).fetchCount();
-    }
-
     @Override
-    public Page<PriceOffer> paginate(Pageable pageable, Filter filter, List<Long> companyIds) {
+    public Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+        DefaultSortParser sortParser = new DefaultSortParser();
+        DefaultFilterParser filterParser = new DefaultFilterParser();
+        Predicate predicate = new BooleanBuilder();
+
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-        BooleanBuilder filterCondition = new BooleanBuilder();
 
-        if (filter != null && !filter.isEmpty()) {
-            filterCondition = filter.buildPriceOfferFilterPredicate();
+        Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
+                .put("priceOffer.id", QInvoice.invoice.id)
+                .put("priceOffer.state", QInvoice.invoice.state)
+                .put("priceOffer.contact.id", QInvoice.invoice.contact.id)
+                .put("priceOffer.contact.name", QInvoice.invoice.contact.name)
+                .build();
+
+        if (!rqlFilter.equals("")) {
+            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
+                    .setMapping(pathMapping)));
         }
+        OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<PriceOffer> priceOffers = query.selectFrom(qPriceOffer)
+        List<PriceOffer> priceOfferList = query.selectFrom(qPriceOffer)
                 .leftJoin(qPriceOffer.contact).fetchJoin()
+                .where(predicate)
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
-                .orderBy(qPriceOffer.id.desc())
-                .where(filterCondition)
                 .fetch();
 
-        return new PageImpl<PriceOffer>(priceOffers, pageable, total());
+        return new PageImpl<>(priceOfferList, pageable, getTotalCount(predicate));
     }
 
     @Override
@@ -71,6 +89,16 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         return Optional.ofNullable(priceOffer);
     }
 
+    @Override
+    public Optional<PriceOffer> getByIdSimple(Long id, List<Long> companyIds) {
+        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
+
+        return Optional.ofNullable(query.selectFrom(qPriceOffer)
+                .where(qPriceOffer.id.eq(id))
+                .where(qPriceOffer.company.id.in(companyIds))
+                .fetchOne());
+    }
+
     private void priceOfferPackSetItems(PriceOffer priceOffer) {
         QDocumentPackItem qDocumentPackItem = QDocumentPackItem.documentPackItem;
         QItem qItem = QItem.item;
@@ -88,15 +116,12 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         ));
     }
 
-    @Override
-    public Optional<PriceOffer> getByIdSimple(Long id, List<Long> companyIds) {
+    private Long getTotalCount(Predicate predicate) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
 
-        return Optional.ofNullable(query.selectFrom(qPriceOffer)
-                .where(qPriceOffer.id.eq(id))
-                .where(qPriceOffer.company.id.in(companyIds))
-                .fetchOne());
+        return query.selectFrom(qPriceOffer)
+                .where(predicate)
+                .fetchCount();
     }
-
 
 }

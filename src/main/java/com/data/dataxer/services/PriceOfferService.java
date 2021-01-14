@@ -13,7 +13,7 @@ public interface PriceOfferService {
 
     void update(PriceOffer priceOffer);
 
-    Page<PriceOffer> paginate(Pageable pageable, Filter filter);
+    Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     PriceOffer getById(Long id);
 

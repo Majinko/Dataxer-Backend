@@ -25,4 +25,6 @@ public interface ContactService {
     void delete(Long id);
 
     Iterable<Contact> filteringV2(String search);
+
+    List<Contact> getContactByIds(List<Long> contactIds);
 }

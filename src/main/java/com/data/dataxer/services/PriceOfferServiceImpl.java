@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.PriceOfferRepository;
@@ -10,8 +9,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
 
 @Service
 public class PriceOfferServiceImpl implements PriceOfferService {
@@ -61,8 +58,8 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public Page<PriceOffer> paginate(Pageable pageable, Filter filter) {
-        return this.qPriceOfferRepository.paginate(pageable, filter, SecurityUtils.companyIds());
+    public Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qPriceOfferRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override

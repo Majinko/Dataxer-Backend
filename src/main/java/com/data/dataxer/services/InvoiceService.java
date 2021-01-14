@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.enums.DocumentState;
 import org.springframework.data.domain.Page;
@@ -16,13 +15,11 @@ public interface InvoiceService {
 
     void update(Invoice invoice);
 
-    Page<Invoice> paginate(Pageable pageable, Filter filter);
+    Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     Invoice getById(Long id);
 
     Invoice getByIdSimple(Long id);
-
-    Page<Invoice> getByClient(Pageable pageable, Long contactId);
 
     void destroy(Long id);
 

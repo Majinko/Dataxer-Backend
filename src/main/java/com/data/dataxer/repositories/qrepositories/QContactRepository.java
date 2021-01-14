@@ -18,4 +18,6 @@ public interface QContactRepository {
     public Contact getByName(String name);
 
     Iterable<Contact> findAll(BooleanExpression exp);
+
+    List<Contact> getAllByIds(List<Long> contactIds, List<Long> companyIds);
 }

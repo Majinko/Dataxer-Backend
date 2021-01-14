@@ -74,4 +74,9 @@ public class ContactServiceImpl implements ContactService {
 
         return qContactRepository.findAll(builder.parsePattern(search));
     }
+
+    @Override
+    public List<Contact> getContactByIds(List<Long> contactIds) {
+        return this.qContactRepository.getAllByIds(contactIds, SecurityUtils.companyIds());
+    }
 }

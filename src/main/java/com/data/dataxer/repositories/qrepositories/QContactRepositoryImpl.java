@@ -55,4 +55,12 @@ public class QContactRepositoryImpl implements QContactRepository {
     public Iterable<Contact> findAll(BooleanExpression exp) {
         return query.selectFrom(QContact.contact).where(exp).fetch();
     }
+
+    @Override
+    public List<Contact> getAllByIds(List<Long> contactIds, List<Long> companyIds) {
+        return this.query.selectFrom(CONTACT)
+                .where(CONTACT.id.in(contactIds))
+                .where(CONTACT.company.id.in(companyIds))
+                .fetch();
+    }
 }
