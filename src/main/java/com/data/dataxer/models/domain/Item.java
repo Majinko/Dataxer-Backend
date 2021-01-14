@@ -33,9 +33,11 @@ public class Item extends BaseEntity {
     @JoinTable(
             name = "storage",
             joinColumns = @JoinColumn(name = "fileAbleId"),
-            inverseJoinColumns = @JoinColumn(name = "id")
+            inverseJoinColumns = @JoinColumn(name = "id"),
+            foreignKey = @javax.persistence.ForeignKey(name = "none")
     )
     @OneToMany(fetch = FetchType.LAZY)
+    @Where(clause="file_able_type='item'")
     private List<Storage> storage = new ArrayList<>();
 
     String title;

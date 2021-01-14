@@ -32,6 +32,7 @@ public class QTaskRepositoryImpl implements QTaskRepository {
                 .selectFrom(qTask)
                 .where(qTask.company.id.in(companyIds))
                 .where(qTask.id.eq(id))
+                .leftJoin(qTask.files).fetchJoin()
                 .leftJoin(qTask.user).fetchJoin()
                 .leftJoin(qTask.userFrom).fetchJoin()
                 .leftJoin(qTask.project).fetchJoin()

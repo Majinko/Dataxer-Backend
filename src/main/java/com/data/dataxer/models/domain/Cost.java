@@ -14,6 +14,8 @@ import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 @Entity
@@ -33,6 +35,16 @@ public class Cost extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     Project project;
+
+    @JoinTable(
+            name = "storage",
+            joinColumns = @JoinColumn(name = "fileAbleId"),
+            inverseJoinColumns = @JoinColumn(name = "id"),
+            foreignKey = @javax.persistence.ForeignKey(name = "none")
+    )
+    @OneToMany(fetch = FetchType.LAZY)
+    @Where(clause="file_able_type='cost'")
+    private List<Storage> files = new ArrayList<>();
 
     private String title;
 

@@ -3,9 +3,12 @@ package com.data.dataxer.models.domain;
 import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,6 +33,16 @@ public class Task extends BaseEntity {
     @JoinColumn(name = "user_from_uid", referencedColumnName = "uid")
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private AppUser userFrom;
+
+    @JoinTable(
+            name = "storage",
+            joinColumns = @JoinColumn(name = "fileAbleId"),
+            inverseJoinColumns = @JoinColumn(name = "id"),
+            foreignKey = @javax.persistence.ForeignKey(name = "none")
+    )
+    @Where(clause="file_able_type='storage'")
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<Storage> files = new ArrayList<>();
 
     private String title;
 

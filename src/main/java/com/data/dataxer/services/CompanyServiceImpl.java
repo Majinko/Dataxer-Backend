@@ -54,6 +54,7 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
+    // todo change default company to is default and remove app_user_id and add it to app_user_companies
     public Company getDefaultCompany() {
         return this.companyRepository.findByDefaultCompanyAndAppUserId(true, SecurityUtils.id())
                 .orElseThrow(() -> new RuntimeException("Default company not exist, please set it"));

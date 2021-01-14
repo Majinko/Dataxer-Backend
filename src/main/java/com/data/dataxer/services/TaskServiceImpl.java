@@ -19,10 +19,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void store(Task task) {
+    public Task store(Task task) {
         task.setUserFrom(SecurityUtils.loggedUser());
 
-        this.taskRepository.save(task);
+        return this.taskRepository.save(task);
     }
 
     @Override

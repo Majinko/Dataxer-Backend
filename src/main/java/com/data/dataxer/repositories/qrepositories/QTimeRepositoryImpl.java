@@ -1,9 +1,13 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.domain.Time;
+import com.github.vineey.rql.filter.parser.DefaultFilterParser;
+import com.google.common.collect.ImmutableMap;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -12,7 +16,10 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static com.github.vineey.rql.querydsl.filter.QueryDslFilterContext.withMapping;
 
 @Repository
 public class QTimeRepositoryImpl implements QTimeRepository {
@@ -47,25 +54,41 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public Page<Time> paginate(Pageable pageable, Long userId, List<Long> companyIds) {
+    public Page<Time> paginate(Pageable pageable, String rqlFilter, Long userId, List<Long> companyIds) {
         QTime qTime = QTime.time1;
         BooleanBuilder filterCondition = new BooleanBuilder();
 
-        List<Time> times = this.query.selectFrom(qTime)
+        JPAQuery<Time> times = this.query.selectFrom(qTime)
                 .leftJoin(qTime.category).fetchJoin()
                 .where(filterCondition)
                 .where(qTime.company.id.in(companyIds))
                 .where(qTime.user.id.eq(userId))
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
-                .orderBy(qTime.id.desc())
-                .fetch();
+                .orderBy(qTime.id.desc());
 
-        return new PageImpl<Time>(times, pageable, total());
+        if (rqlFilter != null) {
+            times.where(predicate(rqlFilter));
+        }
+
+        return new PageImpl<Time>(times.fetch(), pageable, total());
     }
 
     private Long total() {
         QTime qTime = QTime.time1;
         return this.query.selectFrom(qTime).fetchCount();
     }
+
+    public Predicate predicate(String rqlFilter) {
+        DefaultFilterParser filterParser = new DefaultFilterParser();
+
+        Map<String, Path> pathHashMap = ImmutableMap.<String, Path>builder()
+                .put("time.description", QTime.time1.description)
+                .put("time.dateWork", QTime.time1.dateWork)
+                .put("time.categoryId", QTime.time1.category.id)
+                .build();
+
+        return filterParser.parse(rqlFilter, withMapping(pathHashMap));
+    }
+
 }

@@ -12,7 +12,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -26,7 +28,7 @@ public class TimeDTO {
     private Integer timeTo;
     private BigDecimal price;
     private String description;
-    private LocalDateTime dateWork;
+    private LocalDate dateWork;
     private Float km;
 
 

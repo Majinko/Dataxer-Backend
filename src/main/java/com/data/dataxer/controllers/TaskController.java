@@ -1,8 +1,12 @@
 package com.data.dataxer.controllers;
 
+import com.data.dataxer.mappers.StorageMapper;
 import com.data.dataxer.mappers.TaskMapper;
 import com.data.dataxer.models.dto.TaskDTO;
+import com.data.dataxer.models.dto.UploadContextDTO;
 import com.data.dataxer.services.TaskService;
+import com.data.dataxer.services.storage.StorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,17 +17,27 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/task")
 public class TaskController {
-    private final TaskService taskService;
-    private final TaskMapper taskMapper;
+    @Autowired
+    private TaskService taskService;
 
-    public TaskController(TaskService taskService, TaskMapper taskMapper) {
-        this.taskService = taskService;
-        this.taskMapper = taskMapper;
-    }
+    @Autowired
+    private StorageService storageService;
+
+    @Autowired
+    private TaskMapper taskMapper;
+
+    @Autowired
+    private StorageMapper storageMapper;
 
     @PostMapping("/store")
-    public void store(@RequestBody TaskDTO taskDTO) {
-        this.taskService.store(taskMapper.taskDTOtoTask(taskDTO));
+    public void store(@RequestBody UploadContextDTO<TaskDTO> uploadContext) {
+        TaskDTO task = taskMapper.taskToTaskDTO(this.taskService.store(taskMapper.taskDTOtoTask(uploadContext.getObject())));
+
+        if (!uploadContext.getFiles().isEmpty()) {
+            uploadContext.getFiles().forEach(file -> {
+                this.storageService.store(storageMapper.storageFileDTOtoStorage(file), task.getId(), "task");
+            });
+        }
     }
 
     @PostMapping("/update")
@@ -38,7 +52,7 @@ public class TaskController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(taskService.paginate(pageable).map(taskMapper::taskToTaskDTO));
+        return ResponseEntity.ok(taskService.paginate(pageable).map(taskMapper::taskToTaskDTOPaginate));
     }
 
     @GetMapping("/{id}")

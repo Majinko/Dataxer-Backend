@@ -17,7 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class CostServiceImpl implements CostService{
+public class CostServiceImpl implements CostService {
 
     private final CostRepository costRepository;
     private final QCostRepository qCostRepository;

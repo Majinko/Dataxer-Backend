@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class TimeServiceImpl implements TimeService {
-
     private final TimeRepository timeRepository;
     private final QTimeRepository qTimeRepository;
 
@@ -50,8 +49,8 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public Page<Time> paginate(Pageable pageable) {
+    public Page<Time> paginate(Pageable pageable, String rqlFilter) {
         return this.qTimeRepository
-                .paginate(pageable, SecurityUtils.id(),  SecurityUtils.companyIds());
+                .paginate(pageable, rqlFilter, SecurityUtils.id(),  SecurityUtils.companyIds());
     }
 }

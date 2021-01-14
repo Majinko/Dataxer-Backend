@@ -6,7 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -16,12 +16,15 @@ public class Time extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // todo set fetch type lazy
     @OneToOne
     Project project;
 
+    // todo set fetch type lazy
     @OneToOne
     AppUser user;
 
+    // todo set fetch type lazy
     @OneToOne
     Category category;
 
@@ -39,7 +42,7 @@ public class Time extends BaseEntity {
 
     float km;
 
-    private LocalDateTime dateWork;
+    private LocalDate dateWork;
 
     @PrePersist
     private void persist() {

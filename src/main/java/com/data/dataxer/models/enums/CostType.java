@@ -2,8 +2,8 @@ package com.data.dataxer.models.enums;
 
 public enum CostType {
 
-    INVESTMENT("investment"),
-    OUTGOING("outgoing");
+    INVOICE("invoice"),
+    OTHER("other");
 
     private String name;
 

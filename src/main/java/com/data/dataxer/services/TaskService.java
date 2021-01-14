@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface TaskService {
-    void store(Task task);
+    Task store(Task task);
 
     void update(Task task);
 

@@ -2,9 +2,13 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.CostMapper;
+import com.data.dataxer.mappers.StorageMapper;
 import com.data.dataxer.models.dto.CostDTO;
+import com.data.dataxer.models.dto.UploadContextDTO;
 import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.services.CostService;
+import com.data.dataxer.services.storage.StorageService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,21 +19,33 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/costs")
+@RequestMapping("/api/cost")
 public class CostController {
 
-    private final CostService costService;
-    private final CostMapper costMapper;
+    @Autowired
+    private CostService costService;
 
-    public CostController(CostService costService, CostMapper costMapper) {
-        this.costService = costService;
-        this.costMapper = costMapper;
-    }
+    @Autowired
+    private StorageService storageService;
+
+    @Autowired
+    private CostMapper costMapper;
+
+    @Autowired
+    private StorageMapper storageMapper;
+
 
     @PostMapping("/store")
-    public ResponseEntity<CostDTO> store(@RequestBody CostDTO costDTO) {
-        return ResponseEntity.ok(this.costMapper.costToCostDTO(
-                this.costService.store(this.costMapper.costDTOToCost(costDTO))));
+    public ResponseEntity<CostDTO> store(@RequestBody UploadContextDTO<CostDTO> uploadContext) {
+        CostDTO cost = this.costMapper.costToCostDTO(this.costService.store(this.costMapper.costDTOToCost(uploadContext.getObject())));
+
+        if (!uploadContext.getFiles().isEmpty()) {
+            uploadContext.getFiles().forEach(file -> {
+                this.storageService.store(storageMapper.storageFileDTOtoStorage(file), cost.getId(), "cost");
+            });
+        }
+
+        return ResponseEntity.ok(cost);
     }
 
     @PostMapping("/update")
