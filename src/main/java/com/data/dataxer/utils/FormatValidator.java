@@ -1,6 +1,6 @@
 package com.data.dataxer.utils;
 
-import com.data.dataxer.Exceptions.ValidationException;
+import com.data.dataxer.exceptions.ValidationException;
 import com.data.dataxer.models.enums.Periods;
 
 public class FormatValidator {

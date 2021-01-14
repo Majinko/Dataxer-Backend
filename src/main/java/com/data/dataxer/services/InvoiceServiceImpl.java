@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
@@ -76,8 +75,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable, Filter filter) {
-        return this.qInvoiceRepository.paginate(pageable, filter, SecurityUtils.companyIds());
+    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qInvoiceRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override
@@ -149,11 +148,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         this.invoiceRepository.save(duplicatedInvoice);
         this.setInvoicePackAndItems(duplicatedInvoice);
         return duplicatedInvoice;
-    }
-
-    @Override
-    public Page<Invoice> getByClient(Pageable pageable, Long contactId) {
-        return this.qInvoiceRepository.getByClient(pageable, contactId, SecurityUtils.companyIds());
     }
 
     private Invoice setInvoicePackAndItems(Invoice invoice) {

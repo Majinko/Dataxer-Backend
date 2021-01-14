@@ -106,6 +106,12 @@
         </dependency>
 
         <dependency>
+            <groupId>com.github.vineey</groupId>
+            <artifactId>rsql-querydsl-all</artifactId>
+            <version>2.0.0.RELEASE</version>
+        </dependency>
+
+        <dependency>
             <groupId>com.querydsl</groupId>
             <artifactId>querydsl-apt</artifactId>
         </dependency>
@@ -119,6 +125,13 @@
             <artifactId>annotations</artifactId>
             <version>19.0.0</version>
             <scope>compile</scope>
+        </dependency>
+
+        <!--Email-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
+            <version>2.2.5.RELEASE</version>
         </dependency>
     </dependencies>
 

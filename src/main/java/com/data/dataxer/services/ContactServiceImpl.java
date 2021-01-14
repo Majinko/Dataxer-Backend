@@ -95,4 +95,9 @@ public class ContactServiceImpl implements ContactService {
         CustomPredicatesBuilder<Contact> builder = new CustomPredicatesBuilder<>("contact");
         return qContactRepository.findAll(builder.parsePattern(search));
     }
+
+    @Override
+    public List<Contact> getContactByIds(List<Long> contactIds) {
+        return this.qContactRepository.getAllByIds(contactIds, SecurityUtils.companyIds());
+    }
 }

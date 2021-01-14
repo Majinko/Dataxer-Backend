@@ -1,4 +1,4 @@
-package com.data.dataxer.Exceptions;
+package com.data.dataxer.exceptions;
 
 public class ValidationException extends RuntimeException {
 
