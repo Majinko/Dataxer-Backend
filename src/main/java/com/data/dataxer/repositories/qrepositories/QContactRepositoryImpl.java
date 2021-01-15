@@ -34,6 +34,7 @@ public class QContactRepositoryImpl implements QContactRepository {
                 .where(CONTACT.company.id.in(companyIds))
                 .join(CONTACT.projects, PROJECT)
                 .fetch();
+
     }
 
     @Override
