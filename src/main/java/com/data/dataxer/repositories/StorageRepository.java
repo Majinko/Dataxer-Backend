@@ -8,7 +8,7 @@ import java.util.List;
 public interface StorageRepository extends CrudRepository<Storage, Long> {
     List<Storage> findAllByFileAbleIdAndFileAbleType(Long id, String type);
 
+    Storage findByFileAbleIdAndFileAbleTypeAndCompanyIdInAndIsDefault(Long id, String type, List<Long> companyIds, boolean isDefault);
 
-    // todo pridat aj filtrovanie podla id firmy
-    Storage findByFileAbleIdAndFileAbleTypeAndIsDefault(Long id, String type, boolean isDefault);
+    Storage findByIdAndCompanyIdIn(Long id, List<Long> companyIds);
 }

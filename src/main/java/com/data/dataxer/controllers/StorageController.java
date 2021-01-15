@@ -23,18 +23,19 @@ public class StorageController {
     @Autowired
     StorageMapper storageMapper;
 
-    @GetMapping("/preview/{id}/{type}")
-    protected ResponseEntity<Resource> preview(@PathVariable Long id, @PathVariable String type) {
-        StorageFileDTO storageFileDTO = storageMapper.storageToStorageFileDTO(storageService.getPreview(id, type, true));
-
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(storageFileDTO.getContentType()))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + storageFileDTO.getFileName() + "\"")
-                .body(new ByteArrayResource(storageFileDTO.getContent()));
+    @GetMapping("/{id}/{type}")
+    protected ResponseEntity<StorageFileDTO> getStoragePreviewFile(@PathVariable Long id, @PathVariable String type) {
+        return ResponseEntity.ok(storageMapper.storageToStorageFileDTO(this.storageService.getPreview(id, type)));
     }
 
-    @GetMapping("/{id}/{type}")
-    protected ResponseEntity<StorageFileDTO> getStoragePreviewFile(@PathVariable Long id, @PathVariable String type){
-        return ResponseEntity.ok(storageMapper.storageToStorageFileDTO(this.storageService.getPreview(id, type, false)));
+    @GetMapping("/{id}")
+    protected ResponseEntity<StorageFileDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(storageMapper.storageToStorageFileDTO(this.storageService.getById(id)));
+    }
+
+
+    @GetMapping("/destroy/{id}")
+    protected void destroy(@PathVariable Long id) {
+        this.storageService.destroy(id);
     }
 }

@@ -24,5 +24,7 @@ public interface CostService {
 
     Cost getById(Long id);
 
+    Cost getByIdWithRelation(Long id);
+
     Cost duplicate(Long id);
 }

@@ -26,11 +26,20 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public Storage getPreview(Long id, String type, boolean setContent) {
-        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndIsDefault(id, type, true);
+    public Storage getPreview(Long id, String type) {
+        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndCompanyIdInAndIsDefault(id, type, SecurityUtils.companyIds(), true);
 
-        if (storage != null && setContent)
+        if (storage != null)
             storage.setContent(this.getFileContent(storage.getPath()));
+
+        return storage;
+    }
+
+    @Override
+    public Storage getById(Long id) {
+        Storage storage = this.storageRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds());
+
+        storage.setContent(this.getFileContent(storage.getPath()));
 
         return storage;
     }
@@ -70,10 +79,23 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public void destroy(Long id, String type) {
-        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndIsDefault(id, type, true);
+        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndCompanyIdInAndIsDefault(id, type, SecurityUtils.companyIds(), true);
 
-        if (storage != null)
+        this.destroy(storage);
+    }
+
+    @Override
+    public void destroy(Long id) {
+        Storage storage = this.storageRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds());
+
+        this.destroy(storage);
+    }
+
+    private void destroy(Storage storage) {
+        if (storage != null) {
+            bucket.get(storage.getPath()).delete();
             this.storageRepository.delete(storage);
+        }
     }
 
     private HashMap<String, String> uploadFileToStorage(Storage file, String type) throws IOException {

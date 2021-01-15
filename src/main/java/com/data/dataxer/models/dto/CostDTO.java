@@ -3,6 +3,7 @@ package com.data.dataxer.models.dto;
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.Project;
+import com.data.dataxer.models.domain.Storage;
 import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.models.enums.CostType;
 import com.data.dataxer.models.enums.CostsPeriods;
@@ -12,6 +13,8 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,7 +26,6 @@ public class CostDTO {
     private Category category;
     private PaymentMethod paymentMethod;
     private CostsPeriods period;
-
     private String note;
     private String title;
     private String number;
@@ -32,6 +34,7 @@ public class CostDTO {
     private String constantSymbol;
     private Boolean isInternal;
     private Boolean isRepeated;
+    private Boolean isPaid;
     private LocalDate repeatedFrom;
     private LocalDate repeatedTo;
     private LocalDate nextRepeatedCost;
@@ -45,4 +48,6 @@ public class CostDTO {
 
     Contact contact;
     Project project;
+
+    private List<Storage> files = new ArrayList<>();
 }

@@ -46,16 +46,17 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
-                .put("priceOffer.id", QInvoice.invoice.id)
-                .put("priceOffer.state", QInvoice.invoice.state)
-                .put("priceOffer.contact.id", QInvoice.invoice.contact.id)
-                .put("priceOffer.contact.name", QInvoice.invoice.contact.name)
+                .put("priceOffer.id", QPriceOffer.priceOffer.id)
+                .put("priceOffer.state", QPriceOffer.priceOffer.state)
+                .put("priceOffer.contact.id", QPriceOffer.priceOffer.contact.id)
+                .put("priceOffer.contact.name", QPriceOffer.priceOffer.contact.name)
                 .build();
 
         if (!rqlFilter.equals("")) {
             predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
                     .setMapping(pathMapping)));
         }
+
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<PriceOffer> priceOfferList = query.selectFrom(qPriceOffer)

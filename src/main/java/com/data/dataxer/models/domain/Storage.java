@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 @Entity
 @Setter
 @Getter
-@Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE contact SET deleted_at = now() WHERE id = ?")
 public class Storage extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +34,4 @@ public class Storage extends BaseEntity {
 
     @Transient
     private byte[] content;
-
-    private LocalDateTime deletedAt;
 }

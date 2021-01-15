@@ -18,4 +18,7 @@ public interface CostRepository extends CrudRepository<Cost, Long> {
 
     @Query(value = "SELECT * FROM cost c WHERE c.is_repeated = true AND c.deleted_at IS NULL", nativeQuery = true)
     public List<Cost> findAllRepeated();
+
+    @Query("SELECT cost FROM Cost cost LEFT JOIN Contact contact ON contact.id = cost.contact.id")
+    List<Cost> paginate(Pageable pageable, List<Long> companyIds);
 }

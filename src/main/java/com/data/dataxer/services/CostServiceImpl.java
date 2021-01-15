@@ -43,21 +43,14 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost update(Cost cost) {
-        return this.costRepository.save(cost);
+        this.costRepository.save(cost);
+
+        return cost;
     }
 
     @Override
     public Page<Cost> paginate(Pageable pageable, List<Filter> filters) {
-        List<Cost> costs;
-        String whereCondition;
-        if (!filters.isEmpty()) {
-            whereCondition = Filter.buildConditionsFromFilters(filters, "c");
-            costs = this.costRepository.findWithFilter(SecurityUtils.companyIds(), whereCondition, pageable);
-        } else {
-            costs = this.costRepository.findDefault(SecurityUtils.companyIds(), pageable);
-        }
-
-        return new PageImpl<>(costs, pageable, costs.size());
+        return this.qCostRepository.paginate(pageable, SecurityUtils.companyIds());
     }
 
     @Override
@@ -92,6 +85,11 @@ public class CostServiceImpl implements CostService {
     public Cost getById(Long id) {
         return this.qCostRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
+    }
+
+    @Override
+    public Cost getByIdWithRelation(Long id) {
+        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyIds());
     }
 
     @Override

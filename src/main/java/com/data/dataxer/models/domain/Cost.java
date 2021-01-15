@@ -22,7 +22,7 @@ import java.util.Map;
 @Getter
 @Setter
 @Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE contact SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE cost SET deleted_at = now() WHERE id = ?")
 public class Cost extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,6 +80,8 @@ public class Cost extends BaseEntity {
 
     private Boolean isRepeated;
 
+    private Boolean isPaid;
+
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)
     protected Map<String, Object> costData;
@@ -104,5 +106,5 @@ public class Cost extends BaseEntity {
 
     protected LocalDate taxableSupply; // datum uplatnenia DPH
 
-    private LocalDateTime deleteAt;
+    private LocalDateTime deletedAt;
 }

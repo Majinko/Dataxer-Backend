@@ -1,10 +1,9 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.QCost;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class QCostRepositoryImpl implements QCostRepository{
+public class QCostRepositoryImpl implements QCostRepository {
 
     private final JPAQueryFactory query;
 
@@ -25,21 +24,14 @@ public class QCostRepositoryImpl implements QCostRepository{
     }
 
     @Override
-    public Page<Cost> paginate(Pageable pageable, List<Filter> costFilters, List<Long> companyIds) {
+    public Page<Cost> paginate(Pageable pageable, List<Long> companyIds) {
         QCost qCost = QCost.cost;
-
-        BooleanBuilder filterConditions = new BooleanBuilder();
-
-        if (!costFilters.isEmpty()) {
-            for (Filter filter : costFilters) {
-                //filterConditions.or(filter.buildCostFilterPredicate());
-            }
-        }
 
         QueryResults<Cost> costResults = this.query.selectFrom(qCost)
                 .leftJoin(qCost.contact).fetchJoin()
+                .leftJoin(qCost.project).fetchJoin()
+                .leftJoin(qCost.category).fetchJoin()
                 .where(qCost.company.id.in(companyIds))
-                .where(filterConditions)
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
                 .orderBy(qCost.id.desc())
@@ -50,13 +42,24 @@ public class QCostRepositoryImpl implements QCostRepository{
 
     @Override
     public Optional<Cost> getById(Long id, List<Long> companyIds) {
-        QCost qCost = QCost.cost;
-
         return Optional.ofNullable(
-                this.query.selectFrom(qCost)
-                .where(qCost.company.id.in(companyIds))
-                .where(qCost.id.eq(id))
-                .fetchOne()
+                this.constructGetAllByIdAndCompanyIds(id, companyIds).fetchOne()
         );
+    }
+
+    @Override
+    public Cost getByIdWithRelation(Long id, List<Long> companyIds) {
+        return this.constructGetAllByIdAndCompanyIds(id, companyIds)
+                .leftJoin(QCost.cost.category).fetchJoin()
+                .leftJoin(QCost.cost.contact).fetchJoin()
+                .leftJoin(QCost.cost.project).fetchJoin()
+                .leftJoin(QCost.cost.files).fetchJoin()
+                .fetchOne();
+    }
+
+    private JPAQuery<Cost> constructGetAllByIdAndCompanyIds(Long id, List<Long> companyIds) {
+        return query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.in(companyIds))
+                .where(QCost.cost.id.eq(id));
     }
 }

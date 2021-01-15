@@ -49,9 +49,16 @@ public class CostController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<CostDTO> update(@RequestBody CostDTO costDTO) {
-        return ResponseEntity.ok(this.costMapper.costToCostDTO(
-                this.costService.update(this.costMapper.costDTOToCost(costDTO))));
+    public ResponseEntity<CostDTO> update(@RequestBody UploadContextDTO<CostDTO> uploadContext) {
+        CostDTO cost = this.costMapper.costToCostDTO(this.costService.update(this.costMapper.costDTOToCost(uploadContext.getObject())));
+
+        if (!uploadContext.getFiles().isEmpty()) {
+            uploadContext.getFiles().forEach(file -> {
+                this.storageService.store(storageMapper.storageFileDTOtoStorage(file), cost.getId(), "cost");
+            });
+        }
+
+        return ResponseEntity.ok(cost);
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
@@ -71,7 +78,12 @@ public class CostController {
         }
 
         return ResponseEntity.ok(this.costService
-                .paginate(pageable, listOfFilters).map(this.costMapper::costToCostDTO));
+                .paginate(pageable, listOfFilters).map(this.costMapper::costToCostDTOPaginate));
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CostDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.getByIdWithRelation(id)));
     }
 
     @GetMapping("/changeState")
@@ -81,7 +93,7 @@ public class CostController {
         return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.changeState(id, state)));
     }
 
-    @RequestMapping(value = "/duplicate/{id}")
+    @GetMapping(value = "/duplicate/{id}")
     public ResponseEntity<CostDTO> duplicate(@PathVariable Long id) {
         return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.duplicate(id)));
     }
