@@ -104,25 +104,15 @@ public class CostServiceImpl implements CostService{
     }
 
     private Cost generateNewCostFromRepeated(Cost repeatedCost) {
-        Cost cost = new Cost();
-        cost.setTitle(repeatedCost.getTitle());
-        cost.setCostOrder(repeatedCost.getCostOrder());
-        cost.setCategory(repeatedCost.getCategory());
-        cost.setContact(repeatedCost.getContact());
-        cost.setIsInternal(repeatedCost.getIsInternal());
-        cost.setCreatedDate(LocalDate.now());
+        Cost newCost = new Cost();
+        BeanUtils.copyProperties(repeatedCost, newCost, "id", "dueDate", "createdDate", "isRepeated", "state");
+        newCost.setCreatedDate(LocalDate.now());
         if (repeatedCost.getDueDate() != null) {
-            cost.setDueDate(repeatedCost.getDueDate());
+            newCost.setDueDate(repeatedCost.getDueDate());
         } else {
-            cost.setDueDate(LocalDate.now());
+            newCost.setDueDate(LocalDate.now());
         }
-        cost.setIsRepeated(Boolean.FALSE);
-        cost.setPrice(repeatedCost.getPrice());
-        cost.setTotalPrice(repeatedCost.getTotalPrice());
-        cost.setState(CostState.UNPAID);
-        cost.setType(repeatedCost.getType());
-        cost.setCompany(repeatedCost.getCompany());
-        return cost;
+        return newCost;
     }
 
     private LocalDate getNextRepeat(Cost cost) {
