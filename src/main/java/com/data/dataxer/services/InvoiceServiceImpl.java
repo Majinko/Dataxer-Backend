@@ -96,13 +96,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Invoice getByIdWithContactAndCompany(Long id) {
-        return this.qInvoiceRepository
-                .getByIdContactAndCompany(id)
-                .orElseThrow(() -> new RuntimeException("Invoice not found"));
-    }
-
-    @Override
     public void destroy(Long id) {
         this.invoiceRepository.delete(this.getByIdSimple(id));
     }

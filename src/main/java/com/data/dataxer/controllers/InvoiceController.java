@@ -92,9 +92,4 @@ public class InvoiceController {
     public ResponseEntity<InvoiceDTO> getSummaryInvoice(@PathVariable Long id) {
         return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateSummaryInvoice(id)));
     }
-
-    @GetMapping("/pdf/{id}")
-    public void pdf(@PathVariable Long id) {
-
-    }
 }
