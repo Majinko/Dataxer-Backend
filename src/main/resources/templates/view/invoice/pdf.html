@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="sk">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title><p th:text="${invoice.title}"></p></title>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+</head>
+<body>
+    <section>
+        <header>
+            <div class="col-md-6" style="float: left;">
+                <img height="80" src="http://www.rules.sk/images/logo-dark_sk.png" alt="" />
+
+<<<<<<< HEAD
+            <div class="fields-box-text fields-box-only-text">
+                <p style="font-weight: bold; margin-top: 35px" th:text="'Dodávateľ: ' + ${firm.name}"></p>
+                <p th:text="${firm.name}"></p>
+            </div> <!-- end .fields-box-text -->
+        </div>
+=======
+                <div class="fields-box-text fields-box-only-text">
+                    <p style="font-weight: bold; margin-top: 35px" th:text="'Dodávateľ: ' + ${invoice.contact.name}"></p>
+                </div> <!-- end .fields-box-text -->
+            </div>
+>>>>>>> 25977f33789e397fe98b9d6e9f6994fbc4e046ce
+        <div class="clear"></div>
+        </header>
+    </section> <!-- end .box -->
+</body>body>
+</html>

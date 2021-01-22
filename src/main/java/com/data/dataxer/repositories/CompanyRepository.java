@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CompanyRepository extends JpaRepository<Company, Long> {
-    List<Company> findByAppUserId(Long userId);
+    List<Company> findByAppUserIdOrderByIdDesc(Long userId);
 
     Optional<Company> findAllByIdAndAppUserId(Long companyId, Long userId);
 

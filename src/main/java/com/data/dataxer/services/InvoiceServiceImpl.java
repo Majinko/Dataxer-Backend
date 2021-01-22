@@ -28,10 +28,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final QInvoiceRepository qInvoiceRepository;
     private final PaymentRepository paymentRepository;
-    private final DocumentRelationServiceImpl documentRelationService;
+    private final DocumentRelationService documentRelationService;
 
     public InvoiceServiceImpl(InvoiceRepository invoiceRepository, QInvoiceRepository qInvoiceRepository,
-                              PaymentRepository paymentRepository, DocumentRelationServiceImpl documentRelationService) {
+                              PaymentRepository paymentRepository, DocumentRelationService documentRelationService) {
         this.invoiceRepository = invoiceRepository;
         this.qInvoiceRepository = qInvoiceRepository;
         this.paymentRepository = paymentRepository;
@@ -153,7 +153,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private Invoice setInvoicePackAndItems(Invoice invoice) {
         int packPosition = 0;
 
-        for(DocumentPack documentPack : invoice.getPacks()) {
+        for (DocumentPack documentPack : invoice.getPacks()) {
             documentPack.setDocumentId(invoice.getId());
             documentPack.setType(DocumentType.INVOICE);
             documentPack.setPosition(packPosition);
@@ -161,7 +161,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
             int packItemPosition = 0;
 
-            for(DocumentPackItem packItem : documentPack.getPackItems()) {
+            for (DocumentPackItem packItem : documentPack.getPackItems()) {
                 packItem.setPack(documentPack);
                 packItem.setPosition(packItemPosition);
 
@@ -175,7 +175,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private void setPropertiesForTaxDocument(Invoice proformaInvoice, Invoice taxDocument) {
         List<Payment> payments = this.paymentRepository.findAllWithoutTaxDocumentByDocumentId(SecurityUtils.companyIds(), proformaInvoice.getId());
         BigDecimal payed = BigDecimal.ZERO;
-        for ( Payment payment: payments ) {
+        for (Payment payment : payments) {
             payed = payed.add(payment.getPayedValue());
         }
         taxDocument.setTotalPrice(payed);
@@ -219,7 +219,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private String generateTaxDocumentItemDescription(String number, LocalDate paymentDate, String variableSymbol) {
-        return "Na základe zálohovej faktúry " +  number +
+        return "Na základe zálohovej faktúry " + number +
                 " uhradenej " + paymentDate + ", variabilný symbol " + variableSymbol;
     }
 
@@ -259,7 +259,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private void updatePaymentsOfTaxDocument(Long proformaInvoiceId) {
         List<Payment> payments = this.paymentRepository.findAllWithoutTaxDocumentByDocumentId(SecurityUtils.companyIds(), proformaInvoiceId);
-        for ( Payment payment: payments ) {
+        for (Payment payment : payments) {
             payment.setTaxDocumentCreated(Boolean.TRUE);
             this.paymentRepository.save(payment);
         }

@@ -29,6 +29,8 @@ public class DocumentPackItem extends BaseEntity {
 
     private String title;
 
+    private String unit;
+
     Integer position;
 
     private BigDecimal discount;
@@ -53,4 +55,19 @@ public class DocumentPackItem extends BaseEntity {
         this.totalPrice = packItem.getTotalPrice();
     }
 
+    public BigDecimal countQuantityTotalPrice() {
+        return this.totalPrice.multiply(BigDecimal.valueOf(this.qty));
+    }
+
+    public BigDecimal countPriceDiscount() {
+        return this.price.multiply(this.discount.divide(BigDecimal.valueOf(100)));
+    }
+
+    public BigDecimal countTotalPriceDiscount() {
+        return this.totalPrice.multiply(this.discount.divide(BigDecimal.valueOf(100)));
+    }
+
+    public BigDecimal countQuantityTotalPriceDiscount() {
+        return this.countTotalPriceDiscount().multiply(BigDecimal.valueOf(this.qty));
+    }
 }

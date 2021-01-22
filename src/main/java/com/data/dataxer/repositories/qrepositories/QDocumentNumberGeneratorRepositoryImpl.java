@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGeneratorRepository{
+public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGeneratorRepository {
     private final JPAQueryFactory query;
 
     public QDocumentNumberGeneratorRepositoryImpl(EntityManager entityManager) {
@@ -80,15 +80,15 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     }
 
     @Override
-    public Optional<DocumentNumberGenerator> getDefaultByDocumentType(DocumentType documentType, List<Long> companyIds) {
+    public DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, List<Long> companyIds) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
-        return Optional.ofNullable(this.query
-        .selectFrom(qDocumentNumberGenerator)
-        .where(qDocumentNumberGenerator.type.eq(documentType))
-        .where(qDocumentNumberGenerator.isDefault.eq(true))
-        .where(qDocumentNumberGenerator.company.id.in(companyIds))
-        .fetchOne());
+        return this.query
+                .selectFrom(qDocumentNumberGenerator)
+                .where(qDocumentNumberGenerator.type.eq(documentType))
+                .where(qDocumentNumberGenerator.isDefault.eq(true))
+                .where(qDocumentNumberGenerator.company.id.in(companyIds))
+                .fetchOne();
     }
 
     private Long total() {

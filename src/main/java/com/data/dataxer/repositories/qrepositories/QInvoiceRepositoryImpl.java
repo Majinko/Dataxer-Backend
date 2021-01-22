@@ -108,19 +108,19 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .fetchCount();
     }
 
-     private void invoicePackSetItems(Invoice invoice) {
-         QDocumentPackItem qDocumentPackItem = QDocumentPackItem.documentPackItem;
-         QItem qItem = QItem.item;
+    private void invoicePackSetItems(Invoice invoice) {
+        QDocumentPackItem qDocumentPackItem = QDocumentPackItem.documentPackItem;
+        QItem qItem = QItem.item;
 
-         List<DocumentPackItem> invoicePackItems = query.selectFrom(qDocumentPackItem)
-                 .where(qDocumentPackItem.pack.id.in(invoice.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
-                 .leftJoin(qDocumentPackItem.item, qItem).fetchJoin()
-                 .orderBy(qDocumentPackItem.position.asc())
-                 .fetch();
+        List<DocumentPackItem> invoicePackItems = query.selectFrom(qDocumentPackItem)
+                .where(qDocumentPackItem.pack.id.in(invoice.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
+                .leftJoin(qDocumentPackItem.item, qItem).fetchJoin()
+                .orderBy(qDocumentPackItem.position.asc())
+                .fetch();
 
-         invoice.getPacks().forEach(documentPack -> documentPack.setPackItems(
-                 invoicePackItems.stream().filter(
-                         invoicePackItem -> invoicePackItem.getPack().getId().equals(documentPack.getId())).collect(Collectors.toList())
-         ));
+        invoice.getPacks().forEach(documentPack -> documentPack.setPackItems(
+                invoicePackItems.stream().filter(
+                        invoicePackItem -> invoicePackItem.getPack().getId().equals(documentPack.getId())).collect(Collectors.toList())
+        ));
     }
 }

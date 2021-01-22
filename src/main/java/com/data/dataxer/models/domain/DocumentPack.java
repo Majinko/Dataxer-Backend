@@ -8,7 +8,9 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Entity
 @Setter
@@ -31,9 +33,14 @@ public class DocumentPack implements Serializable {
 
     Integer tax;
 
+    private Boolean customPrice;
+
+    private BigDecimal price;
+
     private BigDecimal totalPrice;
 
-    public DocumentPack() {}
+    public DocumentPack() {
+    }
 
     public DocumentPack(DocumentPack pack) {
         this.documentId = null;
@@ -41,6 +48,8 @@ public class DocumentPack implements Serializable {
         this.position = pack.getPosition();
         this.title = pack.getTitle();
         this.tax = pack.getTax();
+        this.price = pack.getPrice();
+        this.customPrice = pack.getCustomPrice();
         this.totalPrice = pack.getTotalPrice();
         if (pack.getPackItems() != null && !pack.getPackItems().isEmpty()) {
             this.setDuplicatedDocumentPackItems(pack.getPackItems(), this);
@@ -51,5 +60,19 @@ public class DocumentPack implements Serializable {
         for (DocumentPackItem packItem : packItems) {
             this.packItems.add(new DocumentPackItem(packItem, pack));
         }
+    }
+
+    public Map<Integer, BigDecimal> getPackItemsTaxesAndValues() {
+        Map<Integer, BigDecimal> taxesAndValues = new HashMap<>();
+        for (DocumentPackItem item : this.packItems) {
+            if (taxesAndValues.containsKey(item.getTax())) {
+                BigDecimal value = taxesAndValues.get(item.getTax());
+                value = value.add(item.getPrice());
+                taxesAndValues.replace(item.getTax(), value);
+            } else {
+                taxesAndValues.put(item.getTax(), item.getPrice());
+            }
+        }
+        return taxesAndValues;
     }
 }

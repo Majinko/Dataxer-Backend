@@ -5,7 +5,7 @@ import com.data.dataxer.models.enums.Periods;
 
 public class DefaultInvoiceNumberGenerator {
 
-    public static final String title = "Default invoice number generator";
+    public static final String title = "Default number generator";
 
     public static final String format = "YYYYNNNNNN";
 

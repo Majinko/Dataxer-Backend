@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.InvoiceMapper;
 import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.models.enums.DocumentState;
+import com.data.dataxer.services.DocumentNumberGeneratorService;
 import com.data.dataxer.services.InvoiceService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,19 +18,25 @@ public class InvoiceController {
 
     private final InvoiceService invoiceService;
     private final InvoiceMapper invoiceMapper;
+    private final DocumentNumberGeneratorService documentNumberGeneratorService;
 
-    public InvoiceController(InvoiceService invoiceService, InvoiceMapper invoiceMapper) {
+    public InvoiceController(InvoiceService invoiceService, InvoiceMapper invoiceMapper, DocumentNumberGeneratorService documentNumberGeneratorService) {
         this.invoiceService = invoiceService;
         this.invoiceMapper = invoiceMapper;
+        this.documentNumberGeneratorService = documentNumberGeneratorService;
     }
 
     @PostMapping("/store")
     public void store(@RequestBody InvoiceDTO invoiceDTO) {
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType(), true);
+
         this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
     }
 
-    @PostMapping("/storeTaxDocument")
-    public void storeTaxDocument(@RequestParam(value = "id") Long id, @RequestBody InvoiceDTO invoiceDTO) {
+    @RequestMapping(value = "/storeTaxDocument", method = RequestMethod.POST)
+    public void storeTaxDocument(
+            @RequestParam(value = "id") Long id,
+            @RequestBody InvoiceDTO invoiceDTO) {
         this.invoiceService.storeTaxDocument(this.invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), id);
     }
 
@@ -50,7 +57,7 @@ public class InvoiceController {
     public void changeState(
             @RequestParam(value = "id") Long id,
             @RequestParam(value = "documentState") DocumentState newState
-            ) {
+    ) {
         this.invoiceService.changeState(id, newState);
     }
 
@@ -90,5 +97,4 @@ public class InvoiceController {
     public ResponseEntity<InvoiceDTO> getSummaryInvoice(@PathVariable Long id) {
         return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateSummaryInvoice(id)));
     }
-
 }

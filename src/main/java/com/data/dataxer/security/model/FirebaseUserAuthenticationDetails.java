@@ -18,7 +18,7 @@ public class FirebaseUserAuthenticationDetails implements UserDetails {
 
     public FirebaseUserAuthenticationDetails(AppUser user, CompanyRepository companyRepository) {
         this.user = user;
-        this.companies = companyRepository.findByAppUserId(this.user.getId());
+        this.companies = companyRepository.findByAppUserIdOrderByIdDesc(this.user.getId());
     }
 
     public AppUser getLoggedUser() {

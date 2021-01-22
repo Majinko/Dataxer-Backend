@@ -26,7 +26,17 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public BankAccount update(BankAccount bankAccount) {
-        return bankAccountRepository.save(bankAccount);
+        return this.bankAccountRepository.findById(bankAccount.getId()).map(account -> {
+
+            account.setAccountNumber(bankAccount.getAccountNumber());
+            account.setBankCode(bankAccount.getBankCode());
+            account.setBankName(bankAccount.getBankName());
+            account.setCurrency(bankAccount.getCurrency());
+            account.setIban(bankAccount.getIban());
+            account.setSwift(bankAccount.getSwift());
+
+            return bankAccountRepository.save(account);
+        }).orElse(null);
     }
 
     @Override

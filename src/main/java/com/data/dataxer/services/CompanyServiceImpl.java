@@ -40,7 +40,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> findAll() {
-        return companyRepository.findByAppUserId(SecurityUtils.id());
+        return companyRepository.findByAppUserIdOrderByIdDesc(SecurityUtils.id());
     }
 
     @Override

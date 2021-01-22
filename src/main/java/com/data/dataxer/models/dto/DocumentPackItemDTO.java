@@ -12,6 +12,7 @@ public class DocumentPackItemDTO {
     private ItemDTO item;
     private Float qty;
     private String title;
+    private String unit;
     Integer position;
     private BigDecimal discount;
     private BigDecimal price;
