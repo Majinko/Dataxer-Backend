@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class QDemandRepositoryImpl implements QDemandRepository {
@@ -40,14 +41,14 @@ public class QDemandRepositoryImpl implements QDemandRepository {
     }
 
     @Override
-    public Demand getById(Long id, List<Long> companyIds) {
+    public Optional<Demand> getById(Long id, List<Long> companyIds) {
         QDemand qDemand = QDemand.demand;
 
-        return query.selectFrom(qDemand)
+        return Optional.ofNullable(query.selectFrom(qDemand)
                 .where(qDemand.company.id.in(companyIds))
                 .where(qDemand.id.eq(id))
                 .leftJoin(qDemand.category).fetchJoin()
                 .leftJoin(qDemand.contact).fetchJoin()
-                .fetchOne();
+                .fetchOne());
     }
 }

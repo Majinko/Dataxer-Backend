@@ -40,7 +40,8 @@ public class DemandServiceImpl implements DemandService {
 
     @Override
     public Demand getById(Long id) {
-        return this.qDemandRepository.getById(id, SecurityUtils.companyIds());
+        return this.qDemandRepository.getById(id, SecurityUtils.companyIds())
+                .orElseThrow(() -> new RuntimeException("Demand not found"));
     }
 
     @Override
