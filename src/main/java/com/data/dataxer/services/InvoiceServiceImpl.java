@@ -145,8 +145,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice originalInvoice = this.getById(id);
         Invoice duplicatedInvoice = new Invoice();
         BeanUtils.copyProperties(originalInvoice, duplicatedInvoice, "id", "packs");
-        this.invoiceRepository.save(duplicatedInvoice);
+        duplicatedInvoice.setPacks(this.duplicateDocumentPacks(originalInvoice.getPacks()));
         this.setInvoicePackAndItems(duplicatedInvoice);
+        this.invoiceRepository.save(duplicatedInvoice);
         return duplicatedInvoice;
     }
 
@@ -170,6 +171,26 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         return invoice;
+    }
+
+    private List<DocumentPack> duplicateDocumentPacks(List<DocumentPack> originalDocumentPacks) {
+        List<DocumentPack> duplicatedDocumentPacks = new ArrayList<>();
+        for (DocumentPack originalDocumentPack : originalDocumentPacks) {
+            DocumentPack duplicatePack = new DocumentPack();
+            duplicatePack.setPackItems(this.duplicateDocumentPackItems(originalDocumentPack.getPackItems()));
+            duplicatedDocumentPacks.add(duplicatePack);
+        }
+        return duplicatedDocumentPacks;
+    }
+
+    private List<DocumentPackItem> duplicateDocumentPackItems(List<DocumentPackItem> originalPackItems) {
+        List<DocumentPackItem> duplicatedDocumentPackItems = new ArrayList<>();
+        for (DocumentPackItem originalDocumentPackItem : originalPackItems) {
+            DocumentPackItem duplicatedDocumentPackItem = new DocumentPackItem();
+            BeanUtils.copyProperties(originalDocumentPackItem, duplicatedDocumentPackItem, "id", "pack");
+            duplicatedDocumentPackItems.add(duplicatedDocumentPackItem);
+        }
+        return duplicatedDocumentPackItems;
     }
 
     private void setPropertiesForTaxDocument(Invoice proformaInvoice, Invoice taxDocument) {
