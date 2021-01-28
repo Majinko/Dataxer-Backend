@@ -109,6 +109,19 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
         return payedTotalPrice;
     }
 
+    @Override
+    public List<Payment> getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(Long documentId, List<Long> companyIds) {
+        QPayment qPayment = QPayment.payment;
+
+        return this.query.selectFrom(qPayment)
+                .where(qPayment.documentId.eq(documentId))
+                .where(qPayment.taxDocumentCreated.eq(false))
+                .where(qPayment.company.id.in(companyIds))
+                .orderBy(qPayment.payedDate.desc())
+                .fetch();
+
+    }
+
     private long total() {
         QPayment qPayment = QPayment.payment;
         return this.query.selectFrom(qPayment).fetchCount();
