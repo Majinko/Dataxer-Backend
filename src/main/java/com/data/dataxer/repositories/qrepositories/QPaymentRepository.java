@@ -18,4 +18,6 @@ public interface QPaymentRepository {
     BigDecimal getDocumentTotalPrice(Long id, DocumentType documentType);
 
     BigDecimal getPayedTotalPrice(Long id);
+
+    List<Payment> getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(Long documentId, List<Long> companyIds);
 }

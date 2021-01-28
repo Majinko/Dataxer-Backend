@@ -1,5 +1,7 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.filters.Filter;
+import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.domain.Payment;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
@@ -11,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -37,7 +40,7 @@ public class PaymentServiceImpl implements PaymentService {
         this.paymentRepository.save(payment);
         if (this.documentIsPayed(payment)) {
             if (payment.getDocumentType().equals(DocumentType.INVOICE)) {
-                this.invoiceService.changeState(payment.getDocumentId(), DocumentState.PAYED);
+                this.invoiceService.changeState(payment.getDocumentId(), DocumentState.PAYED, payment.getPayedDate());
             }
             if (payment.getDocumentType().equals(DocumentType.PRICE_OFFER)) {
                 //not implemented now
@@ -65,7 +68,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public void destroy(Long id) {
-        this.paymentRepository.delete(this.getById(id));
+        Payment payment = this.getById(id);
+        Invoice invoice = this.invoiceService.getById(payment.getDocumentId());
+        if (invoice.getState() != DocumentState.PAYED && invoice.getPaymentDate() != null) {
+            invoice.setState(DocumentState.WAITING);
+            invoice.setPaymentDate(null);
+            this.invoiceService.update(invoice);
+        }
+        this.paymentRepository.delete(payment);
     }
 
     @Override
@@ -74,6 +84,11 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(documentId);
 
         return documentTotalPrice.subtract(payedTotalPrice);
+    }
+
+    @Override
+    public List<Payment> getWithoutTaxDocumentCreatedByDocumentId(Long documentId) {
+        return this.qPaymentRepository.getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(documentId, SecurityUtils.companyIds());
     }
 
     private boolean documentIsPayed(Payment payment) {
