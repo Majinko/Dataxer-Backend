@@ -29,8 +29,8 @@ public class DemandServiceImpl implements DemandService {
     }
 
     @Override
-    public Page<Demand> paginate(Pageable pageable) {
-        return qDemandRepository.paginate(pageable, SecurityUtils.companyIds());
+    public Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return qDemandRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     private Demand getByIdSimple(Long id) {

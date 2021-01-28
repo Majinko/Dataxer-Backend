@@ -8,9 +8,10 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ItemService  {
+
     Item store(Item item, ItemPrice itemPrice);
 
-    Page<Item> paginate(Pageable pageable);
+    Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     Item update(Item item, ItemPrice itemPrice);
 

@@ -14,5 +14,5 @@ public interface FileService {
 
     File getFileByName(String fileName);
 
-    Page<File> paginate(Pageable pageable);
+    Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 }

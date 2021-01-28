@@ -55,8 +55,8 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Page<Payment> paginate(Pageable pageable, Filter filter) {
-        return this.qPaymentRepository.paginate(pageable, filter, SecurityUtils.companyIds());
+    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override

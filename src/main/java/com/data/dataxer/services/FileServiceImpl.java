@@ -22,7 +22,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -96,8 +95,8 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public Page<File> paginate(Pageable pageable) {
-        return this.qFileRepository.paginate(pageable, SecurityUtils.companyIds());
+    public Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qFileRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     private String loadCompanyUploadDirectory() {

@@ -1,6 +1,5 @@
 package com.data.dataxer.controllers;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.mappers.PaymentMapper;
 import com.data.dataxer.models.dto.PaymentDTO;
 import com.data.dataxer.models.enums.DocumentType;
@@ -40,12 +39,12 @@ public class PaymentController {
     public ResponseEntity<Page<PaymentDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "sort", defaultValue = "id") String sortColumn,
-            @RequestBody(required = false) Filter filter
+            @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
+            @RequestParam(value = "sortExpression", defaultValue = "sort(+payment.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.paymentService.paginate(pageable, filter).map(this.paymentMapper::paymentToPaymentDTOSimple));
+        return ResponseEntity.ok(this.paymentService.paginate(pageable, rqlFilter, sortExpression).map(this.paymentMapper::paymentToPaymentDTOSimple));
     }
 
     @RequestMapping(value = "/restToPay", method = RequestMethod.GET)
