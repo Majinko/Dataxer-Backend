@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public interface PaymentService {
 
@@ -21,4 +22,7 @@ public interface PaymentService {
     void destroy(Long id);
 
     BigDecimal getRestToPay(Long documentId, DocumentType documentType);
+
+    List<Payment> getWithoutTaxDocumentCreatedByDocumentId(Long documentId);
+
 }
