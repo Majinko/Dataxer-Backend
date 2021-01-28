@@ -6,8 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface InvoiceService {
-
     void store(Invoice invoice);
+
+    void store(Invoice invoice, Long oldInvoiceId);
 
     Invoice storeTaxDocument(Invoice taxDocument, Long proformaInvoiceId);
 
@@ -30,4 +31,6 @@ public interface InvoiceService {
     Invoice generateTaxDocument(Long id);
 
     Invoice generateSummaryInvoice(Long id);
+
+    Invoice changeTypeAndSave(Long id, String type, String number);
 }

@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -27,8 +28,8 @@ public class PaymentController {
     }
 
     @PostMapping("/store")
-    public void store(@RequestBody PaymentDTO paymentDTO) {
-        this.paymentService.store(this.paymentMapper.paymentDTOtoPayment(paymentDTO));
+    public ResponseEntity<PaymentDTO> store(@RequestBody PaymentDTO paymentDTO) {
+        return ResponseEntity.ok(this.paymentMapper.paymentToPaymentDTO(this.paymentService.store(paymentMapper.paymentDTOtoPayment(paymentDTO))));
     }
 
     @PostMapping("/update")
@@ -48,17 +49,18 @@ public class PaymentController {
         return ResponseEntity.ok(this.paymentService.paginate(pageable, filter).map(this.paymentMapper::paymentToPaymentDTOSimple));
     }
 
-    @RequestMapping(value = "/restToPay", method = RequestMethod.GET)
-    public BigDecimal getRestToPay(
-            @RequestParam(value = "id") Long documentId,
-            @RequestParam(value = "documentType") DocumentType documentType
-    ) {
-        return this.paymentService.getRestToPay(documentId, documentType);
+    @GetMapping("/restToPay/{id}/{type}")
+    public BigDecimal getRestToPay(@PathVariable Long id, @PathVariable String type) {
+        return this.paymentService.getRestToPay(id, DocumentType.valueOf(type));
+    }
+
+    @GetMapping("/document-payments/{id}/{type}")
+    public ResponseEntity<List<PaymentDTO>> getDocumentPayments(@PathVariable Long id, @PathVariable String type) {
+        return ResponseEntity.ok(this.paymentMapper.paymentsToPaymentDTOs(paymentService.getDocumentPayments(id, DocumentType.valueOf(type))));
     }
 
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.paymentService.destroy(id);
     }
-
 }

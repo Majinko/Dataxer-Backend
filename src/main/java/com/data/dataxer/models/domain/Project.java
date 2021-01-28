@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
+@SQLDelete(sql = "UPDATE project SET deleted_at = now() WHERE id = ?")
 public class Project extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

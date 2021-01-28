@@ -42,7 +42,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     @Override
     public DocumentNumberGenerator update(DocumentNumberGenerator documentNumberGenerator) {
         FormatValidator.validateFormat(documentNumberGenerator.getFormat(), documentNumberGenerator.getPeriod());
-        
+
         if (documentNumberGenerator.getIsDefault()) {
             this.handleIfDefaultAlreadyExist(documentNumberGenerator, true);
         }
@@ -86,6 +86,11 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         }
 
         return this.generateNextDocumentNumber(documentNumberGenerator, storeGenerated);
+    }
+
+    @Override
+    public String generateNextNumberByDocumentTypeFromString(String type) {
+        return this.generateNextNumberByDocumentType(DocumentType.valueOf(type), true);
     }
 
     private DocumentNumberGenerator returnDefault(DocumentType type) {

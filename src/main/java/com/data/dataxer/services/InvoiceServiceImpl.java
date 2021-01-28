@@ -48,6 +48,21 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     @Transactional
+    public void store(Invoice invoice, Long oldInvoiceId) { // store invoice from old invoice
+        invoice.getPacks().forEach(documentPack -> {
+            documentPack.setId(null);
+
+            documentPack.getPackItems().forEach(documentPackItem -> {
+                documentPackItem.setId(null);
+            });
+        });
+
+        this.store(invoice);
+        this.storeRelation(invoice.getId(), oldInvoiceId);
+    }
+
+    @Override
+    @Transactional
     public Invoice storeTaxDocument(Invoice taxDocument, Long proformaInvoiceId) {
         Invoice i = this.invoiceRepository.save(taxDocument);
 
@@ -118,7 +133,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         taxDocument.setState(DocumentState.PAYED);
         taxDocument.setDiscount(BigDecimal.ZERO);
         taxDocument.setCreatedDate(LocalDate.now());
-        taxDocument.setDocumentType(DocumentType.TAX_DOCUMENT);
+        taxDocument.setDocumentType(DocumentType.INVOICE);
         this.setPropertiesForTaxDocument(invoice, taxDocument);
         return taxDocument;
     }
@@ -137,6 +152,27 @@ public class InvoiceServiceImpl implements InvoiceService {
         taxDocument.setDocumentType(DocumentType.SUMMARY_INVOICE);
         this.setPropertiesForSummaryInvoice(proformaInvoice, taxDocument, summaryInvoice);
         return summaryInvoice;
+    }
+
+    @Override
+    @Transactional
+    public Invoice changeTypeAndSave(Long id, String type, String number) {
+        Invoice originalInvoice = this.getById(id);
+        Invoice invoice = new Invoice();
+
+        BeanUtils.copyProperties(originalInvoice, invoice, "id", "packs");
+
+        invoice.setNumber(number);
+        invoice.setVariableSymbol(number);
+        invoice.setTitle(this.generateInvoiceTitle(type, number));
+        invoice.setDeliveredDate(LocalDate.now());
+        invoice.setCreatedDate(LocalDate.now());
+        invoice.setDueDate(LocalDate.now().plusDays(14));
+        invoice.setDocumentType(DocumentType.valueOf(type.toUpperCase()));
+
+        this.invoiceRepository.save(invoice);
+
+        return invoice;
     }
 
     @Override
@@ -263,5 +299,19 @@ public class InvoiceServiceImpl implements InvoiceService {
             payment.setTaxDocumentCreated(Boolean.TRUE);
             this.paymentRepository.save(payment);
         }
+    }
+
+    private String generateInvoiceTitle(String type, String number) {
+        String title;
+
+        switch (type) {
+            case "PROFORMA":
+                title = "Zálohová faktúra " + number;
+                break;
+            default:
+                title = "Faktúra " + number;
+        }
+
+        return title;
     }
 }

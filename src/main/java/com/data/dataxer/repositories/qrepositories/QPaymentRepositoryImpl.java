@@ -32,10 +32,6 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
         QPayment qPayment = QPayment.payment;
         BooleanBuilder filterCondition = new BooleanBuilder();
 
-        //will be implemented later
-        /*if (!filter.isEmpty()) {
-            filterCondition = filter.buildPaymentFilterPredicate();
-        }*/
         List<Payment> payments = this.query
                 .selectFrom(qPayment)
                 .where(qPayment.company.id.in(companyIds))

@@ -33,10 +33,15 @@ public class InvoiceController {
         this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
     }
 
+    @PostMapping("/store/{oldInvoiceId}")
+    public void store(@RequestBody InvoiceDTO invoiceDTO, @PathVariable Long oldInvoiceId) {
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType(), true);
+
+        this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), oldInvoiceId);
+    }
+
     @RequestMapping(value = "/storeTaxDocument", method = RequestMethod.POST)
-    public void storeTaxDocument(
-            @RequestParam(value = "id") Long id,
-            @RequestBody InvoiceDTO invoiceDTO) {
+    public void storeTaxDocument(@RequestParam(value = "id") Long id, @RequestBody InvoiceDTO invoiceDTO) {
         this.invoiceService.storeTaxDocument(this.invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), id);
     }
 
@@ -96,5 +101,10 @@ public class InvoiceController {
     @GetMapping("/summary-invoice/{id}")
     public ResponseEntity<InvoiceDTO> getSummaryInvoice(@PathVariable Long id) {
         return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateSummaryInvoice(id)));
+    }
+
+    @GetMapping("/change-type-create-new/{id}/{type}")
+    public ResponseEntity<InvoiceDTO> changeType(@PathVariable Long id, @PathVariable String type) {
+        return ResponseEntity.ok(invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.changeTypeAndSave(id, type, documentNumberGeneratorService.generateNextNumberByDocumentTypeFromString(type))));
     }
 }

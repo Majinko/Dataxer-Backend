@@ -11,12 +11,10 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class PaymentDTO {
-
     private Long id;
     private Long documentId;
     private DocumentType documentType;
     private BigDecimal payedValue;
     private PaymentMethod paymentMethod;
     private LocalDate payedDate;
-
 }

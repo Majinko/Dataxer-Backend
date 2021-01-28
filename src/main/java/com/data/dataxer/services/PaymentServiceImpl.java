@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import javax.print.Doc;
 import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -35,8 +36,9 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public void store(Payment payment) {
+    public Payment store(Payment payment) {
         this.paymentRepository.save(payment);
+
         if (this.documentIsPayed(payment)) {
             if (payment.getDocumentType().equals(DocumentType.INVOICE)) {
                 this.invoiceService.changeState(payment.getDocumentId(), DocumentState.PAYED);
@@ -46,6 +48,8 @@ public class PaymentServiceImpl implements PaymentService {
                 //this.priceOfferService.setPayed(payment.getDocumentId());
             }
         }
+
+        return payment;
     }
 
     @Override
@@ -76,6 +80,11 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(documentId);
 
         return documentTotalPrice.subtract(payedTotalPrice);
+    }
+
+    @Override
+    public List<Payment> getDocumentPayments(Long id, DocumentType type) {
+        return this.paymentRepository.findAllByDocumentIdAndDocumentType(id, type);
     }
 
     private boolean documentIsPayed(Payment payment) {

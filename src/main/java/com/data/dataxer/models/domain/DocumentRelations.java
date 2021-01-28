@@ -12,7 +12,6 @@ import javax.persistence.Id;
 @Getter
 @Setter
 public class DocumentRelations extends BaseEntity{
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
@@ -20,5 +19,4 @@ public class DocumentRelations extends BaseEntity{
     private Long documentId;
 
     private Long relationDocumentId;
-
 }

@@ -22,6 +22,8 @@ public interface DocumentNumberGeneratorService {
 
     String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated);
 
+    String generateNextNumberByDocumentTypeFromString(String type);
+
     String getNextNumber(DocumentNumberGenerator documentNumberGenerator);
 
     void resetGenerationByType(DocumentType documentType);
