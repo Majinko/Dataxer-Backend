@@ -37,11 +37,12 @@ public class ItemController {
     public ResponseEntity<Page<ItemDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "sort", defaultValue = "id") String sort
+            @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
+            @RequestParam(value = "sortExpression", defaultValue = "sort(+item.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(sort));
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
 
-        return ResponseEntity.ok(itemService.paginate(pageable).map((itemMapper::itemToItemDtoSimple)));
+        return ResponseEntity.ok(itemService.paginate(pageable, rqlFilter, sortExpression).map((itemMapper::itemToItemDtoSimple)));
     }
 
     @PostMapping("/store")

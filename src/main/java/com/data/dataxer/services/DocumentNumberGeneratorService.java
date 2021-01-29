@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
 import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
@@ -12,7 +11,7 @@ public interface DocumentNumberGeneratorService {
 
     DocumentNumberGenerator update(DocumentNumberGenerator documentNumberGenerator);
 
-    Page<DocumentNumberGenerator> paginate(Pageable pageable, Filter filter);
+    Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     DocumentNumberGenerator getById(Long id);
 

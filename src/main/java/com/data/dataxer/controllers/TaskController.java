@@ -48,11 +48,13 @@ public class TaskController {
     @GetMapping("/paginate")
     public ResponseEntity<Page<TaskDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "15") int size
+            @RequestParam(value = "size", defaultValue = "15") int size,
+            @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
+            @RequestParam(value = "sortExpression", defaultValue = "sort(+task.id)") String sortExpression
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(taskService.paginate(pageable).map(taskMapper::taskToTaskDTOPaginate));
+        return ResponseEntity.ok(taskService.paginate(pageable, rqlFilter, sortExpression).map(taskMapper::taskToTaskDTO));
     }
 
     @GetMapping("/{id}")

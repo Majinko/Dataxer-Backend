@@ -2,7 +2,17 @@ package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.QCost;
-import com.querydsl.core.QueryResults;
+import com.github.vineey.rql.filter.parser.DefaultFilterParser;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
+import com.github.vineey.rql.querydsl.sort.OrderSpecifierList;
+import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
+import com.github.vineey.rql.sort.parser.DefaultSortParser;
+import com.google.common.collect.ImmutableMap;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
@@ -12,7 +22,10 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
 @Repository
 public class QCostRepositoryImpl implements QCostRepository {
@@ -24,20 +37,33 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Page<Cost> paginate(Pageable pageable, List<Long> companyIds) {
+    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+        DefaultSortParser sortParser = new DefaultSortParser();
+        DefaultFilterParser filterParser = new DefaultFilterParser();
+        Predicate predicate = new BooleanBuilder();
+
         QCost qCost = QCost.cost;
 
-        QueryResults<Cost> costResults = this.query.selectFrom(qCost)
-                .leftJoin(qCost.contact).fetchJoin()
-                .leftJoin(qCost.project).fetchJoin()
-                .leftJoin(qCost.category).fetchJoin()
-                .where(qCost.company.id.in(companyIds))
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .orderBy(qCost.id.desc())
-                .fetchResults();
+        Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
+                .put("cost.id", QCost.cost.id)
+                .build();
 
-        return new PageImpl<>(costResults.getResults(), pageable, costResults.getTotal());
+        if (!rqlFilter.equals("")) {
+            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
+                    .setMapping(pathMapping)));
+        }
+        OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
+
+        List<Cost> costList = this.query.selectFrom(qCost)
+                .leftJoin(qCost.contact).fetchJoin()
+                .where(predicate)
+                .where(qCost.company.id.in(companyIds))
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(costList, pageable, getTotalCount(predicate));
     }
 
     @Override
@@ -61,5 +87,13 @@ public class QCostRepositoryImpl implements QCostRepository {
         return query.selectFrom(QCost.cost)
                 .where(QCost.cost.company.id.in(companyIds))
                 .where(QCost.cost.id.eq(id));
+    }
+
+    private long getTotalCount(Predicate predicate) {
+        QCost qCost = QCost.cost;
+
+        return this.query.selectFrom(qCost)
+                .where(predicate)
+                .fetchCount();
     }
 }

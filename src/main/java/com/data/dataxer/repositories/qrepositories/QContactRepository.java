@@ -1,23 +1,19 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.Contact;
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface QContactRepository {
-    public List<Contact> filtering(Predicate predicate);
-    
-    public List<Contact> allWithProjects(List<Long> companyIds);
 
-    public Contact getById(Long id);
+    List<Contact> allWithProjects(List<Long> companyIds);
 
-    public Contact getByEmail(String email);
+    Page<Contact> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
 
-    public Contact getByName(String name);
-
-    Iterable<Contact> findAll(BooleanExpression exp);
+    Optional<Contact> getById(Long id, List<Long> companyIds);
 
     List<Contact> getAllByIds(List<Long> contactIds, List<Long> companyIds);
 }

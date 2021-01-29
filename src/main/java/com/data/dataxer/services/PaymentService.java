@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Payment;
 import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
@@ -16,7 +15,7 @@ public interface PaymentService {
 
     void update(Payment payment);
 
-    Page<Payment> paginate(Pageable pageable, Filter filter);
+    Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     Payment getById(Long id);
 
@@ -25,4 +24,6 @@ public interface PaymentService {
     BigDecimal getRestToPay(Long documentId, DocumentType documentType);
 
     List<Payment> getDocumentPayments(Long id, DocumentType type);
+
+    List<Payment> getWithoutTaxDocumentCreatedByDocumentId(Long documentId);
 }

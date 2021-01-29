@@ -1,12 +1,22 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QInvoice;
+import com.data.dataxer.models.domain.QPack;
 import com.data.dataxer.models.domain.QPayment;
 import com.data.dataxer.models.domain.QPriceOffer;
 import com.data.dataxer.models.enums.DocumentType;
+import com.github.vineey.rql.filter.parser.DefaultFilterParser;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
+import com.github.vineey.rql.querydsl.sort.OrderSpecifierList;
+import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
+import com.github.vineey.rql.sort.parser.DefaultSortParser;
+import com.google.common.collect.ImmutableMap;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -16,7 +26,10 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
 @Repository
 public class QPaymentRepositoryImpl implements QPaymentRepository {
@@ -28,20 +41,32 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public Page<Payment> paginate(Pageable pageable, Filter filter, List<Long> companyIds) {
-        QPayment qPayment = QPayment.payment;
-        BooleanBuilder filterCondition = new BooleanBuilder();
+    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+        DefaultSortParser sortParser = new DefaultSortParser();
+        DefaultFilterParser filterParser = new DefaultFilterParser();
+        Predicate predicate = new BooleanBuilder();
 
-        List<Payment> payments = this.query
-                .selectFrom(qPayment)
+        QPayment qPayment = QPayment.payment;
+
+        Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
+                .put("payment.id", QPayment.payment.id)
+                .build();
+
+        if (!rqlFilter.equals("")) {
+            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
+                    .setMapping(pathMapping)));
+        }
+        OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
+
+        List<Payment> paymentList = this.query.selectFrom(qPayment)
+                .where(predicate)
                 .where(qPayment.company.id.in(companyIds))
-                .where(filterCondition)
-                .limit(pageable.getPageSize())
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
-                .orderBy(qPayment.id.desc())
+                .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(payments, pageable, total());
+        return new PageImpl<>(paymentList, pageable, getTotalCount(predicate));
     }
 
     @Override
@@ -105,8 +130,24 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
         return payedTotalPrice;
     }
 
-    private long total() {
+    @Override
+    public List<Payment> getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(Long documentId, List<Long> companyIds) {
         QPayment qPayment = QPayment.payment;
-        return this.query.selectFrom(qPayment).fetchCount();
+
+        return this.query.selectFrom(qPayment)
+                .where(qPayment.documentId.eq(documentId))
+                .where(qPayment.taxDocumentCreated.eq(false))
+                .where(qPayment.company.id.in(companyIds))
+                .orderBy(qPayment.payedDate.desc())
+                .fetch();
+
+    }
+
+    private long getTotalCount(Predicate predicate) {
+        QPayment qPayment = QPayment.payment;
+
+        return this.query.selectFrom(qPayment)
+                .where(predicate)
+                .fetchCount();
     }
 }

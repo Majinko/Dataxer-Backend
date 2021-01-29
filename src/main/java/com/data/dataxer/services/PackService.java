@@ -1,7 +1,6 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Pack;
-import com.data.dataxer.models.domain.PackItem;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -12,7 +11,7 @@ public interface PackService {
 
     Pack getByIdSimple(Long id);
 
-    Page<Pack> paginate(Pageable pageable);
+    Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     void destroy(Long id);
 

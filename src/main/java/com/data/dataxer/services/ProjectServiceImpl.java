@@ -36,8 +36,8 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public Page<Project> paginate(Pageable pageable) {
-        return qProjectRepository.paginate(pageable, SecurityUtils.companyIds());
+    public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return qProjectRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override

@@ -1,28 +1,41 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.models.domain.Contact;
+import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QContact;
 import com.data.dataxer.models.domain.QProject;
+import com.github.vineey.rql.filter.parser.DefaultFilterParser;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
+import com.github.vineey.rql.querydsl.sort.OrderSpecifierList;
+import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
+import com.github.vineey.rql.sort.parser.DefaultSortParser;
+import com.google.common.collect.ImmutableMap;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
 @Repository
 public class QContactRepositoryImpl implements QContactRepository {
+
     private final JPAQueryFactory query;
 
     private QContact CONTACT = QContact.contact;
 
     public QContactRepositoryImpl(EntityManager entityManager) {
         this.query = new JPAQueryFactory(entityManager);
-    }
-
-    public List<Contact> filtering(Predicate predicate) {
-        return query.selectFrom(CONTACT).where(predicate).fetch();
     }
 
     @Override
@@ -38,23 +51,43 @@ public class QContactRepositoryImpl implements QContactRepository {
     }
 
     @Override
-    public Contact getById(Long id) {
-        return null;
+    public Page<Contact> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+        DefaultSortParser sortParser = new DefaultSortParser();
+        DefaultFilterParser filterParser = new DefaultFilterParser();
+        Predicate predicate = new BooleanBuilder();
+
+        QContact qContact = QContact.contact;
+
+        Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
+                .put("contact.id", QContact.contact.id)
+                .put("contact.name", QContact.contact.name)
+                .put("contact.email", QContact.contact.email)
+                .build();
+
+        if (!rqlFilter.equals("")) {
+            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
+                    .setMapping(pathMapping)));
+        }
+        OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
+
+        List<Contact> contactList = this.query.selectFrom(qContact)
+                .leftJoin(qContact.projects).fetchJoin()
+                .where(predicate)
+                .where(qContact.company.id.in(companyIds))
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(contactList, pageable, getTotalCount(predicate));
     }
 
     @Override
-    public Contact getByEmail(String email) {
-        return null;
-    }
-
-    @Override
-    public Contact getByName(String name) {
-        return null;
-    }
-
-    @Override
-    public Iterable<Contact> findAll(BooleanExpression exp) {
-        return query.selectFrom(QContact.contact).where(exp).fetch();
+    public Optional<Contact> getById(Long id, List<Long> companyIds) {
+        return Optional.ofNullable(this.query.selectFrom(CONTACT)
+                .where(CONTACT.id.eq(id))
+                .where(CONTACT.company.id.in(companyIds))
+                .fetchOne());
     }
 
     @Override
@@ -63,5 +96,13 @@ public class QContactRepositoryImpl implements QContactRepository {
                 .where(CONTACT.id.in(contactIds))
                 .where(CONTACT.company.id.in(companyIds))
                 .fetch();
+    }
+
+    private long getTotalCount(Predicate predicate) {
+        QContact qContact = QContact.contact;
+
+        return this.query.selectFrom(qContact)
+                .where(predicate)
+                .fetchCount();
     }
 }

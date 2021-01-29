@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.filters.Filter;
 import com.data.dataxer.models.domain.Time;
 import com.data.dataxer.repositories.TimeRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
@@ -49,8 +48,8 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public Page<Time> paginate(Pageable pageable, String rqlFilter) {
+    public Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
         return this.qTimeRepository
-                .paginate(pageable, rqlFilter, SecurityUtils.id(),  SecurityUtils.companyIds());
+                .paginate(pageable, rqlFilter, sortExpression, SecurityUtils.id(), SecurityUtils.companyIds());
     }
 }

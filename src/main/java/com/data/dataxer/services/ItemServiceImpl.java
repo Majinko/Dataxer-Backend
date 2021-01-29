@@ -39,8 +39,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Page<Item> paginate(Pageable pageable) {
-        return qItemRepository.paginate(pageable, SecurityUtils.companyIds());
+    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return qItemRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override

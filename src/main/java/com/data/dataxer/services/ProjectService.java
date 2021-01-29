@@ -13,7 +13,7 @@ public interface ProjectService {
 
     Project getById(Long id);
 
-    Page<Project> paginate(Pageable pageable);
+    Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     void destroy(Long id);
 

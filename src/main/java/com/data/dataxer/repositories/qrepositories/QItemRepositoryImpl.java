@@ -1,6 +1,21 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QCategory;
+import com.data.dataxer.models.domain.QContact;
+import com.data.dataxer.models.domain.QItem;
+import com.data.dataxer.models.domain.QItemPrice;
+import com.github.vineey.rql.filter.parser.DefaultFilterParser;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
+import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
+import com.github.vineey.rql.querydsl.sort.OrderSpecifierList;
+import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
+import com.github.vineey.rql.sort.parser.DefaultSortParser;
+import com.google.common.collect.ImmutableMap;
+import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.Path;
+import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -9,7 +24,10 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+
+import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
 @Repository
 public class QItemRepositoryImpl implements QItemRepository {
@@ -49,18 +67,40 @@ public class QItemRepositoryImpl implements QItemRepository {
     }
 
     @Override
-    public Page<Item> paginate(Pageable pageable, List<Long> companyIds) {
-        List<Item> items = query.selectFrom(QItem.item)
-                .where(QItem.item.company.id.in(companyIds))
+    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+        DefaultSortParser sortParser = new DefaultSortParser();
+        DefaultFilterParser filterParser = new DefaultFilterParser();
+        Predicate predicate = new BooleanBuilder();
+
+        QItem qItem = QItem.item;
+
+        Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
+                .put("item.id", QItem.item.id)
+                .build();
+
+        if (!rqlFilter.equals("")) {
+            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
+                    .setMapping(pathMapping)));
+        }
+        OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
+
+        List<Item> itemList = this.query.selectFrom(qItem)
                 .leftJoin(QItem.item.itemPrices).fetchJoin()
-                .distinct()
+                .where(predicate)
+                .where(qItem.company.id.in(companyIds))
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<Item>(items, pageable, total(companyIds));
+        return new PageImpl<>(itemList, pageable, getTotalCount(predicate));
     }
 
-    private long total(List<Long> companyIds) {
-        return query.selectFrom(QItem.item)
-                .where(QItem.item.company.id.in(companyIds)).fetchCount();
+    private long getTotalCount(Predicate predicate) {
+        QItem qItem = QItem.item;
+
+        return this.query.selectFrom(qItem)
+                .where(predicate)
+                .fetchCount();
     }
 }

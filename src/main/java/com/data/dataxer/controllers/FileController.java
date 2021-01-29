@@ -93,10 +93,11 @@ public class FileController {
     public ResponseEntity<Page<FileDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
-            @RequestParam(value = "sort", defaultValue = "id") String sortColumn
+            @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
+            @RequestParam(value = "sortExpression", defaultValue = "sort(+file.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc(sortColumn)));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.fileService.paginate(pageable).map(this.fileMapper::fileToFileDTO));
+        return ResponseEntity.ok(this.fileService.paginate(pageable, rqlFilter, sortExpression).map(this.fileMapper::fileToFileDTO));
     }
 }

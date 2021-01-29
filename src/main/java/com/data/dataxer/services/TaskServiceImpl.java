@@ -36,8 +36,8 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Page<Task> paginate(Pageable pageable) {
-        return this.qTaskRepository.paginate(pageable, SecurityUtils.companyIds());
+    public Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qTaskRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override

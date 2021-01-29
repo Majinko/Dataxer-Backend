@@ -12,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/api/invoice")
 public class InvoiceController {
@@ -61,9 +63,10 @@ public class InvoiceController {
     @RequestMapping(value = "/changeState", method = RequestMethod.PUT)
     public void changeState(
             @RequestParam(value = "id") Long id,
-            @RequestParam(value = "documentState") DocumentState newState
-    ) {
-        this.invoiceService.changeState(id, newState);
+            @RequestParam(value = "documentState") DocumentState newState,
+            @RequestParam(value = "payedDate") LocalDate payedDate
+            ) {
+        this.invoiceService.changeState(id, newState, payedDate);
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)

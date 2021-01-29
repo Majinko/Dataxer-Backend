@@ -10,7 +10,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 public class PackServiceImpl implements PackService {
@@ -48,8 +47,8 @@ public class PackServiceImpl implements PackService {
     }
 
     @Override
-    public Page<Pack> paginate(Pageable pageable) {
-        return this.qPackRepository.paginate(pageable, SecurityUtils.companyIds());
+    public Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qPackRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override
