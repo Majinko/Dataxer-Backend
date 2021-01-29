@@ -2,7 +2,6 @@ package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QInvoice;
-import com.data.dataxer.models.domain.QPack;
 import com.data.dataxer.models.domain.QPayment;
 import com.data.dataxer.models.domain.QPriceOffer;
 import com.data.dataxer.models.enums.DocumentType;
