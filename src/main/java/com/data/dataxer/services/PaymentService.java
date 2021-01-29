@@ -10,7 +10,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface PaymentService {
-
     Payment store(Payment payment);
 
     void update(Payment payment);

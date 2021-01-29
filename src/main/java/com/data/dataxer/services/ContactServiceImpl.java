@@ -1,8 +1,6 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Contact;
-
-import com.data.dataxer.models.domain.QContact;
 import com.data.dataxer.repositories.ContactRepository;
 import com.data.dataxer.repositories.qrepositories.QContactRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -11,9 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
-
-import static com.github.vineey.rql.querydsl.filter.QueryDslFilterContext.withMapping;
 
 @Service
 public class ContactServiceImpl implements ContactService {
