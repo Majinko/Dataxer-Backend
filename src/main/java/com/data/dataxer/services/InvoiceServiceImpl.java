@@ -4,7 +4,9 @@ import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.InvoiceRepository;
+import com.data.dataxer.repositories.PaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
+import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
@@ -22,15 +24,18 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private final InvoiceRepository invoiceRepository;
     private final QInvoiceRepository qInvoiceRepository;
-    private final PaymentService paymentService;
+    private final PaymentRepository paymentRepository;
+    private final QPaymentRepository qPaymentRepository;
     private final DocumentRelationServiceImpl documentRelationService;
 
     public InvoiceServiceImpl(InvoiceRepository invoiceRepository, QInvoiceRepository qInvoiceRepository,
-                              DocumentRelationServiceImpl documentRelationService, PaymentService paymentService) {
+                              DocumentRelationServiceImpl documentRelationService, QPaymentRepository qPaymentRepository,
+                              PaymentRepository paymentRepository) {
         this.invoiceRepository = invoiceRepository;
         this.qInvoiceRepository = qInvoiceRepository;
         this.documentRelationService = documentRelationService;
-        this.paymentService = paymentService;
+        this.paymentRepository = paymentRepository;
+        this.qPaymentRepository = qPaymentRepository;
     }
 
     @Override
@@ -226,7 +231,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private void setPropertiesForTaxDocument(Invoice proformaInvoice, Invoice taxDocument) {
-        List<Payment> payments = this.paymentService.getWithoutTaxDocumentCreatedByDocumentId(proformaInvoice.getId());
+        List<Payment> payments = this.qPaymentRepository.getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(proformaInvoice.getId(), SecurityUtils.companyIds());
         BigDecimal payed = BigDecimal.ZERO;
         for (Payment payment : payments) {
             payed = payed.add(payment.getPayedValue());
@@ -289,10 +294,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private void updatePaymentsOfTaxDocument(Long proformaInvoiceId) {
-        List<Payment> payments = this.paymentService.getWithoutTaxDocumentCreatedByDocumentId(proformaInvoiceId);
+        List<Payment> payments = this.qPaymentRepository.getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
         for (Payment payment : payments) {
             payment.setTaxDocumentCreated(Boolean.TRUE);
-            this.paymentService.update(payment);
+            this.paymentRepository.save(payment);
         }
     }
 
