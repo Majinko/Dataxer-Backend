@@ -143,7 +143,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
     }
 
-    private long total() {
+    private long getTotalCount(predicate) {
         QPayment qPayment = QPayment.payment;
 
         return this.query.selectFrom(qPayment)
