@@ -8,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface ContactService {
-
     Contact store(Contact contactDTO);
 
     Contact update(Contact contactDTO);
@@ -20,4 +19,8 @@ public interface ContactService {
     void destroy(Long id);
 
     List<Contact> getContactByIds(List<Long> contactIds);
+
+    List<Contact> findAll();
+
+    List<Contact> findByName(String name);
 }

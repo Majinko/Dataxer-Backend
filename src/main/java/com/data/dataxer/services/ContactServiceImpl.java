@@ -51,4 +51,16 @@ public class ContactServiceImpl implements ContactService {
     public List<Contact> getContactByIds(List<Long> contactIds) {
         return this.qContactRepository.getAllByIds(contactIds, SecurityUtils.companyIds());
     }
+
+    @Override
+    public List<Contact> findAll() {
+        return contactRepository.findAllByCompanyIdIn(SecurityUtils.companyIds()).orElse(null);
+    }
+
+    @Override
+    public List<Contact> findByName(String name) {
+        return contactRepository
+                .findFirst5ByNameContaining(name)
+                .orElseThrow(() -> new RuntimeException("Contact not found"));
+    }
 }

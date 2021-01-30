@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface InvoiceService {
     void store(Invoice invoice);
@@ -26,7 +27,7 @@ public interface InvoiceService {
 
     void destroy(Long id);
 
-    void changeState(Long id, DocumentState documentState, LocalDate payedDate);
+    void makePay(Long id, LocalDate payedDate);
 
     Invoice duplicate(Long id);
 
@@ -35,4 +36,6 @@ public interface InvoiceService {
     Invoice generateSummaryInvoice(Long id);
 
     Invoice changeTypeAndSave(Long id, String type, String number);
+
+    List<Invoice> findAllByRelatedDocuments(Long documentId);
 }

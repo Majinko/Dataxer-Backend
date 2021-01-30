@@ -10,6 +10,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/contact")
 public class ContactController {
@@ -52,5 +54,10 @@ public class ContactController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         contactService.destroy(id);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<ContactDTO>> all() {
+        return ResponseEntity.ok(contactMapper.toContactDTOs(contactService.findAll()));
     }
 }

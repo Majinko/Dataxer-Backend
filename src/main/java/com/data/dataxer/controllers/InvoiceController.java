@@ -13,11 +13,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/invoice")
 public class InvoiceController {
-
     private final InvoiceService invoiceService;
     private final InvoiceMapper invoiceMapper;
     private final DocumentNumberGeneratorService documentNumberGeneratorService;
@@ -65,8 +65,8 @@ public class InvoiceController {
             @RequestParam(value = "id") Long id,
             @RequestParam(value = "documentState") DocumentState newState,
             @RequestParam(value = "payedDate") LocalDate payedDate
-            ) {
-        this.invoiceService.changeState(id, newState, payedDate);
+    ) {
+        this.invoiceService.makePay(id, payedDate);
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
@@ -109,5 +109,10 @@ public class InvoiceController {
     @GetMapping("/change-type-create-new/{id}/{type}")
     public ResponseEntity<InvoiceDTO> changeType(@PathVariable Long id, @PathVariable String type) {
         return ResponseEntity.ok(invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.changeTypeAndSave(id, type, documentNumberGeneratorService.generateNextNumberByDocumentTypeFromString(type))));
+    }
+
+    @GetMapping("/all-related-invoices/{id}")
+    public ResponseEntity<List<InvoiceDTO>> findAllByRelatedDocuments(@PathVariable Long id) {
+        return ResponseEntity.ok(invoiceMapper.invoicesToInvoicesDTOWithoutRelation(this.invoiceService.findAllByRelatedDocuments(id)));
     }
 }

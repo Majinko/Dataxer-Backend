@@ -67,8 +67,7 @@ public class CostController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.costService
-                .paginate(pageable, rqlFilter, sortExpression).map(this.costMapper::costToCostDTO));
+        return ResponseEntity.ok(this.costService.paginate(pageable, rqlFilter, sortExpression).map(this.costMapper::costToCostDTOPaginate));
     }
 
     @GetMapping("/changeState")

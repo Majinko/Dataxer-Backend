@@ -15,7 +15,6 @@ import java.util.Optional;
 
 @Service
 public class DocumentRelationServiceImpl implements DocumentRelationService {
-
     private final DocumentRelationsRepository documentRelationsRepository;
     private final QDocumentRelationsRepository qDocumentRelationsRepository;
     private final QInvoiceRepository qInvoiceRepository;

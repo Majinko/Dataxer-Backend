@@ -114,12 +114,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public void changeState(Long id, DocumentState documentState, LocalDate payedDate) {
+    public void makePay(Long id, LocalDate payedDate) {
         Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds()).orElseThrow(() -> new RuntimeException("Invoice not found"));
 
-        invoice.setState(documentState);
         invoice.setPaymentDate(payedDate);
-
         this.invoiceRepository.save(invoice);
     }
 
@@ -174,6 +172,11 @@ public class InvoiceServiceImpl implements InvoiceService {
         this.invoiceRepository.save(invoice);
 
         return invoice;
+    }
+
+    @Override
+    public List<Invoice> findAllByRelatedDocuments(Long documentId) {
+        return this.invoiceRepository.findAllByIdInAndCompanyIdIn(this.documentRelationService.getAllRelationDocumentIds(documentId), SecurityUtils.companyIds());
     }
 
     @Override

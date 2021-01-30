@@ -39,12 +39,8 @@ public class PaymentServiceImpl implements PaymentService {
         this.paymentRepository.save(payment);
 
         if (this.documentIsPayed(payment)) {
-            if (payment.getDocumentType().equals(DocumentType.INVOICE)) {
-                this.invoiceService.changeState(payment.getDocumentId(), DocumentState.PAYED, payment.getPayedDate());
-            }
-            if (payment.getDocumentType().equals(DocumentType.PRICE_OFFER)) {
-                //not implemented now
-                //this.priceOfferService.setPayed(payment.getDocumentId());
+            if (payment.getDocumentType().equals(DocumentType.INVOICE) || payment.getDocumentType().equals(DocumentType.PROFORMA)) {
+                this.invoiceService.makePay(payment.getDocumentId(), payment.getPayedDate());
             }
         }
 
@@ -73,7 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = this.getById(id);
         Invoice invoice = this.invoiceService.getById(payment.getDocumentId());
 
-        if (invoice.getState() != DocumentState.PAYED && invoice.getPaymentDate() != null) {
+        if (invoice.getState() == DocumentState.PAYED && invoice.getPaymentDate() != null) {
             invoice.setState(DocumentState.WAITING);
             invoice.setPaymentDate(null);
             this.invoiceService.update(invoice);
