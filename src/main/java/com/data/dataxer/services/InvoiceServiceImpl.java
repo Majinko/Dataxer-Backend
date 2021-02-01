@@ -129,15 +129,21 @@ public class InvoiceServiceImpl implements InvoiceService {
     public List<DocumentPack> generateTaxDocumentPacks(Long proformaInvoiceId, Boolean allPayments) {
         List<DocumentPack> taxDocumentPacks = new ArrayList<>();
         BigDecimal payed = BigDecimal.ZERO;
-        Payment lastPayment = this.qPaymentRepository.getNewestWithoutTaxDocumentByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
-                .orElseThrow(() -> new RuntimeException("No suitable payment found"));
+        Payment lastPayment;
         if (allPayments) {
             List<Payment> payments = this.qPaymentRepository.getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
+            lastPayment = payments.get(0);
             for (Payment paymentTmp:payments) {
                 payed = payed.add(paymentTmp.getPayedValue());
+                paymentTmp.setTaxDocumentCreated(Boolean.TRUE);
+                this.paymentRepository.save(paymentTmp);
             }
         } else {
+            lastPayment = this.qPaymentRepository.getNewestWithoutTaxDocumentByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
+                    .orElseThrow(() -> new RuntimeException("No suitable payment found"));
             payed = lastPayment.getPayedValue();
+            lastPayment.setTaxDocumentCreated(Boolean.TRUE);
+            this.paymentRepository.save(lastPayment);
         }
         Invoice proformaInvoice = this.getById(proformaInvoiceId);
 
