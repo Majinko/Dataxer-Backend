@@ -17,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 @Service
@@ -124,19 +126,69 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Invoice generateTaxDocument(Long id) {
-        Invoice invoice = this.getById(id);
-        Invoice taxDocument = new Invoice();
-        BeanUtils.copyProperties(invoice, taxDocument,
-                "id", "packs", "title", "note", "number", "state", "discount", "price",
-                "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
-                "paymentMethod", "invoiceType");
-        taxDocument.setState(DocumentState.PAYED);
-        taxDocument.setDiscount(BigDecimal.ZERO);
-        taxDocument.setCreatedDate(LocalDate.now());
-        taxDocument.setDocumentType(DocumentType.INVOICE);
-        this.setPropertiesForTaxDocument(invoice, taxDocument);
-        return taxDocument;
+    public List<DocumentPack> generateTaxDocumentPacks(Long proformaInvoiceId, Boolean allPayments) {
+        List<DocumentPack> taxDocumentPacks = new ArrayList<>();
+        BigDecimal payed = BigDecimal.ZERO;
+        Payment lastPayment = this.qPaymentRepository.getNewestWithoutTaxDocumentByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
+                .orElseThrow(() -> new RuntimeException("No suitable payment found"));
+        if (allPayments) {
+            List<Payment> payments = this.qPaymentRepository.getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
+            for (Payment paymentTmp:payments) {
+                payed = payed.add(paymentTmp.getPayedValue());
+            }
+        } else {
+            payed = lastPayment.getPayedValue();
+        }
+        Invoice proformaInvoice = this.getById(proformaInvoiceId);
+
+        BigDecimal coveredPayedValue = this.getPayedValue(proformaInvoiceId);
+        HashMap<Integer, BigDecimal> valuesForTaxes = getTaxesValuesMap(proformaInvoice.getPacks());
+        //storing keys desc****************
+        ArrayList<Integer> sortedKeys = new ArrayList<>(valuesForTaxes.keySet());
+        Collections.sort(sortedKeys);
+        Collections.reverse(sortedKeys);
+        //*********************************
+
+        do {
+            if (coveredPayedValue.compareTo(BigDecimal.ZERO) != 0) {
+                if (coveredPayedValue.compareTo(valuesForTaxes.get(sortedKeys.get(0))) < 0) {
+                    BigDecimal tmpValue = valuesForTaxes.get(sortedKeys.get(0)).subtract(coveredPayedValue);
+                    valuesForTaxes.replace(sortedKeys.get(0), tmpValue);
+                    coveredPayedValue = BigDecimal.ZERO;
+                }  else if (coveredPayedValue.compareTo(valuesForTaxes.get(sortedKeys.get(0))) > 0) {
+                    coveredPayedValue = coveredPayedValue.subtract(valuesForTaxes.get(sortedKeys.get(0)));
+                    valuesForTaxes.remove(sortedKeys.get(0));
+                    sortedKeys.remove(0);
+                } else if (coveredPayedValue.compareTo(valuesForTaxes.get(sortedKeys.get(0))) == 0){
+                    coveredPayedValue = BigDecimal.ZERO;
+                    valuesForTaxes.remove(sortedKeys.get(0));
+                    sortedKeys.remove(0);
+                }
+            } else {
+                if (payed.compareTo(valuesForTaxes.get(sortedKeys.get(0))) <= 0) {
+                    DocumentPack taxDocumentPack = new DocumentPack();
+                    taxDocumentPack.setTax(sortedKeys.get(0));
+                    taxDocumentPack.setPrice(getPriceFromTotalPrice(payed, sortedKeys.get(0)));
+                    taxDocumentPack.setTotalPrice(payed);
+                    taxDocumentPack.setTitle(this.generateTaxDocumentPackTitle(lastPayment.getPayedDate(), proformaInvoice.getVariableSymbol()));
+                    taxDocumentPacks.add(taxDocumentPack);
+                    payed = BigDecimal.ZERO;
+                } else if (payed.compareTo(valuesForTaxes.get(sortedKeys.get(0))) > 0) {
+                    DocumentPack taxDocumentPack = new DocumentPack();
+                    taxDocumentPack.setTax(sortedKeys.get(0));
+                    taxDocumentPack.setPrice(getPriceFromTotalPrice(valuesForTaxes.get(sortedKeys.get(0)), sortedKeys.get(0)));
+                    taxDocumentPack.setTotalPrice(valuesForTaxes.get(sortedKeys.get(0)));
+                    taxDocumentPack.setTitle(this.generateTaxDocumentPackTitle(lastPayment.getPayedDate(), proformaInvoice.getVariableSymbol()));
+                    taxDocumentPacks.add(taxDocumentPack);
+                    payed = payed.subtract(valuesForTaxes.get(sortedKeys.get(0)));
+                    valuesForTaxes.remove(sortedKeys.get(0));
+                    sortedKeys.remove(0);
+                }
+            }
+            //!sortedKeys.isEmpty() => pre pripad zeby platba previsovala sumu co bolo treba zaplatit
+        } while(payed.compareTo(BigDecimal.ZERO) > 0 || !sortedKeys.isEmpty());
+
+        return taxDocumentPacks;
     }
 
     @Override
@@ -188,6 +240,32 @@ public class InvoiceServiceImpl implements InvoiceService {
         return duplicatedInvoice;
     }
 
+    private HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPack> documentPacks) {
+        HashMap<Integer, BigDecimal> mappedTaxedValues = new HashMap<>();
+        for (DocumentPack documentPack: documentPacks) {
+            if (mappedTaxedValues.containsKey(documentPack.getTax())) {
+                BigDecimal newValue = mappedTaxedValues.get(documentPack.getTax()).add(documentPack.getTotalPrice());
+                mappedTaxedValues.replace(documentPack.getTax(), newValue);
+            } else {
+                mappedTaxedValues.put(documentPack.getTax(), documentPack.getTotalPrice());
+            }
+        }
+        return mappedTaxedValues;
+    }
+
+    private BigDecimal getPayedValue(Long proformaInvoiceId) {
+        BigDecimal payedValue = BigDecimal.ZERO;
+        List<Payment> payments = this.qPaymentRepository.getPaymentsWithTaxDocumentByDocumentId(proformaInvoiceId, SecurityUtils.companyIds());
+        for (Payment payment: payments) {
+            payedValue.add(payment.getPayedValue());
+        }
+        return payedValue;
+    }
+
+    private String generateTaxDocumentPackTitle(LocalDate date, String variableSymbol) {
+        return "Daňový doklad k prijatej platbe z " + date + " VS " + variableSymbol;
+    }
+
     private Invoice setInvoicePackAndItems(Invoice invoice) {
         int packPosition = 0;
 
@@ -230,19 +308,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         return duplicatedDocumentPackItems;
     }
 
-    private void setPropertiesForTaxDocument(Invoice proformaInvoice, Invoice taxDocument) {
-        List<Payment> payments = this.qPaymentRepository.getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(proformaInvoice.getId(), SecurityUtils.companyIds());
-        BigDecimal payed = BigDecimal.ZERO;
-        for (Payment payment : payments) {
-            payed = payed.add(payment.getPayedValue());
-        }
-        taxDocument.setTotalPrice(payed);
-        taxDocument.setPaymentMethod(payments.get(payments.size() - 1).getPaymentMethod());
-        DocumentPack documentPack = new DocumentPack();
-        documentPack.setTitle(this.generateTaxDocumentItemDescription(proformaInvoice.getNumber(), proformaInvoice.getPaymentDate(), proformaInvoice.getVariableSymbol()));
-        taxDocument.setPacks(new ArrayList<>(List.of(documentPack)));
-    }
-
     private void setPropertiesForSummaryInvoice(Invoice proforma, Invoice taxDocument, Invoice summaryInvoice) {
         List<DocumentPack> packs = proforma.getPacks();
         DocumentPack documentPack = new DocumentPack();
@@ -252,11 +317,6 @@ public class InvoiceServiceImpl implements InvoiceService {
                 .add(taxDocument.getPrice().multiply(BigDecimal.valueOf(-1))));
         summaryInvoice.setTotalPrice(proforma.getTotalPrice()
                 .add(taxDocument.getTotalPrice().multiply(BigDecimal.valueOf(-1))));
-    }
-
-    private String generateTaxDocumentItemDescription(String number, LocalDate paymentDate, String variableSymbol) {
-        return "Na základe zálohovej faktúry " + number +
-                " uhradenej " + paymentDate + ", variabilný symbol " + variableSymbol;
     }
 
     private String generateSummaryInvoiceItemDescription(String number, LocalDate dateCreated, String variableSymbol) {

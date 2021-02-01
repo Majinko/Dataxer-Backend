@@ -142,6 +142,29 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
     }
 
+    @Override
+    public Optional<Payment> getNewestWithoutTaxDocumentByDocumentId(Long documentId, List<Long> companyIds) {
+        QPayment qPayment = QPayment.payment;
+
+        return Optional.ofNullable(this.query.selectFrom(qPayment)
+                .where(qPayment.documentId.eq(documentId))
+                .where(qPayment.taxDocumentCreated.eq(false))
+                .where(qPayment.company.id.in(companyIds))
+                .orderBy(qPayment.createdAt.desc())
+                .fetchFirst());
+    }
+
+    @Override
+    public List<Payment> getPaymentsWithTaxDocumentByDocumentId(Long documentId, List<Long> companyIds) {
+        QPayment qPayment = QPayment.payment;
+
+        return this.query.selectFrom(qPayment)
+                .where(qPayment.documentId.eq(documentId))
+                .where(qPayment.taxDocumentCreated.eq(true))
+                .where(qPayment.company.id.in(companyIds))
+                .fetch();
+    }
+
     private long getTotalCount(Predicate predicate) {
         QPayment qPayment = QPayment.payment;
 
