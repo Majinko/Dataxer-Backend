@@ -99,10 +99,10 @@ public class InvoiceController {
     }
 
     @GetMapping("/tax-invoice/{id}")
-    public ResponseEntity<List<DocumentPack>> getTaxDocument(
+    public ResponseEntity<InvoiceDTO>> getTaxDocument(
             @PathVariable Long id,
             @RequestParam Boolean allPayments) {
-        return ResponseEntity.ok(this.invoiceService.generateTaxDocumentPacks(id, allPayments));
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateTaxDocument(id, allPayments)));
     }
 
     @GetMapping("/summary-invoice/{id}")
