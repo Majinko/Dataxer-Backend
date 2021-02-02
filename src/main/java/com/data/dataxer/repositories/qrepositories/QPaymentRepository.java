@@ -20,4 +20,8 @@ public interface QPaymentRepository {
     BigDecimal getPayedTotalPrice(Long id);
 
     List<Payment> getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(Long documentId, List<Long> companyIds);
+
+    Optional<Payment> getNewestWithoutTaxDocumentByDocumentId(Long documentId, List<Long> companyIds);
+
+    List<Payment> getPaymentsWithTaxDocumentByDocumentId(Long documentId, List<Long> companyIds);
 }

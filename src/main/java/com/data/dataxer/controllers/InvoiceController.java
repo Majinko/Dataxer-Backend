@@ -1,6 +1,7 @@
 package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.InvoiceMapper;
+import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.services.DocumentNumberGeneratorService;
@@ -97,8 +98,10 @@ public class InvoiceController {
     }
 
     @GetMapping("/tax-invoice/{id}")
-    public ResponseEntity<InvoiceDTO> getTaxDocument(@PathVariable Long id) {
-        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateTaxDocument(id)));
+    public ResponseEntity<List<DocumentPack>> getTaxDocument(
+            @PathVariable Long id,
+            @RequestParam Boolean allPayments) {
+        return ResponseEntity.ok(this.invoiceService.generateTaxDocumentPacks(id, allPayments));
     }
 
     @GetMapping("/summary-invoice/{id}")
