@@ -1,11 +1,9 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.enums.DocumentState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,9 +13,9 @@ public interface InvoiceService {
 
     void store(Invoice invoice, Long oldInvoiceId);
 
-    Invoice storeTaxDocument(Invoice taxDocument, Long proformaInvoiceId);
+    void storeTaxDocument(Invoice taxDocument, Long proformaInvoiceId);
 
-    Invoice storeSummaryInvoice(Invoice summaryInvoice, Long taxDocumentId, Long proformaId);
+    void storeSummaryInvoice(Invoice summaryInvoice, Long taxDocumentId, Long proformaId);
 
     void update(Invoice invoice);
 
@@ -34,7 +32,7 @@ public interface InvoiceService {
     Invoice duplicate(Long id);
 
     //parameter je id zalohovej faktury
-    Invoice generateTaxDocumentPacks(Long proformaInvoiceId, Boolean allPayments);
+    Invoice generateTaxDocument(Long proformaInvoiceId);
 
     Invoice generateSummaryInvoice(Long id);
 

@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.DocumentRelations;
 import com.data.dataxer.models.domain.Invoice;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.DocumentRelationsRepository;
 import com.data.dataxer.repositories.qrepositories.QDocumentRelationsRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
@@ -79,6 +80,19 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
         for (DocumentRelations documentRelation : documentRelations) {
             Optional<Invoice> optionalInvoice = this.qInvoiceRepository.getById(documentRelation.getRelationDocumentId(), SecurityUtils.companyIds());
             optionalInvoice.ifPresent(result::add);
+        }
+        return result;
+    }
+
+    @Override
+    public List<Invoice> getAllRelationDocumentsByDocumentType(Long originalDocumentId, DocumentType documentType) {
+        List<Invoice> result = new ArrayList<>();
+        List<DocumentRelations> documentRelations = this.documentRelationsRepository.findAllRelationDocuments(originalDocumentId);
+        for (DocumentRelations documentRelation:documentRelations) {
+            Invoice optionalRelatedInvoice = this.qInvoiceRepository.getById(documentRelation.getRelationDocumentId(), SecurityUtils.companyIds()).orElse(null);
+            if (optionalRelatedInvoice != null && optionalRelatedInvoice.getDocumentType().equals(documentType)) {
+                result.add(optionalRelatedInvoice);
+            }
         }
         return result;
     }
