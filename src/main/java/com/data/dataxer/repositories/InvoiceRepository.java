@@ -10,4 +10,6 @@ public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
     Optional<Invoice> findByNumberAndCompanyIdIn(String number, List<Long> companyIds);
 
     List<Invoice> findAllByIdInAndCompanyIdIn(List<Long> invoiceIds, List<Long> companyIds);
+
+    Invoice findByIdAndCompanyIdIn(Long invoiceId, List<Long> companyIds);
 }

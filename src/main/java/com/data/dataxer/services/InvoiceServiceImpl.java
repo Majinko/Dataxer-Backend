@@ -126,9 +126,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice invoice = this.getById(id);
         Invoice taxDocument = new Invoice();
         BeanUtils.copyProperties(invoice, taxDocument,
-                "id", "packs", "title", "note", "number", "state", "discount", "price",
-                "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
-                "paymentMethod", "invoiceType");
+                "id", "packs", "title", "note", "number", "state", "discount", "documentData", "createdDate", "variableSymbol", "headerComment",
+                "paymentMethod", "invoiceType", "price", "totalPrice");
         taxDocument.setState(DocumentState.PAYED);
         taxDocument.setDiscount(BigDecimal.ZERO);
         taxDocument.setCreatedDate(LocalDate.now());
