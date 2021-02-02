@@ -17,4 +17,5 @@ public class PaymentDTO {
     private BigDecimal payedValue;
     private PaymentMethod paymentMethod;
     private LocalDate payedDate;
+    private Boolean taxDocumentCreated;
 }

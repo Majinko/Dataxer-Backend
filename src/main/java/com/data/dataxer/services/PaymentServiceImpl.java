@@ -2,15 +2,17 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.domain.Payment;
-import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
+import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.PaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.beans.Transient;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -19,19 +21,12 @@ public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
     private final QPaymentRepository qPaymentRepository;
-    private final InvoiceService invoiceService;
-    private final PriceOfferService priceOfferService;
+    private final InvoiceRepository invoiceRepository;
 
-    public PaymentServiceImpl(
-            PaymentRepository paymentRepository,
-            QPaymentRepository qPaymentRepository,
-            InvoiceService invoiceService,
-            PriceOfferService priceOfferService
-    ) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, QPaymentRepository qPaymentRepository, InvoiceRepository invoiceRepository) {
         this.paymentRepository = paymentRepository;
         this.qPaymentRepository = qPaymentRepository;
-        this.invoiceService = invoiceService;
-        this.priceOfferService = priceOfferService;
+        this.invoiceRepository = invoiceRepository;
     }
 
     @Override
@@ -40,7 +35,9 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (this.documentIsPayed(payment)) {
             if (payment.getDocumentType().equals(DocumentType.INVOICE) || payment.getDocumentType().equals(DocumentType.PROFORMA)) {
-                this.invoiceService.makePay(payment.getDocumentId(), payment.getPayedDate());
+                Invoice invoice = this.invoiceRepository.findByIdAndCompanyIdIn(payment.getDocumentId(), SecurityUtils.companyIds());
+                invoice.setPaymentDate(payment.getPayedDate());
+                invoiceRepository.save(invoice);
             }
         }
 
@@ -67,12 +64,11 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void destroy(Long id) {
         Payment payment = this.getById(id);
-        Invoice invoice = this.invoiceService.getById(payment.getDocumentId());
+        Invoice invoice = this.invoiceRepository.findByIdAndCompanyIdIn(payment.getDocumentId(), SecurityUtils.companyIds());
 
-        if (invoice.getState() == DocumentState.PAYED && invoice.getPaymentDate() != null) {
-            invoice.setState(DocumentState.WAITING);
+        if (this.documentIsPayed(payment)) {
             invoice.setPaymentDate(null);
-            this.invoiceService.update(invoice);
+            invoiceRepository.save(invoice);
         }
 
         this.paymentRepository.delete(payment);
