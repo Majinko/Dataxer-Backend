@@ -34,7 +34,7 @@ public interface InvoiceService {
     Invoice duplicate(Long id);
 
     //parameter je id zalohovej faktury
-    List<DocumentPack> generateTaxDocumentPacks(Long proformaInvoiceId, Boolean allPayments);
+    Invoice generateTaxDocumentPacks(Long proformaInvoiceId, Boolean allPayments);
 
     Invoice generateSummaryInvoice(Long id);
 
