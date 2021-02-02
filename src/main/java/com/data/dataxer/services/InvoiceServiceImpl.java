@@ -126,7 +126,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<DocumentPack> generateTaxDocumentPacks(Long proformaInvoiceId, Boolean allPayments) {
+    public Invoice generateTaxDocumentPacks(Long proformaInvoiceId, Boolean allPayments) {
         List<DocumentPack> taxDocumentPacks = new ArrayList<>();
         BigDecimal payed = BigDecimal.ZERO;
         Payment lastPayment;
@@ -194,7 +194,15 @@ public class InvoiceServiceImpl implements InvoiceService {
             //!sortedKeys.isEmpty() => pre pripad zeby platba previsovala sumu co bolo treba zaplatit
         } while(payed.compareTo(BigDecimal.ZERO) > 0 || !sortedKeys.isEmpty());
 
-        return taxDocumentPacks;
+        Invoice taxDocument = new Invoice();
+        BeanUtils.copyProperties(proformaInvoice, taxDocument,
+                "id", "packs", "title", "note", "number", "state", "discount", "price",
+                "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
+                "paymentMethod", "invoiceType");
+        taxDocument.setCreatedDate(LocalDate.now());
+        taxDocument.setDocumentType(DocumentType.INVOICE);
+        taxDocument.setPacks(taxDocumentPacks);
+        return taxDocument;
     }
 
     @Override
