@@ -137,8 +137,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 this.paymentRepository.save(paymentTmp);
             }
         } else {
-            lastPayment = this.qPaymentRepository.getNewestWithoutTaxDocumentByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
-                    .orElseThrow(() -> new RuntimeException("No suitable payment found"));
+            lastPayment = this.qPaymentRepository.getNewestWithoutTaxDocumentByDocumentId(proformaInvoiceId, SecurityUtils.companyIds()).orElseThrow(() -> new RuntimeException("No suitable payment found"));
             payed = lastPayment.getPayedValue();
             lastPayment.setTaxDocumentCreated(Boolean.TRUE);
             this.paymentRepository.save(lastPayment);
