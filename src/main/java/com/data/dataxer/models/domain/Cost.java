@@ -80,7 +80,6 @@ public class Cost extends BaseEntity {
 
     private Boolean isRepeated;
 
-    private Boolean isPaid;
 
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)
@@ -91,6 +90,8 @@ public class Cost extends BaseEntity {
     private Integer tax;
 
     private BigDecimal totalPrice;
+
+    private LocalDate paymentDate;
 
     private LocalDate repeatedFrom;
 

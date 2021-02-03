@@ -34,7 +34,7 @@ public class CostDTO {
     private String constantSymbol;
     private Boolean isInternal;
     private Boolean isRepeated;
-    private Boolean isPaid;
+    private LocalDate paymentDate;
     private LocalDate repeatedFrom;
     private LocalDate repeatedTo;
     private LocalDate nextRepeatedCost;

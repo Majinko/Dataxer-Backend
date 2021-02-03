@@ -41,41 +41,4 @@ public class DocumentPack implements Serializable {
     private BigDecimal price;
 
     private BigDecimal totalPrice;
-
-    public DocumentPack() {
-    }
-
-    public DocumentPack(DocumentPack pack) {
-        this.document = null;
-        this.type = pack.getType();
-        this.position = pack.getPosition();
-        this.title = pack.getTitle();
-        this.tax = pack.getTax();
-        this.price = pack.getPrice();
-        this.customPrice = pack.getCustomPrice();
-        this.totalPrice = pack.getTotalPrice();
-        if (pack.getPackItems() != null && !pack.getPackItems().isEmpty()) {
-            this.setDuplicatedDocumentPackItems(pack.getPackItems(), this);
-        }
-    }
-
-    private void setDuplicatedDocumentPackItems(List<DocumentPackItem> packItems, DocumentPack pack) {
-        for (DocumentPackItem packItem : packItems) {
-            this.packItems.add(new DocumentPackItem(packItem, pack));
-        }
-    }
-
-    public Map<Integer, BigDecimal> getPackItemsTaxesAndValues() {
-        Map<Integer, BigDecimal> taxesAndValues = new HashMap<>();
-        for (DocumentPackItem item : this.packItems) {
-            if (taxesAndValues.containsKey(item.getTax())) {
-                BigDecimal value = taxesAndValues.get(item.getTax());
-                value = value.add(item.getPrice());
-                taxesAndValues.replace(item.getTax(), value);
-            } else {
-                taxesAndValues.put(item.getTax(), item.getPrice());
-            }
-        }
-        return taxesAndValues;
-    }
 }

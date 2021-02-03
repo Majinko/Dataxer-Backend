@@ -111,5 +111,4 @@ public class QTimeRepositoryImpl implements QTimeRepository {
 
         return filterParser.parse(rqlFilter, withMapping(pathHashMap));
     }
-
 }

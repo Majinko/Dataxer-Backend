@@ -15,7 +15,6 @@ import java.time.LocalDate;
 @DiscriminatorValue("INVOICE")
 @SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
 public class Invoice extends DocumentBase {
-
     private String variableSymbol;
 
     private String specificSymbol;
