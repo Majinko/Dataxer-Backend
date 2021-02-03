@@ -64,7 +64,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         }
 
         this.store(invoice);
-        this.storeRelation(invoice.getId(), oldInvoiceId);
+        this.storeRelation(oldInvoiceId, invoice.getId());
     }
 
 
@@ -243,7 +243,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public List<Invoice> findAllByRelatedDocuments(Long documentId) {
         return this.invoiceRepository.findAllByIdInAndCompanyIdIn(
-                documentRelationsRepository.findAllByRelationDocumentIdAndCompanyIdIn(documentId, SecurityUtils.companyIds()).stream().map(DocumentRelations::getId).collect(Collectors.toList()),
+                documentRelationsRepository.findAllByDocumentIdAndCompanyIdIn(documentId, SecurityUtils.companyIds()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()),
                 SecurityUtils.companyIds()
         );
     }
@@ -287,7 +287,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         BigDecimal payedValue = BigDecimal.ZERO;
         List<Invoice> relatedInvoices = this.invoiceRepository.findAllByDocumentTypeAndIdInAndCompanyIdIn(
                 documentType,
-                documentRelationsRepository.findAllByRelationDocumentIdAndCompanyIdIn(proformaInvoiceId, SecurityUtils.companyIds()).stream().map(DocumentRelations::getDocumentId).collect(Collectors.toList()),
+                documentRelationsRepository.findAllByDocumentIdAndCompanyIdIn(proformaInvoiceId, SecurityUtils.companyIds()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()),
                 SecurityUtils.companyIds()
         );
 
