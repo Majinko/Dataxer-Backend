@@ -1,6 +1,7 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.models.enums.DocumentType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +21,9 @@ public class DocumentPack implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long documentId;
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    private DocumentBase document;
 
     private Enum<DocumentType> type;
 
@@ -43,7 +46,7 @@ public class DocumentPack implements Serializable {
     }
 
     public DocumentPack(DocumentPack pack) {
-        this.documentId = null;
+        this.document = null;
         this.type = pack.getType();
         this.position = pack.getPosition();
         this.title = pack.getTitle();

@@ -311,7 +311,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         int packPosition = 0;
 
         for (DocumentPack documentPack : invoice.getPacks()) {
-            documentPack.setDocumentId(invoice.getId());
+            documentPack.setDocument(invoice);
             documentPack.setType(DocumentType.INVOICE);
             documentPack.setPosition(packPosition);
             packPosition++;

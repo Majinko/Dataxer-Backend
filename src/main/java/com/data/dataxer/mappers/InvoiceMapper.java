@@ -1,5 +1,6 @@
 package com.data.dataxer.mappers;
 
+import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.dto.DocumentPackItemDTO;
