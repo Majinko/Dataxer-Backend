@@ -1,7 +1,6 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Invoice;
-import com.data.dataxer.models.enums.DocumentState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -32,7 +31,8 @@ public interface InvoiceService {
     //parameter je id zalohovej faktury
     Invoice generateTaxDocument(Long proformaInvoiceId);
 
-    Invoice generateSummaryInvoice(Long id);
+    //parameter je id danoveho dokladu
+    Invoice generateSummaryInvoice(Long taxDocumentId);
 
     Invoice changeTypeAndSave(Long id, String type, String number);
 
