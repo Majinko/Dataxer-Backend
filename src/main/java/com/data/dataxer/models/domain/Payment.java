@@ -31,9 +31,6 @@ public class Payment extends BaseEntity {
 
     private BigDecimal payedValue;
 
-    @Column(nullable = false)
-    private Boolean taxDocumentCreated = false;
-
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 

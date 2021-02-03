@@ -1,8 +1,8 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
+import com.data.dataxer.repositories.DocumentRelationsRepository;
 import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.PaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
@@ -17,28 +17,27 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
-
     private final InvoiceRepository invoiceRepository;
     private final QInvoiceRepository qInvoiceRepository;
     private final PaymentRepository paymentRepository;
     private final QPaymentRepository qPaymentRepository;
-    private final DocumentRelationServiceImpl documentRelationService;
+    private final DocumentRelationsRepository documentRelationsRepository;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, QInvoiceRepository qInvoiceRepository,
-                              DocumentRelationServiceImpl documentRelationService, QPaymentRepository qPaymentRepository,
-                              PaymentRepository paymentRepository) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, QInvoiceRepository qInvoiceRepository, PaymentRepository paymentRepository, QPaymentRepository qPaymentRepository, DocumentRelationsRepository documentRelationsRepository) {
         this.invoiceRepository = invoiceRepository;
         this.qInvoiceRepository = qInvoiceRepository;
-        this.documentRelationService = documentRelationService;
         this.paymentRepository = paymentRepository;
         this.qPaymentRepository = qPaymentRepository;
+        this.documentRelationsRepository = documentRelationsRepository;
     }
 
     @Override
@@ -60,19 +59,14 @@ public class InvoiceServiceImpl implements InvoiceService {
             });
         });
 
+        if (invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT)) {
+            invoice.setPaymentDate(LocalDate.now());
+        }
+
         this.store(invoice);
         this.storeRelation(invoice.getId(), oldInvoiceId);
     }
 
-    @Override
-    @Transactional
-    public void storeTaxDocument(Invoice taxDocument, Long proformaInvoiceId) {
-        Invoice i = this.invoiceRepository.save(taxDocument);
-
-        this.setInvoicePackAndItems(i);
-        this.storeAllTaxDocumentRelations(proformaInvoiceId, i.getId());
-        this.updatePaymentsOfTaxDocument(proformaInvoiceId);
-    }
 
     @Override
     @Transactional
@@ -146,7 +140,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         BigDecimal payments = this.getPaymentsValue(proformaInvoice.getId());
 
         //storing keys desc****************
-        HashMap<Integer, BigDecimal> valuesForTaxes = getTaxesValuesMap(proformaInvoice.getPacks());
+        HashMap<Integer, BigDecimal> valuesForTaxes = getTaxesValuesMap(this.getInvoiceItems(proformaInvoice.getPacks()));
         ArrayList<Integer> sortedKeys = new ArrayList<>(valuesForTaxes.keySet());
         Collections.sort(sortedKeys);
         Collections.reverse(sortedKeys);
@@ -155,18 +149,14 @@ public class InvoiceServiceImpl implements InvoiceService {
         for (Integer keyTax : sortedKeys) {
             if (payments.compareTo(BigDecimal.ZERO) > 0 && valuesForTaxes.get(keyTax).compareTo(payed) > 0) {
                 BigDecimal totalPrice = payments.compareTo(valuesForTaxes.get(keyTax)) > 0 ? valuesForTaxes.get(keyTax) : payments;
+
                 if (payed.compareTo(BigDecimal.ZERO) > 0) {
                     totalPrice = totalPrice.subtract(payed);
                 }
 
-                DocumentPack taxDocumentPack = new DocumentPack();
-
-                taxDocumentPack.setTax(sortedKeys.get(0));
-                taxDocumentPack.setPrice(getPriceFromTotalPrice(totalPrice, keyTax));
-                taxDocumentPack.setTotalPrice(totalPrice);
-                taxDocumentPack.setTitle(this.generateTaxDocumentPackTitle(getNewestPaymentPayedDate(proformaInvoice.getId()), proformaInvoice.getVariableSymbol()));
-                documentPacks.add(taxDocumentPack);
+                documentPacks.add(generateDocumentPackForTaxDocument(proformaInvoice, keyTax, totalPrice));
             }
+
             payed = payed.subtract(valuesForTaxes.get(keyTax));
             payments = payments.subtract(valuesForTaxes.get(keyTax));
         }
@@ -174,9 +164,46 @@ public class InvoiceServiceImpl implements InvoiceService {
         return documentPacks;
     }
 
+    private DocumentPack generateDocumentPackForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal totalPrice) {
+        DocumentPack taxDocumentPack = new DocumentPack();
+
+        taxDocumentPack.setTax(tax);
+        taxDocumentPack.setPrice(getPriceFromTotalPrice(totalPrice, tax));
+        taxDocumentPack.setTotalPrice(totalPrice);
+        taxDocumentPack.setTitle("Daňový doklad k prijatej platbe");
+
+        taxDocumentPack.setPackItems(List.of(generateDocumentPackItemForTaxDocument(proformaInvoice, tax, totalPrice)));
+
+        return taxDocumentPack;
+    }
+
+    private DocumentPackItem generateDocumentPackItemForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal totalPrice) {
+        DocumentPackItem documentPackItem = new DocumentPackItem();
+
+        documentPackItem.setTitle(this.generateTaxDocumentPackTitle(getNewestPaymentPayedDate(proformaInvoice.getId()), proformaInvoice));
+        documentPackItem.setQty(1f);
+        documentPackItem.setDiscount(BigDecimal.valueOf(0));
+        documentPackItem.setTax(tax);
+        documentPackItem.setPrice(getPriceFromTotalPrice(totalPrice, tax));
+        documentPackItem.setTotalPrice(totalPrice);
+
+        return documentPackItem;
+    }
+
+    // return all item in invoices
+    private List<DocumentPackItem> getInvoiceItems(List<DocumentPack> packs) {
+        List<DocumentPackItem> documentPackItems = new ArrayList<>();
+
+        packs.forEach(pack -> {
+            documentPackItems.addAll(pack.getPackItems());
+        });
+
+        return documentPackItems;
+    }
+
     @Override
     public Invoice generateSummaryInvoice(Long id) {
-        Invoice proformaInvoice = this.getById(this.documentRelationService.getOriginalDocumentId(id));
+        /*Invoice proformaInvoice = this.getById(this.documentRelationService.getOriginalDocumentId(id));
         Invoice taxDocument = this.getById(id);
         Invoice summaryInvoice = new Invoice();
         BeanUtils.copyProperties(taxDocument, summaryInvoice,
@@ -187,7 +214,9 @@ public class InvoiceServiceImpl implements InvoiceService {
         summaryInvoice.setCreatedDate(LocalDate.now());
         taxDocument.setDocumentType(DocumentType.SUMMARY_INVOICE);
         this.setPropertiesForSummaryInvoice(proformaInvoice, taxDocument, summaryInvoice);
-        return summaryInvoice;
+        return summaryInvoice;*/
+
+        return null;
     }
 
     @Override
@@ -213,7 +242,10 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<Invoice> findAllByRelatedDocuments(Long documentId) {
-        return this.invoiceRepository.findAllByIdInAndCompanyIdIn(this.documentRelationService.getAllRelationDocumentIds(documentId), SecurityUtils.companyIds());
+        return this.invoiceRepository.findAllByIdInAndCompanyIdIn(
+                documentRelationsRepository.findAllByRelationDocumentIdAndCompanyIdIn(documentId, SecurityUtils.companyIds()).stream().map(DocumentRelations::getId).collect(Collectors.toList()),
+                SecurityUtils.companyIds()
+        );
     }
 
     @Override
@@ -228,14 +260,14 @@ public class InvoiceServiceImpl implements InvoiceService {
         return duplicatedInvoice;
     }
 
-    private HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPack> documentPacks) {
+    private HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems) {
         HashMap<Integer, BigDecimal> mappedTaxedValues = new HashMap<>();
-        for (DocumentPack documentPack : documentPacks) {
-            if (mappedTaxedValues.containsKey(documentPack.getTax())) {
-                BigDecimal newValue = mappedTaxedValues.get(documentPack.getTax()).add(documentPack.getTotalPrice());
-                mappedTaxedValues.replace(documentPack.getTax(), newValue);
+        for (DocumentPackItem documentPackItem : documentPackItems) {
+            if (mappedTaxedValues.containsKey(documentPackItem.getTax())) {
+                BigDecimal newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(documentPackItem.getTotalPrice());
+                mappedTaxedValues.replace(documentPackItem.getTax(), newValue);
             } else {
-                mappedTaxedValues.put(documentPack.getTax(), documentPack.getTotalPrice());
+                mappedTaxedValues.put(documentPackItem.getTax(), documentPackItem.getTotalPrice());
             }
         }
         return mappedTaxedValues;
@@ -243,7 +275,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private BigDecimal getPaymentsValue(Long proformaInvoiceId) {
         BigDecimal paymentsValue = BigDecimal.ZERO;
-        List<Payment> payments = this.qPaymentRepository.getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
+        List<Payment> payments = this.qPaymentRepository.getPaymentsByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
+
         for (Payment payment : payments) {
             paymentsValue = paymentsValue.add(payment.getPayedValue());
         }
@@ -252,7 +285,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private BigDecimal getPayedValueFromRelatedType(Long proformaInvoiceId, DocumentType documentType) {
         BigDecimal payedValue = BigDecimal.ZERO;
-        List<Invoice> relatedInvoices = this.documentRelationService.getAllRelationDocumentsByDocumentType(proformaInvoiceId, documentType);
+        List<Invoice> relatedInvoices = this.invoiceRepository.findAllByDocumentTypeAndIdInAndCompanyIdIn(
+                documentType,
+                documentRelationsRepository.findAllByRelationDocumentIdAndCompanyIdIn(proformaInvoiceId, SecurityUtils.companyIds()).stream().map(DocumentRelations::getDocumentId).collect(Collectors.toList()),
+                SecurityUtils.companyIds()
+        );
+
         for (Invoice invoice : relatedInvoices) {
             payedValue = payedValue.add(invoice.getTotalPrice());
         }
@@ -260,13 +298,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private LocalDate getNewestPaymentPayedDate(Long proformaInvoiceId) {
-        Payment payment = this.qPaymentRepository.getNewestWithoutTaxDocumentByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
+        Payment payment = this.qPaymentRepository.getNewestByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("No payment usable for tax document"));
         return payment.getPayedDate();
     }
 
-    private String generateTaxDocumentPackTitle(LocalDate date, String variableSymbol) {
-        return "Daňový doklad k prijatej platbe z " + date + " VS " + variableSymbol;
+    private String generateTaxDocumentPackTitle(LocalDate date, Invoice proformaInvoice) {
+        return "Na základe zálohovej faktúry " + proformaInvoice.getTitle() + " uhradenej " + date.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " VS " + proformaInvoice.getVariableSymbol();
     }
 
     private Invoice setInvoicePackAndItems(Invoice invoice) {
@@ -332,16 +370,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         return totalPrice.divide(BigDecimal.valueOf(taxCoefficient), 2, RoundingMode.HALF_UP);
     }
 
-    private void storeAllTaxDocumentRelations(Long proformaInvoiceId, Long taxDocumentId) {
-        this.storeRelation(proformaInvoiceId, taxDocumentId);
-        this.storeRelation(taxDocumentId, proformaInvoiceId);
-
-        List<Long> allRelationDocumentIds = this.documentRelationService.getAllRelationDocumentIds(proformaInvoiceId);
-        for (Long relationDocumentId : allRelationDocumentIds) {
-            this.storeRelation(taxDocumentId, relationDocumentId);
-        }
-    }
-
     private void storeAllSummaryInvoiceRelations(Long taxDocumentId, Long summaryInvoiceId, Long proformaId) {
         this.storeRelation(taxDocumentId, summaryInvoiceId);
         this.storeRelation(summaryInvoiceId, taxDocumentId);
@@ -353,16 +381,10 @@ public class InvoiceServiceImpl implements InvoiceService {
         DocumentRelations documentRelation = new DocumentRelations();
         documentRelation.setDocumentId(documentId);
         documentRelation.setRelationDocumentId(relationDocumentId);
-        this.documentRelationService.storeDocumentRelation(documentRelation);
+
+        documentRelationsRepository.save(documentRelation);
     }
 
-    private void updatePaymentsOfTaxDocument(Long proformaInvoiceId) {
-        List<Payment> payments = this.qPaymentRepository.getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
-        for (Payment payment : payments) {
-            payment.setTaxDocumentCreated(Boolean.TRUE);
-            this.paymentRepository.save(payment);
-        }
-    }
 
     private String generateInvoiceTitle(String type, String number) {
         String title;

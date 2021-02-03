@@ -14,5 +14,5 @@ public interface DocumentRelationsRepository extends CrudRepository<DocumentRela
     @Query(value = "SELECT * FROM document_relations WHERE document_id = ?1", nativeQuery = true)
     List<DocumentRelations> findAllRelationDocuments(Long originalId);
 
-    List<DocumentRelations> findAllByDocumentId(Long documentId);
+    List<DocumentRelations> findAllByRelationDocumentIdAndCompanyIdIn(Long documentId, List<Long> companyIds);
 }

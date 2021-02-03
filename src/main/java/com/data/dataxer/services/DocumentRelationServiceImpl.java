@@ -96,5 +96,4 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
         }
         return result;
     }
-
 }

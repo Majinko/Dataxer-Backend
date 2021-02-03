@@ -23,6 +23,4 @@ public interface PaymentService {
     BigDecimal getRestToPay(Long documentId, DocumentType documentType);
 
     List<Payment> getDocumentPayments(Long id, DocumentType type);
-
-    List<Payment> getWithoutTaxDocumentCreatedByDocumentId(Long documentId);
 }

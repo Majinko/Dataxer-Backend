@@ -43,11 +43,6 @@ public class InvoiceController {
         this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), oldInvoiceId);
     }
 
-    @RequestMapping(value = "/storeTaxDocument", method = RequestMethod.POST)
-    public void storeTaxDocument(@RequestParam(value = "id") Long id, @RequestBody InvoiceDTO invoiceDTO) {
-        this.invoiceService.storeTaxDocument(this.invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), id);
-    }
-
     @RequestMapping(value = "/storeSummaryInvoice", method = RequestMethod.POST)
     public void storeTaxDocument(
             @RequestParam(value = "id1") Long taxDocumentId,

@@ -13,8 +13,6 @@ public interface InvoiceService {
 
     void store(Invoice invoice, Long oldInvoiceId);
 
-    void storeTaxDocument(Invoice taxDocument, Long proformaInvoiceId);
-
     void storeSummaryInvoice(Invoice summaryInvoice, Long taxDocumentId, Long proformaId);
 
     void update(Invoice invoice);

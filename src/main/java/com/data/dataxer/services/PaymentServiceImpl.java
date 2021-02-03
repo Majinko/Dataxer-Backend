@@ -87,10 +87,6 @@ public class PaymentServiceImpl implements PaymentService {
         return this.paymentRepository.findAllByDocumentIdAndDocumentType(id, type);
     }
 
-    public List<Payment> getWithoutTaxDocumentCreatedByDocumentId(Long documentId) {
-        return this.qPaymentRepository.getPaymentsWithoutTaxDocumentByDocumentIdSortedByPayDate(documentId, SecurityUtils.companyIds());
-    }
-
     private boolean documentIsPayed(Payment payment) {
         return this.getRestToPay(payment.getDocumentId(), payment.getDocumentType()).compareTo(BigDecimal.ZERO) == 0;
     }
