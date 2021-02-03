@@ -28,6 +28,7 @@ public class DocumentBase extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
 
+
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPack> packs = new ArrayList<>();
 
