@@ -201,7 +201,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 SecurityUtils.companyIds()
         );
         for (Invoice invoice:invoices) {
-            if (invoice.getDocumentType().equals(DocumentType.INVOICE)) {
+            if (invoice.getDocumentType().equals(DocumentType.INVOICE) || invoice.getDocumentType().equals(DocumentType.PROFORMA)) {
                 return invoice;
             }
         }
