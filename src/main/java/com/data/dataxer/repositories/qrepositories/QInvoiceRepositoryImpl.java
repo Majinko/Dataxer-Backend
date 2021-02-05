@@ -81,6 +81,25 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .leftJoin(qInvoice.contact).fetchJoin()
                 .leftJoin(qInvoice.packs, qDocumentPack).fetchJoin()
                 .where(qInvoice.id.eq(id))
+                .where(qInvoice.company.id.in(companyIds))
+                .orderBy(qDocumentPack.position.asc())
+                .fetchOne();
+
+        if (invoice != null) {
+            this.invoicePackSetItems(invoice);
+        }
+        return Optional.ofNullable(invoice);
+    }
+
+    @Override
+    public Optional<Invoice> getById(Long id) {
+        QInvoice qInvoice = QInvoice.invoice;
+        QDocumentPack qDocumentPack = QDocumentPack.documentPack;
+
+        Invoice invoice = query.selectFrom(qInvoice)
+                .leftJoin(qInvoice.contact).fetchJoin()
+                .leftJoin(qInvoice.packs, qDocumentPack).fetchJoin()
+                .where(qInvoice.id.eq(id))
                 .orderBy(qDocumentPack.position.asc())
                 .fetchOne();
 

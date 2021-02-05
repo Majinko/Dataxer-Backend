@@ -13,6 +13,8 @@ public interface QInvoiceRepository {
 
     Optional<Invoice> getById(Long id, List<Long> companyIds);
 
+    Optional<Invoice> getById(Long id);
+
     Optional<Invoice> getByIdSimple(Long id, List<Long> companyIds);
 
 }

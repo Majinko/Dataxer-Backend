@@ -20,6 +20,8 @@ public interface InvoiceService {
 
     Invoice getById(Long id);
 
+    Invoice getByIdWithoutFirm(Long id);
+
     Invoice getByIdSimple(Long id);
 
     void destroy(Long id);

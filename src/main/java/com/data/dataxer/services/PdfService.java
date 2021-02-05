@@ -51,7 +51,7 @@ public class PdfService {
     }
 
     private Context getContext(Long id) {
-        Invoice invoice = this.invoiceService.getById(id);
+        Invoice invoice = this.invoiceService.getByIdWithoutFirm(id);
 
         Context context = new Context();
 

@@ -94,6 +94,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    public Invoice getByIdWithoutFirm(Long id) {
+        return this.qInvoiceRepository
+                .getById(id)
+                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+    }
+
+    @Override
     public Invoice getByIdSimple(Long id) {
         return this.qInvoiceRepository
                 .getByIdSimple(id, SecurityUtils.companyIds())
