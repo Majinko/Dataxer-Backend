@@ -117,7 +117,7 @@
             <div class="col-md-6">
                 <p style="padding-top: 0; margin-top: 0; font-size: 8px;" th:text="${invoice.getHeaderComment()} ?: ''"></p>
             </div>
-            <div class="col-md-12" style="width: 100%" th:with="taxesAndValues=${invoice.getTaxesAndValues()}">
+            <!--<div class="col-md-12" style="width: 100%" th:with="taxesAndValues=${invoice.getTaxesAndValues()}">
                 <table class="table-invoice-items table-invoice-summary" style="margin-top: -3px;">
                     <tfoot class="table-foot-offset text-right">
                     <tr class="row-invoice-summary">
@@ -130,14 +130,14 @@
                         <td colspan="5" class="text-right" th:text="'Zľava ' + ${invoice.getDiscount()} + '%'"></td>
                         <td class="text-right thin">
                             <span class="open-sans" th:text="${#numbers.formatDecimal(invoice.countDiscountTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
-                            <!-- {{priceFormat(discount($document->sets->sum('price_tax'), $document->discount))}} &euro; -->
+                            &lt;!&ndash; {{priceFormat(discount($document->sets->sum('price_tax'), $document->discount))}} &euro; &ndash;&gt;
                         </td>
                     </tr>
                     <tr class="row-invoice-summary">
                         <td colspan="5" class="text-right" th:text="'Celkom bez DPH: '"></td>
                         <td class="text-right thin">
                             <span class="open-sans" th:text="${#numbers.formatDecimal(invoice.getPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
-                            <!-- {{priceFormat($document->price)}} &euro; -->
+                            &lt;!&ndash; {{priceFormat($document->price)}} &euro; &ndash;&gt;
                         </td>
                     </tr>
 
@@ -168,7 +168,7 @@
                     </tr>
                     </tfoot>
                 </table>
-            </div>
+            </div>-->
         </div>
 
         <div class="row" style="margin-top: 50px; margin-bottom: 0;">

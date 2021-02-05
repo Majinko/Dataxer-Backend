@@ -61,6 +61,7 @@ public class PdfService {
         context.setVariable("createdPhone", "0905123456");
         context.setVariable("createdWeb", "www.example.com");
         context.setVariable("createdEmail", "janko.hrasko@example.com");
+
         return context;
     }
 
