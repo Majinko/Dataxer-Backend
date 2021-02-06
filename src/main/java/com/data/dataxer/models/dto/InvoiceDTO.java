@@ -37,5 +37,6 @@ public class InvoiceDTO {
     private DocumentType documentType;
 
     private ContactDTO contact;
+    private ProjectDTO project;
     List<DocumentPackDTO> packs = new ArrayList<>();
 }

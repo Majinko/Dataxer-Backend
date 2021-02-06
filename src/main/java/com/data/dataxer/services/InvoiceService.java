@@ -1,10 +1,14 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.DocumentPack;
+import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 
 public interface InvoiceService {
@@ -32,6 +36,10 @@ public interface InvoiceService {
 
     //parameter je id zalohovej faktury
     Invoice generateTaxDocument(Long proformaInvoiceId);
+
+    HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems);
+
+    List<DocumentPackItem> getInvoiceItems(List<DocumentPack> packs);
 
     //parameter je id danoveho dokladu
     Invoice generateSummaryInvoice(Long taxDocumentId);

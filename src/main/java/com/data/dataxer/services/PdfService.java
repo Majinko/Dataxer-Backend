@@ -40,6 +40,7 @@ public class PdfService {
         File file = File.createTempFile("students", ".pdf");
         OutputStream outputStream = new FileOutputStream(file);
         ITextRenderer renderer = new ITextRenderer(20f * 4f / 3f, 20);
+
         renderer.getFontResolver().addFont("/fonts/OpenSans.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
         renderer.getFontResolver().addFont("/fonts/DejaVuSans.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
         renderer.setDocumentFromString(html, new ClassPathResource(PDF_RESOURCES).getURL().toExternalForm());
@@ -57,6 +58,8 @@ public class PdfService {
         Context context = new Context();
 
         context.setVariable("firm", invoice.getDocumentData().get("firm"));
+        context.setVariable("bankAccount", invoice.getDocumentData().get("bankAccount"));
+        context.setVariable("taxes", invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(invoice.getPacks())));
         context.setVariable("invoice", invoice);
         context.setVariable("createdName", "Janko Hrasko");
         context.setVariable("createdPhone", "0905123456");

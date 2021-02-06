@@ -64,9 +64,9 @@ public class BankAccountServiceImpl implements BankAccountService {
 
         bankAccounts.forEach(bankAccount -> {
             bankAccount.setIsDefault(bankAccount.getId().equals(id));
-
-            bankAccountRepository.save(bankAccount);
         });
+
+        bankAccountRepository.saveAll(bankAccounts);
     }
 
     @Override

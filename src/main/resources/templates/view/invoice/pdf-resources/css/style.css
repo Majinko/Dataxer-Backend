@@ -2,13 +2,8 @@
     size: letter;
 }
 
-<<<<<<< HEAD
-* {
-    font-family: 'DejaVu Sans', sans-serif;
-=======
 body {
     font-family: 'DejaVu Sans', 'sans-serif';
->>>>>>> 25977f33789e397fe98b9d6e9f6994fbc4e046ce
 }
 
 *, div, span, li, p, section, td, th, a {
@@ -40,6 +35,14 @@ p {
     font-family: 'sans-serif';
 }
 
+.float-left{
+    float: left;
+}
+
+.float-right{
+    float: right;
+}
+
 .clear {
     clear: both;
 }
@@ -54,6 +57,10 @@ p {
 
 .text-center {
     text-align: center !important;
+}
+
+.border-bottom-2px{
+    border-bottom: 2px solid black;
 }
 
 table td, table th {
@@ -91,12 +98,12 @@ table.table-data tbody td {
     vertical-align: middle;
 }
 
-table tbody tr:last-of-type td {
-    border: none !important;
+table tbody tr:last-child td {
+    border-bottom: 2px solid #000;
 }
 
 table.table-data thead th, table.table-data tbody td {
-    padding: 5px 4px 5px 4px;
+    padding: 5px 4px 10px 4px;
     font-size: 8.4px;
     line-height: 1em;
     vertical-align: middle;
@@ -108,15 +115,6 @@ table.table-data thead th {
     font-weight: bold;
     text-align: right;
     line-height: 1em;
-    padding-bottom: 0px;
-}
-
-table tbody td:first-child, table.table-data thead th:first-child {
-    padding-left: 0px;
-}
-
-table tbody td:last-child, table.table-data thead th:last-child {
-    padding-right: 0px;
 }
 
 table .set td:first-child {
@@ -130,6 +128,11 @@ table .set td {
 
 table td {
     white-space: nowrap;
+}
+
+table th{
+    border: none;
+    border-bottom: 2px solid #000000;
 }
 
 table.table-data tbody tr td:first-child {
@@ -163,4 +166,8 @@ table span {
 
 .white-space-normal {
     white-space: normal !important;
+}
+
+.white-space-nowrap{
+    white-space: nowrap !important;
 }

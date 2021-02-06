@@ -8,7 +8,6 @@ import com.lowagie.text.DocumentException;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
-import javax.websocket.server.PathParam;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,7 +37,7 @@ public class PdfController {
             Path file = Paths.get(pdfService.generatePdf(id).getAbsolutePath());
             if (Files.exists(file)) {
                 response.setContentType("application/pdf");
-                response.addHeader("Content-Disposition", "attachment; filename=" + file.getFileName());
+                response.addHeader("Content-Disposition", "inline; filename=" + file.getFileName());
                 Files.copy(file, response.getOutputStream());
                 response.getOutputStream().flush();
             }

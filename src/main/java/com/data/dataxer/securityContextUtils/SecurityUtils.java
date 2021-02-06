@@ -22,8 +22,7 @@ public class SecurityUtils {
     }
 
     public static List<Long> companyIds() {
-        return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal())
-                .getCompanies().stream().map(Company::getId).collect(Collectors.toList());
+        return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getCompanies().stream().map(Company::getId).collect(Collectors.toList());
     }
 
     public static Company defaultCompany() {

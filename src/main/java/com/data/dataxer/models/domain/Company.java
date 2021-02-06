@@ -26,11 +26,13 @@ public class Company implements Serializable {
     @Column(length = 50)
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private AppUser appUser;
-
-    /*@OneToMany(mappedBy = "company", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BillingInformation> billingInformation = new ArrayList<>();*/
+    @JoinTable(
+            name = "app_user_companies",
+            joinColumns = @JoinColumn(name = "company_id"),
+            inverseJoinColumns = @JoinColumn(name = "app_user_id")
+    )
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<AppUser> appUsers = new ArrayList<>();
 
     private Boolean defaultCompany;
 

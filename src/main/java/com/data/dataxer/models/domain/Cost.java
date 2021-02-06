@@ -80,7 +80,6 @@ public class Cost extends BaseEntity {
 
     private Boolean isRepeated;
 
-
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)
     protected Map<String, Object> costData;

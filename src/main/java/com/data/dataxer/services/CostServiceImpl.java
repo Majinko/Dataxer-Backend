@@ -40,10 +40,43 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public Cost update(Cost cost) {
-        this.costRepository.save(cost);
+    public Cost update(Cost oldCost) {
+        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyIds()).map(cost -> {
 
-        return cost;
+            cost.setContact(oldCost.getContact());
+            cost.setProject(oldCost.getProject());
+            cost.setTitle(oldCost.getTitle());
+            cost.setCostOrder(oldCost.getCostOrder());
+            cost.setCategory(oldCost.getCategory());
+            cost.setCategory(oldCost.getCategory());
+            cost.setNumber(oldCost.getNumber());
+            cost.setVariableSymbol(oldCost.getVariableSymbol());
+            cost.setConstantSymbol(oldCost.getConstantSymbol());
+            cost.setCurrency(oldCost.getCurrency());
+            cost.setNote(oldCost.getNote());
+            cost.setState(oldCost.getState());
+            cost.setType(oldCost.getType());
+            cost.setPeriod(oldCost.getPeriod());
+            cost.setPaymentMethod(oldCost.getPaymentMethod());
+            cost.setIsInternal(oldCost.getIsInternal());
+            cost.setIsRepeated(oldCost.getIsRepeated());
+            cost.setCostData(oldCost.getCostData());
+            cost.setPrice(oldCost.getPrice());
+            cost.setTax(oldCost.getTax());
+            cost.setTotalPrice(oldCost.getTotalPrice());
+            cost.setPaymentDate(oldCost.getPaymentDate());
+            cost.setRepeatedFrom(oldCost.getRepeatedFrom());
+            cost.setRepeatedTo(oldCost.getRepeatedTo());
+            cost.setNextRepeatedCost(oldCost.getNextRepeatedCost());
+            cost.setCreatedDate(oldCost.getCreatedDate());
+            cost.setDueDate(oldCost.getDueDate());
+            cost.setDeliveredDate(oldCost.getDeliveredDate());
+            cost.setTaxableSupply(oldCost.getTaxableSupply());
+
+            costRepository.save(cost);
+
+            return cost;
+        }).orElse(null);
     }
 
     @Override
@@ -87,7 +120,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost getByIdWithRelation(Long id) {
-        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyIds());
+        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyIds()).orElse(null);
     }
 
     @Override

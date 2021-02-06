@@ -22,9 +22,9 @@ public interface InvoiceMapper {
     @Mapping(target = "packs", ignore = true)
     InvoiceDTO invoiceToInvoiceDTOSimple(Invoice invoice);
 
-
     @Mapping(target = "packs", ignore = true)
     @Mapping(target = "contact", ignore = true)
+    @Mapping(target = "project", ignore = true)
     @Named(value = "invoiceToInvoiceDtoWithoutRelation")
     InvoiceDTO invoiceToInvoiceDtoWithoutRelation(Invoice invoice);
 

@@ -43,8 +43,6 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
 
-        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("priceOffer.id", QPriceOffer.priceOffer.id)
                 .put("priceOffer.state", QPriceOffer.priceOffer.state)
@@ -59,8 +57,9 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
 
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<PriceOffer> priceOfferList = query.selectFrom(qPriceOffer)
-                .leftJoin(qPriceOffer.contact).fetchJoin()
+        List<PriceOffer> priceOfferList = query.selectFrom(QPriceOffer.priceOffer)
+                .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
+                .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
                 .where(predicate)
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .limit(pageable.getPageSize())
@@ -72,14 +71,12 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
 
     @Override
     public Optional<PriceOffer> getById(Long id, List<Long> companyIds) {
-        QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-        QDocumentPack qDocumentPack = QDocumentPack.documentPack;
-
-        PriceOffer priceOffer = query.selectFrom(qPriceOffer)
-                .leftJoin(qPriceOffer.contact).fetchJoin()
-                .leftJoin(qPriceOffer.packs, qDocumentPack).fetchJoin()
-                .where(qPriceOffer.id.eq(id))
-                .orderBy(qDocumentPack.position.asc())
+        PriceOffer priceOffer = query.selectFrom(QPriceOffer.priceOffer)
+                .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
+                .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
+                .leftJoin(QPriceOffer.priceOffer.packs, QDocumentPack.documentPack).fetchJoin()
+                .where(QPriceOffer.priceOffer.id.eq(id))
+                .orderBy(QDocumentPack.documentPack.position.asc())
                 .fetchOne();
 
         // price offer pack set items

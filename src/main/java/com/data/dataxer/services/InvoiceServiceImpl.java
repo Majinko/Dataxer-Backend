@@ -300,7 +300,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     // return all item in invoices
-    private List<DocumentPackItem> getInvoiceItems(List<DocumentPack> packs) {
+    @Override
+    public List<DocumentPackItem> getInvoiceItems(List<DocumentPack> packs) {
         List<DocumentPackItem> documentPackItems = new ArrayList<>();
 
         packs.forEach(pack -> {
@@ -310,7 +311,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         return documentPackItems;
     }
 
-    private HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems) {
+    @Override
+    public HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems) {
         HashMap<Integer, BigDecimal> mappedTaxedValues = new HashMap<>();
         for (DocumentPackItem documentPackItem : documentPackItems) {
             if (mappedTaxedValues.containsKey(documentPackItem.getTax())) {

@@ -3,6 +3,7 @@ package com.data.dataxer.models.domain;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -16,16 +17,13 @@ public class Time extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // todo set fetch type lazy
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     Project project;
 
-    // todo set fetch type lazy
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     AppUser user;
 
-    // todo set fetch type lazy
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     Category category;
 
     Integer time;

@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/cost")
 public class CostController {
-
     @Autowired
     private CostService costService;
 
@@ -44,6 +43,13 @@ public class CostController {
 
         return ResponseEntity.ok(cost);
     }
+
+
+    @GetMapping("/{id}")
+    public ResponseEntity<CostDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.getByIdWithRelation(id)));
+    }
+
 
     @PostMapping("/update")
     public ResponseEntity<CostDTO> update(@RequestBody UploadContextDTO<CostDTO> uploadContext) {
@@ -86,5 +92,4 @@ public class CostController {
     public void destroy(@PathVariable Long id) {
         this.costService.destroy(id);
     }
-
 }

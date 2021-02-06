@@ -45,8 +45,6 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
 
-        QInvoice qInvoice = QInvoice.invoice;
-
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("invoice.id", QInvoice.invoice.id)
                 .put("invoice.state", QInvoice.invoice.state)
@@ -60,10 +58,11 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Invoice> invoiceList = this.query.selectFrom(qInvoice)
-                .leftJoin(qInvoice.contact).fetchJoin()
+        List<Invoice> invoiceList = this.query.selectFrom(QInvoice.invoice)
+                .leftJoin(QInvoice.invoice.contact).fetchJoin()
+                .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .where(predicate)
-                .where(qInvoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -74,15 +73,14 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
     @Override
     public Optional<Invoice> getById(Long id, List<Long> companyIds) {
-        QInvoice qInvoice = QInvoice.invoice;
-        QDocumentPack qDocumentPack = QDocumentPack.documentPack;
 
-        Invoice invoice = query.selectFrom(qInvoice)
-                .leftJoin(qInvoice.contact).fetchJoin()
-                .leftJoin(qInvoice.packs, qDocumentPack).fetchJoin()
-                .where(qInvoice.id.eq(id))
-                .where(qInvoice.company.id.in(companyIds))
-                .orderBy(qDocumentPack.position.asc())
+        Invoice invoice = query.selectFrom(QInvoice.invoice)
+                .leftJoin(QInvoice.invoice.contact).fetchJoin()
+                .leftJoin(QInvoice.invoice.project).fetchJoin()
+                .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
+                .where(QInvoice.invoice.id.eq(id))
+                .where(QInvoice.invoice.company.id.in(companyIds))
+                .orderBy(QDocumentPack.documentPack.position.asc())
                 .fetchOne();
 
         if (invoice != null) {

@@ -75,13 +75,15 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Cost getByIdWithRelation(Long id, List<Long> companyIds) {
-        return this.constructGetAllByIdAndCompanyIds(id, companyIds)
-                .leftJoin(QCost.cost.category).fetchJoin()
-                .leftJoin(QCost.cost.contact).fetchJoin()
-                .leftJoin(QCost.cost.project).fetchJoin()
-                .leftJoin(QCost.cost.files).fetchJoin()
-                .fetchOne();
+    public Optional<Cost> getByIdWithRelation(Long id, List<Long> companyIds) {
+        return Optional.ofNullable(
+                this.constructGetAllByIdAndCompanyIds(id, companyIds)
+                        .leftJoin(QCost.cost.category).fetchJoin()
+                        .leftJoin(QCost.cost.contact).fetchJoin()
+                        .leftJoin(QCost.cost.project).fetchJoin()
+                        .leftJoin(QCost.cost.files).fetchJoin()
+                        .fetchOne()
+        );
     }
 
     private JPAQuery<Cost> constructGetAllByIdAndCompanyIds(Long id, List<Long> companyIds) {

@@ -7,7 +7,10 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Entity
 @Setter
@@ -29,4 +32,12 @@ public class Invoice extends DocumentBase {
     private String headerComment;
 
     private LocalDate paymentDate;
+
+    public BigDecimal countDiscountTotalPrice() {
+        return this.totalPrice.multiply(this.discount.divide(BigDecimal.valueOf(100)));
+    }
+
+    public BigDecimal countTaxPrice(BigDecimal price, Integer tax) {
+        return price.multiply(new BigDecimal(tax.floatValue() / 100));
+    }
 }

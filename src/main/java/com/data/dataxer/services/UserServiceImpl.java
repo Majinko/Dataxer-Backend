@@ -35,6 +35,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUser update(AppUser appUser) {
-        return this.userRepository.save(appUser);
+        return this.userRepository.findByUid(SecurityUtils.uid()).map(user -> {
+
+            user.setFirstName(appUser.getFirstName());
+            user.setLastName(appUser.getLastName());
+            user.setPhone(appUser.getPhone());
+            user.setStreet(appUser.getStreet());
+            user.setCity(appUser.getCity());
+            user.setPostalCode(appUser.getPostalCode());
+            user.setCountry(appUser.getCountry());
+
+            return userRepository.save(user);
+        }).orElse(null);
     }
 }

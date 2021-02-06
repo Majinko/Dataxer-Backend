@@ -25,9 +25,6 @@ public class AppUser implements Serializable {
     @Column(unique = true, nullable = false, updatable = false, length = 100)
     private String uid;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<Company> companies = new ArrayList<>();
-
     private String firstName;
 
     private String lastName;

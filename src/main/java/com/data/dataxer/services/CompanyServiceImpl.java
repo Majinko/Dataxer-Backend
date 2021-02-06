@@ -14,60 +14,82 @@ import java.util.List;
 public class CompanyServiceImpl implements CompanyService {
 
     private final CompanyRepository companyRepository;
-    private final AppUserRepository appUserRepository;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository, AppUserRepository appUserRepository) {
+    public CompanyServiceImpl(CompanyRepository companyRepository) {
         this.companyRepository = companyRepository;
-        this.appUserRepository = appUserRepository;
     }
 
     @Override
     @Transactional
     public Company store(Company company) {
-        AppUser appUser = appUserRepository
-                .findById(SecurityUtils.id())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        company.setAppUsers(List.of(SecurityUtils.loggedUser()));
 
-        company.setAppUser(appUser);
+        if (this.getDefaultCompany() == null) {
+            company.setDefaultCompany(true);
+        }
 
-        Company c = this.companyRepository.save(company);
-
-        appUser.getCompanies().add(c);
-        appUserRepository.save(appUser);
-
-        return c;
+        return this.companyRepository.save(company);
     }
 
     @Override
     public List<Company> findAll() {
-        return companyRepository.findByAppUserIdOrderByIdDesc(SecurityUtils.id());
+        return this.companyRepository.findAllByAppUsersIn(List.of(SecurityUtils.loggedUser()));
     }
 
     @Override
     public Company findById(Long id) {
-        return companyRepository.findAllByIdAndAppUserId(id, SecurityUtils.id()).orElse(null);
+        return companyRepository.findByIdAndAppUsersIn(id, List.of(SecurityUtils.loggedUser())).orElseThrow(() -> {
+            throw new RuntimeException("Company is not exist");
+        });
     }
 
     @Override
-    public Company update(Company company) {
-        return this.store(company);
+    public Company update(Company oldCompany) {
+        return companyRepository.findByIdAndAppUsersIn(oldCompany.getId(), List.of(SecurityUtils.loggedUser())).map(company -> {
+
+            company.setName(oldCompany.getName());
+            company.setLogoUrl(oldCompany.getLogoUrl());
+            company.setLegalForm(oldCompany.getLegalForm());
+            company.setStreet(oldCompany.getStreet());
+            company.setCity(oldCompany.getCity());
+            company.setPostalCode(oldCompany.getPostalCode());
+            company.setCountry(oldCompany.getCountry());
+            company.setEmail(oldCompany.getEmail());
+            company.setPhone(oldCompany.getPhone());
+            company.setWeb(oldCompany.getWeb());
+            company.setIban(oldCompany.getIban());
+            company.setCin(oldCompany.getTin());
+            company.setTin(oldCompany.getTin());
+            company.setVatin(oldCompany.getVatin());
+
+            return companyRepository.save(company);
+        }).orElse(null);
     }
 
     @Override
-    // todo change default company to is default and remove app_user_id and add it to app_user_companies
     public Company getDefaultCompany() {
-        return this.companyRepository.findByDefaultCompanyAndAppUserId(true, SecurityUtils.id())
-                .orElseThrow(() -> new RuntimeException("Default company not exist, please set it"));
+        return SecurityUtils.defaultCompany();
     }
 
     @Override
     public void destroy(Long id) {
         Company c = this.findById(id);
 
-        if (c.getDefaultCompany() != null){
+        if (c.getDefaultCompany() != null) {
             throw new RuntimeException("Default company cannot destroy");
         }
 
         this.companyRepository.delete(c);
+    }
+
+    @Override
+    public void switchCompany(Long id) {
+        List<Company> companies = this.findAll();
+
+        companies.forEach(company -> {
+            company.setDefaultCompany(company.getId().equals(id));
+        });
+
+        companyRepository.saveAll(companies);
     }
 }

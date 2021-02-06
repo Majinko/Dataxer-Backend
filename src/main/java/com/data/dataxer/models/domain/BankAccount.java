@@ -6,6 +6,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,7 +19,7 @@ public class BankAccount extends BaseEntity {
 
     Integer bankCode;
 
-    Integer accountNumber;
+    BigInteger accountNumber;
 
     String bankName;
 
