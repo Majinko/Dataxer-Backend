@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<AppUser> all() {
-        return this.qAppUserRepository.all(SecurityUtils.companyIds());
+        return this.userRepository.getAll(SecurityUtils.companyId());
     }
 
     @Override

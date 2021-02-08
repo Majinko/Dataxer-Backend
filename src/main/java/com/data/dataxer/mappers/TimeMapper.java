@@ -13,7 +13,6 @@ public interface TimeMapper {
     Time timeDTOToTime(TimeDTO timeDTO);
 
     @Mapping(target = "project.contact", ignore = true)
-    @Mapping(target = "user.companies", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
     TimeDTO timeToTimeDTO(Time time);
 

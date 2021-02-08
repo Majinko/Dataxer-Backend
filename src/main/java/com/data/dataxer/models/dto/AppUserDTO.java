@@ -19,5 +19,4 @@ public class AppUserDTO {
     private String city;
     private String postalCode;
     private String country;
-    private List<Company> companies;
 }

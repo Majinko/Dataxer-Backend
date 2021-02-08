@@ -26,5 +26,4 @@ public interface ContactRepository extends JpaRepository<Contact, Long>, Queryds
     default public void customize(QuerydslBindings bindings, QContact root) {
         bindings.bind(String.class).first((StringPath path, String value) -> path.containsIgnoreCase(value));
     }
-
 }

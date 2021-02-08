@@ -12,7 +12,6 @@ import java.util.List;
 
 @Mapper
 public interface UserMapper {
-    @Mapping(target = "companies", ignore = true)
     AppUserDTO appUserToAppUserDTO(AppUser user);
 
     @Mapping(target = "updatedAt", ignore = true)
@@ -22,7 +21,6 @@ public interface UserMapper {
     AppUser appUserDTOtoAppUser(AppUserDTO userDTO);
 
     @Named(value = "appUserToAppUserDTOSimple")
-    @Mapping(target = "companies", ignore = true)
     AppUserDTO appUserToAppUserDTOSimple(AppUser appUser);
 
     @IterableMapping(qualifiedByName = "appUserToAppUserDTOSimple")

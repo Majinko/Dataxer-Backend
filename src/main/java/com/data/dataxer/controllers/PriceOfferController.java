@@ -2,6 +2,8 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.PriceOfferMapper;
 import com.data.dataxer.models.dto.PriceOfferDTO;
+import com.data.dataxer.models.enums.DocumentType;
+import com.data.dataxer.services.DocumentNumberGeneratorService;
 import com.data.dataxer.services.PriceOfferService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -15,14 +17,18 @@ import org.springframework.web.bind.annotation.*;
 public class PriceOfferController {
     private final PriceOfferService priceOfferService;
     private final PriceOfferMapper priceOfferMapper;
+    private final DocumentNumberGeneratorService documentNumberGeneratorService;
 
-    public PriceOfferController(PriceOfferService priceOfferService, PriceOfferMapper priceOfferMapper) {
+    public PriceOfferController(PriceOfferService priceOfferService, PriceOfferMapper priceOfferMapper, DocumentNumberGeneratorService documentNumberGeneratorService) {
         this.priceOfferService = priceOfferService;
         this.priceOfferMapper = priceOfferMapper;
+        this.documentNumberGeneratorService = documentNumberGeneratorService;
     }
 
     @PostMapping("/store")
     public void store(@RequestBody PriceOfferDTO priceOfferDTO) {
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.valueOf("PRICE_OFFER"), true);
+
         this.priceOfferService.store(priceOfferMapper.priceOfferDTOtoPriceOffer(priceOfferDTO));
     }
 

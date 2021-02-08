@@ -23,6 +23,11 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
         QAppUser qAppUser = QAppUser.appUser;
         QCompany qCompany = QCompany.company;
 
+        /*return query.selectFrom(qAppUser)
+                .where(qAppUser.id.in(
+                        JPAExpressions.select(qCompany).where(qCompany.id.in(companyIds))
+                ))
+                .fetch();*/
         return null;
     }
 }

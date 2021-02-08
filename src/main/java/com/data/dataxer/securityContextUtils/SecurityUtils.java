@@ -29,7 +29,7 @@ public class SecurityUtils {
         return ((FirebaseUserAuthenticationDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getCompanies().stream().filter(Company::getDefaultCompany).collect(Collectors.toList()).get(0);
     }
 
-    public static Long CompanyId() {
+    public static Long companyId() {
         return defaultCompany().getId();
     }
 }
