@@ -26,7 +26,7 @@ public class PdfController {
 
     @GetMapping("/pdf")
     public ModelAndView pdf(ModelAndView modelAndView) {
-        modelAndView.addObject("invoice", this.invoiceService.getById(4L, false));
+        modelAndView.addObject("invoice", this.invoiceService.getById(4L));
         modelAndView.setViewName("view/invoice/show");
         return modelAndView;
     }

@@ -45,7 +45,7 @@ public class PaymentController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.paymentService.paginate(pageable, rqlFilter, sortExpression, false).map(this.paymentMapper::paymentToPaymentDTOSimple));
+        return ResponseEntity.ok(this.paymentService.paginate(pageable, rqlFilter, sortExpression).map(this.paymentMapper::paymentToPaymentDTOSimple));
     }
 
     @GetMapping("/restToPay/{id}/{type}")

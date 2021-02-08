@@ -29,7 +29,7 @@ public class DocumentRelationsController {
 
     @GetMapping("/getDocumentRelations/{id}")
     public ResponseEntity<List<InvoiceDTO>> getAllRelationDocuments(@PathVariable Long id) {
-        return ResponseEntity.ok(this.mapListInvoiceToListInvoiceDTO(this.documentRelationsService.getAllRelatedDocuments(id, false)));
+        return ResponseEntity.ok(this.mapListInvoiceToListInvoiceDTO(this.documentRelationsService.getAllRelatedDocuments(id)));
     }
 
     private List<InvoiceDTO> mapListInvoiceToListInvoiceDTO(List<Invoice> invoices) {

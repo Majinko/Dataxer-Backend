@@ -42,12 +42,12 @@ public class PackController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
 
-        return ResponseEntity.ok(this.packService.paginate(pageable, rqlFilter, sortExpression, false).map(packMapper::packToPackDTOSimple));
+        return ResponseEntity.ok(this.packService.paginate(pageable, rqlFilter, sortExpression).map(packMapper::packToPackDTOSimple));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PackDTO> getById(@PathVariable Long id) {
-        PackDTO packDTO = packMapper.packToPackDTO(this.packService.getById(id, false));
+        PackDTO packDTO = packMapper.packToPackDTO(this.packService.getById(id));
 
         Collections.sort(packDTO.getPackItems());
 

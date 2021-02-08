@@ -42,8 +42,8 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     }
 
     @Override
-    public DocumentRelations getById(Long id, Boolean disableFilter) {
-        return this.qDocumentRelationsRepository.getById(id, SecurityUtils.companyId(), disableFilter)
+    public DocumentRelations getById(Long id) {
+        return this.qDocumentRelationsRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Document relation not found"));
     }
 
@@ -74,22 +74,22 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     }
 
     @Override
-    public List<Invoice> getAllRelatedDocuments(Long originalDocumentId, Boolean disableFilter) {
+    public List<Invoice> getAllRelatedDocuments(Long originalDocumentId) {
         List<Invoice> result = new ArrayList<>();
         List<DocumentRelations> documentRelations = this.documentRelationsRepository.findAllRelationDocuments(originalDocumentId);
         for (DocumentRelations documentRelation : documentRelations) {
-            Optional<Invoice> optionalInvoice = this.qInvoiceRepository.getById(documentRelation.getRelationDocumentId(), SecurityUtils.companyId(), disableFilter);
+            Optional<Invoice> optionalInvoice = this.qInvoiceRepository.getById(documentRelation.getRelationDocumentId(), SecurityUtils.companyIds());
             optionalInvoice.ifPresent(result::add);
         }
         return result;
     }
 
     @Override
-    public List<Invoice> getAllRelationDocumentsByDocumentType(Long originalDocumentId, DocumentType documentType, Boolean disableFilter) {
+    public List<Invoice> getAllRelationDocumentsByDocumentType(Long originalDocumentId, DocumentType documentType) {
         List<Invoice> result = new ArrayList<>();
         List<DocumentRelations> documentRelations = this.documentRelationsRepository.findAllRelationDocuments(originalDocumentId);
         for (DocumentRelations documentRelation:documentRelations) {
-            Invoice optionalRelatedInvoice = this.qInvoiceRepository.getById(documentRelation.getRelationDocumentId(), SecurityUtils.companyId(), disableFilter).orElse(null);
+            Invoice optionalRelatedInvoice = this.qInvoiceRepository.getById(documentRelation.getRelationDocumentId(), SecurityUtils.companyIds()).orElse(null);
             if (optionalRelatedInvoice != null && optionalRelatedInvoice.getDocumentType().equals(documentType)) {
                 result.add(optionalRelatedInvoice);
             }

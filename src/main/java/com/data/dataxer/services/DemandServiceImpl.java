@@ -4,8 +4,6 @@ import com.data.dataxer.models.domain.Demand;
 import com.data.dataxer.repositories.DemandRepository;
 import com.data.dataxer.repositories.qrepositories.QDemandRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -31,8 +29,8 @@ public class DemandServiceImpl implements DemandService {
     }
 
     @Override
-    public Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
-        return qDemandRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
+    public Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return qDemandRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     private Demand getByIdSimple(Long id) {
@@ -41,14 +39,14 @@ public class DemandServiceImpl implements DemandService {
     }
 
     @Override
-    public Demand getById(Long id, Boolean disableFilter) {
-        return this.qDemandRepository.getById(id, SecurityUtils.companyId(), disableFilter)
+    public Demand getById(Long id) {
+        return this.qDemandRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Demand not found"));
     }
 
     @Override
     public void destroy(Long id) {
-        Demand demand = this.getById(id, false);
+        Demand demand = this.getById(id);
 
         this.demandRepository.delete(demand);
     }

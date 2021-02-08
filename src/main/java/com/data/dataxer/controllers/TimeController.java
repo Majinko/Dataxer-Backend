@@ -43,12 +43,12 @@ public class TimeController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.timeService.paginate(pageable, rqlFilter, sortExpression, false).map(this.timeMapper::timeToTimeDTO));
+        return ResponseEntity.ok(this.timeService.paginate(pageable, rqlFilter, sortExpression).map(this.timeMapper::timeToTimeDTO));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TimeDTO> getTimeById(@PathVariable Long id) {
-        return ResponseEntity.ok(this.timeMapper.timeToTimeDTO(this.timeService.getTimeById(id, false)));
+        return ResponseEntity.ok(this.timeMapper.timeToTimeDTO(this.timeService.getTimeById(id)));
     }
 
     @GetMapping("/destroy/{id}")

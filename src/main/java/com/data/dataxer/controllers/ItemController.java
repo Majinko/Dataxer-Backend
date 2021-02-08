@@ -42,7 +42,7 @@ public class ItemController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("id"));
 
-        return ResponseEntity.ok(itemService.paginate(pageable, rqlFilter, sortExpression, false).map((itemMapper::itemToItemDtoSimple)));
+        return ResponseEntity.ok(itemService.paginate(pageable, rqlFilter, sortExpression).map((itemMapper::itemToItemDtoSimple)));
     }
 
     @PostMapping("/store")
@@ -68,7 +68,7 @@ public class ItemController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ItemDTO> getById(@PathVariable long id) {
-        return ResponseEntity.ok(itemMapper.itemToItemDto(this.itemService.getById(id, false)));
+        return ResponseEntity.ok(itemMapper.itemToItemDto(this.itemService.getById(id)));
     }
 
     @GetMapping("/search/{q}")

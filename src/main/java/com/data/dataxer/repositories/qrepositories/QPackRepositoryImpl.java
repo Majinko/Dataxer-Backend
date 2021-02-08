@@ -17,7 +17,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,17 +30,14 @@ import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
 @Repository
 public class QPackRepositoryImpl implements QPackRepository {
-
     private final JPAQueryFactory query;
-    private final EntityManager entityManager;
 
     public QPackRepositoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager.getEntityManagerFactory().createEntityManager();
-        this.query = new JPAQueryFactory(this.entityManager);
+        this.query = new JPAQueryFactory(entityManager);
     }
 
     @Override
-    public Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId, Boolean disableFilter) {
+    public Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -58,12 +54,9 @@ public class QPackRepositoryImpl implements QPackRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         List<Pack> packList = this.query.selectFrom(qPack)
                 .where(predicate)
+                .where(qPack.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -73,17 +66,14 @@ public class QPackRepositoryImpl implements QPackRepository {
     }
 
     @Override
-    public Pack getById(Long id, Long companyId, Boolean disableFilter) {
+    public Pack getById(Long id, List<Long> companyIds) {
         QPack qPack = QPack.pack;
         QPackItem qPackItem = QPackItem.packItem;
         QItem qItem = QItem.item;
         QItemPrice qItemPrice = QItemPrice.itemPrice;
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         return query.selectFrom(qPack)
+                .where(qPack.company.id.in(companyIds))
                 .where(qPack.id.eq(id))
                 .leftJoin(qPack.packItems, qPackItem).orderBy(qPackItem.position.desc()).fetchJoin()
                 .leftJoin(qPackItem.item, qItem).fetchJoin()
@@ -92,14 +82,11 @@ public class QPackRepositoryImpl implements QPackRepository {
     }
 
     @Override
-    public List<Pack> search(String q, Long companyId, Boolean disableFilter) {
+    public List<Pack> search(String q, List<Long> companyIds) {
         QPack qPack = QPack.pack;
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         return query.selectFrom(qPack)
+                .where(qPack.company.id.in(companyIds))
                 .where(qPack.title.containsIgnoreCase(q))
                 .fetch();
     }

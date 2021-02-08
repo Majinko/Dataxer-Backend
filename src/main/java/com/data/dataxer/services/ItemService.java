@@ -11,13 +11,13 @@ public interface ItemService  {
 
     Item store(Item item, ItemPrice itemPrice);
 
-    Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
+    Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     Item update(Item item, ItemPrice itemPrice);
 
     void destroy(long id);
 
-    Item getById(long id, Boolean disableFilter);
+    Item getById(long id);
 
     Item getByIdSimple(long id);
 

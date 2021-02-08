@@ -14,9 +14,9 @@ public interface PaymentService {
 
     void update(Payment payment);
 
-    Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
+    Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
-    Payment getById(Long id, Boolean disableFilter);
+    Payment getById(Long id);
 
     void destroy(Long id);
 

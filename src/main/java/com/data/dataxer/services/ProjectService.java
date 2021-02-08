@@ -11,13 +11,13 @@ public interface ProjectService {
 
     Project update(Project project);
 
-    Project getById(Long id, Boolean disableFilter);
+    Project getById(Long id);
 
-    Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
+    Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     void destroy(Long id);
 
     List<Project> all();
 
-    List<Project> search(String queryString, Boolean disableFilter);
+    List<Project> search(String queryString);
 }

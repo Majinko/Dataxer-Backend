@@ -1,6 +1,8 @@
 package com.data.dataxer.repositories.qrepositories;
 
+import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.Demand;
+import com.data.dataxer.models.domain.QCost;
 import com.data.dataxer.models.domain.QDemand;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -14,7 +16,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,15 +31,13 @@ import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 @Repository
 public class QDemandRepositoryImpl implements QDemandRepository {
     private final JPAQueryFactory query;
-    private final EntityManager entityManager;
 
     public QDemandRepositoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager.getEntityManagerFactory().createEntityManager();
-        this.query = new JPAQueryFactory(this.entityManager);
+        this.query = new JPAQueryFactory(entityManager);
     }
 
     @Override
-    public Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId, Boolean disableFilter) {
+    public Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -55,14 +54,11 @@ public class QDemandRepositoryImpl implements QDemandRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         List<Demand> demandList = this.query.selectFrom(qDemand)
                 .leftJoin(qDemand.category).fetchJoin()
                 .leftJoin(qDemand.contact).fetchJoin()
                 .where(predicate)
+                .where(qDemand.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -72,14 +68,11 @@ public class QDemandRepositoryImpl implements QDemandRepository {
     }
 
     @Override
-    public Optional<Demand> getById(Long id, Long companyId, Boolean disableFilter) {
+    public Optional<Demand> getById(Long id, List<Long> companyIds) {
         QDemand qDemand = QDemand.demand;
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         return Optional.ofNullable(query.selectFrom(qDemand)
+                .where(qDemand.company.id.in(companyIds))
                 .where(qDemand.id.eq(id))
                 .leftJoin(qDemand.category).fetchJoin()
                 .leftJoin(qDemand.contact).fetchJoin()

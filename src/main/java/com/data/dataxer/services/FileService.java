@@ -12,7 +12,7 @@ public interface FileService {
 
     Resource loadFileAsResource(String fileName);
 
-    File getFileByName(String fileName, Boolean disableFilter);
+    File getFileByName(String fileName);
 
-    Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
+    Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 }

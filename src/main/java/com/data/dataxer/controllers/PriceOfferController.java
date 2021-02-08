@@ -27,7 +27,7 @@ public class PriceOfferController {
 
     @PostMapping("/store")
     public void store(@RequestBody PriceOfferDTO priceOfferDTO) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.valueOf("PRICE_OFFER"), true, false);
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.valueOf("PRICE_OFFER"), true);
 
         this.priceOfferService.store(priceOfferMapper.priceOfferDTOtoPriceOffer(priceOfferDTO));
     }
@@ -46,12 +46,12 @@ public class PriceOfferController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(priceOfferService.paginate(pageable, rqlFilter, sortExpression, false).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
+        return ResponseEntity.ok(priceOfferService.paginate(pageable, rqlFilter, sortExpression).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PriceOfferDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTO(this.priceOfferService.getById(id, false)));
+        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTO(this.priceOfferService.getById(id)));
     }
 
     @GetMapping("/destroy/{id}")

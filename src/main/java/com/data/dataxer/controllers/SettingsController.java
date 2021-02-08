@@ -33,7 +33,7 @@ public class SettingsController {
     @GetMapping("/getByName/{settingName}")
     public ResponseEntity<SettingsDTO> getSettingByName(@PathVariable String settingName) {
         return ResponseEntity.ok(this.settingsMapper
-                .settingsToSettingsDTO(this.settingsService.getByName(settingName, false)));
+                .settingsToSettingsDTO(this.settingsService.getByName(settingName)));
     }
 
     @PostMapping("/destroyCompanySettings/{companyId}")

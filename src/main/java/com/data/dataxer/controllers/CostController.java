@@ -47,7 +47,7 @@ public class CostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CostDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.getByIdWithRelation(id, false)));
+        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.getByIdWithRelation(id)));
     }
 
 
@@ -73,19 +73,19 @@ public class CostController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.costService.paginate(pageable, rqlFilter, sortExpression, false).map(this.costMapper::costToCostDTOPaginate));
+        return ResponseEntity.ok(this.costService.paginate(pageable, rqlFilter, sortExpression).map(this.costMapper::costToCostDTOPaginate));
     }
 
     @GetMapping("/changeState")
     public ResponseEntity<CostDTO> changeState(
             @RequestParam(value = "id") Long id,
             @RequestParam(value = "state", defaultValue = "PAYED") CostState state) {
-        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.changeState(id, state, false)));
+        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.changeState(id, state)));
     }
 
     @GetMapping(value = "/duplicate/{id}")
     public ResponseEntity<CostDTO> duplicate(@PathVariable Long id) {
-        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.duplicate(id, false)));
+        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.duplicate(id)));
     }
 
     @GetMapping("/destroy/{id}")

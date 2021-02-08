@@ -4,23 +4,12 @@ import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.models.enums.Periods;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
 
 @Entity
 @Getter
 @Setter
-@FilterDef(
-        name = "companyCondition",
-        parameters = @ParamDef(name = "companyId", type = "long")
-)
-@Filter(
-        name = "companyCondition",
-        condition = "company_id = :companyId"
-)
 public class DocumentNumberGenerator extends BaseEntity {
 
     @Id

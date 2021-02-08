@@ -3,10 +3,10 @@ package com.data.dataxer.models.domain;
 import com.data.dataxer.models.enums.DocumentState;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
 import java.time.LocalDateTime;
 
 @Entity
@@ -14,14 +14,6 @@ import java.time.LocalDateTime;
 @Getter
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE item SET deleted_at = now() WHERE id = ?")
-@FilterDef(
-        name = "companyCondition",
-        parameters = @ParamDef(name = "companyId", type = "long")
-)
-@Filter(
-        name = "companyCondition",
-        condition = "company_id = :companyId"
-)
 public class Demand extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

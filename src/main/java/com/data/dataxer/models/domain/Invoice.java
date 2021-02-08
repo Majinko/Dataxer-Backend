@@ -4,9 +4,6 @@ import com.data.dataxer.models.enums.DeliveryMethod;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
@@ -20,14 +17,6 @@ import java.util.Map;
 @Getter
 @DiscriminatorValue("INVOICE")
 @SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
-@FilterDef(
-        name = "companyCondition",
-        parameters = @ParamDef(name = "companyId", type = "long")
-)
-@Filter(
-        name = "companyCondition",
-        condition = "company_id = :companyId"
-)
 public class Invoice extends DocumentBase {
     private String variableSymbol;
 

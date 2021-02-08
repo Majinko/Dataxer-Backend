@@ -82,14 +82,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
-        return this.qInvoiceRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
+    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qInvoiceRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override
-    public Invoice getById(Long id, Boolean disableFilter) {
+    public Invoice getById(Long id) {
         return this.qInvoiceRepository
-                .getById(id, SecurityUtils.companyId(), disableFilter)
+                .getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
@@ -101,20 +101,20 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public Invoice getByIdSimple(Long id, Boolean disableFilter) {
+    public Invoice getByIdSimple(Long id) {
         return this.qInvoiceRepository
-                .getByIdSimple(id, SecurityUtils.companyId(), disableFilter)
+                .getByIdSimple(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
     @Override
     public void destroy(Long id) {
-        this.invoiceRepository.delete(this.getByIdSimple(id, false));
+        this.invoiceRepository.delete(this.getByIdSimple(id));
     }
 
     @Override
     public void makePay(Long id, LocalDate payedDate) {
-        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyId(), false).orElseThrow(() -> new RuntimeException("Invoice not found"));
+        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds()).orElseThrow(() -> new RuntimeException("Invoice not found"));
 
         invoice.setPaymentDate(payedDate);
         this.invoiceRepository.save(invoice);
@@ -123,7 +123,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     @Transactional
     public Invoice changeTypeAndSave(Long id, String type, String number) {
-        Invoice originalInvoice = this.getById(id, false);
+        Invoice originalInvoice = this.getById(id);
         Invoice invoice = new Invoice();
 
         BeanUtils.copyProperties(originalInvoice, invoice, "id", "packs");
@@ -152,7 +152,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     @Transactional
     public Invoice duplicate(Long id) {
-        Invoice originalInvoice = this.getById(id, false);
+        Invoice originalInvoice = this.getById(id);
         Invoice duplicatedInvoice = new Invoice();
         BeanUtils.copyProperties(originalInvoice, duplicatedInvoice, "id", "packs");
         duplicatedInvoice.setPacks(this.duplicateDocumentPacks(originalInvoice.getPacks()));
@@ -163,7 +163,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Invoice generateTaxDocument(Long proformaInvoiceId) {
-        Invoice proformaInvoice = this.getById(proformaInvoiceId, false);
+        Invoice proformaInvoice = this.getById(proformaInvoiceId);
 
         Invoice taxDocument = new Invoice();
         BeanUtils.copyProperties(proformaInvoice, taxDocument,
@@ -180,7 +180,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public Invoice generateSummaryInvoice(Long taxDocumentId) {
         Invoice proformaInvoice = this.getOriginalProformaInvoiceFromTaxDocument(taxDocumentId);
-        Invoice taxDocument = this.getById(taxDocumentId, false);
+        Invoice taxDocument = this.getById(taxDocumentId);
 
         Invoice summaryInvoice = new Invoice();
         BeanUtils.copyProperties(taxDocument, summaryInvoice,
@@ -327,7 +327,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private BigDecimal getPaymentsValue(Long proformaInvoiceId) {
         BigDecimal paymentsValue = BigDecimal.ZERO;
-        List<Payment> payments = this.qPaymentRepository.getPaymentsByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyId(), false);
+        List<Payment> payments = this.qPaymentRepository.getPaymentsByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
 
         for (Payment payment : payments) {
             paymentsValue = paymentsValue.add(payment.getPayedValue());
@@ -350,7 +350,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private LocalDate getNewestPaymentPayedDate(Long proformaInvoiceId) {
-        Payment payment = this.qPaymentRepository.getNewestByDocumentId(proformaInvoiceId, SecurityUtils.companyId(), false)
+        Payment payment = this.qPaymentRepository.getNewestByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("No payment usable for tax document"));
         return payment.getPayedDate();
     }

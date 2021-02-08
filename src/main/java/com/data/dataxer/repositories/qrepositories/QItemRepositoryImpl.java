@@ -17,7 +17,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,28 +31,22 @@ import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
 @Repository
 public class QItemRepositoryImpl implements QItemRepository {
-
     private final JPAQueryFactory query;
-    private final EntityManager entityManager;
 
     public QItemRepositoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager.getEntityManagerFactory().createEntityManager();
-        this.query = new JPAQueryFactory(this.entityManager);
+        this.query = new JPAQueryFactory(entityManager);
     }
 
     @Override
-    public Item getById(long id, Long companyId, Boolean disableFilter) {
+    public Item getById(long id, List<Long> companyIds) {
         QItem qItem = QItem.item;
         QItemPrice qItemPrice = QItemPrice.itemPrice;
         QCategory qCategory = QCategory.category;
         QContact qContact = QContact.contact;
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         return query
                 .selectFrom(qItem)
+                .where(qItem.company.id.in(companyIds))
                 .where(qItem.id.eq(id))
                 .leftJoin(qItem.itemPrices, qItemPrice).fetchJoin()
                 .leftJoin(qItem.category, qCategory).fetchJoin()
@@ -62,22 +55,19 @@ public class QItemRepositoryImpl implements QItemRepository {
     }
 
     @Override
-    public Optional<List<Item>> findAllByTitleContainsAndCompanyIs(String q, Long companyId, Boolean disableFilter) {
+    public Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String q, List<Long> companyIds) {
         QItem qItem = QItem.item;
-
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
 
         return Optional.ofNullable(query
                 .selectFrom(qItem)
+                .where(qItem.company.id.in(companyIds))
                 .where(qItem.title.containsIgnoreCase(q))
                 .leftJoin(qItem.itemPrices).fetchJoin()
                 .fetch());
     }
 
     @Override
-    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId, Boolean disableFilter) {
+    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -94,13 +84,10 @@ public class QItemRepositoryImpl implements QItemRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         List<Item> itemList = this.query.selectFrom(qItem)
                 .leftJoin(QItem.item.itemPrices).fetchJoin()
                 .where(predicate)
+                .where(qItem.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface QSettingsRepository {
 
-    Optional<Settings> getByName(String name, Long companyId, Boolean disableFilter);
+    Optional<Settings> getByName(String name, List<Long> companyIds);
 
     List<Settings> getByCompanyId(Long companyId);
 
