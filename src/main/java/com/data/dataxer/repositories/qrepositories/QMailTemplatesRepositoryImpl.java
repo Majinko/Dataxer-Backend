@@ -14,6 +14,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -30,25 +31,30 @@ import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
 
     private final JPAQueryFactory query;
+    private final EntityManager entityManager;
 
     public QMailTemplatesRepositoryImpl(EntityManager entityManager) {
-        this.query = new JPAQueryFactory(entityManager);
+        this.entityManager = entityManager.getEntityManagerFactory().createEntityManager();
+        this.query = new JPAQueryFactory(this.entityManager);
     }
 
     @Override
-    public Optional<MailTemplates> getById(Long id, List<Long> companyIds) {
+    public Optional<MailTemplates> getById(Long id, Long companyId, Boolean disableFilter) {
         QMailTemplates qMailTemplates = QMailTemplates.mailTemplates;
+
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
 
         return Optional.ofNullable(
             this.query.selectFrom(qMailTemplates)
                 .where(qMailTemplates.id.eq(id))
-                .where(qMailTemplates.company.id.in(companyIds))
                 .fetchOne()
         );
     }
 
     @Override
-    public Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId, Boolean disableFilter) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -68,9 +74,12 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
+
         List<MailTemplates> mailTemplatesList = this.query.selectFrom(qMailTemplates)
                 .where(predicate)
-                .where(qMailTemplates.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -80,14 +89,17 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
     }
 
     @Override
-    public long updateByMailTemplates(MailTemplates mailTemplates, List<Long> companyIds) {
+    public long updateByMailTemplates(MailTemplates mailTemplates, Long companyId, Boolean disableFilter) {
         QMailTemplates qMailTemplates = QMailTemplates.mailTemplates;
+
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
 
         return this.query.update(qMailTemplates)
                 .set(qMailTemplates.emailSubject, mailTemplates.getEmailSubject())
                 .set(qMailTemplates.emailContent, mailTemplates.getEmailContent())
                 .where(qMailTemplates.id.eq(mailTemplates.getId()))
-                .where(qMailTemplates.company.id.in(companyIds))
                 .execute();
     }
 

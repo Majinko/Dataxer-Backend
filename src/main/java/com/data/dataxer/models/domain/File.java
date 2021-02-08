@@ -2,11 +2,11 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
@@ -14,6 +14,14 @@ import java.net.URL;
 @Entity
 @Setter
 @Getter
+@FilterDef(
+        name = "companyCondition",
+        parameters = @ParamDef(name = "companyId", type = "long")
+)
+@Filter(
+        name = "companyCondition",
+        condition = "company_id = :companyId"
+)
 public class File extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -31,17 +31,17 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public Task getById(Long id) {
-        return this.qTaskRepository.getById(id, SecurityUtils.companyIds());
+    public Task getById(Long id, Boolean disableFilter) {
+        return this.qTaskRepository.getById(id, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
-    public Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qTaskRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+    public Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
+        return this.qTaskRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
     public void destroy(Long id) {
-        this.taskRepository.delete(this.getById(id));
+        this.taskRepository.delete(this.getById(id, false));
     }
 }

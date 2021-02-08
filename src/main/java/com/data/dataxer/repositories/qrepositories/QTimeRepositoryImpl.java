@@ -16,6 +16,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -33,14 +34,20 @@ import static com.github.vineey.rql.querydsl.filter.QueryDslFilterContext.withMa
 public class QTimeRepositoryImpl implements QTimeRepository {
 
     private final JPAQueryFactory query;
+    private final EntityManager entityManager;
 
     public QTimeRepositoryImpl(EntityManager entityManager) {
-        this.query = new JPAQueryFactory(entityManager);
+        this.entityManager = entityManager.getEntityManagerFactory().createEntityManager();
+        this.query = new JPAQueryFactory(this.entityManager);
     }
 
     @Override
-    public Optional<Time> getById(Long id, List<Long> companyIds) {
+    public Optional<Time> getById(Long id, Long companyId, Boolean disableFilter) {
         QTime qtime = QTime.time1;
+
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
 
         return Optional.ofNullable(this.query.selectFrom(qtime)
                 .leftJoin(qtime.category).fetchJoin()
@@ -48,21 +55,24 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .leftJoin(qtime.company).fetchJoin()
                 .leftJoin(qtime.project).fetchJoin()
                 .where(qtime.id.eq(id))
-                .where(qtime.company.id.in(companyIds))
                 .fetchOne());
     }
 
     @Override
-    public Optional<Time> getByIdSimple(Long id, List<Long> companyIds) {
+    public Optional<Time> getByIdSimple(Long id, Long companyId, Boolean disableFilter) {
         QTime qTime = QTime.time1;
+
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
+
         return Optional.ofNullable(this.query.selectFrom(qTime)
                 .where(qTime.id.eq(id))
-                .where(qTime.company.id.in(companyIds))
                 .fetchOne());
     }
 
     @Override
-    public Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long userId, List<Long> companyIds) {
+    public Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long userId, Long companyId, Boolean disableFilter) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -79,10 +89,13 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
+
         List<Time> timeList = this.query.selectFrom(qTime)
                 .leftJoin(qTime.category).fetchJoin()
                 .where(predicate)
-                .where(qTime.company.id.in(companyIds))
                 .where(qTime.user.id.eq(userId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())

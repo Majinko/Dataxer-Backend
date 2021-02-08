@@ -20,13 +20,12 @@ public interface InvoiceService {
 
     void update(Invoice invoice);
 
-    Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression);
+    Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
 
-    Invoice getById(Long id);
+    Invoice getById(Long id, Boolean disableFilter);
 
+    Invoice getByIdSimple(Long id, Boolean disableFilter);
     Invoice getByIdWithoutFirm(Long id);
-
-    Invoice getByIdSimple(Long id);
 
     void destroy(Long id);
 

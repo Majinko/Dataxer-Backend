@@ -41,7 +41,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost update(Cost oldCost) {
-        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyIds()).map(cost -> {
+        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyId(), false).map(cost -> {
 
             cost.setContact(oldCost.getContact());
             cost.setProject(oldCost.getProject());
@@ -80,8 +80,8 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qCostRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
+        return this.qCostRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
@@ -100,8 +100,8 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public Cost changeState(Long id, CostState state) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
+    public Cost changeState(Long id, CostState state, Boolean disableFilter) {
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         oldCost.setState(state);
         return this.update(oldCost);
@@ -109,23 +109,23 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public void destroy(Long id) {
-        this.costRepository.delete(this.getById(id));
+        this.costRepository.delete(this.getById(id, false));
     }
 
     @Override
-    public Cost getById(Long id) {
-        return this.qCostRepository.getById(id, SecurityUtils.companyIds())
+    public Cost getById(Long id, Boolean disableFilter) {
+        return this.qCostRepository.getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
     }
 
     @Override
-    public Cost getByIdWithRelation(Long id) {
-        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyIds()).orElse(null);
+    public Cost getByIdWithRelation(Long id, Boolean disableFilter) {
+        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyId(), disableFilter).orElse(null);
     }
 
     @Override
-    public Cost duplicate(Long id) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
+    public Cost duplicate(Long id, Boolean disableFilter) {
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         Cost newCost = new Cost();
         BeanUtils.copyProperties(oldCost, newCost, "id");

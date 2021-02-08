@@ -31,7 +31,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     public void store(DocumentNumberGenerator documentNumberGenerator) {
         FormatValidator.validateFormat(documentNumberGenerator.getFormat(), documentNumberGenerator.getPeriod());
         if (documentNumberGenerator.getIsDefault()) {
-            this.handleIfDefaultAlreadyExist(documentNumberGenerator, false);
+            this.handleIfDefaultAlreadyExist(documentNumberGenerator, false, false);
         }
 
         documentNumberGenerator.setLastNumber("0");
@@ -43,9 +43,9 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         FormatValidator.validateFormat(documentNumberGenerator.getFormat(), documentNumberGenerator.getPeriod());
 
         if (documentNumberGenerator.getIsDefault()) {
-            this.handleIfDefaultAlreadyExist(documentNumberGenerator, true);
+            this.handleIfDefaultAlreadyExist(documentNumberGenerator, true, false);
         }
-        Optional<DocumentNumberGenerator> oldDocumentNumberGenerator = this.qDocumentNumberGeneratorRepository.getById(documentNumberGenerator.getId(), SecurityUtils.companyIds());
+        Optional<DocumentNumberGenerator> oldDocumentNumberGenerator = this.qDocumentNumberGeneratorRepository.getById(documentNumberGenerator.getId(), SecurityUtils.companyId(), false);
 
         oldDocumentNumberGenerator.ifPresent(numberGenerator -> documentNumberGenerator.setLastNumber(numberGenerator.getLastNumber()));
 
@@ -53,32 +53,32 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qDocumentNumberGeneratorRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+    public Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
+        return this.qDocumentNumberGeneratorRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
-    public DocumentNumberGenerator getById(Long id) {
+    public DocumentNumberGenerator getById(Long id, Boolean disableFilter) {
         return this.qDocumentNumberGeneratorRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Document number generator not found"));
     }
 
     @Override
-    public DocumentNumberGenerator getByIdSimple(Long id) {
+    public DocumentNumberGenerator getByIdSimple(Long id, Boolean disableFilter) {
         return this.qDocumentNumberGeneratorRepository
-                .getByIdSimple(id, SecurityUtils.companyIds())
+                .getByIdSimple(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Document number generator not found"));
     }
 
     @Override
     public void destroy(Long id) {
-        this.documentNumberGeneratorRepository.delete(this.getByIdSimple(id));
+        this.documentNumberGeneratorRepository.delete(this.getByIdSimple(id, false));
     }
 
     @Override
-    public String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated) {
-        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.companyIds());
+    public String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated, Boolean disableFilter) {
+        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.companyId(), disableFilter);
 
         if (documentNumberGenerator == null) {
             documentNumberGenerator = this.documentNumberGeneratorRepository.save(this.returnDefault(documentType));
@@ -88,8 +88,8 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public String generateNextNumberByDocumentTypeFromString(String type) {
-        return this.generateNextNumberByDocumentType(DocumentType.valueOf(type), true);
+    public String generateNextNumberByDocumentTypeFromString(String type, Boolean disableFilter) {
+        return this.generateNextNumberByDocumentType(DocumentType.valueOf(type), true, disableFilter);
     }
 
     private DocumentNumberGenerator returnDefault(DocumentType type) {
@@ -97,9 +97,9 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public String generateNextNumberByDocumentId(Long id, boolean storeGenerated) {
+    public String generateNextNumberByDocumentId(Long id, boolean storeGenerated, Boolean disableFilter) {
         DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Generator not found"));
         return this.generateNextDocumentNumber(documentNumberGenerator, storeGenerated);
     }
@@ -110,8 +110,8 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public void resetGenerationByType(DocumentType documentType) {
-        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.companyIds());
+    public void resetGenerationByType(DocumentType documentType, Boolean disableFilter) {
+        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.companyId(), disableFilter);
         if (documentNumberGenerator != null) {
             documentNumberGenerator.setLastNumber("0");
             this.documentNumberGeneratorRepository.save(documentNumberGenerator);
@@ -119,9 +119,9 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public void resetGenerationById(Long id) {
+    public void resetGenerationById(Long id, Boolean disableFilter) {
         Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
-                .getByIdSimple(id, SecurityUtils.companyIds());
+                .getByIdSimple(id, SecurityUtils.companyId(), disableFilter);
         if (documentNumberGeneratorOptional.isPresent()) {
             DocumentNumberGenerator documentNumberGenerator = documentNumberGeneratorOptional.get();
             documentNumberGenerator.setLastNumber("0");
@@ -295,8 +295,8 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return generatedNumber.replace(forReplace, dayForReplace.toString());
     }
 
-    private void handleIfDefaultAlreadyExist(DocumentNumberGenerator documentNumberGenerator, boolean isUpdated) {
-        DocumentNumberGenerator defaultNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentNumberGenerator.getType(), SecurityUtils.companyIds());
+    private void handleIfDefaultAlreadyExist(DocumentNumberGenerator documentNumberGenerator, boolean isUpdated, Boolean disableFilter) {
+        DocumentNumberGenerator defaultNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentNumberGenerator.getType(), SecurityUtils.companyId(), disableFilter);
         if (defaultNumberGenerator != null) {
             if (isUpdated && documentNumberGenerator.getId().equals(defaultNumberGenerator.getId())) {
                 return;

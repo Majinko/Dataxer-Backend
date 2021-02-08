@@ -4,6 +4,9 @@ import com.data.dataxer.securityContextUtils.SecurityUtils;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -12,6 +15,14 @@ import java.time.LocalDate;
 @Entity
 @Getter
 @Setter
+@FilterDef(
+        name = "companyCondition",
+        parameters = @ParamDef(name = "companyId", type = "long")
+)
+@Filter(
+        name = "companyCondition",
+        condition = "company_id = :companyId"
+)
 public class Time extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

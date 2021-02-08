@@ -26,7 +26,7 @@ public class DocumentNumberGeneratorController {
 
     @GetMapping("/{id}")
     public ResponseEntity<DocumentNumberGeneratorDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(documentNumberGeneratorMapper.documentNumberGeneratorToDocumentNumberGeneratorDTO(this.documentNumberGeneratorService.getById(id)));
+        return ResponseEntity.ok(documentNumberGeneratorMapper.documentNumberGeneratorToDocumentNumberGeneratorDTO(this.documentNumberGeneratorService.getById(id, false)));
     }
 
     @PostMapping("/store")
@@ -48,7 +48,7 @@ public class DocumentNumberGeneratorController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.documentNumberGeneratorService.paginate(pageable, rqlFilter, sortExpression)
+        return ResponseEntity.ok(this.documentNumberGeneratorService.paginate(pageable, rqlFilter, sortExpression, false)
                 .map(this::convertToDocumentNumberGeneratorDTO));
     }
 
@@ -56,28 +56,28 @@ public class DocumentNumberGeneratorController {
     public ResponseEntity<String> generateNextNumberByDocumentType(
             @PathVariable DocumentType documentType
     ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, false));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, false, false));
     }
 
     @GetMapping("/generateAndSaveNextByType/{documentType}")
     public ResponseEntity<String> generateAndSaveNextNumberByDocumentType(
             @PathVariable DocumentType documentType
     ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, true));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, true, false));
     }
 
     @GetMapping("/generateNextById/{id}")
     public ResponseEntity<String> generateNextNumberByDocumentId(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentId(id, false));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentId(id, false, false));
     }
 
     @GetMapping("/generateAndSaveNextById/{id}")
     public ResponseEntity<String> generateAndSaveNextNumberByDocumentId(
             @PathVariable Long id
     ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentId(id, true));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentId(id, true, false));
     }
 
     @GetMapping("/destroy/{id}")
@@ -87,12 +87,12 @@ public class DocumentNumberGeneratorController {
 
     @GetMapping("/resetGenerationByType/{documentType}")
     public void resetGenerationByType(@PathVariable DocumentType documentType) {
-        this.documentNumberGeneratorService.resetGenerationByType(documentType);
+        this.documentNumberGeneratorService.resetGenerationByType(documentType, false);
     }
 
     @GetMapping("/resetGenerationById/{id}")
     public void resetGenerationById(@PathVariable Long id) {
-        this.documentNumberGeneratorService.resetGenerationById(id);
+        this.documentNumberGeneratorService.resetGenerationById(id, false);
     }
 
     private DocumentNumberGeneratorDTO convertToDocumentNumberGeneratorDTO(DocumentNumberGenerator documentNumberGenerator) {

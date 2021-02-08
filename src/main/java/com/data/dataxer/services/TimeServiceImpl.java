@@ -30,26 +30,26 @@ public class TimeServiceImpl implements TimeService {
 
     @Override
     public void destroy(Long id) {
-        this.timeRepository.delete(this.getTimeByIdSimple(id));
+        this.timeRepository.delete(this.getTimeByIdSimple(id, false));
     }
 
     @Override
-    public Time getTimeById(Long id) {
+    public Time getTimeById(Long id, Boolean disableFilter) {
         return this.qTimeRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Time not found!"));
     }
 
     @Override
-    public Time getTimeByIdSimple(Long id) {
+    public Time getTimeByIdSimple(Long id, Boolean disableFilter) {
         return this.qTimeRepository
-                .getByIdSimple(id, SecurityUtils.companyIds())
+                .getByIdSimple(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Time not found"));
     }
 
     @Override
-    public Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+    public Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
         return this.qTimeRepository
-                .paginate(pageable, rqlFilter, sortExpression, SecurityUtils.id(), SecurityUtils.companyIds());
+                .paginate(pageable, rqlFilter, sortExpression, SecurityUtils.id(), SecurityUtils.companyId(), disableFilter);
     }
 }

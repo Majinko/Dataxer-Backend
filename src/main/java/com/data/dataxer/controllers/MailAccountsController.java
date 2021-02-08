@@ -36,7 +36,7 @@ public class MailAccountsController {
     @GetMapping("/getById/{id}")
     public ResponseEntity<MailAccountsDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(this.mailAccountsMapper.mailAccountsToMailAccountsDTO(
-                this.mailAccountsService.getById(id)
+                this.mailAccountsService.getById(id, false)
         ));
     }
 
@@ -49,7 +49,7 @@ public class MailAccountsController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.mailAccountsService.paginate(pageable, rqlFilter, sortExpression)
+        return ResponseEntity.ok(this.mailAccountsService.paginate(pageable, rqlFilter, sortExpression, false)
             .map(this.mailAccountsMapper::mailAccountsToMailAccountsDTO));
     }
 

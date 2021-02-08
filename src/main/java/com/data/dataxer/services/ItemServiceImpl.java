@@ -39,8 +39,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return qItemRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
+        return qItemRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
@@ -64,8 +64,8 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public Item getById(long id) {
-        return this.qItemRepository.getById(id, SecurityUtils.companyIds());
+    public Item getById(long id, Boolean disableFilter) {
+        return this.qItemRepository.getById(id, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
@@ -76,7 +76,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<Item> search(String q) {
-        return this.qItemRepository.findAllByTitleContainsAndCompanyIdIn(q, SecurityUtils.companyIds())
+        return this.qItemRepository.findAllByTitleContainsAndCompanyIs(q, SecurityUtils.companyId(), false)
                 .orElse(null);
     }
 
