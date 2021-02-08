@@ -91,7 +91,7 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     public List<Invoice> getAllRelationDocumentsByDocumentType(Long originalDocumentId, DocumentType documentType) {
         List<Invoice> result = new ArrayList<>();
         List<DocumentRelations> documentRelations = this.documentRelationsRepository.findAllRelationDocuments(originalDocumentId);
-        for (DocumentRelations documentRelation:documentRelations) {
+        for (DocumentRelations documentRelation : documentRelations) {
             Invoice optionalRelatedInvoice = this.qInvoiceRepository.getById(documentRelation.getRelationDocumentId(), SecurityUtils.companyIds()).orElse(null);
             if (optionalRelatedInvoice != null && optionalRelatedInvoice.getDocumentType().equals(documentType)) {
                 result.add(optionalRelatedInvoice);
@@ -102,16 +102,15 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
 
     @Override
     public List<DocumentRelation> getRelatedDocuments(Long id) {
-        List<DocumentBase> documents = this.qDocumentBaseRepository.getAllDocumentByIds(
-                this.documentRelationsRepository.findAllRelationDocuments(id).stream().map(DocumentRelations::getRelationDocumentId)
-                .collect(Collectors.toList()), SecurityUtils.companyId()
-        );
+        List<DocumentBase> documents = this.qDocumentBaseRepository.getAllDocumentByIds(this.documentRelationsRepository.findAllRelationDocuments(id).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.companyId());
 
-        return  documents.stream().map(documentsBase -> {
+        return documents.stream().map(documentsBase -> {
+
             DocumentRelation documentRelation = new DocumentRelation();
             documentRelation.setRelatedDocumentId(documentsBase.getId());
             documentRelation.setDocumentTitle(documentsBase.getTitle());
             return documentRelation;
+
         }).collect(Collectors.toList());
     }
 }
