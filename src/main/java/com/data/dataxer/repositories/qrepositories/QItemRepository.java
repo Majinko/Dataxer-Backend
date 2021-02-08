@@ -9,9 +9,9 @@ import java.util.Optional;
 
 public interface QItemRepository {
 
-    Item getById(long id,  List<Long> companyIds);
+    Item getById(long id,  Long companyId, Boolean disableFilter);
 
-    Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String q, List<Long> companyIds);
+    Optional<List<Item>> findAllByTitleContainsAndCompanyIs(String q, Long companyId, Boolean disableFilter);
 
-    Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId, Boolean disableFilter);
 }

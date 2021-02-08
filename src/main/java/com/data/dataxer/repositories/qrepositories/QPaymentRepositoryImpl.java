@@ -17,6 +17,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -34,13 +35,15 @@ import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 public class QPaymentRepositoryImpl implements QPaymentRepository {
 
     private final JPAQueryFactory query;
+    private final EntityManager entityManager;
 
     public QPaymentRepositoryImpl(EntityManager entityManager) {
-        this.query = new JPAQueryFactory(entityManager);
+        this.entityManager = entityManager.getEntityManagerFactory().createEntityManager();
+        this.query = new JPAQueryFactory(this.entityManager);
     }
 
     @Override
-    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId, Boolean disableFilter) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -57,9 +60,12 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
+
         List<Payment> paymentList = this.query.selectFrom(qPayment)
                 .where(predicate)
-                .where(qPayment.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -69,12 +75,15 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public Optional<Payment> getById(Long id, List<Long> companyIds) {
+    public Optional<Payment> getById(Long id, Long companyId, Boolean disableFilter) {
         QPayment qPayment = QPayment.payment;
+
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
 
         return Optional.ofNullable(this.query
                 .selectFrom(qPayment)
-                .where(qPayment.company.id.in(companyIds))
                 .where(qPayment.id.eq(id))
                 .orderBy(qPayment.id.desc())
                 .fetchOne());
@@ -130,24 +139,30 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public List<Payment> getPaymentsByDocumentIdSortedByPayDate(Long documentId, List<Long> companyIds) {
+    public List<Payment> getPaymentsByDocumentIdSortedByPayDate(Long documentId, Long companyId, Boolean disableFilter) {
         QPayment qPayment = QPayment.payment;
+
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
 
         return this.query.selectFrom(qPayment)
                 .where(qPayment.documentId.eq(documentId))
-                .where(qPayment.company.id.in(companyIds))
                 .orderBy(qPayment.payedDate.desc())
                 .fetch();
 
     }
 
     @Override
-    public Optional<Payment> getNewestByDocumentId(Long documentId, List<Long> companyIds) {
+    public Optional<Payment> getNewestByDocumentId(Long documentId, Long companyId, Boolean disableFilter) {
         QPayment qPayment = QPayment.payment;
+
+        if (!disableFilter) {
+            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
+        }
 
         return Optional.ofNullable(this.query.selectFrom(qPayment)
                 .where(qPayment.documentId.eq(documentId))
-                .where(qPayment.company.id.in(companyIds))
                 .orderBy(qPayment.createdAt.desc())
                 .fetchFirst());
     }

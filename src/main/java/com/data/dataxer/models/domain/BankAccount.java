@@ -2,11 +2,11 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import javax.persistence.Entity;
 import java.time.LocalDateTime;
 
 @Entity

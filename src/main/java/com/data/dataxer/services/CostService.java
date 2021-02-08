@@ -11,17 +11,17 @@ public interface CostService {
 
     Cost update(Cost cost);
 
-    Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression);
+    Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
 
     void taskExecute();
 
-    Cost changeState(Long id, CostState state);
+    Cost changeState(Long id, CostState state, Boolean disableFilter);
 
     void destroy(Long id);
 
-    Cost getById(Long id);
+    Cost getById(Long id, Boolean disableFilter);
 
-    Cost getByIdWithRelation(Long id);
+    Cost getByIdWithRelation(Long id, Boolean disableFilter);
 
-    Cost duplicate(Long id);
+    Cost duplicate(Long id, Boolean disableFilter);
 }

@@ -12,9 +12,9 @@ public interface TimeService {
 
     void destroy(Long id);
 
-    Time getTimeById(Long id);
+    Time getTimeById(Long id, Boolean disableFilter);
 
-    Time getTimeByIdSimple(Long id);
+    Time getTimeByIdSimple(Long id, Boolean disableFilter);
 
-    Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression);
+    Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
 }

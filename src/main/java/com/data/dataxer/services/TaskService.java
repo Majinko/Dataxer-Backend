@@ -9,9 +9,9 @@ public interface TaskService {
 
     void update(Task task);
 
-    Task getById(Long id);
+    Task getById(Long id, Boolean disableFilter);
 
-    Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression);
+    Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
 
     void destroy(Long id);
 }

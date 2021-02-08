@@ -50,20 +50,20 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
-    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
+        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.CompanyId(), disableFilter);
     }
 
     @Override
-    public Payment getById(Long id) {
+    public Payment getById(Long id, Boolean disableFilter) {
         return this.qPaymentRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.CompanyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
     }
 
     @Override
     public void destroy(Long id) {
-        Payment payment = this.getById(id);
+        Payment payment = this.getById(id, false);
         Invoice invoice = this.invoiceRepository.findByIdAndCompanyIdIn(payment.getDocumentId(), SecurityUtils.companyIds());
 
         if (this.documentIsPayed(payment)) {

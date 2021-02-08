@@ -10,7 +10,7 @@ public interface SettingsService {
 
     List<Settings> getCompanySettings(Long id);
 
-    Settings getByName(String name);
+    Settings getByName(String name, Boolean disableFilter);
 
     void destroyAllCompanySettings(Long companyId);
 

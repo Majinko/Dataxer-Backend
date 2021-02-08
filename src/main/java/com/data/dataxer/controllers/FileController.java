@@ -85,7 +85,7 @@ public class FileController {
     @GetMapping("/getFileByName/{fileName}")
     public ResponseEntity<FileDTO> getFileByName(@PathVariable String fileName) {
         return ResponseEntity.ok(
-                this.fileMapper.fileToFileDTO(this.fileService.getFileByName(fileName))
+                this.fileMapper.fileToFileDTO(this.fileService.getFileByName(fileName, false))
         );
     }
 
@@ -98,6 +98,6 @@ public class FileController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.fileService.paginate(pageable, rqlFilter, sortExpression).map(this.fileMapper::fileToFileDTO));
+        return ResponseEntity.ok(this.fileService.paginate(pageable, rqlFilter, sortExpression, false).map(this.fileMapper::fileToFileDTO));
     }
 }

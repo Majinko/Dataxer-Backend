@@ -12,14 +12,14 @@ public interface DocumentRelationService {
 
     void storeDocumentRelation(DocumentRelations documentRelations);
 
-    DocumentRelations getById(Long id);
+    DocumentRelations getById(Long id, Boolean disableFilter);
 
     Long getOriginalDocumentId(Long relativeDocumentId);
 
     List<Long> getAllRelationDocumentIds(Long originalDocumentId);
 
-    List<Invoice> getAllRelatedDocuments(Long originalDocumentId);
+    List<Invoice> getAllRelatedDocuments(Long originalDocumentId, Boolean disableFilter);
 
-    List<Invoice> getAllRelationDocumentsByDocumentType(Long originalDocumentId, DocumentType documentType);
+    List<Invoice> getAllRelationDocumentsByDocumentType(Long originalDocumentId, DocumentType documentType, Boolean disableFilter);
 
 }

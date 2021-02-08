@@ -9,11 +9,11 @@ public interface PriceOfferService {
 
     void update(PriceOffer priceOffer);
 
-    Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression);
+    Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
 
-    PriceOffer getById(Long id);
+    PriceOffer getById(Long id, Boolean disableFilter);
 
-    PriceOffer getByIdSimple(Long id);
+    PriceOffer getByIdSimple(Long id, Boolean disableFilter);
 
     void destroy(Long id);
 }

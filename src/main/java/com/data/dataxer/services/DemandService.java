@@ -10,9 +10,9 @@ public interface DemandService {
 
     void update(Demand demandDTOtoDemand);
 
-    Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression);
+    Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
 
-    Demand getById(Long id);
+    Demand getById(Long id, Boolean disableFilter);
 
     void destroy(Long id);
 }

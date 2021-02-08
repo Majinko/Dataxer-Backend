@@ -46,12 +46,12 @@ public class PriceOfferController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(priceOfferService.paginate(pageable, rqlFilter, sortExpression).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
+        return ResponseEntity.ok(priceOfferService.paginate(pageable, rqlFilter, sortExpression, false).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PriceOfferDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTO(this.priceOfferService.getById(id)));
+        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTO(this.priceOfferService.getById(id, false)));
     }
 
     @GetMapping("/destroy/{id}")

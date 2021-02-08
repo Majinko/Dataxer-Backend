@@ -54,12 +54,12 @@ public class TaskController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(taskService.paginate(pageable, rqlFilter, sortExpression).map(taskMapper::taskToTaskDTO));
+        return ResponseEntity.ok(taskService.paginate(pageable, rqlFilter, sortExpression, false).map(taskMapper::taskToTaskDTO));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TaskDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(taskMapper.taskToTaskDTO(taskService.getById(id)));
+        return ResponseEntity.ok(taskMapper.taskToTaskDTO(taskService.getById(id, false)));
     }
 
     @GetMapping("/destroy/{id}")
