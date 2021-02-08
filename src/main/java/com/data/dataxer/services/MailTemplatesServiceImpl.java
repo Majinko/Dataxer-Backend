@@ -29,20 +29,20 @@ public class MailTemplatesServiceImpl implements MailTemplatesService {
     @Override
     @Transactional
     public void update(MailTemplates mailTemplates) {
-        if (this.qMailTemplatesRepository.updateByMailTemplates(mailTemplates, SecurityUtils.companyIds()) != 1) {
+        if (this.qMailTemplatesRepository.updateByMailTemplates(mailTemplates, SecurityUtils.companyId()) != 1) {
             throw new RuntimeException("Mail template update failed");
         }
     }
 
     @Override
     public MailTemplates getById(Long id) {
-        return this.qMailTemplatesRepository.getById(id, SecurityUtils.companyIds())
+        return this.qMailTemplatesRepository.getById(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Mail templates not found"));
     }
 
     @Override
     public Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qMailTemplatesRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qMailTemplatesRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
     }
 
     @Override

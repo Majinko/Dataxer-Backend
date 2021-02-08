@@ -36,19 +36,19 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
     }
 
     @Override
-    public Optional<MailTemplates> getById(Long id, List<Long> companyIds) {
+    public Optional<MailTemplates> getById(Long id, Long companyId) {
         QMailTemplates qMailTemplates = QMailTemplates.mailTemplates;
 
         return Optional.ofNullable(
             this.query.selectFrom(qMailTemplates)
                 .where(qMailTemplates.id.eq(id))
-                .where(qMailTemplates.company.id.in(companyIds))
+                .where(qMailTemplates.company.id.eq(companyId))
                 .fetchOne()
         );
     }
 
     @Override
-    public Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -70,7 +70,7 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
 
         List<MailTemplates> mailTemplatesList = this.query.selectFrom(qMailTemplates)
                 .where(predicate)
-                .where(qMailTemplates.company.id.in(companyIds))
+                .where(qMailTemplates.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -80,14 +80,14 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
     }
 
     @Override
-    public long updateByMailTemplates(MailTemplates mailTemplates, List<Long> companyIds) {
+    public long updateByMailTemplates(MailTemplates mailTemplates, Long companyId) {
         QMailTemplates qMailTemplates = QMailTemplates.mailTemplates;
 
         return this.query.update(qMailTemplates)
                 .set(qMailTemplates.emailSubject, mailTemplates.getEmailSubject())
                 .set(qMailTemplates.emailContent, mailTemplates.getEmailContent())
                 .where(qMailTemplates.id.eq(mailTemplates.getId()))
-                .where(qMailTemplates.company.id.in(companyIds))
+                .where(qMailTemplates.company.id.eq(companyId))
                 .execute();
     }
 

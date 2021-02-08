@@ -10,12 +10,12 @@ import java.util.Optional;
 
 public interface QDocumentNumberGeneratorRepository {
 
-    Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
 
-    Optional<DocumentNumberGenerator> getById(Long id, List<Long> companyIds);
+    Optional<DocumentNumberGenerator> getById(Long id, Long companyId);
 
-    Optional<DocumentNumberGenerator> getByIdSimple(Long id, List<Long> companyIds);
+    Optional<DocumentNumberGenerator> getByIdSimple(Long id, Long companyId);
 
-    DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, List<Long> companyIds);
+    DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long companyId);
 
 }

@@ -8,11 +8,13 @@ import org.springframework.data.repository.CrudRepository;
 import java.util.List;
 
 public interface DocumentRelationsRepository extends CrudRepository<DocumentRelations, Long> {
-    @Query(value = "SELECT * FROM document_relations WHERE company_id IN ?2 AND relation_document_id = ?1", nativeQuery = true)
-    List<DocumentRelations> findOriginalDocumentIdByRelative(Long id, List<Long> companyIds);
+    // todo native query replace to jpa query
+
+    @Query(value = "SELECT * FROM document_relations WHERE company_id = ?2 AND relation_document_id = ?1", nativeQuery = true)
+    List<DocumentRelations> findOriginalDocumentIdByRelative(Long id, Long companyId);
 
     @Query(value = "SELECT * FROM document_relations WHERE document_id = ?1", nativeQuery = true)
     List<DocumentRelations> findAllRelationDocuments(Long originalId);
 
-    List<DocumentRelations> findAllByDocumentIdAndCompanyIdIn(Long documentId, List<Long> companyIds);
+    List<DocumentRelations> findAllByDocumentIdAndCompanyId(Long documentId, Long CompanyId);
 }

@@ -40,7 +40,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -62,7 +62,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .where(predicate)
-                .where(QInvoice.invoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -72,14 +72,14 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Optional<Invoice> getById(Long id, List<Long> companyIds) {
+    public Optional<Invoice> getById(Long id, Long companyId) {
 
         Invoice invoice = query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
                 .where(QInvoice.invoice.id.eq(id))
-                .where(QInvoice.invoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.company.id.eq(companyId))
                 .orderBy(QDocumentPack.documentPack.position.asc())
                 .fetchOne();
 
@@ -109,12 +109,12 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Optional<Invoice> getByIdSimple(Long id, List<Long> companyIds) {
+    public Optional<Invoice> getByIdSimple(Long id, Long companyId) {
         QInvoice qInvoice = QInvoice.invoice;
 
         return Optional.ofNullable(query.selectFrom(qInvoice)
                 .where(qInvoice.id.eq(id))
-                .where(qInvoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.company.id.eq(companyId))
                 .fetchOne());
     }
 

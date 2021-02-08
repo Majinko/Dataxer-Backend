@@ -8,11 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
-    Optional<Invoice> findByNumberAndCompanyIdIn(String number, List<Long> companyIds);
+    List<Invoice> findAllByIdInAndCompanyId(List<Long> invoiceIds, Long companyId);
 
-    List<Invoice> findAllByIdInAndCompanyIdIn(List<Long> invoiceIds, List<Long> companyIds);
+    List<Invoice> findAllByDocumentTypeAndIdInAndCompanyIdIn(DocumentType documentType, List<Long> invoiceIds, Long companyId);
 
-    List<Invoice> findAllByDocumentTypeAndIdInAndCompanyIdIn(DocumentType documentType, List<Long> invoiceIds, List<Long> companyIds);
-
-    Invoice findByIdAndCompanyIdIn(Long invoiceId, List<Long> companyIds);
+    Invoice findByIdAndCompanyId(Long invoiceId, Long companyId);
 }

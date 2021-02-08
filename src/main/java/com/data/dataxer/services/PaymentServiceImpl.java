@@ -35,7 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (this.documentIsPayed(payment)) {
             if (payment.getDocumentType().equals(DocumentType.INVOICE) || payment.getDocumentType().equals(DocumentType.PROFORMA)) {
-                Invoice invoice = this.invoiceRepository.findByIdAndCompanyIdIn(payment.getDocumentId(), SecurityUtils.companyIds());
+                Invoice invoice = this.invoiceRepository.findByIdAndCompanyId(payment.getDocumentId(), SecurityUtils.companyId());
                 invoice.setPaymentDate(payment.getPayedDate());
                 invoiceRepository.save(invoice);
             }
@@ -51,20 +51,20 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
     }
 
     @Override
     public Payment getById(Long id) {
         return this.qPaymentRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
     }
 
     @Override
     public void destroy(Long id) {
         Payment payment = this.getById(id);
-        Invoice invoice = this.invoiceRepository.findByIdAndCompanyIdIn(payment.getDocumentId(), SecurityUtils.companyIds());
+        Invoice invoice = this.invoiceRepository.findByIdAndCompanyId(payment.getDocumentId(), SecurityUtils.companyId());
 
         if (this.documentIsPayed(payment)) {
             invoice.setPaymentDate(null);

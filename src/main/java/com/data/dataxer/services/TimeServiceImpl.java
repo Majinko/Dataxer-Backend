@@ -36,20 +36,20 @@ public class TimeServiceImpl implements TimeService {
     @Override
     public Time getTimeById(Long id) {
         return this.qTimeRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Time not found!"));
     }
 
     @Override
     public Time getTimeByIdSimple(Long id) {
         return this.qTimeRepository
-                .getByIdSimple(id, SecurityUtils.companyIds())
+                .getByIdSimple(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Time not found"));
     }
 
     @Override
     public Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
         return this.qTimeRepository
-                .paginate(pageable, rqlFilter, sortExpression, SecurityUtils.id(), SecurityUtils.companyIds());
+                .paginate(pageable, rqlFilter, sortExpression, SecurityUtils.id(), SecurityUtils.companyId());
     }
 }

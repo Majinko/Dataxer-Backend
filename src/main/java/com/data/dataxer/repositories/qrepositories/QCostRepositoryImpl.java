@@ -37,7 +37,7 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -58,7 +58,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .leftJoin(qCost.contact).fetchJoin()
                 .leftJoin(qCost.project).fetchJoin()
                 .where(predicate)
-                .where(qCost.company.id.in(companyIds))
+                .where(qCost.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -68,16 +68,16 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Optional<Cost> getById(Long id, List<Long> companyIds) {
+    public Optional<Cost> getById(Long id, Long companyId) {
         return Optional.ofNullable(
-                this.constructGetAllByIdAndCompanyIds(id, companyIds).fetchOne()
+                this.constructGetAllByIdAndCompanyId(id, companyId).fetchOne()
         );
     }
 
     @Override
-    public Optional<Cost> getByIdWithRelation(Long id, List<Long> companyIds) {
+    public Optional<Cost> getByIdWithRelation(Long id, Long companyId) {
         return Optional.ofNullable(
-                this.constructGetAllByIdAndCompanyIds(id, companyIds)
+                this.constructGetAllByIdAndCompanyId(id, companyId)
                         .leftJoin(QCost.cost.category).fetchJoin()
                         .leftJoin(QCost.cost.contact).fetchJoin()
                         .leftJoin(QCost.cost.project).fetchJoin()
@@ -86,9 +86,9 @@ public class QCostRepositoryImpl implements QCostRepository {
         );
     }
 
-    private JPAQuery<Cost> constructGetAllByIdAndCompanyIds(Long id, List<Long> companyIds) {
+    private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, Long companyId) {
         return query.selectFrom(QCost.cost)
-                .where(QCost.cost.company.id.in(companyIds))
+                .where(QCost.cost.company.id.eq(companyId))
                 .where(QCost.cost.id.eq(id));
     }
 

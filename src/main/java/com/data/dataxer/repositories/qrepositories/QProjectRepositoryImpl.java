@@ -40,7 +40,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -60,7 +60,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
         List<Project> projectList = this.query.selectFrom(qProject)
                 .leftJoin(qProject.contact).fetchJoin()
                 .where(predicate)
-                .where(qProject.company.id.in(companyIds))
+                .where(qProject.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -70,12 +70,12 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public Project getById(Long id, List<Long> companyIds) {
+    public Project getById(Long id, Long companyId) {
         QProject qProject = QProject.project;
 
         return query
                 .selectFrom(qProject)
-                .where(qProject.company.id.in(companyIds))
+                .where(qProject.company.id.eq(companyId))
                 .where(qProject.id.eq(id))
                 .leftJoin(qProject.contact)
                 .fetchJoin()
@@ -84,9 +84,9 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public List<Project> search(List<Long> companyIds, String queryString) {
+    public List<Project> search(Long companyId, String queryString) {
         return query.selectFrom(QProject.project)
-                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.company.id.eq(companyId))
                 .where(QProject.project.title.containsIgnoreCase(queryString))
                 .fetch();
     }

@@ -9,11 +9,11 @@ import java.util.Optional;
 
 public interface QMailAccountsRepository {
 
-    Optional<MailAccounts> getById(Long id, List<Long> companyIds);
+    Optional<MailAccounts> getById(Long id, Long companyId);
 
-    long updateByMailAccounts(MailAccounts mailAccounts, List<Long> companyIds);
+    long updateByMailAccounts(MailAccounts mailAccounts, Long companyId);
 
-    Page<MailAccounts> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<MailAccounts> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
 
     Optional<MailAccounts> getByCompaniesId(Long companyId);
 }
