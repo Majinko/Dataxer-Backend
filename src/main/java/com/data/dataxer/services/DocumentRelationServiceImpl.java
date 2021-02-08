@@ -1,9 +1,9 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.DocumentRelations;
-import com.data.dataxer.models.domain.Invoice;
+import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.DocumentRelationsRepository;
+import com.data.dataxer.repositories.qrepositories.QDocumentBaseRepository;
 import com.data.dataxer.repositories.qrepositories.QDocumentRelationsRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -13,18 +13,21 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DocumentRelationServiceImpl implements DocumentRelationService {
     private final DocumentRelationsRepository documentRelationsRepository;
     private final QDocumentRelationsRepository qDocumentRelationsRepository;
     private final QInvoiceRepository qInvoiceRepository;
+    private final QDocumentBaseRepository qDocumentBaseRepository;
 
     public DocumentRelationServiceImpl(DocumentRelationsRepository documentRelationsRepository, QDocumentRelationsRepository qDocumentRelationsRepository,
-                                       QInvoiceRepository qInvoiceRepository) {
+                                       QInvoiceRepository qInvoiceRepository, QDocumentBaseRepository qDocumentBaseRepository) {
         this.documentRelationsRepository = documentRelationsRepository;
         this.qDocumentRelationsRepository = qDocumentRelationsRepository;
         this.qInvoiceRepository = qInvoiceRepository;
+        this.qDocumentBaseRepository = qDocumentBaseRepository;
     }
 
     @Override
@@ -95,5 +98,20 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
             }
         }
         return result;
+    }
+
+    @Override
+    public List<DocumentRelation> getRelatedDocuments(Long id) {
+        List<DocumentBase> documents = this.qDocumentBaseRepository.getAllDocumentByIds(
+                this.documentRelationsRepository.findAllRelationDocuments(id).stream().map(DocumentRelations::getRelationDocumentId)
+                .collect(Collectors.toList()), SecurityUtils.companyId()
+        );
+
+        return  documents.stream().map(documentsBase -> {
+            DocumentRelation documentRelation = new DocumentRelation();
+            documentRelation.setRelatedDocumentId(documentsBase.getId());
+            documentRelation.setDocumentTitle(documentsBase.getTitle());
+            return documentRelation;
+        }).collect(Collectors.toList());
     }
 }

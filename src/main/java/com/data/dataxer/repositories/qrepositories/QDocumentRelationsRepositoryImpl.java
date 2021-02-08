@@ -27,4 +27,13 @@ public class QDocumentRelationsRepositoryImpl implements QDocumentRelationsRepos
                 .where(qDocumentRelations.company.id.in(companyIds))
                 .fetchOne());
     }
+
+    @Override
+    public List<DocumentRelations> getAllRelatedByOriginalId(Long originalDocumentId, Long companyId) {
+        return this.query.selectFrom(QDocumentRelations.documentRelations)
+                .where(QDocumentRelations.documentRelations.documentId.eq(originalDocumentId))
+                .fetch();
+    }
+
+
 }

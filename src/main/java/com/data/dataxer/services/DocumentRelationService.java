@@ -1,5 +1,6 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.DocumentRelation;
 import com.data.dataxer.models.domain.DocumentRelations;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.enums.DocumentType;
@@ -22,4 +23,5 @@ public interface DocumentRelationService {
 
     List<Invoice> getAllRelationDocumentsByDocumentType(Long originalDocumentId, DocumentType documentType);
 
+    List<DocumentRelation> getRelatedDocuments(Long id);
 }

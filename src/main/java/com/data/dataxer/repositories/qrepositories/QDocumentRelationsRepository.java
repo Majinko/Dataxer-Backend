@@ -9,4 +9,6 @@ public interface QDocumentRelationsRepository {
 
     Optional<DocumentRelations> getById(Long id, List<Long> companyIds);
 
+    List<DocumentRelations> getAllRelatedByOriginalId(Long originalDocumentId, Long companyId);
+
 }
