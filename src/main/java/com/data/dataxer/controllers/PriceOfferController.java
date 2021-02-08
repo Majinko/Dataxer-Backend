@@ -27,7 +27,7 @@ public class PriceOfferController {
 
     @PostMapping("/store")
     public void store(@RequestBody PriceOfferDTO priceOfferDTO) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.valueOf("PRICE_OFFER"), true);
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.valueOf("PRICE_OFFER"), true, false);
 
         this.priceOfferService.store(priceOfferMapper.priceOfferDTOtoPriceOffer(priceOfferDTO));
     }

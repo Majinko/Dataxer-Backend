@@ -37,7 +37,7 @@ public class PackServiceImpl implements PackService {
 
     @Override
     public List<Pack> search(String q) {
-        return qPackRepository.search(q, SecurityUtils.CompanyId(), false);
+        return qPackRepository.search(q, SecurityUtils.companyId(), false);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class PackServiceImpl implements PackService {
 
     @Override
     public Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
-        return this.qPackRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.CompanyId(), disableFilter);
+        return this.qPackRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
@@ -60,7 +60,7 @@ public class PackServiceImpl implements PackService {
 
     @Override
     public Pack getById(Long id, Boolean disableFilter) {
-        return this.qPackRepository.getById(id, SecurityUtils.CompanyId(), disableFilter);
+        return this.qPackRepository.getById(id, SecurityUtils.companyId(), disableFilter);
     }
 
     private void preparePackItems(Pack pack){

@@ -27,7 +27,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project getById(Long id, Boolean disableFilter) {
-        return this.qProjectRepository.getById(id, SecurityUtils.CompanyId(), disableFilter);
+        return this.qProjectRepository.getById(id, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
@@ -37,12 +37,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
-        return qProjectRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.CompanyId(), disableFilter);
+        return qProjectRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
     public void destroy(Long id) {
-        this.projectRepository.delete(this.qProjectRepository.getById(id, SecurityUtils.CompanyId(), false));
+        this.projectRepository.delete(this.qProjectRepository.getById(id, SecurityUtils.companyId(), false));
     }
 
     @Override
@@ -52,6 +52,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> search(String queryString, Boolean disableFilter) {
-        return this.qProjectRepository.search(queryString, SecurityUtils.CompanyId(),disableFilter);
+        return this.qProjectRepository.search(queryString, SecurityUtils.companyId(),disableFilter);
     }
 }

@@ -51,13 +51,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
-        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.CompanyId(), disableFilter);
+        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
     public Payment getById(Long id, Boolean disableFilter) {
         return this.qPaymentRepository
-                .getById(id, SecurityUtils.CompanyId(), disableFilter)
+                .getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
     }
 

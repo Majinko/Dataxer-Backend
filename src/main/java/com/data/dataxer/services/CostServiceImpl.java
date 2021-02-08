@@ -41,7 +41,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost update(Cost oldCost) {
-        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.CompanyId(), false).map(cost -> {
+        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyId(), false).map(cost -> {
 
             cost.setContact(oldCost.getContact());
             cost.setProject(oldCost.getProject());
@@ -81,7 +81,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
-        return this.qCostRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.CompanyId(), disableFilter);
+        return this.qCostRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost changeState(Long id, CostState state, Boolean disableFilter) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.CompanyId(), disableFilter)
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         oldCost.setState(state);
         return this.update(oldCost);
@@ -114,18 +114,18 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost getById(Long id, Boolean disableFilter) {
-        return this.qCostRepository.getById(id, SecurityUtils.CompanyId(), disableFilter)
+        return this.qCostRepository.getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
     }
 
     @Override
     public Cost getByIdWithRelation(Long id, Boolean disableFilter) {
-        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.CompanyId(), disableFilter).orElse(null);
+        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyId(), disableFilter).orElse(null);
     }
 
     @Override
     public Cost duplicate(Long id, Boolean disableFilter) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.CompanyId(), disableFilter)
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         Cost newCost = new Cost();
         BeanUtils.copyProperties(oldCost, newCost, "id");

@@ -32,7 +32,7 @@ public class DemandServiceImpl implements DemandService {
 
     @Override
     public Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
-        return qDemandRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.CompanyId(), disableFilter);
+        return qDemandRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
     }
 
     private Demand getByIdSimple(Long id) {
@@ -42,7 +42,7 @@ public class DemandServiceImpl implements DemandService {
 
     @Override
     public Demand getById(Long id, Boolean disableFilter) {
-        return this.qDemandRepository.getById(id, SecurityUtils.CompanyId(), disableFilter)
+        return this.qDemandRepository.getById(id, SecurityUtils.companyId(), disableFilter)
                 .orElseThrow(() -> new RuntimeException("Demand not found"));
     }
 
