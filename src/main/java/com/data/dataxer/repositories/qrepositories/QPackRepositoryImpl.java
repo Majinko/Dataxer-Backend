@@ -37,7 +37,7 @@ public class QPackRepositoryImpl implements QPackRepository {
     }
 
     @Override
-    public Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -56,7 +56,7 @@ public class QPackRepositoryImpl implements QPackRepository {
 
         List<Pack> packList = this.query.selectFrom(qPack)
                 .where(predicate)
-                .where(qPack.company.id.in(companyIds))
+                .where(qPack.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -66,14 +66,14 @@ public class QPackRepositoryImpl implements QPackRepository {
     }
 
     @Override
-    public Pack getById(Long id, List<Long> companyIds) {
+    public Pack getById(Long id, Long companyId) {
         QPack qPack = QPack.pack;
         QPackItem qPackItem = QPackItem.packItem;
         QItem qItem = QItem.item;
         QItemPrice qItemPrice = QItemPrice.itemPrice;
 
         return query.selectFrom(qPack)
-                .where(qPack.company.id.in(companyIds))
+                .where(qPack.company.id.eq(companyId))
                 .where(qPack.id.eq(id))
                 .leftJoin(qPack.packItems, qPackItem).orderBy(qPackItem.position.desc()).fetchJoin()
                 .leftJoin(qPackItem.item, qItem).fetchJoin()
@@ -82,11 +82,11 @@ public class QPackRepositoryImpl implements QPackRepository {
     }
 
     @Override
-    public List<Pack> search(String q, List<Long> companyIds) {
+    public List<Pack> search(String q, Long companyId) {
         QPack qPack = QPack.pack;
 
         return query.selectFrom(qPack)
-                .where(qPack.company.id.in(companyIds))
+                .where(qPack.company.id.eq(companyId))
                 .where(qPack.title.containsIgnoreCase(q))
                 .fetch();
     }

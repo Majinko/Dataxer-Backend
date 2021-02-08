@@ -9,10 +9,10 @@ import java.util.Optional;
 
 public interface QMailTemplatesRepository {
 
-    Optional<MailTemplates> getById(Long id, List<Long> companyIds);
+    Optional<MailTemplates> getById(Long id, Long companyId);
 
-    Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
 
-    long updateByMailTemplates(MailTemplates mailTemplates, List<Long> companyIds);
+    long updateByMailTemplates(MailTemplates mailTemplates, Long companyId);
 
 }

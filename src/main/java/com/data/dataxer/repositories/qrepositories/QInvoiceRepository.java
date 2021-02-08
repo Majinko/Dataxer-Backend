@@ -9,12 +9,12 @@ import java.util.Optional;
 
 public interface QInvoiceRepository {
 
-    Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
 
-    Optional<Invoice> getById(Long id, List<Long> companyIds);
+    Optional<Invoice> getById(Long id, Long companyId);
 
     Optional<Invoice> getById(Long id);
 
-    Optional<Invoice> getByIdSimple(Long id, List<Long> companyIds);
+    Optional<Invoice> getByIdSimple(Long id, Long companyId);
 
 }

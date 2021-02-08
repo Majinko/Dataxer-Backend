@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface QProjectRepository {
 
-    Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
 
-    Project getById(Long id, List<Long> companyIds);
+    Project getById(Long id, Long companyId);
 
-    List<Project> search(List<Long> companyIds, String queryString);
+    List<Project> search(Long companyId, String queryString);
 }

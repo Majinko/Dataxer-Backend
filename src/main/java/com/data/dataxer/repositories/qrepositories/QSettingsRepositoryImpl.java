@@ -19,13 +19,13 @@ public class QSettingsRepositoryImpl implements QSettingsRepository {
     }
 
     @Override
-    public Optional<Settings> getByName(String name, List<Long> companyIds) {
+    public Optional<Settings> getByName(String name, Long companyId) {
         QSettings qSettings = QSettings.settings;
 
         return Optional.ofNullable(
                 this.query.selectFrom(qSettings)
                         .where(qSettings.name.eq(name))
-                        .where(qSettings.company.id.in(companyIds))
+                        .where(qSettings.company.id.eq(companyId))
                         .fetchOne()
         );
     }

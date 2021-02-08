@@ -32,12 +32,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public Task getById(Long id) {
-        return this.qTaskRepository.getById(id, SecurityUtils.companyIds());
+        return this.qTaskRepository.getById(id, SecurityUtils.companyId());
     }
 
     @Override
     public Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qTaskRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qTaskRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
     }
 
     @Override

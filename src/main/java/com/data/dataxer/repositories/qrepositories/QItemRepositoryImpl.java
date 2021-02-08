@@ -38,7 +38,7 @@ public class QItemRepositoryImpl implements QItemRepository {
     }
 
     @Override
-    public Item getById(long id, List<Long> companyIds) {
+    public Item getById(long id, Long companyId) {
         QItem qItem = QItem.item;
         QItemPrice qItemPrice = QItemPrice.itemPrice;
         QCategory qCategory = QCategory.category;
@@ -46,7 +46,7 @@ public class QItemRepositoryImpl implements QItemRepository {
 
         return query
                 .selectFrom(qItem)
-                .where(qItem.company.id.in(companyIds))
+                .where(qItem.company.id.eq(companyId))
                 .where(qItem.id.eq(id))
                 .leftJoin(qItem.itemPrices, qItemPrice).fetchJoin()
                 .leftJoin(qItem.category, qCategory).fetchJoin()
@@ -55,19 +55,19 @@ public class QItemRepositoryImpl implements QItemRepository {
     }
 
     @Override
-    public Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String q, List<Long> companyIds) {
+    public Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String q, Long companyId) {
         QItem qItem = QItem.item;
 
         return Optional.ofNullable(query
                 .selectFrom(qItem)
-                .where(qItem.company.id.in(companyIds))
+                .where(qItem.company.id.eq(companyId))
                 .where(qItem.title.containsIgnoreCase(q))
                 .leftJoin(qItem.itemPrices).fetchJoin()
                 .fetch());
     }
 
     @Override
-    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -87,7 +87,7 @@ public class QItemRepositoryImpl implements QItemRepository {
         List<Item> itemList = this.query.selectFrom(qItem)
                 .leftJoin(QItem.item.itemPrices).fetchJoin()
                 .where(predicate)
-                .where(qItem.company.id.in(companyIds))
+                .where(qItem.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

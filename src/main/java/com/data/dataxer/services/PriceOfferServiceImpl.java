@@ -59,20 +59,20 @@ public class PriceOfferServiceImpl implements PriceOfferService {
 
     @Override
     public Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qPriceOfferRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qPriceOfferRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
     }
 
     @Override
     public PriceOffer getById(Long id) {
         return this.qPriceOfferRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Price offer not found"));
     }
 
     @Override
     public PriceOffer getByIdSimple(Long id) {
         return this.qPriceOfferRepository
-                .getByIdSimple(id, SecurityUtils.companyIds())
+                .getByIdSimple(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Price offer not found"));
     }
 

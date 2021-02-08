@@ -8,9 +8,9 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface QPackRepository {
-    Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
 
-    Pack getById(Long id, List<Long> companyIds);
+    Pack getById(Long id, Long companyId);
 
-    List<Pack> search(String q, List<Long> companyIds);
+    List<Pack> search(String q, Long companyId);
 }

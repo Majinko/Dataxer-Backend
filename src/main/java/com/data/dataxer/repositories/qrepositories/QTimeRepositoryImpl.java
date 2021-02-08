@@ -39,7 +39,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public Optional<Time> getById(Long id, List<Long> companyIds) {
+    public Optional<Time> getById(Long id, Long companyId) {
         QTime qtime = QTime.time1;
 
         return Optional.ofNullable(this.query.selectFrom(qtime)
@@ -48,21 +48,21 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .leftJoin(qtime.company).fetchJoin()
                 .leftJoin(qtime.project).fetchJoin()
                 .where(qtime.id.eq(id))
-                .where(qtime.company.id.in(companyIds))
+                .where(qtime.company.id.eq(companyId))
                 .fetchOne());
     }
 
     @Override
-    public Optional<Time> getByIdSimple(Long id, List<Long> companyIds) {
+    public Optional<Time> getByIdSimple(Long id, Long companyId) {
         QTime qTime = QTime.time1;
         return Optional.ofNullable(this.query.selectFrom(qTime)
                 .where(qTime.id.eq(id))
-                .where(qTime.company.id.in(companyIds))
+                .where(qTime.company.id.eq(companyId))
                 .fetchOne());
     }
 
     @Override
-    public Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long userId, List<Long> companyIds) {
+    public Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long userId, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -82,7 +82,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         List<Time> timeList = this.query.selectFrom(qTime)
                 .leftJoin(qTime.category).fetchJoin()
                 .where(predicate)
-                .where(qTime.company.id.in(companyIds))
+                .where(qTime.company.id.eq(companyId))
                 .where(qTime.user.id.eq(userId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())

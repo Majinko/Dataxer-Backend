@@ -83,13 +83,13 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qInvoiceRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qInvoiceRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
     }
 
     @Override
     public Invoice getById(Long id) {
         return this.qInvoiceRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
@@ -103,7 +103,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public Invoice getByIdSimple(Long id) {
         return this.qInvoiceRepository
-                .getByIdSimple(id, SecurityUtils.companyIds())
+                .getByIdSimple(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
@@ -114,7 +114,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void makePay(Long id, LocalDate payedDate) {
-        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds()).orElseThrow(() -> new RuntimeException("Invoice not found"));
+        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Invoice not found"));
 
         invoice.setPaymentDate(payedDate);
         this.invoiceRepository.save(invoice);
@@ -143,9 +143,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public List<Invoice> findAllByRelatedDocuments(Long documentId) {
-        return this.invoiceRepository.findAllByIdInAndCompanyIdIn(
-                documentRelationsRepository.findAllByDocumentIdAndCompanyIdIn(documentId, SecurityUtils.companyIds()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()),
-                SecurityUtils.companyIds()
+        return this.invoiceRepository.findAllByIdInAndCompanyId(
+                documentRelationsRepository.findAllByDocumentIdAndCompanyId(documentId, SecurityUtils.companyId()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.companyId()
         );
     }
 
@@ -202,10 +201,10 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private Invoice getOriginalProformaInvoiceFromTaxDocument(Long taxDocumentId) {
-        List<Invoice> invoices = this.invoiceRepository.findAllByIdInAndCompanyIdIn(
-                this.documentRelationsRepository.findOriginalDocumentIdByRelative(taxDocumentId, SecurityUtils.companyIds())
+        List<Invoice> invoices = this.invoiceRepository.findAllByIdInAndCompanyId(
+                this.documentRelationsRepository.findOriginalDocumentIdByRelative(taxDocumentId, SecurityUtils.companyId())
                         .stream().map(DocumentRelations::getDocumentId).collect(Collectors.toList()),
-                SecurityUtils.companyIds()
+                SecurityUtils.companyId()
         );
         for (Invoice invoice:invoices) {
             if (invoice.getDocumentType().equals(DocumentType.PROFORMA)) {
@@ -327,7 +326,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private BigDecimal getPaymentsValue(Long proformaInvoiceId) {
         BigDecimal paymentsValue = BigDecimal.ZERO;
-        List<Payment> payments = this.qPaymentRepository.getPaymentsByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
+        List<Payment> payments = this.qPaymentRepository.getPaymentsByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyId());
 
         for (Payment payment : payments) {
             paymentsValue = paymentsValue.add(payment.getPayedValue());
@@ -339,8 +338,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         BigDecimal payedValue = BigDecimal.ZERO;
         List<Invoice> relatedInvoices = this.invoiceRepository.findAllByDocumentTypeAndIdInAndCompanyIdIn(
                 documentType,
-                documentRelationsRepository.findAllByDocumentIdAndCompanyIdIn(proformaInvoiceId, SecurityUtils.companyIds()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()),
-                SecurityUtils.companyIds()
+                documentRelationsRepository.findAllByDocumentIdAndCompanyId(proformaInvoiceId, SecurityUtils.companyId()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()),
+                SecurityUtils.companyId()
         );
 
         for (Invoice invoice : relatedInvoices) {
@@ -350,7 +349,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private LocalDate getNewestPaymentPayedDate(Long proformaInvoiceId) {
-        Payment payment = this.qPaymentRepository.getNewestByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
+        Payment payment = this.qPaymentRepository.getNewestByDocumentId(proformaInvoiceId, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("No payment usable for tax document"));
         return payment.getPayedDate();
     }

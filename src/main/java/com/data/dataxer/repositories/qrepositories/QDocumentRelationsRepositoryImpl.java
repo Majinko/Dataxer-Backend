@@ -19,12 +19,12 @@ public class QDocumentRelationsRepositoryImpl implements QDocumentRelationsRepos
     }
 
     @Override
-    public Optional<DocumentRelations> getById(Long id, List<Long> companyIds) {
+    public Optional<DocumentRelations> getById(Long id, Long companyId) {
         QDocumentRelations qDocumentRelations = QDocumentRelations.documentRelations;
 
         return Optional.ofNullable(this.query.selectFrom(qDocumentRelations)
                 .where(qDocumentRelations.id.eq(id))
-                .where(qDocumentRelations.company.id.in(companyIds))
+                .where(qDocumentRelations.company.id.eq(companyId))
                 .fetchOne());
     }
 }

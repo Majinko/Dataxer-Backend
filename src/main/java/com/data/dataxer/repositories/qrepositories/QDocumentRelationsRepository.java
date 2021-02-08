@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface QDocumentRelationsRepository {
 
-    Optional<DocumentRelations> getById(Long id, List<Long> companyIds);
+    Optional<DocumentRelations> getById(Long id, Long companyId);
 
 }

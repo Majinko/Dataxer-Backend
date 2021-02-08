@@ -38,7 +38,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     @Override
-    public Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -70,7 +70,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     @Override
-    public Optional<PriceOffer> getById(Long id, List<Long> companyIds) {
+    public Optional<PriceOffer> getById(Long id, Long companyId) {
         PriceOffer priceOffer = query.selectFrom(QPriceOffer.priceOffer)
                 .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
@@ -88,12 +88,12 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     @Override
-    public Optional<PriceOffer> getByIdSimple(Long id, List<Long> companyIds) {
+    public Optional<PriceOffer> getByIdSimple(Long id, Long companyId) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
 
         return Optional.ofNullable(query.selectFrom(qPriceOffer)
                 .where(qPriceOffer.id.eq(id))
-                .where(qPriceOffer.company.id.in(companyIds))
+                .where(qPriceOffer.company.id.eq(companyId))
                 .fetchOne());
     }
 
