@@ -10,9 +10,9 @@ public interface MailTemplatesService {
 
     void update(MailTemplates mailTemplates);
 
-    MailTemplates getById(Long id, Boolean disableFilter);
+    MailTemplates getById(Long id);
 
-    Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
+    Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     void destroy(Long id);
 

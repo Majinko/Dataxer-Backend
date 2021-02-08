@@ -37,17 +37,17 @@ public class ProjectController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(projectService.paginate(pageable, rqlFilter, sortExpression, false).map(projectMapper::projectToProjectDTO));
+        return ResponseEntity.ok(projectService.paginate(pageable, rqlFilter, sortExpression).map(projectMapper::projectToProjectDTO));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProjectDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.getById(id, false)));
+        return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.getById(id)));
     }
 
     @GetMapping("/search/{queryString}")
     public ResponseEntity<List<ProjectDTO>> search(@PathVariable String queryString) {
-        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.search(queryString, false)));
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.search(queryString)));
     }
 
     @PostMapping("/update")

@@ -45,8 +45,8 @@ public class SettingsServiceImpl implements SettingsService{
     }
 
     @Override
-    public Settings getByName(String name, Boolean disableFilter) {
-        return this.qSettingsRepository.getByName(name, SecurityUtils.companyId(), disableFilter)
+    public Settings getByName(String name) {
+        return this.qSettingsRepository.getByName(name, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Setting does not exists!"));
     }
 

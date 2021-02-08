@@ -46,36 +46,36 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     @Override
     @Transactional
     public void update(MailAccounts mailAccounts) {
-        if (this.qMailAccountsRepository.updateByMailAccounts(mailAccounts, SecurityUtils.companyId(), false) != 1) {
+        if (this.qMailAccountsRepository.updateByMailAccounts(mailAccounts, SecurityUtils.companyIds()) != 1) {
             throw new RuntimeException("Update failed!");
         }
     }
 
     @Override
-    public MailAccounts getById(Long id, Boolean disableFilter) {
-        return this.qMailAccountsRepository.getById(id, SecurityUtils.companyId(), disableFilter)
+    public MailAccounts getById(Long id) {
+        return this.qMailAccountsRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Mail account not found."));
     }
 
     @Override
-    public Page<MailAccounts> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter) {
-        return this.qMailAccountsRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId(), disableFilter);
+    public Page<MailAccounts> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
+        return this.qMailAccountsRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override
     public void destroy(Long id) {
-        this.mailAccountsRepository.delete(this.getById(id, false));
+        this.mailAccountsRepository.delete(this.getById(id));
     }
 
     @Override
     @Transactional
     public void activate(Long id) {
-        MailAccounts mailAccounts = this.getById(id, false);
+        MailAccounts mailAccounts = this.getById(id);
         try {
             this.getMailSender(mailAccounts.getHostName(), mailAccounts.getPort(), mailAccounts.getUserName(), mailAccounts.getPassword())
                     .testConnection();
             mailAccounts.setState(MailAccountState.ACTIVATED);
-            this.qMailAccountsRepository.updateByMailAccounts(mailAccounts, SecurityUtils.companyId(), false);
+            this.qMailAccountsRepository.updateByMailAccounts(mailAccounts, SecurityUtils.companyIds());
         } catch (MessagingException e) {
             throw new RuntimeException("Mail account activating failed");
         }
@@ -84,9 +84,9 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     @Override
     @Transactional
     public void deactivate(Long id) {
-        MailAccounts mailAccounts = this.getById(id, false);
+        MailAccounts mailAccounts = this.getById(id);
         mailAccounts.setState(MailAccountState.DEACTIVATED);
-        if (this.qMailAccountsRepository.updateByMailAccounts(mailAccounts, SecurityUtils.companyId(), false) != 1) {
+        if (this.qMailAccountsRepository.updateByMailAccounts(mailAccounts, SecurityUtils.companyIds()) != 1) {
             throw new RuntimeException("Mail account deactivation failed");
         }
     }
@@ -104,7 +104,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
                 helper.setSubject(emailSubject);
                 helper.setText(emailContent, true);
             } else if (templateId != null) {
-                MailTemplates mailTemplates = this.mailTemplatesService.getById(templateId, false);
+                MailTemplates mailTemplates = this.mailTemplatesService.getById(templateId);
                 helper.setSubject(mailTemplates.getEmailSubject());
                 helper.setText(mailTemplates.getEmailContent(), true);
             } else {

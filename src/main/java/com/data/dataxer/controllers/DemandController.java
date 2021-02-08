@@ -40,12 +40,12 @@ public class DemandController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(demandService.paginate(pageable, rqlFilter, sortExpression, false).map(demandMapper::demandToDemandDTO));
+        return ResponseEntity.ok(demandService.paginate(pageable, rqlFilter, sortExpression).map(demandMapper::demandToDemandDTO));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DemandDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(demandMapper.demandToDemandDTO(demandService.getById(id, false)));
+        return ResponseEntity.ok(demandMapper.demandToDemandDTO(demandService.getById(id)));
     }
 
     @GetMapping("/destroy/{id}")

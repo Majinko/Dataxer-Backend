@@ -11,11 +11,11 @@ public interface PackService {
 
     Pack getByIdSimple(Long id);
 
-    Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
+    Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     void destroy(Long id);
 
-    Pack getById(Long id, Boolean disableFilter);
+    Pack getById(Long id);
 
     void update(Pack packDTOtoPack);
 

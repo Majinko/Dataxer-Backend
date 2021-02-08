@@ -14,7 +14,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -28,13 +27,10 @@ import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
 @Repository
 public class QProjectRepositoryImpl implements QProjectRepository {
-
     private final JPAQueryFactory query;
-    private final EntityManager entityManager;
 
     public QProjectRepositoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager.getEntityManagerFactory().createEntityManager();
-        this.query = new JPAQueryFactory(this.entityManager);
+        this.query = new JPAQueryFactory(entityManager);
     }
 
     private Long total() {
@@ -44,7 +40,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId, Boolean disableFilter) {
+    public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -61,13 +57,10 @@ public class QProjectRepositoryImpl implements QProjectRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         List<Project> projectList = this.query.selectFrom(qProject)
                 .leftJoin(qProject.contact).fetchJoin()
                 .where(predicate)
+                .where(qProject.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -77,15 +70,12 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public Project getById(Long id, Long companyId, Boolean disableFilter) {
+    public Project getById(Long id, List<Long> companyIds) {
         QProject qProject = QProject.project;
-
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
 
         return query
                 .selectFrom(qProject)
+                .where(qProject.company.id.in(companyIds))
                 .where(qProject.id.eq(id))
                 .leftJoin(qProject.contact)
                 .fetchJoin()
@@ -94,12 +84,9 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public List<Project> search(String queryString, Long companyId, Boolean disableFilter) {
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
+    public List<Project> search(List<Long> companyIds, String queryString) {
         return query.selectFrom(QProject.project)
+                .where(QProject.project.company.id.in(companyIds))
                 .where(QProject.project.title.containsIgnoreCase(queryString))
                 .fetch();
     }

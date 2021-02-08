@@ -35,7 +35,7 @@ public class MailTemplatesController {
     @GetMapping("/getById/{id}")
     public ResponseEntity<MailTemplatesDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(
-                this.mailTemplatesMapper.mailTemplatesToMailTemplatesDTO(this.mailTemplatesService.getById(id, false))
+                this.mailTemplatesMapper.mailTemplatesToMailTemplatesDTO(this.mailTemplatesService.getById(id))
         );
     }
 
@@ -49,7 +49,7 @@ public class MailTemplatesController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
         return ResponseEntity.ok(
-                this.mailTemplatesService.paginate(pageable, rqlFilter, sortExpression, false)
+                this.mailTemplatesService.paginate(pageable, rqlFilter, sortExpression)
                     .map(mailTemplatesMapper::mailTemplatesToMailTemplatesDTO)
         );
     }

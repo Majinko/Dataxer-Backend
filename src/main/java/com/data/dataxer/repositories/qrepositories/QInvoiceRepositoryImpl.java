@@ -17,7 +17,6 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -35,15 +34,13 @@ import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
     private final JPAQueryFactory query;
-    private final EntityManager entityManager;
 
     public QInvoiceRepositoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager.getEntityManagerFactory().createEntityManager();
-        this.query = new JPAQueryFactory(this.entityManager);
+        this.query = new JPAQueryFactory(entityManager);
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId, Boolean disableFilter) {
+    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -61,14 +58,11 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         List<Invoice> invoiceList = this.query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .where(predicate)
+                .where(QInvoice.invoice.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -78,16 +72,14 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Optional<Invoice> getById(Long id, Long companyId, Boolean disableFilter) {
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
+    public Optional<Invoice> getById(Long id, List<Long> companyIds) {
 
         Invoice invoice = query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
                 .where(QInvoice.invoice.id.eq(id))
+                .where(QInvoice.invoice.company.id.in(companyIds))
                 .orderBy(QDocumentPack.documentPack.position.asc())
                 .fetchOne();
 
@@ -117,15 +109,12 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Optional<Invoice> getByIdSimple(Long id, Long companyId, Boolean disableFilter) {
+    public Optional<Invoice> getByIdSimple(Long id, List<Long> companyIds) {
         QInvoice qInvoice = QInvoice.invoice;
-
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
 
         return Optional.ofNullable(query.selectFrom(qInvoice)
                 .where(qInvoice.id.eq(id))
+                .where(qInvoice.company.id.in(companyIds))
                 .fetchOne());
     }
 

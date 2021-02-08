@@ -7,11 +7,10 @@ import com.data.dataxer.models.enums.CostsPeriods;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,14 +23,6 @@ import java.util.Map;
 @Setter
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE cost SET deleted_at = now() WHERE id = ?")
-@FilterDef(
-        name = "companyCondition",
-        parameters = @ParamDef(name = "companyId", type = "long")
-)
-@Filter(
-        name = "companyCondition",
-        condition = "company_id = :companyId"
-)
 public class Cost extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

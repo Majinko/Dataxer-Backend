@@ -11,9 +11,9 @@ public interface MailAccountsService {
 
     void update(MailAccounts mailAccounts);
 
-    MailAccounts getById(Long id, Boolean disableFilter);
+    MailAccounts getById(Long id);
 
-    Page<MailAccounts> paginate(Pageable pageable, String rqlFilter, String sortExpression, Boolean disableFilter);
+    Page<MailAccounts> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     void destroy(Long id);
 

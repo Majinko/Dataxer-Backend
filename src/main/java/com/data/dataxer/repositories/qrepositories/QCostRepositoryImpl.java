@@ -15,7 +15,6 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.hibernate.Session;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -32,15 +31,13 @@ import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 public class QCostRepositoryImpl implements QCostRepository {
 
     private final JPAQueryFactory query;
-    private final EntityManager entityManager;
 
     public QCostRepositoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager.getEntityManagerFactory().createEntityManager();
-        this.query = new JPAQueryFactory(this.entityManager);
+        this.query = new JPAQueryFactory(entityManager);
     }
 
     @Override
-    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId, Boolean disableFilter) {
+    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -57,14 +54,11 @@ public class QCostRepositoryImpl implements QCostRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
         List<Cost> costList = this.query.selectFrom(qCost)
                 .leftJoin(qCost.contact).fetchJoin()
                 .leftJoin(qCost.project).fetchJoin()
                 .where(predicate)
+                .where(qCost.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -74,24 +68,16 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Optional<Cost> getById(Long id, Long companyId, Boolean disableFilter) {
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
+    public Optional<Cost> getById(Long id, List<Long> companyIds) {
         return Optional.ofNullable(
-                this.constructGetAllByIdAndCompanyIds(id).fetchOne()
+                this.constructGetAllByIdAndCompanyIds(id, companyIds).fetchOne()
         );
     }
 
     @Override
-    public Optional<Cost> getByIdWithRelation(Long id, Long companyId, Boolean disableFilter) {
-        if (!disableFilter) {
-            this.entityManager.unwrap(Session.class).enableFilter("companyCondition").setParameter("companyId", companyId);
-        }
-
+    public Optional<Cost> getByIdWithRelation(Long id, List<Long> companyIds) {
         return Optional.ofNullable(
-                this.constructGetAllByIdAndCompanyIds(id)
+                this.constructGetAllByIdAndCompanyIds(id, companyIds)
                         .leftJoin(QCost.cost.category).fetchJoin()
                         .leftJoin(QCost.cost.contact).fetchJoin()
                         .leftJoin(QCost.cost.project).fetchJoin()
@@ -100,8 +86,9 @@ public class QCostRepositoryImpl implements QCostRepository {
         );
     }
 
-    private JPAQuery<Cost> constructGetAllByIdAndCompanyIds(Long id) {
+    private JPAQuery<Cost> constructGetAllByIdAndCompanyIds(Long id, List<Long> companyIds) {
         return query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.in(companyIds))
                 .where(QCost.cost.id.eq(id));
     }
 

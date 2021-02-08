@@ -5,9 +5,6 @@ import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Filter;
-import org.hibernate.annotations.FilterDef;
-import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -26,14 +23,6 @@ import java.util.Map;
 @DiscriminatorValue("DOCUMENT")
 @Table(name = "DOCUMENT_BASE")
 @Where(clause = "deleted_at is null")
-@FilterDef(
-        name = "companyCondition",
-        parameters = @ParamDef(name = "companyId", type = "long")
-)
-@Filter(
-        name = "companyCondition",
-        condition = "company_id = :companyId"
-)
 public class DocumentBase extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
