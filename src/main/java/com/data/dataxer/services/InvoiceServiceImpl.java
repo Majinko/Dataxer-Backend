@@ -162,47 +162,6 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    @Transactional
-    public Invoice changeTypeAndSave(Long id, String type, String number) {
-        Invoice originalInvoice = this.getById(id);
-        Invoice invoice = new Invoice();
-
-        BeanUtils.copyProperties(originalInvoice, invoice, "id", "packs");
-
-        invoice.setNumber(number);
-        invoice.setVariableSymbol(number);
-        invoice.setTitle(this.generateInvoiceTitle(type, number));
-        invoice.setDeliveredDate(LocalDate.now());
-        invoice.setCreatedDate(LocalDate.now());
-        invoice.setDueDate(LocalDate.now().plusDays(14));
-        invoice.setDocumentType(DocumentType.valueOf(type.toUpperCase()));
-
-        this.invoiceRepository.save(invoice);
-
-        return invoice;
-    }
-
-    @Override
-    public List<Invoice> findAllByRelatedDocuments(Long documentId) {
-        return this.invoiceRepository.findAllByIdInAndCompanyIdIn(
-                documentRelationsRepository.findAllByDocumentIdAndCompanyIdIn(documentId, SecurityUtils.companyIds()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()),
-                SecurityUtils.companyIds()
-        );
-    }
-
-    @Override
-    @Transactional
-    public Invoice duplicate(Long id) {
-        Invoice originalInvoice = this.getById(id);
-        Invoice duplicatedInvoice = new Invoice();
-        BeanUtils.copyProperties(originalInvoice, duplicatedInvoice, "id", "packs");
-        duplicatedInvoice.setPacks(this.duplicateDocumentPacks(originalInvoice.getPacks()));
-        this.setInvoicePackAndItems(duplicatedInvoice);
-        this.invoiceRepository.save(duplicatedInvoice);
-        return duplicatedInvoice;
-    }
-
-    @Override
     public Invoice generateTaxDocument(Long proformaInvoiceId) {
         Invoice proformaInvoice = this.getById(proformaInvoiceId, false);
 
@@ -324,18 +283,6 @@ public class InvoiceServiceImpl implements InvoiceService {
         documentPackItem.setTax(tax);
         documentPackItem.setPrice(getPriceFromTotalPrice(totalPrice, tax));
         documentPackItem.setTotalPrice(totalPrice);
-
-        return documentPackItem;
-    }
-
-    private DocumentPackItem generateDocumentPackItemForSummaryInvoice(DocumentPack taxDocumentPack, String taxDocumentNumber,
-                                                                       LocalDate taxDocumentCreated, String taxDocumentVariableSymbol) {
-        DocumentPackItem documentPackItem = new DocumentPackItem();
-
-        documentPackItem.setTitle(this.generateSummaryInvoicePackTitle(taxDocumentNumber, taxDocumentCreated, taxDocumentVariableSymbol));
-        documentPackItem.setTax(taxDocumentPack.getTax());
-        documentPackItem.setPrice(taxDocumentPack.getPrice().negate());
-        documentPackItem.setTotalPrice(taxDocumentPack.getTotalPrice().negate());
 
         return documentPackItem;
     }

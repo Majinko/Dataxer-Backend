@@ -25,7 +25,7 @@ public interface InvoiceService {
     Invoice getById(Long id, Boolean disableFilter);
 
     Invoice getByIdSimple(Long id, Boolean disableFilter);
-    Invoice getByIdWithoutFirm(Long id, Boolean disableFilter);
+    Invoice getByIdWithoutFirm(Long id);
 
     void destroy(Long id);
 

@@ -47,7 +47,7 @@ public class CostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CostDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.getByIdWithRelation(id)));
+        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.getByIdWithRelation(id, false)));
     }
 
 

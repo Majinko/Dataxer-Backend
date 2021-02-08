@@ -41,7 +41,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost update(Cost oldCost) {
-        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyIds()).map(cost -> {
+        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.CompanyId(), false).map(cost -> {
 
             cost.setContact(oldCost.getContact());
             cost.setProject(oldCost.getProject());
@@ -121,6 +121,7 @@ public class CostServiceImpl implements CostService {
     @Override
     public Cost getByIdWithRelation(Long id, Boolean disableFilter) {
         return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.CompanyId(), disableFilter).orElse(null);
+    }
 
     @Override
     public Cost duplicate(Long id, Boolean disableFilter) {
