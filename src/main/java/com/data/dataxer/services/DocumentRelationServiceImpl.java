@@ -1,7 +1,6 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.dto.DocumentRelationDTO;
 import com.data.dataxer.repositories.DocumentRelationsRepository;
 import com.data.dataxer.repositories.qrepositories.QDocumentBaseRepository;;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -21,36 +20,30 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     }
 
     @Override
-    public void store(Long originalDocumentId, Long relatedDocumentId) {
-        DocumentRelations documentRelation = new DocumentRelations();
+    public DocumentRelation store(Long originalDocumentId, Long relatedDocumentId) {
+        DocumentRelation documentRelation = new DocumentRelation();
         documentRelation.setDocumentId(originalDocumentId);
         documentRelation.setRelationDocumentId(relatedDocumentId);
 
-        this.documentRelationsRepository.save(documentRelation);
+        return this.documentRelationsRepository.save(documentRelation);
     }
 
     @Override
-    public List<DocumentRelationDTO> getRelatedDocuments(Long id) {
-        List<DocumentBase> documents = this.qDocumentBaseRepository.getAllDocumentByIds(this.documentRelationsRepository.findAllRelationDocuments(id, SecurityUtils.companyId()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.companyId());
+    public List<DocumentBase> getRelatedDocuments(Long id) {
+        return this.qDocumentBaseRepository.getAllDocumentByIds(this.documentRelationsRepository.findAllRelationDocuments(id, SecurityUtils.companyId()).stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.companyId());
+    }
 
-        return documents.stream().map(documentsBase -> {
-
-            DocumentRelationDTO documentRelation = new DocumentRelationDTO();
-            documentRelation.setRelatedDocumentId(documentsBase.getId());
-            documentRelation.setDocumentTitle(documentsBase.getTitle());
-            documentRelation.setDocumentType(documentsBase.getDocumentType());
-
-            return documentRelation;
-
-        }).collect(Collectors.toList());
+    @Override
+    public List<DocumentBase> search(String queryString) {
+        return this.qDocumentBaseRepository.getAllByQueryString(queryString, SecurityUtils.companyId());
     }
 
     @Override
     public void destroy(Long documentId, Long relationDocumentId) {
-        DocumentRelations documentRelations = this.documentRelationsRepository.findAllByDocumentIdAndAndRelationDocumentIdAAndCompanyId(
+        DocumentRelation documentRelation = this.documentRelationsRepository.findAllByDocumentIdAndRelationDocumentIdAndCompanyId(
                 documentId, relationDocumentId, SecurityUtils.companyId()
         );
 
-        documentRelationsRepository.delete(documentRelations);
+        documentRelationsRepository.delete(documentRelation);
     }
 }

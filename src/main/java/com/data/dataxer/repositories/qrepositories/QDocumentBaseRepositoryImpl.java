@@ -25,4 +25,12 @@ public class QDocumentBaseRepositoryImpl implements QDocumentBaseRepository {
                 .fetch();
 
     }
+
+    @Override
+    public List<DocumentBase> getAllByQueryString(String search, Long companyId) {
+        return this.query.selectFrom(QDocumentBase.documentBase)
+                .where(QDocumentBase.documentBase.title.containsIgnoreCase(search))
+                .where(QDocumentBase.documentBase.company.id.eq(companyId))
+                .fetch();
+    }
 }

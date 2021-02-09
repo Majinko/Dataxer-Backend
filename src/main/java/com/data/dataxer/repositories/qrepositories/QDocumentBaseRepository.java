@@ -8,4 +8,6 @@ public interface QDocumentBaseRepository {
 
     List<DocumentBase> getAllDocumentByIds(List<Long> documentIds, Long companyId);
 
+    List<DocumentBase> getAllByQueryString(String search, Long companyId);
+
 }

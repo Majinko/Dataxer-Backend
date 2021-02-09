@@ -145,7 +145,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public List<Invoice> findAllByRelatedDocuments(Long documentId) {
         return this.invoiceRepository.findAllByIdInAndCompanyId(
-                documentRelationsRepository.findAllByDocumentIdAndCompanyId(documentId, SecurityUtils.companyId()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.companyId()
+                documentRelationsRepository.findAllByDocumentIdAndCompanyId(documentId, SecurityUtils.companyId()).stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.companyId()
         );
     }
 
@@ -204,7 +204,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     private Invoice getOriginalProformaInvoiceFromTaxDocument(Long taxDocumentId) {
         List<Invoice> invoices = this.invoiceRepository.findAllByIdInAndCompanyId(
                 this.documentRelationsRepository.findOriginalDocumentIdByRelative(taxDocumentId, SecurityUtils.companyId())
-                        .stream().map(DocumentRelations::getDocumentId).collect(Collectors.toList()),
+                        .stream().map(DocumentRelation::getDocumentId).collect(Collectors.toList()),
                 SecurityUtils.companyId()
         );
         for (Invoice invoice : invoices) {
@@ -339,7 +339,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         BigDecimal payedValue = BigDecimal.ZERO;
         List<Invoice> relatedInvoices = this.invoiceRepository.findAllByDocumentTypeAndIdInAndCompanyIdIn(
                 documentType,
-                documentRelationsRepository.findAllByDocumentIdAndCompanyId(proformaInvoiceId, SecurityUtils.companyId()).stream().map(DocumentRelations::getRelationDocumentId).collect(Collectors.toList()),
+                documentRelationsRepository.findAllByDocumentIdAndCompanyId(proformaInvoiceId, SecurityUtils.companyId()).stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList()),
                 SecurityUtils.companyId()
         );
 
@@ -419,7 +419,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private void storeRelation(Long documentId, Long relationDocumentId) {
-        DocumentRelations documentRelation = new DocumentRelations();
+        DocumentRelation documentRelation = new DocumentRelation();
         documentRelation.setDocumentId(documentId);
         documentRelation.setRelationDocumentId(relationDocumentId);
 
