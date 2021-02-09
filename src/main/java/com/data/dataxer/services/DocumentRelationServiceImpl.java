@@ -20,12 +20,17 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     }
 
     @Override
-    public DocumentRelation store(Long originalDocumentId, Long relatedDocumentId) {
+    public void store(Long originalDocumentId, Long relatedDocumentId) {
+        if (this.documentRelationsRepository.findByDocumentIdAndRelationDocumentIdAndCompanyId(originalDocumentId, relatedDocumentId, SecurityUtils.companyId()).isPresent()) {
+            throw new RuntimeException("This related is present");
+        }
+
         DocumentRelation documentRelation = new DocumentRelation();
+
         documentRelation.setDocumentId(originalDocumentId);
         documentRelation.setRelationDocumentId(relatedDocumentId);
 
-        return this.documentRelationsRepository.save(documentRelation);
+        this.documentRelationsRepository.save(documentRelation);
     }
 
     @Override
@@ -34,15 +39,15 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
     }
 
     @Override
-    public List<DocumentBase> search(String queryString) {
-        return this.qDocumentBaseRepository.getAllByQueryString(queryString, SecurityUtils.companyId());
+    public List<DocumentBase> search(Long documentId, String queryString) {
+        return this.qDocumentBaseRepository.getAllByQueryString(documentId, queryString, SecurityUtils.companyId());
     }
 
     @Override
     public void destroy(Long documentId, Long relationDocumentId) {
-        DocumentRelation documentRelation = this.documentRelationsRepository.findAllByDocumentIdAndRelationDocumentIdAndCompanyId(
+        DocumentRelation documentRelation = this.documentRelationsRepository.findByDocumentIdAndRelationDocumentIdAndCompanyId(
                 documentId, relationDocumentId, SecurityUtils.companyId()
-        );
+        ).orElseThrow(() -> new RuntimeException("Document relation not found"));
 
         documentRelationsRepository.delete(documentRelation);
     }

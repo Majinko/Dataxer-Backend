@@ -2,6 +2,7 @@ package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.DocumentBase;
 import com.data.dataxer.models.domain.QDocumentBase;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
@@ -27,10 +28,19 @@ public class QDocumentBaseRepositoryImpl implements QDocumentBaseRepository {
     }
 
     @Override
-    public List<DocumentBase> getAllByQueryString(String search, Long companyId) {
+    public List<DocumentBase> getAllByQueryString(Long documentId, String search, Long companyId) {
+        BooleanBuilder where = new BooleanBuilder();
+
+        if (!search.isEmpty()) {
+            where.and(QDocumentBase.documentBase.title.containsIgnoreCase(search));
+        }
+
         return this.query.selectFrom(QDocumentBase.documentBase)
-                .where(QDocumentBase.documentBase.title.containsIgnoreCase(search))
+                .where(where)
+                .where(QDocumentBase.documentBase.id.notIn(documentId))
                 .where(QDocumentBase.documentBase.company.id.eq(companyId))
+                .orderBy(QDocumentBase.documentBase.id.desc())
+                .limit(15L)
                 .fetch();
     }
 }

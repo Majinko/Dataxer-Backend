@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface DocumentRelationsRepository extends CrudRepository<DocumentRelation, Long> {
     // todo native query replace to jpa query
@@ -17,5 +18,5 @@ public interface DocumentRelationsRepository extends CrudRepository<DocumentRela
 
     List<DocumentRelation> findAllByDocumentIdAndCompanyId(Long documentId, Long CompanyId);
 
-    DocumentRelation findAllByDocumentIdAndRelationDocumentIdAndCompanyId(Long documentId, Long relatedDocumentId, Long companyId);
+    Optional<DocumentRelation> findByDocumentIdAndRelationDocumentIdAndCompanyId(Long documentId, Long relatedDocumentId, Long companyId);
 }

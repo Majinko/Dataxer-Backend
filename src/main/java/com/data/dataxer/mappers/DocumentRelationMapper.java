@@ -14,6 +14,8 @@ import java.util.List;
 public interface DocumentRelationMapper {
     DocumentRelationDTO documentToDocumentRelationDTO(DocumentRelation documentRelation);
 
+    DocumentRelation documentRelationDTOtoDocument(DocumentRelationDTO documentRelation);
+
     @Named(value = "documentBaseToDocumentRelationDTO")
     @Mapping(target = "relatedDocumentId", source = "id")
     @Mapping(target = "documentTitle", source = "title")
