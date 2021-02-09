@@ -62,6 +62,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         this.store(invoice);
         this.storeRelation(oldInvoiceId, invoice.getId());
+        this.storeRelation(invoice.getId(), oldInvoiceId);
     }
 
 
@@ -190,7 +191,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         List<DocumentPack> summaryInvoicePacks = new ArrayList<>(proformaInvoice.getPacks());
 
-        for (DocumentPack documentPack:taxDocument.getPacks()) {
+        for (DocumentPack documentPack : taxDocument.getPacks()) {
             summaryInvoicePacks.add(this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(),
                     taxDocument.getCreatedDate(), taxDocument.getVariableSymbol()));
         }
@@ -206,7 +207,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                         .stream().map(DocumentRelations::getDocumentId).collect(Collectors.toList()),
                 SecurityUtils.companyId()
         );
-        for (Invoice invoice:invoices) {
+        for (Invoice invoice : invoices) {
             if (invoice.getDocumentType().equals(DocumentType.PROFORMA)) {
                 return invoice;
             }
@@ -359,8 +360,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     private String generateSummaryInvoicePackTitle(String taxDocumentNumber, LocalDate taxDocumentCreatedDate, String taxDocumentVariableSymbol) {
-        return "Daňový doklad k prijatej platbe " +  taxDocumentNumber + ", zo dňa "
-                +  taxDocumentCreatedDate + ", variabilný symbol " + taxDocumentVariableSymbol;
+        return "Daňový doklad k prijatej platbe " + taxDocumentNumber + ", zo dňa "
+                + taxDocumentCreatedDate + ", variabilný symbol " + taxDocumentVariableSymbol;
     }
 
     private Invoice setInvoicePackAndItems(Invoice invoice) {

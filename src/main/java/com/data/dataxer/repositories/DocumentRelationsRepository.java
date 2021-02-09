@@ -13,8 +13,10 @@ public interface DocumentRelationsRepository extends CrudRepository<DocumentRela
     @Query(value = "SELECT * FROM document_relations WHERE company_id = ?2 AND relation_document_id = ?1", nativeQuery = true)
     List<DocumentRelations> findOriginalDocumentIdByRelative(Long id, Long companyId);
 
-    @Query(value = "SELECT * FROM document_relations WHERE document_id = ?1", nativeQuery = true)
-    List<DocumentRelations> findAllRelationDocuments(Long originalId);
+    @Query("Select d FROM DocumentRelations d where d.documentId = ?1 and d.company.id = ?2")
+    List<DocumentRelations> findAllRelationDocuments(Long originalId, Long companyId);
 
     List<DocumentRelations> findAllByDocumentIdAndCompanyId(Long documentId, Long CompanyId);
+
+    DocumentRelations findAllByDocumentIdAndAndRelationDocumentIdAAndCompanyId(Long documentId, Long relatedDocumentId, Long companyId);
 }

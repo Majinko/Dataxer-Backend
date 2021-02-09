@@ -19,15 +19,10 @@ public class QDocumentBaseRepositoryImpl implements QDocumentBaseRepository {
 
     @Override
     public List<DocumentBase> getAllDocumentByIds(List<Long> documentIds, Long companyId) {
-        for (Long id:documentIds
-             ) {
-            System.out.println("Id:" + id);
-        }
         return this.query.selectFrom(QDocumentBase.documentBase)
                 .where(QDocumentBase.documentBase.id.in(documentIds))
                 .where(QDocumentBase.documentBase.company.id.eq(companyId))
                 .fetch();
 
     }
-
 }
