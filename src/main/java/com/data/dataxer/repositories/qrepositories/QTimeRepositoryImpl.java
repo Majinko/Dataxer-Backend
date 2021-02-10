@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -90,6 +91,15 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .fetch();
 
         return new PageImpl<>(timeList, pageable, getTotalCount(predicate));
+    }
+
+    @Override
+    public List<Time> getHourOverviewForAllUsers(LocalDate fromDate, LocalDate toDate, Long companyId) {
+        return this.query.selectFrom(QTime.time1)
+                .leftJoin(QTime.time1.user).fetchJoin()
+                .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.dateWork.between(fromDate, toDate))
+                .fetch();
     }
 
     private long getTotalCount(Predicate predicate) {
