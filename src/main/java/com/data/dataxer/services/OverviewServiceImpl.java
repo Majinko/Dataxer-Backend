@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Salary;
 import com.data.dataxer.models.domain.Time;
 import com.data.dataxer.models.dto.UserHourOverviewDTO;
+import com.data.dataxer.models.enums.SalaryType;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -77,8 +78,6 @@ public class OverviewServiceImpl implements OverviewService {
                 userDayHoursInMinutes.keySet().stream().map(AppUser::getId).collect(Collectors.toList())
         );
 
-        System.out.println("Size: " + userSalaryHashMap.size());
-
         userDayHoursInMinutes.keySet().iterator().forEachRemaining(key -> {
             UserHourOverviewDTO userHourOverviewDTO = new UserHourOverviewDTO();
             userHourOverviewDTO.setFirstName(key.getFirstName());
@@ -87,7 +86,9 @@ public class OverviewServiceImpl implements OverviewService {
             userHourOverviewDTO.setSalaryType(userSalaryHashMap.get(key.getId()).getSalaryType());
             userHourOverviewDTO.setActiveHourPrice(userSalaryHashMap.get(key.getId()).getPrice());
             userHourOverviewDTO.setUserHours(this.generateUserHoursStringFromMinutes(userDayHoursInMinutes.get(key)));
-            userHourOverviewDTO.setTotalUserPrice(this.countUserTotalPrice(userDayTotalPrice.get(key)));
+            if (userSalaryHashMap.get(key.getId()).getSalaryType() == SalaryType.HOUR) {
+                userHourOverviewDTO.setTotalUserPrice(this.countUserTotalPrice(userDayTotalPrice.get(key)));
+            }
             userHourOverviewDTO.setTotalUserHours(this.countTotalUserHours(userDayHoursInMinutes.get(key)));
             filedResponse.add(userHourOverviewDTO);
         });
@@ -100,7 +101,6 @@ public class OverviewServiceImpl implements OverviewService {
 
         //load just needed salaries
         List<Salary> userSalaries = this.qSalaryRepository.getSalariesForUsersByIds(userIds, SecurityUtils.companyId());
-        System.out.println("List size: " + userSalaries.size());
         for (Salary salary: userSalaries) {
             userSalaryHashMap.put(salary.getUser().getId(), salary);
         }
