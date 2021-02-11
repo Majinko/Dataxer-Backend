@@ -1,12 +1,12 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.AppUser;
+import com.data.dataxer.models.dto.UserHourOverviewDTO;
 
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.List;
 
 public interface OverviewService {
 
-    HashMap<AppUser, HashMap<Integer, Integer>> getAllUsersHourOverview(LocalDate fromDate, LocalDate toDate);
+    List<UserHourOverviewDTO> getAllUsersHourOverview(LocalDate fromDate, LocalDate toDate);
 
 }

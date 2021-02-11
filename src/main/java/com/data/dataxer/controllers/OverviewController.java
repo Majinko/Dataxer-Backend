@@ -1,6 +1,6 @@
 package com.data.dataxer.controllers;
 
-import com.data.dataxer.models.domain.AppUser;
+import com.data.dataxer.models.dto.UserHourOverviewDTO;
 import com.data.dataxer.services.OverviewService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
-import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/overview")
@@ -23,7 +23,7 @@ public class OverviewController {
     }
 
     @GetMapping("/usersHoursOverview")
-    public ResponseEntity<HashMap<AppUser, HashMap<Integer, Integer>>> userHourStatisticForMonth(
+    public ResponseEntity<List<UserHourOverviewDTO>> userHourStatisticForMonth(
             @RequestParam(value = "fromDate")
                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
             @RequestParam(value = "toDate")
