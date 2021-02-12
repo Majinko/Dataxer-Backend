@@ -6,7 +6,5 @@ import java.time.LocalDate;
 import java.util.HashMap;
 
 public interface OverviewService {
-
     HashMap<AppUser, HashMap<Integer, Integer>> getAllUsersHourOverview(LocalDate fromDate, LocalDate toDate);
-
 }

@@ -29,6 +29,7 @@ public class TimeServiceImpl implements TimeService {
     public Time store(Time time) {
         BigDecimal price = this.qSalaryRepository.getPriceFromSalaryByUserFinishIsNull(time.getUser(), SecurityUtils.companyId());
         time.setPrice(price);
+
         return this.timeRepository.save(time);
     }
 
