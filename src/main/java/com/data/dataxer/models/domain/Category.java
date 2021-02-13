@@ -19,8 +19,6 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE category SET deleted_at = now() WHERE id = ?")
 public class Category extends BaseEntity{

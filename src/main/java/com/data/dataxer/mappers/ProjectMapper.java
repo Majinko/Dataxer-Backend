@@ -19,6 +19,10 @@ public interface ProjectMapper {
     @Mapping(target = "contact", ignore = true)
     ProjectDTO projectToProjectDTOSimple(Project project);
 
+    @Named(value = "projectToProjectDTOWithoutCategory")
+    @Mapping(target = "categories", ignore = true)
+    ProjectDTO projectToProjectDTOWithoutCategory(Project project);
+
     @IterableMapping(qualifiedByName = "projectToProjectDTOSimple")
     List<ProjectDTO> projectToProjectDTOs(List<Project> projects);
 }

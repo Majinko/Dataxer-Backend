@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -20,4 +22,6 @@ public class ProjectDTO {
     private Float area;
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
+
+    private List<CategoryDTO> categories = new ArrayList<>();
 }

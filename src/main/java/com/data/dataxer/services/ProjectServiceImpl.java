@@ -22,6 +22,8 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project store(Project project) {
+        String penis = "penis";
+
         return this.projectRepository.save(project);
     }
 
