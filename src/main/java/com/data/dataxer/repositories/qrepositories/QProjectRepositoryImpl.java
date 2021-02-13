@@ -71,13 +71,12 @@ public class QProjectRepositoryImpl implements QProjectRepository {
 
     @Override
     public Project getById(Long id, Long companyId) {
-        QProject qProject = QProject.project;
-
         return query
-                .selectFrom(qProject)
-                .where(qProject.company.id.eq(companyId))
-                .where(qProject.id.eq(id))
-                .leftJoin(qProject.contact)
+                .selectFrom(QProject.project)
+                .where(QProject.project.company.id.eq(companyId))
+                .where(QProject.project.id.eq(id))
+                .leftJoin(QProject.project.contact)
+                .leftJoin(QProject.project.categories)
                 .fetchJoin()
                 .fetchOne();
 

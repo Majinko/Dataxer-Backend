@@ -28,14 +28,7 @@ public class Project extends BaseEntity {
     @OneToOne
     private AppUser user;
 
-    @JoinTable(
-            name = "categoryAble",
-            joinColumns = @JoinColumn(name = "categoryAbleId"),
-            inverseJoinColumns = @JoinColumn(name = "categoryId"),
-            foreignKey = @javax.persistence.ForeignKey(name = "none")
-    )
     @ManyToMany(fetch = FetchType.LAZY)
-    @Where(clause="categoryAbleType='project'")
     private List<Category> categories = new ArrayList<>();
 
     private String title;

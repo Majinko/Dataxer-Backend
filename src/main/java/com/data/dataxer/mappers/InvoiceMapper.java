@@ -20,6 +20,7 @@ public interface InvoiceMapper {
     InvoiceDTO invoiceToInvoiceDTO(Invoice invoice);
 
     @Mapping(target = "packs", ignore = true)
+    @Mapping(target = "project.categories", ignore = true)
     InvoiceDTO invoiceToInvoiceDTOSimple(Invoice invoice);
 
     @Mapping(target = "packs", ignore = true)
