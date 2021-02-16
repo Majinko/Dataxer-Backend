@@ -17,4 +17,6 @@ public interface QTimeRepository {
     Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long userId,  Long companyId);
 
     List<Time> getHourOverviewForAllUsers(LocalDate fromDate, LocalDate toDate, Long companyId);
+
+    List<Time> allForPeriod(LocalDate from, LocalDate to, Long companyId);
 }

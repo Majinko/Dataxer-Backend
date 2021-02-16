@@ -7,10 +7,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/time")
@@ -44,6 +47,15 @@ public class TimeController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
         return ResponseEntity.ok(this.timeService.paginate(pageable, rqlFilter, sortExpression).map(this.timeMapper::timeToTimeDTO));
+    }
+
+    @GetMapping("/allForPeriod")
+    public ResponseEntity<List<TimeDTO>> allForPeriod(@RequestParam(value = "from")
+                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
+                                                      @RequestParam(value = "to")
+                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
+
+        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(from, to)));
     }
 
     @GetMapping("/{id}")
