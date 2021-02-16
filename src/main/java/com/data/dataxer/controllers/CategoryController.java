@@ -37,9 +37,9 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toCategoryDTO(this.categoryService.store(categoryMapper.toCategory(categoryDTO))));
     }
 
-    @PostMapping("/updateTree")
-    public void updateTree(@RequestBody List<CategoryNestedDTO> categoryDTOS) {
-        categoryService.updateTree(categoryMapper.CategoryNestedDTOsToCategories(categoryDTOS), null);
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(categoryMapper.toCategoryDTO(this.categoryService.getById(id)));
     }
 
     @GetMapping("/destroy/{id}")

@@ -1,14 +1,15 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.hibernate.annotations.Where;
+import org.springframework.security.core.context.SecurityContextHolder;
+import works.hacker.mptt.classic.MpttEntity;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -20,18 +21,15 @@ import java.util.List;
 @Getter
 @Setter
 @Where(clause = "deleted_at is null")
-@SQLDelete(sql = "UPDATE category SET deleted_at = now() WHERE id = ?")
-public class Category extends BaseEntity{
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Category extends MpttEntity {
 
-    @NotNull
-    private String name;
+    public Category() {
+        super();
+    }
 
-    private Integer lft;
-
-    private Integer rgt;
+    public Category(String name) {
+        super(name);
+    }
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,8 +37,27 @@ public class Category extends BaseEntity{
     private Category parent;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "parent", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
-    private List<Category> children = new ArrayList<Category>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", referencedColumnName = "id", updatable = false)
+    private Company company;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @CreationTimestamp
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at", nullable = false)
+    @UpdateTimestamp
+    private LocalDateTime updatedAt;
 
     private LocalDateTime deletedAt;
+
+    @PrePersist
+    private void persist() {
+        if (SecurityContextHolder.getContext().getAuthentication() != null)
+            try {
+                company = SecurityUtils.defaultCompany();
+            } catch (NullPointerException ex) {
+                company = null;
+            }
+    }
 }
