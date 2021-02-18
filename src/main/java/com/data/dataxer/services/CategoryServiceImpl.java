@@ -4,9 +4,13 @@ import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import works.hacker.mptt.TreeRepository;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
@@ -19,18 +23,18 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public Category store(Category category) {
+    @Transactional
+    public void store(Category category, Long parentId) {
         try {
-            if (category.getParent() == null) {
-                Long id = this.categoryRepository.startTree(category);
-                return this.getById(id);
+            if (parentId == null || parentId == 0) {
+                this.categoryRepository.startTree(category);
             } else {
-                this.categoryRepository.addChild(category.getParent(), category);
+                Category parent = this.getById(parentId);
+                this.categoryRepository.addChild(parent, category);
             }
         } catch (TreeRepository.NodeAlreadyAttachedToTree | TreeRepository.NodeNotInTree exception) {
             throw new RuntimeException("Category save failed. Reason: " + exception.getMessage());
         }
-        return  this.categoryRepository.save(category);
     }
 
     @Override
@@ -45,12 +49,90 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> nested() {
-        return this.categoryRepository.findAllByCompanyIdAndParentIsNull(SecurityUtils.companyId());
+        return this.categoryRepository.findAllByCompanyIdAndDepth(SecurityUtils.companyId());
+    }
+
+    @Override
+    public List<Category> getChildren(Long parentId) {
+        return this.categoryRepository.findChildren(this.getById(parentId));
+    }
+
+    @Override
+    public void updateTree(Long parentCategoryId, Category category) {
+        if (parentCategoryId == null || parentCategoryId <= 0) {
+            List<Category> subTree = this.categoryRepository.findSubTree(category);
+            //revert list so first element is new root
+            Collections.reverse(subTree);
+            this.moveToNewRoot(subTree);
+        } else {
+            Category parent = this.getById(parentCategoryId);
+            //load children of parent
+            List<Category> children = this.categoryRepository.findChildren(parent);
+            boolean positionChangeOnly = children.stream().filter(c-> c.getId() == category.getId()).count() == 1;
+            List<Category> categoriesToChangePosition = children.stream().filter(c -> c.getPosition() >= category.getPosition()).collect(Collectors.toList());
+            categoriesToChangePosition.forEach(c -> {
+                c.setPosition(c.getPosition() + 1);
+                this.categoryRepository.save(c);
+            });
+            if (positionChangeOnly) {
+                //update position for moved category
+                this.categoryRepository.save(category);
+            } else {
+                try {
+                    this.categoryRepository.addChild(parent, this.createNewFromOld(category));
+                    this.categoryRepository.deleteById(category.getId());
+                } catch (TreeRepository.NodeAlreadyAttachedToTree nodeAlreadyAttachedToTree) {
+                    throw new RuntimeException("Node with name: " + category.getName() + " is already attached to tree");
+                } catch (TreeRepository.NodeNotInTree nodeNotInTree) {
+                    throw new RuntimeException("Parent node with name: " + parent.getName() + " is not in tree");
+                }
+            }
+        }
     }
 
     @Override
     public void delete(Long id) {
         List<Category> categoriesToDelete = this.categoryRepository.findSubTree(this.getById(id));
         this.categoryRepository.deleteInBatch(categoriesToDelete);
+    }
+
+    private void moveToNewRoot(List<Category> subTree) {
+        HashMap<Category, Category> mappedCategories = mapNewCategoryToOld(subTree);
+        try {
+            //create new root
+            this.categoryRepository.startTree(mappedCategories.get(subTree.get(0)));
+            subTree.forEach(category -> {
+                List<Category> children = this.categoryRepository.findChildren(category);
+                children.forEach(child -> {
+                    try {
+                        this.categoryRepository.addChild(mappedCategories.get(category), mappedCategories.get(child));
+                    } catch (TreeRepository.NodeAlreadyAttachedToTree nodeAlreadyAttachedToTree) {
+                        throw new RuntimeException("Node with name: " + child.getName() + " is already attached to tree");
+                    } catch (TreeRepository.NodeNotInTree nodeNotInTree) {
+                        throw new RuntimeException("Parent node with name: " + child.getName() + " is not in tree");
+                    }
+                });
+            });
+            //delete old nodes
+            this.categoryRepository.deleteInBatch(subTree);
+        } catch (TreeRepository.NodeAlreadyAttachedToTree nodeAlreadyAttachedToTree) {
+            throw new RuntimeException("New root is already attached, cannot create new tree root");
+        }
+    }
+
+    private HashMap<Category, Category> mapNewCategoryToOld(List<Category> oldCategories) {
+        HashMap<Category, Category> mappedCategories = new HashMap<>();
+
+        oldCategories.forEach(category -> mappedCategories.put(category, this.createNewFromOld(category)));
+
+        return mappedCategories;
+    }
+
+    private Category createNewFromOld(Category oldCategory) {
+        Category newCategory = new Category();
+        newCategory.setName(oldCategory.getName());
+        newCategory.setPosition(oldCategory.getPosition());
+
+        return newCategory;
     }
 }

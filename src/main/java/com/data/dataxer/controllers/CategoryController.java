@@ -21,6 +21,12 @@ public class CategoryController {
         this.categoryMapper = categoryMapper;
     }
 
+    @PostMapping("/store")
+    public void store(@RequestBody CategoryDTO categoryDTO,
+                      @RequestParam(value = "parentId", defaultValue = "0") Long parentId) {
+        this.categoryService.store(categoryMapper.toCategory(categoryDTO), parentId);
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<CategoryDTO>> all() {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.all()));
@@ -32,9 +38,15 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toCategoryNestedDTOs(categoryService.nested()));
     }
 
-    @PostMapping("/store")
-    public ResponseEntity<CategoryDTO> store(@RequestBody CategoryDTO categoryDTO) {
-        return ResponseEntity.ok(categoryMapper.toCategoryDTO(this.categoryService.store(categoryMapper.toCategory(categoryDTO))));
+    @GetMapping("/updateTree")
+    public void updateTree(@RequestParam(value = "id", defaultValue = "-1") Long parentId,
+                           @RequestBody CategoryDTO categoryDTO) {
+        categoryService.updateTree(parentId, categoryMapper.toCategory(categoryDTO));
+    }
+
+    @GetMapping("/children")
+    public ResponseEntity<List<CategoryDTO>> getChildren(@RequestParam(value = "id") Long id) {
+        return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.categoryService.getChildren(id)));
     }
 
     @GetMapping("/{id}")
@@ -46,4 +58,5 @@ public class CategoryController {
     public void destroy(@PathVariable Long id) {
         categoryService.delete(id);
     }
+
 }

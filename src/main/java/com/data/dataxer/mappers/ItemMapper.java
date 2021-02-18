@@ -4,8 +4,10 @@ import com.data.dataxer.models.domain.Item;
 import com.data.dataxer.models.domain.ItemPrice;
 import com.data.dataxer.models.dto.ItemDTO;
 import com.data.dataxer.models.dto.ItemPriceDTO;
-import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
+import org.mapstruct.IterableMapping;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.List;
 
@@ -17,7 +19,6 @@ public interface ItemMapper {
     //@Mapping(target = "category.parent", ignore = true)
     ItemDTO itemToItemDto(Item item);
 
-    @Mapping(target = "category.parent", ignore = true)
     Item toItem(ItemDTO itemDTO);
 
     @Named(value = "itemToItemDTOWithPrice")

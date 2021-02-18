@@ -16,7 +16,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, Categ
     @Query("SELECT c FROM Category c WHERE c.company.id = ?1")
     List<Category> findAllByCompanyId(Long companyId);
 
-    @Query("SELECT c FROM Category c WHERE c.company.id = ?1 AND c.parent IS NULL")
-    List<Category> findAllByCompanyIdAndParentIsNull(Long companyId);
+    @Query("SELECT c FROM Category c WHERE c.company.id = ?1 AND c.depth = 0")
+    List<Category> findAllByCompanyIdAndDepth(Long companyId);
 
 }

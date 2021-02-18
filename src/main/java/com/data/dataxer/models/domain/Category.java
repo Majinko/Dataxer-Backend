@@ -2,7 +2,6 @@ package com.data.dataxer.models.domain;
 
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -12,10 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import works.hacker.mptt.classic.MpttEntity;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Getter
@@ -31,10 +27,7 @@ public class Category extends MpttEntity {
         super(name);
     }
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Category parent;
+    private Integer position;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
