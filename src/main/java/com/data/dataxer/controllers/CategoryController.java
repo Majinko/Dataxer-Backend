@@ -41,7 +41,7 @@ public class CategoryController {
     @GetMapping("/updateTree")
     public void updateTree(@RequestParam(value = "id", defaultValue = "-1") Long parentId,
                            @RequestBody CategoryDTO categoryDTO) {
-        categoryService.updateTree(parentId, categoryMapper.toCategory(categoryDTO));
+        categoryService.updateTree(parentId, categoryMapper.toCategory(categoryDTO), categoryDTO.getId());
     }
 
     @GetMapping("/children")

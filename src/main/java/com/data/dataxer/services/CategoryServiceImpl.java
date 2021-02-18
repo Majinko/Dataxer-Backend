@@ -58,12 +58,12 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void updateTree(Long parentCategoryId, Category category) {
+    public void updateTree(Long parentCategoryId, Category category, Long categoryId) {
         if (parentCategoryId == null || parentCategoryId <= 0) {
             List<Category> subTree = this.categoryRepository.findSubTree(category);
             //revert list so first element is new root
             Collections.reverse(subTree);
-            this.moveToNewRoot(subTree);
+            this.moveToNewParent(subTree, null, true);
         } else {
             Category parent = this.getById(parentCategoryId);
             //load children of parent
@@ -78,14 +78,7 @@ public class CategoryServiceImpl implements CategoryService {
                 //update position for moved category
                 this.categoryRepository.save(category);
             } else {
-                try {
-                    this.categoryRepository.addChild(parent, this.createNewFromOld(category));
-                    this.categoryRepository.deleteById(category.getId());
-                } catch (TreeRepository.NodeAlreadyAttachedToTree nodeAlreadyAttachedToTree) {
-                    throw new RuntimeException("Node with name: " + category.getName() + " is already attached to tree");
-                } catch (TreeRepository.NodeNotInTree nodeNotInTree) {
-                    throw new RuntimeException("Parent node with name: " + parent.getName() + " is not in tree");
-                }
+                this.moveToNewParent(this.categoryRepository.findSubTree(category), parent,false);
             }
         }
     }
@@ -96,11 +89,15 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryRepository.deleteInBatch(categoriesToDelete);
     }
 
-    private void moveToNewRoot(List<Category> subTree) {
+    private void moveToNewParent(List<Category> subTree, Category newParent, boolean makeNewRoot) {
         HashMap<Category, Category> mappedCategories = mapNewCategoryToOld(subTree);
         try {
-            //create new root
-            this.categoryRepository.startTree(mappedCategories.get(subTree.get(0)));
+            if (makeNewRoot) {
+                //create new root
+                this.categoryRepository.startTree(mappedCategories.get(subTree.get(0)));
+            } else {
+                this.categoryRepository.addChild(newParent, mappedCategories.get(subTree.get(0)));
+            }
             subTree.forEach(category -> {
                 List<Category> children = this.categoryRepository.findChildren(category);
                 children.forEach(child -> {
@@ -117,6 +114,8 @@ public class CategoryServiceImpl implements CategoryService {
             this.categoryRepository.deleteInBatch(subTree);
         } catch (TreeRepository.NodeAlreadyAttachedToTree nodeAlreadyAttachedToTree) {
             throw new RuntimeException("New root is already attached, cannot create new tree root");
+        } catch (TreeRepository.NodeNotInTree nodeNotInTree) {
+            throw new RuntimeException("Parent node with name: " + newParent.getName() + " is not in tree");
         }
     }
 
