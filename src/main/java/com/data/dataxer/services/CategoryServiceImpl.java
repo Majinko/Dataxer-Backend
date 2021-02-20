@@ -28,9 +28,15 @@ public class CategoryServiceImpl implements CategoryService {
     public void store(Category category, Long parentId) {
         try {
             if (parentId == null || parentId == 0) {
+                List<Category> parentsToChangePositions = this.categoryRepository.findAllByCompanyIdAndDepthOrderByPositionAsc(SecurityUtils.companyId())
+                        .stream().filter(c -> c.getPosition() >= category.getPosition()).collect(Collectors.toList());
+                this.changeCategoryPositions(parentsToChangePositions, 1);
                 this.categoryRepository.startTree(category);
             } else {
                 Category parent = this.getById(parentId);
+                List<Category> childrenToChangePositions = this.categoryRepository.findChildren(parent).stream()
+                        .filter(c -> c.getPosition() >= category.getPosition()).collect(Collectors.toList());
+                this.changeCategoryPositions(childrenToChangePositions, 1);
                 this.categoryRepository.addChild(parent, category);
             }
         } catch (TreeRepository.NodeAlreadyAttachedToTree | TreeRepository.NodeNotInTree exception) {
@@ -99,15 +105,15 @@ public class CategoryServiceImpl implements CategoryService {
                 this.changeCategoryPositions(categoriesToChangePosition, 1);
                 //old parent children position change > than
                 List<Category> subTree = this.categoryRepository.findSubTree(category);
-                //revert list so first element is new first is category
+                //revert list so first element is category
                 Collections.reverse(subTree);
-                //find all old siblings
-                List<Category> oldParentChildren = this.categoryRepository.findChildren(
+                //find all old siblings to change positions
+                List<Category> oldParentChildrenToChangePositions = this.categoryRepository.findChildren(
                         this.categoryRepository.findParent(category)
-                                .orElseThrow(() -> new RuntimeException("Old parent not found")));
+                                .orElseThrow(() -> new RuntimeException("Old parent not found")))
+                        .stream().filter(c -> c.getPosition() >= subTree.get(0).getPosition()).collect(Collectors.toList());
                 //change position for all needed
-                this.changeCategoryPositions(oldParentChildren.stream()
-                        .filter(c -> c.getPosition() >= subTree.get(0).getPosition()).collect(Collectors.toList()), -1);
+                this.changeCategoryPositions(oldParentChildrenToChangePositions, -1);
                 this.moveToNewParent(subTree, parent,false);
             }
         }
