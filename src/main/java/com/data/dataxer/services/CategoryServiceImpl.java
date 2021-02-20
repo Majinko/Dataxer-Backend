@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import works.hacker.mptt.TreeRepository;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,12 +50,13 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> nested() {
-        return this.categoryRepository.findAllByCompanyIdAndDepth(SecurityUtils.companyId());
+        return this.categoryRepository.findAllByCompanyIdAndDepthOrderByPositionAsc(SecurityUtils.companyId());
     }
 
     @Override
     public List<Category> getChildren(Long parentId) {
-        return this.categoryRepository.findChildren(this.getById(parentId));
+        return this.categoryRepository.findChildren(this.getById(parentId)).stream()
+                .sorted(Comparator.comparingInt(Category::getPosition)).collect(Collectors.toList());
     }
 
     @Override
@@ -63,22 +65,50 @@ public class CategoryServiceImpl implements CategoryService {
             List<Category> subTree = this.categoryRepository.findSubTree(category);
             //revert list so first element is new root
             Collections.reverse(subTree);
+            //find all roots to change positions
+            List<Category> categoriesToChangePosition = this.categoryRepository.findAllByCompanyIdAndDepthOrderByPositionAsc(SecurityUtils.companyId()).stream()
+                    .filter(c -> c.getPosition() >= category.getPosition()).collect(Collectors.toList());
+            this.changeCategoryPositions(categoriesToChangePosition, 1);
             this.moveToNewParent(subTree, null, true);
         } else {
             Category parent = this.getById(parentCategoryId);
             //load children of parent
             List<Category> children = this.categoryRepository.findChildren(parent);
-            boolean positionChangeOnly = children.stream().filter(c-> c.getId() == category.getId()).count() == 1;
-            List<Category> categoriesToChangePosition = children.stream().filter(c -> c.getPosition() >= category.getPosition()).collect(Collectors.toList());
-            categoriesToChangePosition.forEach(c -> {
-                c.setPosition(c.getPosition() + 1);
-                this.categoryRepository.save(c);
-            });
+
+            boolean positionChangeOnly = children.stream().filter(c-> c.getId() == categoryId).count() == 1;
+
             if (positionChangeOnly) {
+                Category oldCategory = children.stream().filter(c -> c.getId() == categoryId).findFirst()
+                        .orElseThrow(() -> new RuntimeException("Cannot find category with old position"));
+                //we are changing position so we need change all between old and new position
+                if (category.getPosition() < oldCategory.getPosition()) {
+                    List<Category> categoriesToChangePosition = children.stream()
+                            .filter(c -> c.getPosition() >= category.getPosition() && c.getPosition() < oldCategory.getPosition()).collect(Collectors.toList());
+                    this.changeCategoryPositions(categoriesToChangePosition, 1);
+                } else {
+                    List<Category> categoriesToChangePosition = children.stream()
+                            .filter(c -> c.getPosition() <= category.getPosition() && c.getPosition() > oldCategory.getPosition()).collect(Collectors.toList());
+                    this.changeCategoryPositions(categoriesToChangePosition, -1);
+                }
                 //update position for moved category
-                this.categoryRepository.save(category);
+                this.categoryRepository.setCategoryPosition(categoryId, category.getPosition(), SecurityUtils.companyId());
             } else {
-                this.moveToNewParent(this.categoryRepository.findSubTree(category), parent,false);
+                //we are adding new children so we need just move all with position >= + 1
+                List<Category> categoriesToChangePosition = children.stream()
+                        .filter(c -> c.getPosition() >= category.getPosition()).collect(Collectors.toList());
+                this.changeCategoryPositions(categoriesToChangePosition, 1);
+                //old parent children position change > than
+                List<Category> subTree = this.categoryRepository.findSubTree(category);
+                //revert list so first element is new first is category
+                Collections.reverse(subTree);
+                //find all old siblings
+                List<Category> oldParentChildren = this.categoryRepository.findChildren(
+                        this.categoryRepository.findParent(category)
+                                .orElseThrow(() -> new RuntimeException("Old parent not found")));
+                //change position for all needed
+                this.changeCategoryPositions(oldParentChildren.stream()
+                        .filter(c -> c.getPosition() >= subTree.get(0).getPosition()).collect(Collectors.toList()), -1);
+                this.moveToNewParent(subTree, parent,false);
             }
         }
     }
@@ -96,6 +126,7 @@ public class CategoryServiceImpl implements CategoryService {
                 //create new root
                 this.categoryRepository.startTree(mappedCategories.get(subTree.get(0)));
             } else {
+                System.out.println("New parent name: " + newParent.getName() + " and child name: " + mappedCategories.get(subTree.get(0)).getName());
                 this.categoryRepository.addChild(newParent, mappedCategories.get(subTree.get(0)));
             }
             subTree.forEach(category -> {
@@ -106,7 +137,7 @@ public class CategoryServiceImpl implements CategoryService {
                     } catch (TreeRepository.NodeAlreadyAttachedToTree nodeAlreadyAttachedToTree) {
                         throw new RuntimeException("Node with name: " + child.getName() + " is already attached to tree");
                     } catch (TreeRepository.NodeNotInTree nodeNotInTree) {
-                        throw new RuntimeException("Parent node with name: " + child.getName() + " is not in tree");
+                        throw new RuntimeException("Parent node with name: " + mappedCategories.get(category).getName() + ", " + mappedCategories.get(category).getPosition() + " is not in tree");
                     }
                 });
             });
@@ -115,7 +146,7 @@ public class CategoryServiceImpl implements CategoryService {
         } catch (TreeRepository.NodeAlreadyAttachedToTree nodeAlreadyAttachedToTree) {
             throw new RuntimeException("New root is already attached, cannot create new tree root");
         } catch (TreeRepository.NodeNotInTree nodeNotInTree) {
-            throw new RuntimeException("Parent node with name: " + newParent.getName() + " is not in tree");
+            throw new RuntimeException("Parent node with name: " + newParent.getName() + " is not in tree (parent)");
         }
     }
 
@@ -133,5 +164,10 @@ public class CategoryServiceImpl implements CategoryService {
         newCategory.setPosition(oldCategory.getPosition());
 
         return newCategory;
+    }
+
+    private void changeCategoryPositions(List<Category> categoriesToChangePosition, int value) {
+        List<Long> categoryIds = categoriesToChangePosition.stream().map(Category::getId).collect(Collectors.toList());
+        this.categoryRepository.updateCategoriesPosition(categoryIds, value, SecurityUtils.companyId());
     }
 }
