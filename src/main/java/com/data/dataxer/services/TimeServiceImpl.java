@@ -10,6 +10,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class TimeServiceImpl implements TimeService {
@@ -62,5 +64,10 @@ public class TimeServiceImpl implements TimeService {
     public Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
         return this.qTimeRepository
                 .paginate(pageable, rqlFilter, sortExpression, SecurityUtils.id(), SecurityUtils.companyId());
+    }
+
+    @Override
+    public List<Time> allForPeriod(LocalDate from, LocalDate to) {
+        return this.qTimeRepository.allForPeriod(from ,to, SecurityUtils.companyId());
     }
 }
