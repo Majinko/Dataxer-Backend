@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface CategoryService {
 
-    Category store(Category category);
+    void store(Category category, Long parentId);
 
     Category getById(Long id);
 
@@ -14,7 +14,9 @@ public interface CategoryService {
 
     List<Category> nested();
 
-    /*void updateTree(List<Category> categories, Category category);*/
+    List<Category> getChildren(Long parentId);
+
+    void updateTree(Long parentId, Category category, Long categoryId);
 
     void delete(Long id);
 }
