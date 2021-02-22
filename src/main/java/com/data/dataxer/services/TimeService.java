@@ -1,5 +1,7 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.Category;
+import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,4 +24,14 @@ public interface TimeService {
     Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     List<Time> allForPeriod(LocalDate from, LocalDate to);
+
+    List<Time> allUserTimesForPeriod(LocalDate date, Long userId);
+
+    List<Project> allUniqueUserProjectsFromTimes(List<Time> userTimes);
+
+    List<Project> getLastUserWorkingProjects(Long userId);
+
+    List<Category> getProjectCategoryByTime(Long projectId);
+
+    List<Category> getProjectCategoryByPosition(Long projectId);
 }

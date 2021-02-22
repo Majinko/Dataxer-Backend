@@ -19,4 +19,12 @@ public interface QTimeRepository {
     List<Time> getHourOverviewForAllUsers(LocalDate fromDate, LocalDate toDate, Long companyId);
 
     List<Time> allForPeriod(LocalDate from, LocalDate to, Long companyId);
+
+    List<Time> allUserTimesForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId);
+
+    List<Time> getUserLastProjects(Long userId, Long offset, Long limit, Long companyId);
+
+    List<Time> getTimesForProjectCategoryOrderByDate(Long projectId, Long companyId);
+
+    List<Time> getTimesForProjectCategoryOrderByPosition(Long projectId, Long companyId);
 }

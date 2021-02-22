@@ -111,6 +111,51 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .fetch();
     }
 
+    @Override
+    public List<Time> allUserTimesForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId) {
+        return this.query.selectFrom(QTime.time1)
+                .leftJoin(QTime.time1.user).fetchJoin()
+                .leftJoin(QTime.time1.project).fetchJoin()
+                .where(QTime.time1.user.id.eq(userId))
+                .where(QTime.time1.dateWork.between(from, to))
+                .where(QTime.time1.company.id.eq(companyId))
+                .fetch();
+    }
+
+    @Override
+    public List<Time> getUserLastProjects(Long userId, Long offset, Long limit, Long companyId) {
+        return this.query.selectFrom(QTime.time1)
+                .leftJoin(QTime.time1.project).fetchJoin()
+                .where(QTime.time1.user.id.eq(userId))
+                .where(QTime.time1.company.id.eq(companyId))
+                .orderBy(QTime.time1.dateWork.desc())
+                .offset(offset)
+                .limit(limit)
+                .fetch();
+    }
+
+    @Override
+    public List<Time> getTimesForProjectCategoryOrderByDate(Long projectId, Long companyId) {
+        return this.query.selectFrom(QTime.time1)
+                .leftJoin(QTime.time1.category).fetchJoin()
+                .where(QTime.time1.project.id.eq(projectId))
+                .where(QTime.time1.company.id.eq(companyId))
+                .orderBy(QTime.time1.dateWork.desc())
+                .groupBy(QTime.time1.category)
+                .fetch();
+    }
+
+    @Override
+    public List<Time> getTimesForProjectCategoryOrderByPosition(Long projectId, Long companyId) {
+        return this.query.selectFrom(QTime.time1)
+                .leftJoin(QTime.time1.category).fetchJoin()
+                .where(QTime.time1.project.id.eq(projectId))
+                .where(QTime.time1.company.id.eq(companyId))
+                .orderBy(QTime.time1.category.position.asc())
+                .groupBy(QTime.time1.category)
+                .fetch();
+    }
+
     private long getTotalCount(Predicate predicate) {
         QTime qTime = QTime.time1;
 
