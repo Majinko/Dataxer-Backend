@@ -1,9 +1,7 @@
 package com.data.dataxer.models.domain;
 
-import com.data.dataxer.securityContextUtils.SecurityUtils;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Fetch;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -41,9 +39,4 @@ public class Time extends BaseEntity {
     float km;
 
     private LocalDate dateWork;
-
-    @PrePersist
-    private void persist() {
-        user = SecurityUtils.loggedUser();
-    }
 }

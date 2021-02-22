@@ -17,6 +17,7 @@ public interface ProjectMapper {
 
     @Named(value = "projectToProjectDTOSimple")
     @Mapping(target = "contact", ignore = true)
+    @Mapping(target = "categories", ignore = true)
     ProjectDTO projectToProjectDTOSimple(Project project);
 
     @Named(value = "projectToProjectDTOWithoutCategory")

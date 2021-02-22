@@ -3,18 +3,14 @@ package com.data.dataxer.models.dto;
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
-
-import javax.validation.constraints.NotNull;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.Date;
 
 @Getter
 @Setter
@@ -38,5 +34,4 @@ public class TimeDTO {
     private Category category;
 
     private AppUser user;
-
 }

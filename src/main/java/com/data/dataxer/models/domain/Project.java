@@ -28,7 +28,7 @@ public class Project extends BaseEntity {
     @OneToOne
     private AppUser user;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> categories = new ArrayList<>();
 
     private String title;

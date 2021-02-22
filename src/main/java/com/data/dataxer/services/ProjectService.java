@@ -9,7 +9,7 @@ import java.util.List;
 public interface ProjectService {
     Project store(Project project);
 
-    Project update(Project project);
+    void update(Project project);
 
     Project getById(Long id);
 

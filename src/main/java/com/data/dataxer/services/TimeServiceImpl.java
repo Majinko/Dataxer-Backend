@@ -18,8 +18,7 @@ public class TimeServiceImpl implements TimeService {
     private final QTimeRepository qTimeRepository;
     private final QSalaryRepository qSalaryRepository;
 
-    public TimeServiceImpl(TimeRepository timeRepository, QTimeRepository qTimeRepository,
-                           QSalaryRepository qSalaryRepository) {
+    public TimeServiceImpl(TimeRepository timeRepository, QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository) {
         this.timeRepository = timeRepository;
         this.qTimeRepository = qTimeRepository;
         this.qSalaryRepository = qSalaryRepository;
@@ -27,8 +26,10 @@ public class TimeServiceImpl implements TimeService {
 
     @Override
     public Time store(Time time) {
-        BigDecimal price = this.qSalaryRepository.getPriceFromSalaryByUserFinishIsNull(time.getUser(), SecurityUtils.companyId());
-        time.setPrice(price);
+        BigDecimal price = this.qSalaryRepository.getPriceFromSalaryByUserFinishIsNull(SecurityUtils.loggedUser(), SecurityUtils.companyId());
+
+        time.setUser(SecurityUtils.loggedUser());
+        time.setPrice(BigDecimal.valueOf((float)time.getTime() / 60 / 60).multiply(price)); // calc total price by time store
 
         return this.timeRepository.save(time);
     }

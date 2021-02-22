@@ -25,11 +25,11 @@ public interface CategoryMapper {
 
     List<CategoryNestedDTO> toCategoryNestedDTOs(List<Category> categories);
 
-    @Mapping(target = "rgt", source = "")
-    @Mapping(target = "lft", source = "")
-    @Mapping(target = "deletedAt", source = "")
-    @Mapping(target = "createdAt", source = "")
-    @Mapping(target = "company", source = "")
+    @Mapping(target = "rgt", ignore = true)
+    @Mapping(target = "lft", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "company", ignore = true)
     Category toCategory(CategoryDTO categoryDTO);
 }
 

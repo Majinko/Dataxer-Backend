@@ -3,12 +3,12 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.ProjectMapper;
 import com.data.dataxer.models.dto.ProjectDTO;
 import com.data.dataxer.services.ProjectService;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -51,8 +51,8 @@ public class ProjectController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<ProjectDTO> update(@RequestBody ProjectDTO projectDTO) {
-        return ResponseEntity.ok(this.projectMapper.projectToProjectDTO(this.projectService.update(projectMapper.projectDTOtoProject(projectDTO))));
+    public void update(@RequestBody ProjectDTO projectDTO) {
+        this.projectService.update(projectMapper.projectDTOtoProject(projectDTO));
     }
 
     @GetMapping("/destroy/{id}")

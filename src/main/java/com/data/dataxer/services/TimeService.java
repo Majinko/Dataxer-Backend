@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface TimeService {
-
     Time store(Time time);
 
     Time update(Time time);

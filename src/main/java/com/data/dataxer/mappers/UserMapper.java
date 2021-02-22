@@ -6,12 +6,12 @@ import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
 @Mapper
 public interface UserMapper {
+    @Mapping(target = "roles", ignore = true)
     AppUserDTO appUserToAppUserDTO(AppUser user);
 
     @Mapping(target = "updatedAt", ignore = true)
@@ -21,6 +21,7 @@ public interface UserMapper {
     AppUser appUserDTOtoAppUser(AppUserDTO userDTO);
 
     @Named(value = "appUserToAppUserDTOSimple")
+    @Mapping(target = "roles", ignore = true)
     AppUserDTO appUserToAppUserDTOSimple(AppUser appUser);
 
     @IterableMapping(qualifiedByName = "appUserToAppUserDTOSimple")
