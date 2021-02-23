@@ -50,11 +50,7 @@ public class TimeController {
     }
 
     @GetMapping("/allForPeriod")
-    public ResponseEntity<List<TimeDTO>> allForPeriod(@RequestParam(value = "from")
-                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-                                                      @RequestParam(value = "to")
-                                                        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-
+    public ResponseEntity<List<TimeDTO>> allForPeriod(@RequestParam(value = "from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from, @RequestParam(value = "to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(from, to)));
     }
 
@@ -64,9 +60,7 @@ public class TimeController {
     }
 
     @GetMapping("/destroy/{id}")
-    public void destroy(
-            @PathVariable Long id
-    ) {
+    public void destroy(@PathVariable Long id) {
         this.timeService.destroy(id);
     }
 }

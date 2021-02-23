@@ -26,6 +26,8 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void store(Category category, Long parentId) {
+        var persistedTreeNodesCount = this.categoryRepository.count();
+
         try {
             if (parentId == null || parentId == 0) {
                 List<Category> parentsToChangePositions = this.categoryRepository.findAllByCompanyIdAndDepthOrderByPositionAsc(SecurityUtils.companyId())

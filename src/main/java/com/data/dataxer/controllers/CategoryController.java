@@ -22,8 +22,7 @@ public class CategoryController {
     }
 
     @PostMapping("/store")
-    public void store(@RequestBody CategoryDTO categoryDTO,
-                      @RequestParam(value = "parentId", defaultValue = "0") Long parentId) {
+    public void store(@RequestBody CategoryDTO categoryDTO, @RequestParam(value = "parentId", defaultValue = "0") Long parentId) {
         this.categoryService.store(categoryMapper.toCategory(categoryDTO), parentId);
     }
 
@@ -39,8 +38,7 @@ public class CategoryController {
     }
 
     @GetMapping("/updateTree")
-    public void updateTree(@RequestParam(value = "id", defaultValue = "-1") Long parentId,
-                           @RequestBody CategoryDTO categoryDTO) {
+    public void updateTree(@RequestParam(value = "id", defaultValue = "-1") Long parentId, @RequestBody CategoryDTO categoryDTO) {
         categoryService.updateTree(parentId, categoryMapper.toCategory(categoryDTO), categoryDTO.getId());
     }
 
