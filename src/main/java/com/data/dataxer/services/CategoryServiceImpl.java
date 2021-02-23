@@ -26,19 +26,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     @Transactional
     public void store(Category category, Long parentId) {
-        var persistedTreeNodesCount = this.categoryRepository.count();
+        category.setPosition(this.getNextPosition(parentId));
 
         try {
             if (parentId == null || parentId == 0) {
-                List<Category> parentsToChangePositions = this.categoryRepository.findAllByCompanyIdAndDepthOrderByPositionAsc(SecurityUtils.companyId())
-                        .stream().filter(c -> c.getPosition() >= category.getPosition()).collect(Collectors.toList());
-                this.changeCategoryPositions(parentsToChangePositions, 1);
                 this.categoryRepository.startTree(category);
             } else {
                 Category parent = this.getById(parentId);
-                List<Category> childrenToChangePositions = this.categoryRepository.findChildren(parent).stream()
-                        .filter(c -> c.getPosition() >= category.getPosition()).collect(Collectors.toList());
-                this.changeCategoryPositions(childrenToChangePositions, 1);
                 this.categoryRepository.addChild(parent, category);
             }
         } catch (TreeRepository.NodeAlreadyAttachedToTree | TreeRepository.NodeNotInTree exception) {
@@ -125,6 +119,22 @@ public class CategoryServiceImpl implements CategoryService {
     public void delete(Long id) {
         List<Category> categoriesToDelete = this.categoryRepository.findSubTree(this.getById(id));
         this.categoryRepository.deleteInBatch(categoriesToDelete);
+    }
+
+    private Integer getNextPosition(Long parentId) {
+        Integer position = -1;
+        List<Category> categories;
+        if (parentId == null || parentId <= 0) {
+            categories = this.categoryRepository.findByCompanyAndDepthOrderByPositionDesc(SecurityUtils.companyId());
+        } else {
+            categories = this.categoryRepository.findChildren(this.getById(parentId));
+        }
+        for (Category category:categories) {
+            if (category.getPosition() > position) {
+                position = category.getPosition();
+            }
+        }
+        return position + 1;
     }
 
     private void moveToNewParent(List<Category> subTree, Category newParent, boolean makeNewRoot) {
