@@ -1,6 +1,8 @@
 package com.data.dataxer.repositories.qrepositories;
 
+import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
+import com.querydsl.core.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,9 +22,11 @@ public interface QTimeRepository {
 
     List<Time> allForPeriod(LocalDate from, LocalDate to, Long companyId);
 
-    List<Time> allUserTimesForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId);
+    List<Tuple> getAllUserMonths(Long userId, Long companyId);
 
-    List<Time> getUserLastProjects(Long userId, Long offset, Long limit, Long companyId);
+    List<Project> getAllUserProjects(Long userId, Long companyId);
+
+    List<Project> getUserLastProjects(Long userId, Long limit, Long companyId);
 
     List<Time> getTimesForProjectCategoryOrderByDate(Long projectId, Long companyId);
 

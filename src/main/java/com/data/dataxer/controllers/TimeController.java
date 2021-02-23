@@ -3,11 +3,10 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.CategoryMapper;
 import com.data.dataxer.mappers.ProjectMapper;
 import com.data.dataxer.mappers.TimeMapper;
-import com.data.dataxer.models.domain.Time;
 import com.data.dataxer.models.dto.CategoryDTO;
+import com.data.dataxer.models.dto.MonthAndYearDTO;
 import com.data.dataxer.models.dto.ProjectDTO;
 import com.data.dataxer.models.dto.TimeDTO;
-import com.data.dataxer.models.dto.UserTimesAndProjectsDTO;
 import com.data.dataxer.services.TimeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -69,16 +68,14 @@ public class TimeController {
         return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(from, to)));
     }
 
-    @GetMapping("/allUserTimesAndProjects")
-    public ResponseEntity<UserTimesAndProjectsDTO> allUserTimesForPeriod(@RequestParam(value = "date")
-                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                                                         @RequestParam(value = "id") Long userId) {
-        UserTimesAndProjectsDTO response = new UserTimesAndProjectsDTO();
-        List<Time> userTimes = this.timeService.allUserTimesForPeriod(date, userId);
+    @GetMapping("/userMonths")
+    public ResponseEntity<List<MonthAndYearDTO>> getAllUserMonths(@RequestParam(value = "id") Long userId) {
+        return ResponseEntity.ok(this.timeService.getAllUserMonths(userId));
+    }
 
-        response.setUserTimesForPeriod(this.timeMapper.timeListToTimeDTOList(userTimes));
-        response.setUserUniqueProjects(this.projectMapper.projectToProjectDTOs(this.timeService.allUniqueUserProjectsFromTimes(userTimes)));
-        return ResponseEntity.ok(response);
+    @GetMapping("/allUserProjects")
+    public ResponseEntity<List<ProjectDTO>> getAllUserProjects(@RequestParam(value = "id") Long userId) {
+        return ResponseEntity.ok(this.projectMapper.projectToProjectDTOs(this.timeService.getAllUserProjects(userId)));
     }
 
     @GetMapping("/lastUserProjects")
@@ -91,6 +88,7 @@ public class TimeController {
         return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.timeService.getProjectCategoryByTime(projectId)));
     }
 
+    @GetMapping("/allProjectCategory")
     public ResponseEntity<List<CategoryDTO>> getProjectCategoryOrderByPosition(@RequestParam(value = "projectId") Long projectId) {
         return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.timeService.getProjectCategoryByPosition(projectId)));
     }

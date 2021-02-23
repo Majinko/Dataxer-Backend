@@ -1,6 +1,7 @@
 package com.data.dataxer.repositories.qrepositories;
 
 
+import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.QTask;
 import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.domain.Time;
@@ -12,6 +13,7 @@ import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
 import com.github.vineey.rql.sort.parser.DefaultSortParser;
 import com.google.common.collect.ImmutableMap;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
@@ -112,24 +114,39 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Time> allUserTimesForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId) {
-        return this.query.selectFrom(QTime.time1)
-                .leftJoin(QTime.time1.user).fetchJoin()
-                .leftJoin(QTime.time1.project).fetchJoin()
+    public List<Tuple> getAllUserMonths(Long userId, Long companyId) {
+        return this.query.from(QTime.time1)
+                .select(QTime.time1.dateWork.year().as("year"), QTime.time1.dateWork.month().as("month"))
                 .where(QTime.time1.user.id.eq(userId))
-                .where(QTime.time1.dateWork.between(from, to))
                 .where(QTime.time1.company.id.eq(companyId))
+                .groupBy(QTime.time1.dateWork.year())
+                .groupBy(QTime.time1.dateWork.month())
+                .orderBy(QTime.time1.dateWork.year().desc())
+                .orderBy(QTime.time1.dateWork.month().desc())
                 .fetch();
     }
 
     @Override
-    public List<Time> getUserLastProjects(Long userId, Long offset, Long limit, Long companyId) {
-        return this.query.selectFrom(QTime.time1)
+    public List<Project> getAllUserProjects(Long userId, Long companyId) {
+        return this.query.from(QTime.time1)
+                .select(QTime.time1.project)
+                .leftJoin(QTime.time1.project).fetchJoin()
+                .where(QTime.time1.user.id.eq(userId))
+                .where(QTime.time1.company.id.eq(companyId))
+                .groupBy(QTime.time1.project)
+                .orderBy(QTime.time1.project.id.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<Project> getUserLastProjects(Long userId, Long limit, Long companyId) {
+        return this.query.from(QTime.time1)
+                .select(QTime.time1.project)
                 .leftJoin(QTime.time1.project).fetchJoin()
                 .where(QTime.time1.user.id.eq(userId))
                 .where(QTime.time1.company.id.eq(companyId))
                 .orderBy(QTime.time1.dateWork.desc())
-                .offset(offset)
+                .groupBy(QTime.time1.project)
                 .limit(limit)
                 .fetch();
     }
