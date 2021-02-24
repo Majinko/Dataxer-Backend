@@ -3,6 +3,7 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
+import com.data.dataxer.models.dto.MonthAndYearDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -24,9 +25,9 @@ public interface TimeService {
 
     List<Time> allForPeriod(LocalDate from, LocalDate to);
 
-    List<Time> allUserTimesForPeriod(LocalDate date, Long userId);
+    List<MonthAndYearDTO> getAllUserMonths(Long userId);
 
-    List<Project> allUniqueUserProjectsFromTimes(List<Time> userTimes);
+    List<Project> getAllUserProjects(Long userId);
 
     List<Project> getLastUserWorkingProjects(Long userId);
 
