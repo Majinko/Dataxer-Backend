@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.CategoryMapper;
 import com.data.dataxer.models.dto.CategoryDTO;
 import com.data.dataxer.models.dto.CategoryNestedDTO;
+import com.data.dataxer.models.dto.CategoryStoreDTO;
 import com.data.dataxer.services.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +23,8 @@ public class CategoryController {
     }
 
     @PostMapping("/store")
-    public void store(@RequestBody CategoryDTO categoryDTO, @RequestParam(value = "parentId", defaultValue = "0") Long parentId) {
-        this.categoryService.store(categoryMapper.toCategory(categoryDTO), parentId);
+    public void store(@RequestBody CategoryStoreDTO categoryStoreDTO) {
+        this.categoryService.store(this.resolveParentId(categoryStoreDTO.getParent()), categoryStoreDTO.getName());
     }
 
     @GetMapping("/all")
@@ -55,6 +56,14 @@ public class CategoryController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         categoryService.delete(id);
+    }
+
+    private Long resolveParentId(CategoryDTO categoryDTO) {
+        if (categoryDTO != null) {
+            return categoryDTO.getId();
+        } else {
+            return null;
+        }
     }
 
 }

@@ -25,24 +25,34 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public void store(Category category, Long parentId) {
-        category.setPosition(this.getNextPosition(parentId));
-
+    public void store(Long parentId, String name) {
         try {
-            if (parentId == null || parentId == 0) {
-                this.categoryRepository.startTree(category);
+            Category parent = this.getById(parentId);
+            Category node = new Category(name);
+            if (parent == null) {
+                System.out.println("Parent is null");
+                Category treeRoot = this.categoryRepository.findCategoryByDepthAndCompanyIdIs(SecurityUtils.companyId()).orElse(null);
+                if (treeRoot == null) {
+                    Long treeId = this.categoryRepository.startTree(new Category(""));
+                    treeRoot = this.categoryRepository.findTreeRoot(treeId);
+                }
+                node.setPosition(this.getNextPosition(treeRoot));
+                this.categoryRepository.addChild(treeRoot, node);
             } else {
-                Category parent = this.getById(parentId);
-                this.categoryRepository.addChild(parent, category);
+                node.setPosition(this.getNextPosition(parent));
+                this.categoryRepository.addChild(parent, node);
             }
-        } catch (TreeRepository.NodeAlreadyAttachedToTree | TreeRepository.NodeNotInTree exception) {
-            throw new RuntimeException("Category save failed. Reason: " + exception.getMessage());
+        } catch (TreeRepository.NodeAlreadyAttachedToTree nodeAlreadyAttachedToTree) {
+            nodeAlreadyAttachedToTree.printStackTrace();
+        } catch (TreeRepository.NodeNotInTree nodeNotInTree) {
+            nodeNotInTree.printStackTrace();
         }
     }
 
     @Override
     public Category getById(Long id) {
-        return this.categoryRepository.findCategoryByIdAndCompanyId(id, SecurityUtils.companyId());
+        return this.categoryRepository.findCategoryByIdAndCompanyId(id, SecurityUtils.companyId())
+                .orElse(null);
     }
 
     @Override
@@ -121,19 +131,16 @@ public class CategoryServiceImpl implements CategoryService {
         this.categoryRepository.deleteInBatch(categoriesToDelete);
     }
 
-    private Integer getNextPosition(Long parentId) {
+    private Integer getNextPosition(Category parent) {
         Integer position = -1;
-        List<Category> categories;
-        if (parentId == null || parentId <= 0) {
-            categories = this.categoryRepository.findByCompanyAndDepthOrderByPositionDesc(SecurityUtils.companyId());
-        } else {
-            categories = this.categoryRepository.findChildren(this.getById(parentId));
-        }
+        List<Category> categories = this.categoryRepository.findChildren(parent);
+
         for (Category category:categories) {
             if (category.getPosition() > position) {
                 position = category.getPosition();
             }
         }
+
         return position + 1;
     }
 
