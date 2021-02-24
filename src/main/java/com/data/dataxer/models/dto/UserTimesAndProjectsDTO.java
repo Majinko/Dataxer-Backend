@@ -8,9 +8,7 @@ import java.util.List;
 @Getter
 @Setter
 public class UserTimesAndProjectsDTO {
-
     private List<TimeDTO> userTimesForPeriod;
 
     private List<ProjectDTO> userUniqueProjects;
-
 }

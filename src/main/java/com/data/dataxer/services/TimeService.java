@@ -12,7 +12,7 @@ import java.util.List;
 public interface TimeService {
     Time store(Time time);
 
-    Time update(Time time);
+    void update(Time time);
 
     void destroy(Long id);
 

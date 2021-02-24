@@ -10,15 +10,15 @@ import java.util.Optional;
 
 public interface QTimeRepository {
 
-    Optional<Time> getById(Long id, Long companyId);
+    Optional<Time> getById(Long id, Long userId, Long companyId);
 
-    Optional<Time> getByIdSimple(Long id, Long companyId);
+    Optional<Time> getByIdSimple(Long id, Long userId, Long companyId);
 
     Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long userId,  Long companyId);
 
     List<Time> getHourOverviewForAllUsers(LocalDate fromDate, LocalDate toDate, Long companyId);
 
-    List<Time> allForPeriod(LocalDate from, LocalDate to, Long companyId);
+    List<Time> allForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId);
 
     List<Time> allUserTimesForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId);
 

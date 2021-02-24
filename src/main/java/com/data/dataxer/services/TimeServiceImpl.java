@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
+import com.data.dataxer.models.domain.Salary;
 import com.data.dataxer.models.domain.Time;
 import com.data.dataxer.repositories.TimeRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
@@ -20,7 +21,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class TimeServiceImpl implements TimeService {
-
     private final long LIMIT = 5000;
 
     private final TimeRepository timeRepository;
@@ -35,17 +35,24 @@ public class TimeServiceImpl implements TimeService {
 
     @Override
     public Time store(Time time) {
-        BigDecimal price = this.qSalaryRepository.getPriceFromSalaryByUserFinishIsNull(SecurityUtils.loggedUser(), SecurityUtils.companyId());
-
-        time.setUser(SecurityUtils.loggedUser());
-        time.setPrice(BigDecimal.valueOf((float)time.getTime() / 60 / 60).multiply(price)); // calc total price by time store
+        this.addDataToTime(time);
 
         return this.timeRepository.save(time);
     }
 
     @Override
-    public Time update(Time time) {
-        return this.timeRepository.save(time);
+    public void update(Time time) {
+        this.addDataToTime(time);
+
+        this.timeRepository.save(time);
+    }
+
+    private void addDataToTime(Time time) {
+        Salary salary = this.qSalaryRepository.getPriceFromSalaryByUserFinishIsNull(SecurityUtils.loggedUser(), SecurityUtils.companyId());
+
+        time.setSalary(salary);
+        time.setUser(SecurityUtils.loggedUser());
+        time.setPrice(BigDecimal.valueOf((float) time.getTime() / 60 / 60).multiply(salary.getPrice())); // calc total price by time store
     }
 
     @Override
@@ -56,14 +63,14 @@ public class TimeServiceImpl implements TimeService {
     @Override
     public Time getTimeById(Long id) {
         return this.qTimeRepository
-                .getById(id, SecurityUtils.companyId())
+                .getById(id, SecurityUtils.id(), SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Time not found!"));
     }
 
     @Override
     public Time getTimeByIdSimple(Long id) {
         return this.qTimeRepository
-                .getByIdSimple(id, SecurityUtils.companyId())
+                .getByIdSimple(id, SecurityUtils.id(), SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Time not found"));
     }
 
@@ -75,18 +82,18 @@ public class TimeServiceImpl implements TimeService {
 
     @Override
     public List<Time> allForPeriod(LocalDate from, LocalDate to) {
-        return this.qTimeRepository.allForPeriod(from ,to, SecurityUtils.companyId());
+        return this.qTimeRepository.allForPeriod(from, to, SecurityUtils.id(), SecurityUtils.companyId());
     }
 
     @Override
     public List<Time> allUserTimesForPeriod(LocalDate date, Long userId) {
-        return this.qTimeRepository.allUserTimesForPeriod(date.withDayOfMonth(1),
-                date.withDayOfMonth(date.lengthOfMonth()), userId, SecurityUtils.companyId());
+        return this.qTimeRepository.allUserTimesForPeriod(date.withDayOfMonth(1), date.withDayOfMonth(date.lengthOfMonth()), userId, SecurityUtils.companyId());
     }
 
     @Override
     public List<Project> allUniqueUserProjectsFromTimes(List<Time> userTimes) {
         Set<Project> userProjects = new HashSet<>();
+
         userTimes.forEach(time -> userProjects.add(time.getProject()));
 
         return List.copyOf(userProjects);
@@ -98,9 +105,11 @@ public class TimeServiceImpl implements TimeService {
         List<Time> userTimes;
         long offset = 0;
         do {
-            userTimes = this.qTimeRepository.getUserLastProjects(userId,offset, offset + LIMIT, SecurityUtils.companyId());
+            userTimes = this.qTimeRepository.getUserLastProjects(userId, offset, offset + LIMIT, SecurityUtils.companyId());
+
             userProject.addAll(this.allUniqueUserProjectsFromTimes(userTimes));
-        } while(userProject.size() < 5 && userTimes.size() == LIMIT);
+        } while (userProject.size() < 5 && userTimes.size() == LIMIT);
+
         return userProject.stream().limit(5).collect(Collectors.toList());
     }
 

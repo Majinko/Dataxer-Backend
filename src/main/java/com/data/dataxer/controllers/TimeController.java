@@ -44,8 +44,8 @@ public class TimeController {
     }
 
     @PostMapping("/update")
-    public ResponseEntity<TimeDTO> update(@RequestBody TimeDTO timeDTO) {
-        return ResponseEntity.ok(this.timeMapper.timeToTimeDTO(this.timeService.update(this.timeMapper.timeDTOToTime(timeDTO))));
+    public void update(@RequestBody TimeDTO timeDTO) {
+        this.timeService.update(this.timeMapper.timeDTOToTime(timeDTO));
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
@@ -66,14 +66,13 @@ public class TimeController {
     }
 
     @GetMapping("/allUserTimesAndProjects")
-    public ResponseEntity<UserTimesAndProjectsDTO> allUserTimesForPeriod(@RequestParam(value = "date")
-                                      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
-                                                                         @RequestParam(value = "id") Long userId) {
+    public ResponseEntity<UserTimesAndProjectsDTO> allUserTimesForPeriod(@RequestParam(value = "date") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date, @RequestParam(value = "id") Long userId) {
         UserTimesAndProjectsDTO response = new UserTimesAndProjectsDTO();
         List<Time> userTimes = this.timeService.allUserTimesForPeriod(date, userId);
 
         response.setUserTimesForPeriod(this.timeMapper.timeListToTimeDTOList(userTimes));
         response.setUserUniqueProjects(this.projectMapper.projectToProjectDTOs(this.timeService.allUniqueUserProjectsFromTimes(userTimes)));
+
         return ResponseEntity.ok(response);
     }
 

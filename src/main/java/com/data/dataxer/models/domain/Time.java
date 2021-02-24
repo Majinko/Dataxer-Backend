@@ -24,6 +24,9 @@ public class Time extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     Category category;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    Salary salary;
+
     Integer time;
 
     Integer timeFrom;

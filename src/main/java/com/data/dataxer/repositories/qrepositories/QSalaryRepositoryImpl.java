@@ -7,7 +7,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.math.BigDecimal;
 import java.util.List;
 
 @Repository
@@ -20,8 +19,8 @@ public class QSalaryRepositoryImpl implements QSalaryRepository {
     }
 
     @Override
-    public BigDecimal getPriceFromSalaryByUserFinishIsNull(AppUser user, Long companyId) {
-        return this.query.select(QSalary.salary.price)
+    public Salary getPriceFromSalaryByUserFinishIsNull(AppUser user, Long companyId) {
+        return this.query.select(QSalary.salary)
                 .from(QSalary.salary)
                 .where(QSalary.salary.user.eq(user))
                 .where(QSalary.salary.finish.isNull())

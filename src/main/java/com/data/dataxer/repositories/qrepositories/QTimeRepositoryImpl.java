@@ -40,25 +40,27 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public Optional<Time> getById(Long id, Long companyId) {
-        QTime qtime = QTime.time1;
+    public Optional<Time> getById(Long id, Long userId, Long companyId) {
+        QTime qTime = QTime.time1;
 
-        return Optional.ofNullable(this.query.selectFrom(qtime)
-                .leftJoin(qtime.category).fetchJoin()
-                .leftJoin(qtime.user).fetchJoin()
-                .leftJoin(qtime.company).fetchJoin()
-                .leftJoin(qtime.project).fetchJoin()
-                .where(qtime.id.eq(id))
-                .where(qtime.company.id.eq(companyId))
+        return Optional.ofNullable(this.query.selectFrom(qTime)
+                .leftJoin(qTime.category).fetchJoin()
+                .leftJoin(qTime.user).fetchJoin()
+                .leftJoin(qTime.company).fetchJoin()
+                .leftJoin(qTime.project).fetchJoin()
+                .where(qTime.id.eq(id))
+                .where(qTime.company.id.eq(companyId))
+                .where(qTime.user.id.eq(userId))
                 .fetchOne());
     }
 
     @Override
-    public Optional<Time> getByIdSimple(Long id, Long companyId) {
+    public Optional<Time> getByIdSimple(Long id, Long userId, Long companyId) {
         QTime qTime = QTime.time1;
         return Optional.ofNullable(this.query.selectFrom(qTime)
                 .where(qTime.id.eq(id))
                 .where(qTime.company.id.eq(companyId))
+                .where(qTime.user.id.eq(userId))
                 .fetchOne());
     }
 
@@ -103,11 +105,15 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Time> allForPeriod(LocalDate from, LocalDate to, Long companyId) {
+    public List<Time> allForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId) {
         return this.query.selectFrom(QTime.time1)
                 .leftJoin(QTime.time1.user).fetchJoin()
+                .leftJoin(QTime.time1.project).fetchJoin()
+                .leftJoin(QTime.time1.category).fetchJoin()
                 .where(QTime.time1.dateWork.between(from, to))
                 .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.user.id.eq(userId))
+                .orderBy(QTime.time1.id.desc())
                 .fetch();
     }
 
