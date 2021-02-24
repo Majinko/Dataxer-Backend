@@ -1,6 +1,8 @@
 package com.data.dataxer.controllers;
 
+import com.data.dataxer.mappers.CategoryMapper;
 import com.data.dataxer.mappers.ProjectMapper;
+import com.data.dataxer.models.dto.CategoryDTO;
 import com.data.dataxer.models.dto.ProjectDTO;
 import com.data.dataxer.services.ProjectService;
 import org.springframework.data.domain.Page;
@@ -17,10 +19,12 @@ import java.util.List;
 public class ProjectController {
     private final ProjectService projectService;
     private final ProjectMapper projectMapper;
+    private final CategoryMapper categoryMapper;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
+        this.categoryMapper = categoryMapper;
     }
 
     @PostMapping("/store")
@@ -63,5 +67,10 @@ public class ProjectController {
     @GetMapping("/all")
     public ResponseEntity<List<ProjectDTO>> all() {
         return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.all()));
+    }
+
+    @GetMapping("/allProjectCategory")
+    public ResponseEntity<List<CategoryDTO>> getAllProjectCategories(@RequestParam(value = "projectId") Long projectId) {
+        return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.projectService.getAllProjectCategories(projectId)));
     }
 }

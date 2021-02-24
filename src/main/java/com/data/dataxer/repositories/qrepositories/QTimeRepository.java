@@ -1,5 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
 import com.querydsl.core.Tuple;
@@ -26,9 +27,8 @@ public interface QTimeRepository {
 
     List<Project> getAllUserProjects(Long userId, Long companyId);
 
-    List<Project> getUserLastProjects(Long userId, Long limit, Long companyId);
+    List<Tuple> getUserLastProjects(Long userId, Long limit, Long companyId);
 
     List<Time> getTimesForProjectCategoryOrderByDate(Long projectId, Long companyId);
 
-    List<Time> getTimesForProjectCategoryOrderByPosition(Long projectId, Long companyId);
 }

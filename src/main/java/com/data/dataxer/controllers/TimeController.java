@@ -73,19 +73,16 @@ public class TimeController {
         return ResponseEntity.ok(this.projectMapper.projectToProjectDTOs(this.timeService.getAllUserProjects(userId)));
     }
 
+    //poslednych 5 projektov na ktorych user pracoval
     @GetMapping("/lastUserProjects")
     public ResponseEntity<List<ProjectDTO>> lastUserProjects(@RequestParam(value = "id") Long id) {
         return ResponseEntity.ok(this.projectMapper.projectToProjectDTOs(this.timeService.getLastUserWorkingProjects(id)));
     }
 
+    //poslednych 5 categorii projektu na ktorych sa pracovalo
     @GetMapping("/projectCategoryByTime")
     public ResponseEntity<List<CategoryDTO>> getProjectCategoryOrderByWorkDay(@RequestParam(value = "projectId") Long projectId) {
         return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.timeService.getProjectCategoryByTime(projectId)));
-    }
-
-    @GetMapping("/allProjectCategory")
-    public ResponseEntity<List<CategoryDTO>> getProjectCategoryOrderByPosition(@RequestParam(value = "projectId") Long projectId) {
-        return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.timeService.getProjectCategoryByPosition(projectId)));
     }
 
     @GetMapping("/{id}")

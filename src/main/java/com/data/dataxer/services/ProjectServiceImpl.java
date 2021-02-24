@@ -1,5 +1,6 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.repositories.ProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QProjectRepository;
@@ -53,5 +54,10 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<Project> search(String queryString) {
         return this.qProjectRepository.search(SecurityUtils.companyId(), queryString);
+    }
+
+    @Override
+    public List<Category> getAllProjectCategories(Long projectId) {
+        return this.qProjectRepository.getById(projectId, SecurityUtils.companyId()).getCategories();
     }
 }

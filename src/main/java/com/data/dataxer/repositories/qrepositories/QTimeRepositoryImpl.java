@@ -1,9 +1,10 @@
 package com.data.dataxer.repositories.qrepositories;
 
 
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
-import com.data.dataxer.models.domain.QTask;
 import com.data.dataxer.models.domain.QTime;
+import com.data.dataxer.models.domain.QTask;
 import com.data.dataxer.models.domain.Time;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -145,14 +146,13 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Project> getUserLastProjects(Long userId, Long limit, Long companyId) {
-        return this.query.from(QTime.time1)
-                .select(QTime.time1.project)
-                .leftJoin(QTime.time1.project).fetchJoin()
+    public List<Tuple> getUserLastProjects(Long userId, Long limit, Long companyId) {
+        return this.query.selectDistinct(QTime.time1.project, QTime.time1.dateWork, QTime.time1.id)
+                .from(QTime.time1)
+                .leftJoin(QTime.time1.project)
                 .where(QTime.time1.user.id.eq(userId))
                 .where(QTime.time1.company.id.eq(companyId))
-                .orderBy(QTime.time1.dateWork.desc())
-                .groupBy(QTime.time1.project)
+                .orderBy(QTime.time1.dateWork.desc(), QTime.time1.id.desc())
                 .limit(limit)
                 .fetch();
     }
@@ -164,17 +164,6 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.company.id.eq(companyId))
                 .orderBy(QTime.time1.dateWork.desc())
-                .groupBy(QTime.time1.category)
-                .fetch();
-    }
-
-    @Override
-    public List<Time> getTimesForProjectCategoryOrderByPosition(Long projectId, Long companyId) {
-        return this.query.selectFrom(QTime.time1)
-                .leftJoin(QTime.time1.category).fetchJoin()
-                .where(QTime.time1.project.id.eq(projectId))
-                .where(QTime.time1.company.id.eq(companyId))
-                .orderBy(QTime.time1.category.position.asc())
                 .groupBy(QTime.time1.category)
                 .fetch();
     }

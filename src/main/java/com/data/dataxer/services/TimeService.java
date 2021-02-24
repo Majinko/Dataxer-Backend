@@ -33,5 +33,4 @@ public interface TimeService {
 
     List<Category> getProjectCategoryByTime(Long projectId);
 
-    List<Category> getProjectCategoryByPosition(Long projectId);
 }

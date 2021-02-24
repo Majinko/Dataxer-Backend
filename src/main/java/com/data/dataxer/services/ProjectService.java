@@ -1,5 +1,6 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +21,6 @@ public interface ProjectService {
     List<Project> all();
 
     List<Project> search(String queryString);
+
+    List<Category> getAllProjectCategories(Long projectId);
 }

@@ -1,8 +1,11 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.dto.MonthAndYearDTO;
+import com.data.dataxer.repositories.ProjectRepository;
 import com.data.dataxer.repositories.TimeRepository;
+import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -24,11 +27,14 @@ public class TimeServiceImpl implements TimeService {
     private final TimeRepository timeRepository;
     private final QTimeRepository qTimeRepository;
     private final QSalaryRepository qSalaryRepository;
+    private final QProjectRepository qProjectRepository;
 
-    public TimeServiceImpl(TimeRepository timeRepository, QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository) {
+    public TimeServiceImpl(TimeRepository timeRepository, QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository,
+                           QProjectRepository qProjectRepository) {
         this.timeRepository = timeRepository;
         this.qTimeRepository = qTimeRepository;
         this.qSalaryRepository = qSalaryRepository;
+        this.qProjectRepository = qProjectRepository;
     }
 
     @Override
@@ -90,12 +96,6 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public List<Category> getProjectCategoryByPosition(Long projectId) {
-        return this.qTimeRepository.getTimesForProjectCategoryOrderByPosition(projectId, SecurityUtils.companyId()).stream()
-                .map(Time::getCategory).collect(Collectors.toList());
-    }
-
-    @Override
     public List<MonthAndYearDTO> getAllUserMonths(Long userId) {
         List<MonthAndYearDTO> response = new ArrayList<>();
         List<Tuple> yearsAndMonths = this.qTimeRepository.getAllUserMonths(userId, SecurityUtils.companyId());
@@ -114,6 +114,10 @@ public class TimeServiceImpl implements TimeService {
 
     @Override
     public List<Project> getLastUserWorkingProjects(Long userId) {
-        return this.qTimeRepository.getUserLastProjects(userId, LIMIT, SecurityUtils.companyId());
+        List<Project> projects = new ArrayList<>();
+        List<Tuple> dataTuple = this.qTimeRepository.getUserLastProjects(userId, LIMIT, SecurityUtils.companyId());
+        dataTuple.forEach(data -> projects.add(data.get(QTime.time1.project)));
+
+        return projects;
     }
 }
