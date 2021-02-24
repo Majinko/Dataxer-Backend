@@ -31,6 +31,6 @@ public interface TimeService {
 
     List<Project> getLastUserWorkingProjects(Long userId);
 
-    List<Category> getProjectCategoryByTime(Long projectId);
+    List<Category> lastProjectCategories(Long projectId);
 
 }

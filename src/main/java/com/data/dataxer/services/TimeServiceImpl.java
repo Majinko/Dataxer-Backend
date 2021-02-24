@@ -3,7 +3,6 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.dto.MonthAndYearDTO;
-import com.data.dataxer.repositories.ProjectRepository;
 import com.data.dataxer.repositories.TimeRepository;
 import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
@@ -18,7 +17,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class TimeServiceImpl implements TimeService {
@@ -90,9 +88,13 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public List<Category> getProjectCategoryByTime(Long projectId) {
-        return this.qTimeRepository.getTimesForProjectCategoryOrderByDate(projectId, SecurityUtils.companyId()).stream()
-                .map(Time::getCategory).collect(Collectors.toList());
+    public List<Category> lastProjectCategories(Long projectId) {
+        List<Category> categories = new ArrayList<>();
+        List<Tuple> dataTuple = this.qTimeRepository.getProjectLastCategories(projectId, LIMIT, SecurityUtils.companyId());
+
+        dataTuple.forEach(tuple -> categories.add(tuple.get(QTime.time1.category)));
+
+        return categories;
     }
 
     @Override

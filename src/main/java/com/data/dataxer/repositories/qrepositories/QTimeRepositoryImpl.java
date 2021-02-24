@@ -1,7 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
 
-import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.domain.QTask;
@@ -123,7 +122,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     @Override
     public List<Tuple> getAllUserMonths(Long userId, Long companyId) {
         return this.query.from(QTime.time1)
-                .select(QTime.time1.dateWork.year().as("year"), QTime.time1.dateWork.month().as("month"))
+                .select(QTime.time1.dateWork.year(), QTime.time1.dateWork.month())
                 .where(QTime.time1.user.id.eq(userId))
                 .where(QTime.time1.company.id.eq(companyId))
                 .groupBy(QTime.time1.dateWork.year())
@@ -158,13 +157,14 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Time> getTimesForProjectCategoryOrderByDate(Long projectId, Long companyId) {
-        return this.query.selectFrom(QTime.time1)
-                .leftJoin(QTime.time1.category).fetchJoin()
+    public List<Tuple> getProjectLastCategories(Long projectId, Long limit, Long companyId) {
+        return this.query.selectDistinct(QTime.time1.category, QTime.time1.dateWork, QTime.time1.id)
+                .from(QTime.time1)
+                .leftJoin(QTime.time1.category)
                 .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.company.id.eq(companyId))
-                .orderBy(QTime.time1.dateWork.desc())
-                .groupBy(QTime.time1.category)
+                .orderBy(QTime.time1.dateWork.desc(), QTime.time1.id.desc())
+                .limit(limit)
                 .fetch();
     }
 

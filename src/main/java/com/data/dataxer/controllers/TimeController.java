@@ -80,9 +80,9 @@ public class TimeController {
     }
 
     //poslednych 5 categorii projektu na ktorych sa pracovalo
-    @GetMapping("/projectCategoryByTime")
-    public ResponseEntity<List<CategoryDTO>> getProjectCategoryOrderByWorkDay(@RequestParam(value = "projectId") Long projectId) {
-        return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.timeService.getProjectCategoryByTime(projectId)));
+    @GetMapping("/lastProjectCategories")
+    public ResponseEntity<List<CategoryDTO>> lastProjectCategories(@RequestParam(value = "projectId") Long projectId) {
+        return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.timeService.lastProjectCategories(projectId)));
     }
 
     @GetMapping("/{id}")
