@@ -73,4 +73,9 @@ public class ProjectController {
     public ResponseEntity<List<CategoryDTO>> getAllProjectCategories(@RequestParam(value = "projectId") Long projectId) {
         return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.projectService.getAllProjectCategories(projectId)));
     }
+
+    @GetMapping("/allProjectCategoriesByPosition")
+    public ResponseEntity<List<CategoryDTO>> getAllProjectCategoriesOrderByDepthAndPosition(@RequestParam(value = "projectId") Long projectId) {
+        return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.projectService.getAllProjectCategoriesOrderedByPosition(projectId)));
+    }
 }

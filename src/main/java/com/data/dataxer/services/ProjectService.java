@@ -23,4 +23,6 @@ public interface ProjectService {
     List<Project> search(String queryString);
 
     List<Category> getAllProjectCategories(Long projectId);
+
+    List<Category> getAllProjectCategoriesOrderedByPosition(Long projectId);
 }
