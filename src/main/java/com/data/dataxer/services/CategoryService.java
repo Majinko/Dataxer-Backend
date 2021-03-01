@@ -1,6 +1,7 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
+import com.data.dataxer.models.dto.CategoryNestedDTO;
 
 import java.util.List;
 
@@ -12,7 +13,7 @@ public interface CategoryService {
 
     List<Category> all();
 
-    List<Category> nested();
+    List<CategoryNestedDTO> nested(List<Category> categories);
 
     List<Category> getChildren(Long parentId);
 

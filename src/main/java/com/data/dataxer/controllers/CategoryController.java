@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -35,7 +36,7 @@ public class CategoryController {
     @Transactional
     @GetMapping("/nested")
     public ResponseEntity<List<CategoryNestedDTO>> nested() {
-        return ResponseEntity.ok(categoryMapper.toCategoryNestedDTOs(categoryService.nested()));
+        return ResponseEntity.ok(categoryService.nested(null));
     }
 
     @GetMapping("/updateTree")

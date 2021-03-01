@@ -38,8 +38,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long>, Categ
     void setCategoryPosition(Long id, Integer value, Long companyId);
 
     //category changes
-
-    @Query("SELECT c from Category c WHERE c.company.id = ?1 AND c.depth = 0")
-    Optional<Category> findCategoryByDepthAndCompanyIdIs(Long companyId);
+    //check behavior if zero roots or too many
+    @Query("SELECT c FROM Category c WHERE c.company.id = ?1 AND c.depth = 0")
+    Optional<Category> findCompanyRoot(Long companyId);
 
 }

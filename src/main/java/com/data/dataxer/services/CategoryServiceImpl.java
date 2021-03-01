@@ -1,16 +1,14 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
+import com.data.dataxer.models.dto.CategoryNestedDTO;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import works.hacker.mptt.TreeRepository;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,7 +29,7 @@ public class CategoryServiceImpl implements CategoryService {
             Category node = new Category(name);
             if (parent == null) {
                 System.out.println("Parent is null");
-                Category treeRoot = this.categoryRepository.findCategoryByDepthAndCompanyIdIs(SecurityUtils.companyId()).orElse(null);
+                Category treeRoot = this.categoryRepository.findCompanyRoot(SecurityUtils.companyId()).orElse(null);
                 if (treeRoot == null) {
                     Long treeId = this.categoryRepository.startTree(new Category(""));
                     treeRoot = this.categoryRepository.findTreeRoot(treeId);
@@ -61,8 +59,25 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> nested() {
-        return this.categoryRepository.findAllByCompanyIdAndDepthOrderByPositionAsc(SecurityUtils.companyId());
+    public List<CategoryNestedDTO> nested(List<Category> categories) {
+        if (categories == null) {
+            Category root = this.categoryRepository.findCompanyRoot(SecurityUtils.companyId())
+                    .orElseThrow(() -> new RuntimeException("Missing or too many company roots"));
+            categories = new ArrayList<>();
+            categories.addAll(this.categoryRepository.findChildren(root));
+        } else if (categories.isEmpty()){
+            return new ArrayList<>();
+        }
+        List<CategoryNestedDTO> response = new ArrayList<>();
+        categories.forEach(category -> {
+            CategoryNestedDTO categoryNestedDTO = new CategoryNestedDTO();
+            categoryNestedDTO.setId(category.getId());
+            categoryNestedDTO.setName(category.getName());
+            categoryNestedDTO.setChildren(this.nested(this.categoryRepository.findChildren(category)));
+            response.add(categoryNestedDTO);
+        });
+
+        return response;
     }
 
     @Override
