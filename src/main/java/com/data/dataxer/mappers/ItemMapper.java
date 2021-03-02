@@ -19,6 +19,7 @@ public interface ItemMapper {
     //@Mapping(target = "category.parent", ignore = true)
     ItemDTO itemToItemDto(Item item);
 
+    @Mapping(target = "category.parent", ignore = true)
     Item toItem(ItemDTO itemDTO);
 
     @Named(value = "itemToItemDTOWithPrice")

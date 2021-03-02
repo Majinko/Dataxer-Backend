@@ -6,18 +6,13 @@ import com.data.dataxer.models.dto.CategoryNestedDTO;
 import java.util.List;
 
 public interface CategoryService {
-
-    void store(Long parentId, String name);
-
-    Category getById(Long id);
-
     List<Category> all();
 
-    List<CategoryNestedDTO> nested(List<Category> categories);
+    List<Category> nested();
 
-    List<Category> getChildren(Long parentId);
+    Category store(Category category);
 
-    void updateTree(Long parentId, Category category, Long categoryId);
+    void updateTree(List<Category> categories, Category category);
 
     void delete(Long id);
 }
