@@ -76,7 +76,9 @@ public class OverviewServiceImpl implements OverviewService {
 
     @Override
     public List<UserYearOverviewDTO> getAllUsersYearsOverview() {
+        this.userTimeData = new HashMap<>();
         List<Time> allTimeRecords = this.qTimeRepository.getAllTimeRecords(SecurityUtils.companyId());
+
         allTimeRecords.forEach(time -> {
             if (userTimeData.containsKey(time.getUser())) {
                 HashMap<Integer, Integer> yearsHour = userTimeData.get(time.getUser());
@@ -105,6 +107,7 @@ public class OverviewServiceImpl implements OverviewService {
             userYearOverviewDTO.setFirstName(key.getFirstName());
             userYearOverviewDTO.setLastName(key.getLastName());
             userYearOverviewDTO.setYearHours(this.generateUserHoursStringFromMinutes(userTimeData.get(key)));
+            response.add(userYearOverviewDTO);
         });
 
         return response;
@@ -174,7 +177,7 @@ public class OverviewServiceImpl implements OverviewService {
     }
 
     private String convertMinutesTimeToHoursString(Integer minutes) {
-        return minutes / 60 + ":" + minutes % 60 + " /h";
+        return minutes / 3600 + ":" + minutes % 3600 + " /h";
     }
 
     private List<Long> getUserIds(List<AppUser> users) {
