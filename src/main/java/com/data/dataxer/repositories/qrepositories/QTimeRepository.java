@@ -30,4 +30,6 @@ public interface QTimeRepository {
 
     List<Tuple> getProjectLastCategories(Long projectId, Long limit, Long companyId);
 
+    List<Time> getAllTimeRecords(Long companyId);
+
 }
