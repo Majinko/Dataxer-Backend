@@ -177,7 +177,7 @@ public class OverviewServiceImpl implements OverviewService {
     }
 
     private String convertMinutesTimeToHoursString(Integer minutes) {
-        return minutes / 3600 + ":" + minutes % 3600 + " /h";
+        return minutes / 3600 + ":" + (minutes % 3600)/60 + " /h";
     }
 
     private List<Long> getUserIds(List<AppUser> users) {
