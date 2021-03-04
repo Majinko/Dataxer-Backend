@@ -168,6 +168,14 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .fetch();
     }
 
+    @Override
+    public List<Time> getAllTimeRecords(Long companyId) {
+        return this.query.selectFrom(QTime.time1)
+                .leftJoin(QTime.time1.user).fetchJoin()
+                .where(QTime.time1.company.id.eq(companyId))
+                .fetch();
+    }
+
     private long getTotalCount(Predicate predicate) {
         QTime qTime = QTime.time1;
 

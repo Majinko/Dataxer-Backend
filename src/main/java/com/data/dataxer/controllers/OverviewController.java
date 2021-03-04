@@ -1,6 +1,7 @@
 package com.data.dataxer.controllers;
 
 import com.data.dataxer.models.dto.UserHourOverviewDTO;
+import com.data.dataxer.models.dto.UserYearOverviewDTO;
 import com.data.dataxer.services.OverviewService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -29,5 +30,10 @@ public class OverviewController {
             @RequestParam(value = "toDate")
                     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         return ResponseEntity.ok(this.overviewService.getAllUsersHourOverview(fromDate, toDate));
+    }
+
+    @GetMapping("/userYearsOverview")
+    public ResponseEntity<List<UserYearOverviewDTO>> userYearStatistic() {
+        return ResponseEntity.ok(this.overviewService.getAllUsersYearsOverview());
     }
 }
