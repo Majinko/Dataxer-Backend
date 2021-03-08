@@ -16,7 +16,7 @@ public interface QTimeRepository {
 
     Optional<Time> getByIdSimple(Long id, Long userId, Long companyId);
 
-    Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long userId,  Long companyId);
+    Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long userId, Long companyId);
 
     List<Time> getHourOverviewForAllUsers(LocalDate fromDate, LocalDate toDate, Long companyId);
 
@@ -30,4 +30,9 @@ public interface QTimeRepository {
 
     List<Tuple> getProjectLastCategories(Long projectId, Long limit, Long companyId);
 
+    LocalDate getUserFirstLastRecord(Long userId, Long companyId, Boolean last);
+
+    Long getCountProjects(Long id, Long companyId);
+
+    Integer sumUserTime(Long userId, Long companyId);
 }

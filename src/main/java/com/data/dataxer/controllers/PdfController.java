@@ -3,15 +3,13 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.services.InvoiceService;
 import com.data.dataxer.services.PdfService;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-import com.lowagie.text.DocumentException;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Controller
 @RequestMapping("/api/pdf")
@@ -33,8 +31,9 @@ public class PdfController {
 
     @RequestMapping(value = "/download-pdf/{id}", method = RequestMethod.GET)
     public void downloadPDFResource(@PathVariable Long id, HttpServletResponse response) {
-        try {
+  /*      try {
             Path file = Paths.get(pdfService.generatePdf(id).getAbsolutePath());
+
             if (Files.exists(file)) {
                 response.setContentType("application/pdf");
                 response.addHeader("Content-Disposition", "inline; filename=" + file.getFileName());
@@ -43,6 +42,6 @@ public class PdfController {
             }
         } catch (DocumentException | IOException ex) {
             ex.printStackTrace();
-        }
+        }*/
     }
 }

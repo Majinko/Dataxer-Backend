@@ -2,8 +2,8 @@ package com.data.dataxer.repositories.qrepositories;
 
 
 import com.data.dataxer.models.domain.Project;
-import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.domain.QTask;
+import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.domain.Time;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -17,6 +17,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -34,7 +35,6 @@ import static com.github.vineey.rql.querydsl.filter.QueryDslFilterContext.withMa
 
 @Repository
 public class QTimeRepositoryImpl implements QTimeRepository {
-
     private final JPAQueryFactory query;
 
     public QTimeRepositoryImpl(EntityManager entityManager) {
@@ -111,7 +111,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         return this.query.selectFrom(QTime.time1)
                 .leftJoin(QTime.time1.user).fetchJoin()
                 .leftJoin(QTime.time1.project).fetchJoin()
-                .leftJoin(QTime.time1.category).fetchJoin()
+                .join(QTime.time1.category).fetchJoin()
                 .where(QTime.time1.dateWork.between(from, to))
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.user.id.eq(userId))
@@ -166,6 +166,40 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .orderBy(QTime.time1.dateWork.desc(), QTime.time1.id.desc())
                 .limit(limit)
                 .fetch();
+    }
+
+    @Override
+    public LocalDate getUserFirstLastRecord(Long userId, Long companyId, Boolean last) {
+        JPAQuery<LocalDate> jpaQuery = this.query.select(QTime.time1.dateWork)
+                .from(QTime.time1)
+                .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.user.id.eq(userId))
+                .limit(1);
+
+        if (last) {
+            return jpaQuery.orderBy(QTime.time1.dateWork.desc()).fetch().get(0);
+        } else {
+            return jpaQuery.orderBy(QTime.time1.dateWork.asc()).fetch().get(0);
+        }
+    }
+
+    @Override
+    public Long getCountProjects(Long id, Long companyId) {
+        return this.query
+                .select(QTime.time1.project.count())
+                .from(QTime.time1)
+                .groupBy(QTime.time1.project)
+                .fetchCount();
+    }
+
+    @Override
+    public Integer sumUserTime(Long userId, Long companyId) {
+        return this.query
+                .from(QTime.time1)
+                .select(QTime.time1.time.sum())
+                .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.user.id.eq(userId))
+                .fetchOne();
     }
 
     private long getTotalCount(Predicate predicate) {

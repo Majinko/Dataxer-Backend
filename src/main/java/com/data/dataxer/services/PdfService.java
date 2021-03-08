@@ -1,14 +1,13 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Invoice;
+import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 import org.thymeleaf.extras.java8time.dialect.Java8TimeDialect;
 import org.thymeleaf.spring5.SpringTemplateEngine;
-import com.lowagie.text.DocumentException;
-
-import org.thymeleaf.context.Context;
 import org.xhtmlrenderer.pdf.ITextRenderer;
 
 import java.io.File;
@@ -30,14 +29,15 @@ public class PdfService {
         this.templateEngine.addDialect(new Java8TimeDialect());
     }
 
-    public File generatePdf(Long id) throws IOException, DocumentException {
-        Context context = getContext(id);
+    public File generatePdf(Invoice invoice) throws IOException, DocumentException {
+        Context context = getContext(invoice);
         String html = loadAndFillTemplate(context);
-        return renderPdf(html);
+
+        return renderPdf(html, invoice);
     }
 
-    private File renderPdf(String html) throws IOException, DocumentException {
-        File file = File.createTempFile("students", ".pdf");
+    private File renderPdf(String html, Invoice invoice) throws IOException, DocumentException {
+        File file = File.createTempFile(invoice.getTitle(), ".pdf");
         OutputStream outputStream = new FileOutputStream(file);
         ITextRenderer renderer = new ITextRenderer(20f * 4f / 3f, 20);
 
@@ -49,12 +49,11 @@ public class PdfService {
 
         outputStream.close();
         file.deleteOnExit();
+
         return file;
     }
 
-    private Context getContext(Long id) {
-        Invoice invoice = this.invoiceService.getByIdWithoutFirm(id);
-
+    private Context getContext(Invoice invoice) {
         Context context = new Context();
 
         context.setVariable("firm", invoice.getDocumentData().get("firm"));

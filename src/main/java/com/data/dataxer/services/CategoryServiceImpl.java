@@ -68,7 +68,9 @@ public class CategoryServiceImpl implements CategoryService {
         } else if (categories.isEmpty()){
             return new ArrayList<>();
         }
+
         List<CategoryNestedDTO> response = new ArrayList<>();
+
         categories.forEach(category -> {
             CategoryNestedDTO categoryNestedDTO = new CategoryNestedDTO();
             categoryNestedDTO.setId(category.getId());

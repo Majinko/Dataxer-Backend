@@ -1,11 +1,12 @@
 package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.InvoiceMapper;
-import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.services.DocumentNumberGeneratorService;
 import com.data.dataxer.services.InvoiceService;
+import com.data.dataxer.services.PdfService;
+import com.lowagie.text.DocumentException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -13,17 +14,24 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/invoice")
 public class InvoiceController {
+    private final PdfService pdfService;
     private final InvoiceService invoiceService;
     private final InvoiceMapper invoiceMapper;
     private final DocumentNumberGeneratorService documentNumberGeneratorService;
 
-    public InvoiceController(InvoiceService invoiceService, InvoiceMapper invoiceMapper, DocumentNumberGeneratorService documentNumberGeneratorService) {
+    public InvoiceController(PdfService pdfService, InvoiceService invoiceService, InvoiceMapper invoiceMapper, DocumentNumberGeneratorService documentNumberGeneratorService) {
+        this.pdfService = pdfService;
         this.invoiceService = invoiceService;
         this.invoiceMapper = invoiceMapper;
         this.documentNumberGeneratorService = documentNumberGeneratorService;
@@ -80,6 +88,23 @@ public class InvoiceController {
     @GetMapping("/{id}")
     public ResponseEntity<InvoiceDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.getById(id)));
+    }
+
+    @GetMapping("/pdf/{id}")
+    public void pdf(@PathVariable Long id, HttpServletResponse response) {
+        try {
+            Path file = Paths.get(pdfService.generatePdf(this.invoiceService.getById(id)).getAbsolutePath());
+
+            if (Files.exists(file)) {
+                response.setContentType("application/pdf");
+                response.addHeader("Content-Disposition", "inline; filename=" + file.getFileName());
+                Files.copy(file, response.getOutputStream());
+                response.getOutputStream().flush();
+            }
+
+        } catch (DocumentException | IOException ex) {
+            ex.printStackTrace();
+        }
     }
 
     @RequestMapping(value = "/duplicate/{id}", method = RequestMethod.POST)

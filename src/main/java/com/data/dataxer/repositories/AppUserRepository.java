@@ -15,3 +15,4 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     @Query(value = "SELECT * FROM app_user WHERE id IN (SELECT app_user_id FROM company LEFT JOIN app_user_companies auc ON company.id = auc.company_id WHERE company.id = ?1)", nativeQuery = true)
     List<AppUser> getAll(Long companyId);
 }
+

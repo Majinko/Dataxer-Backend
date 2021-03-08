@@ -1,8 +1,9 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.AppUser;
+import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.repositories.AppUserRepository;
-import com.data.dataxer.repositories.qrepositories.QAppUserRepository;
+import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.StringUtils;
 import com.google.firebase.auth.FirebaseAuth;
@@ -10,18 +11,21 @@ import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.data.dataxer.utils.Helpers.getDiffYears;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final FirebaseAuth firebaseAuth;
     private final AppUserRepository userRepository;
-    private final QAppUserRepository qAppUserRepository;
+    private final QTimeRepository qTimeRepository;
 
-    public UserServiceImpl(FirebaseAuth firebaseAuth, AppUserRepository userRepository, QAppUserRepository qAppUserRepository) {
+    public UserServiceImpl(FirebaseAuth firebaseAuth, AppUserRepository userRepository, QTimeRepository qTimeRepository) {
         this.firebaseAuth = firebaseAuth;
         this.userRepository = userRepository;
-        this.qAppUserRepository = qAppUserRepository;
+        this.qTimeRepository = qTimeRepository;
     }
 
     @Override
@@ -58,6 +62,27 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<AppUser> all() {
         return this.userRepository.getAll(SecurityUtils.companyId());
+    }
+
+    @Override
+    public List<AppUserOverviewDTO> overview() {
+        List<AppUser> appUsers = this.userRepository.getAll(SecurityUtils.companyId());
+        List<AppUserOverviewDTO> appUserOverviewDTOS = new ArrayList<>();
+
+        appUsers.forEach(user -> {
+            AppUserOverviewDTO appUserOverviewDTO = new AppUserOverviewDTO();
+
+            appUserOverviewDTO.setId(user.getId());
+            appUserOverviewDTO.setFullName(user.getFirstName() + ' ' + user.getLastName());
+            appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), false));
+            appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), true)));
+            appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.companyId()));
+            appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.companyId()));
+
+            appUserOverviewDTOS.add(appUserOverviewDTO);
+        });
+
+        return appUserOverviewDTOS;
     }
 
     @Override

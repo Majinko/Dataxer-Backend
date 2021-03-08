@@ -1,11 +1,9 @@
 package com.data.dataxer.mappers;
 
-import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.dto.DocumentPackItemDTO;
 import com.data.dataxer.models.dto.InvoiceDTO;
-import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -17,6 +15,8 @@ public interface InvoiceMapper {
     Invoice invoiceDTOtoInvoice(InvoiceDTO invoiceDTO);
 
     @Named(value = "invoiceToInvoiceDTO")
+    @Mapping(target = "project.categories", ignore = true)
+    @Mapping(target = "project.contact", ignore = true)
     InvoiceDTO invoiceToInvoiceDTO(Invoice invoice);
 
     @Mapping(target = "packs", ignore = true)

@@ -4,6 +4,7 @@ import com.data.dataxer.mappers.SalaryMapper;
 import com.data.dataxer.mappers.UserMapper;
 import com.data.dataxer.models.dto.AppUserDTO;
 import com.data.dataxer.models.dto.AppUserInitDTO;
+import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.services.SalaryService;
 import com.data.dataxer.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,11 @@ public class UserController {
     @GetMapping("/all")
     public ResponseEntity<List<AppUserDTO>> all() {
         return ResponseEntity.ok(userMapper.appUserToAppUserDTOs(this.userService.all()));
+    }
+
+    @GetMapping("/overview")
+    public ResponseEntity<List<AppUserOverviewDTO>> overview() {
+        return ResponseEntity.ok(this.userService.overview());
     }
 
     @GetMapping("/logged")
