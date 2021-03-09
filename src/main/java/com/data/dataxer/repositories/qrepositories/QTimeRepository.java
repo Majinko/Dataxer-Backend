@@ -35,4 +35,6 @@ public interface QTimeRepository {
     Long getCountProjects(Long id, Long companyId);
 
     Integer sumUserTime(Long userId, Long companyId);
+
+    List<Time> getAllTimeRecords(Long companyId);
 }

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -66,7 +67,8 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<Category> getAllProjectCategoriesOrderedByPosition(Long projectId) {
         List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.companyId()).getCategories();
-        Collections.sort(categories, Comparator.comparing(Category::getDepth).thenComparing(Category::getPosition));
+        Collections.sort(categories, Comparator.comparing(Category::getLft));
+       // Collections.sort(categories, Comparator.comparing(Category::getDepth).thenComparing(Category::getPosition));
 
         return categories;
     }

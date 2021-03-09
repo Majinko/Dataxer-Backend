@@ -168,7 +168,6 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .fetch();
     }
 
-    @Override
     public LocalDate getUserFirstLastRecord(Long userId, Long companyId, Boolean last) {
         JPAQuery<LocalDate> jpaQuery = this.query.select(QTime.time1.dateWork)
                 .from(QTime.time1)
@@ -200,6 +199,14 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.user.id.eq(userId))
                 .fetchOne();
+    }
+
+    @Override
+    public List<Time> getAllTimeRecords(Long companyId) {
+        return this.query.selectFrom(QTime.time1)
+                .leftJoin(QTime.time1.user).fetchJoin()
+                .where(QTime.time1.company.id.eq(companyId))
+                .fetch();
     }
 
     private long getTotalCount(Predicate predicate) {
