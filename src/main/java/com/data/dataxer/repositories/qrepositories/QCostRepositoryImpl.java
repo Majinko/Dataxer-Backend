@@ -55,6 +55,7 @@ public class QCostRepositoryImpl implements QCostRepository {
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Cost> costList = this.query.selectFrom(qCost)
+                .leftJoin(qCost.category).fetchJoin()
                 .leftJoin(qCost.contact).fetchJoin()
                 .leftJoin(qCost.project).fetchJoin()
                 .where(predicate)
@@ -84,6 +85,15 @@ public class QCostRepositoryImpl implements QCostRepository {
                         .leftJoin(QCost.cost.files).fetchJoin()
                         .fetchOne()
         );
+    }
+
+    @Override
+    public List<Cost> getCostsWhereCategoryIdIn(List<Long> categoryIds, Integer year, Long companyId) {
+        return this.query.selectFrom(QCost.cost)
+                    .where(QCost.cost.category.id.in(categoryIds))
+                    .where(QCost.cost.paymentDate.year().eq(year))
+                    .where(QCost.cost.company.id.eq(companyId))
+                    .fetch();
     }
 
     private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, Long companyId) {

@@ -68,4 +68,18 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
             "WHERE category.lft BETWEEN parent.rgt AND parent.rgt " +
             "AND parent != ?1 AND node = ?1")
     int findNodeDepth(Category category);
+
+    @Query(value = "WITH RECURSIVE children AS (" +
+                        "SELECT id FROM category WHERE id = ?1 AND company_id = ?2 " +
+                        "UNION ALL " +
+                        "SELECT category.id " +
+                            "FROM category JOIN children ON category.parent_id = children.id" +
+                    ") SELECT * from children", nativeQuery = true)
+    List<Long> findSubTreeIds(Long rootId, Long companyId);
+
+    @Query(value = "SELECT c FROM Category c WHERE c.company.id = ?1 AND c.parent IS NULL")
+    Optional<List<Category>> findAllByCompanyAndParentIsNull(Long companyId);
+
+    @Query(value = "SELECT c FROM Category c WHERE c.id = ?1 AND c.company.id = ?2")
+    Optional<Category> findCategoryByIdAndCompanyId(Long id, Long companyId);
 }

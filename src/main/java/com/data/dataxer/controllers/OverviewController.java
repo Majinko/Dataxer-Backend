@@ -1,5 +1,6 @@
 package com.data.dataxer.controllers;
 
+import com.data.dataxer.models.dto.CategoryCostsOverviewDTO;
 import com.data.dataxer.models.dto.UserHourOverviewDTO;
 import com.data.dataxer.models.dto.UserYearOverviewDTO;
 import com.data.dataxer.services.OverviewService;
@@ -36,4 +37,11 @@ public class OverviewController {
     public ResponseEntity<List<UserYearOverviewDTO>> userYearStatistic() {
         return ResponseEntity.ok(this.overviewService.getAllUsersYearsOverview());
     }
+
+    @GetMapping("/costsOverview")
+    public ResponseEntity<CategoryCostsOverviewDTO> costsOverview(@RequestParam(value = "year") Integer year,
+                                                                  @RequestParam(value = "parentId", defaultValue = "") Long categoryId) {
+        return ResponseEntity.ok(this.overviewService.getCategoriesCostsForYear(year, categoryId));
+    }
+
 }
