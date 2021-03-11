@@ -12,6 +12,7 @@ import com.google.firebase.auth.UserRecord;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static com.data.dataxer.utils.Helpers.getDiffYears;
@@ -83,12 +84,14 @@ public class UserServiceImpl implements UserService {
             appUserOverviewDTOS.add(appUserOverviewDTO);
         });
 
+        Collections.sort(appUserOverviewDTOS);
+
         return appUserOverviewDTOS;
     }
 
     @Override
     public AppUser update(AppUser appUser) {
-        return this.userRepository.findByUid(SecurityUtils.uid()).map(user -> {
+        return this.userRepository.findByUidAndCompaniesIn(appUser.getUid(), List.of(SecurityUtils.defaultCompany())).map(user -> {
 
             user.setFirstName(appUser.getFirstName());
             user.setLastName(appUser.getLastName());

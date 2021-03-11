@@ -5,6 +5,7 @@ public enum DocumentType {
     PROFORMA("proforma"),
     INVOICE("invoice"),
     TAX_DOCUMENT("tax_document"),
+    COST("cost"),
     SUMMARY_INVOICE("summary_invoice");
 
     private String name;

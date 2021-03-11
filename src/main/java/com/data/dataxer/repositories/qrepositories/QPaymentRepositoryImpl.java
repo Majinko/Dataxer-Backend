@@ -1,9 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QInvoice;
-import com.data.dataxer.models.domain.QPayment;
-import com.data.dataxer.models.domain.QPriceOffer;
 import com.data.dataxer.models.enums.DocumentType;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -82,7 +79,13 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
     @Override
     public BigDecimal getDocumentTotalPrice(Long documentId, DocumentType documentType) {
-        switch(documentType) {
+        switch (documentType) {
+            case COST:
+                Cost cost = this.query.selectFrom(QCost.cost)
+                        .where(QCost.cost.id.eq(documentId))
+                        .fetchOne();
+
+                return cost != null ? cost.getTotalPrice() : null;
             case INVOICE:
             case PROFORMA:
             case TAX_DOCUMENT:
@@ -98,7 +101,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
                 }
 
             case PRICE_OFFER:
-            default :
+            default:
                 QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
 
                 PriceOffer priceOffer = this.query.selectFrom(qPriceOffer)

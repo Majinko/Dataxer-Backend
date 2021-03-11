@@ -1,8 +1,10 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.domain.Payment;
 import com.data.dataxer.models.enums.DocumentType;
+import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.PaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
@@ -10,10 +12,9 @@ import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.beans.Transient;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -22,11 +23,13 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final QPaymentRepository qPaymentRepository;
     private final InvoiceRepository invoiceRepository;
+    private final CostRepository costRepository;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, QPaymentRepository qPaymentRepository, InvoiceRepository invoiceRepository) {
+    public PaymentServiceImpl(PaymentRepository paymentRepository, QPaymentRepository qPaymentRepository, InvoiceRepository invoiceRepository, CostRepository costRepository) {
         this.paymentRepository = paymentRepository;
         this.qPaymentRepository = qPaymentRepository;
         this.invoiceRepository = invoiceRepository;
+        this.costRepository = costRepository;
     }
 
     @Override
@@ -34,10 +37,10 @@ public class PaymentServiceImpl implements PaymentService {
         this.paymentRepository.save(payment);
 
         if (this.documentIsPayed(payment)) {
-            if (payment.getDocumentType().equals(DocumentType.INVOICE) || payment.getDocumentType().equals(DocumentType.PROFORMA)) {
-                Invoice invoice = this.invoiceRepository.findByIdAndCompanyId(payment.getDocumentId(), SecurityUtils.companyId());
-                invoice.setPaymentDate(payment.getPayedDate());
-                invoiceRepository.save(invoice);
+            if (payment.getDocumentType().equals(DocumentType.COST)) {
+                this.setCostPayment(payment.getDocumentId(), payment.getPayedDate());
+            } else {
+                this.setInvoicePayment(payment.getDocumentId(), payment.getPayedDate());
             }
         }
 
@@ -64,14 +67,28 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public void destroy(Long id) {
         Payment payment = this.getById(id);
-        Invoice invoice = this.invoiceRepository.findByIdAndCompanyId(payment.getDocumentId(), SecurityUtils.companyId());
 
         if (this.documentIsPayed(payment)) {
-            invoice.setPaymentDate(null);
-            invoiceRepository.save(invoice);
+            if (payment.getDocumentType().equals(DocumentType.COST)) {
+                this.setCostPayment(payment.getDocumentId(), null);
+            } else {
+                this.setInvoicePayment(payment.getDocumentId(), null);
+            }
         }
 
         this.paymentRepository.delete(payment);
+    }
+
+    private void setCostPayment(Long costId, LocalDate date) {
+        Cost cost = this.costRepository.findByIdAndCompanyId(costId, SecurityUtils.companyId());
+        cost.setPaymentDate(date);
+        costRepository.save(cost);
+    }
+
+    private void setInvoicePayment(Long invoiceId, LocalDate date) {
+        Invoice invoice = this.invoiceRepository.findByIdAndCompanyId(invoiceId, SecurityUtils.companyId());
+        invoice.setPaymentDate(date);
+        invoiceRepository.save(invoice);
     }
 
     @Override

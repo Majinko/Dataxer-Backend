@@ -21,4 +21,6 @@ public interface CostRepository extends CrudRepository<Cost, Long> {
 
     @Query("SELECT cost FROM Cost cost LEFT JOIN Contact contact ON contact.id = cost.contact.id")
     List<Cost> paginate(Pageable pageable, List<Long> companyIds);
+
+    Cost findByIdAndCompanyId(Long invoiceId, Long companyId);
 }
