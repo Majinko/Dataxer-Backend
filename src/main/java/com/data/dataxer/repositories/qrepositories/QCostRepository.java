@@ -13,4 +13,6 @@ public interface QCostRepository {
     Optional<Cost> getById(Long id, Long companyId);
 
     Optional<Cost> getByIdWithRelation(Long id, Long companyId);
+
+    List<Cost> getCostsWhereCategoryIdIn(List<Long> categoryIds, Integer year, Long companyId);
 }

@@ -1,20 +1,22 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.AppUser;
-import com.data.dataxer.models.domain.Salary;
-import com.data.dataxer.models.domain.Time;
+import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.dto.CategoryCostsOverviewDTO;
+import com.data.dataxer.models.dto.CategoryMonthsCostsDTO;
 import com.data.dataxer.models.dto.UserHourOverviewDTO;
 import com.data.dataxer.models.dto.UserYearOverviewDTO;
 import com.data.dataxer.models.enums.SalaryType;
+import com.data.dataxer.repositories.CategoryRepository;
+import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
-import com.querydsl.core.Tuple;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,14 +26,19 @@ public class OverviewServiceImpl implements OverviewService {
 
     private final QTimeRepository qTimeRepository;
     private final QSalaryRepository qSalaryRepository;
+    private final QCostRepository qCostRepository;
+    private final CategoryRepository categoryRepository;
 
     private HashMap<AppUser, HashMap<Integer, Integer>> userTimeData;
     private HashMap<AppUser, HashMap<Integer, BigDecimal>> userDayTotalPrice;
 
 
-    public OverviewServiceImpl(QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository) {
+    public OverviewServiceImpl(QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository,
+                               QCostRepository qCostRepository, CategoryRepository categoryRepository) {
         this.qTimeRepository = qTimeRepository;
-        this.qSalaryRepository =qSalaryRepository;
+        this.qSalaryRepository = qSalaryRepository;
+        this.qCostRepository = qCostRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -97,6 +104,83 @@ public class OverviewServiceImpl implements OverviewService {
         });
 
         return this.fillAllUsersYearsOverviewData();
+    }
+
+    @Override
+    public CategoryCostsOverviewDTO getCategoriesCostsForYear(Integer year, Long categoryId) {
+        CategoryCostsOverviewDTO response = new CategoryCostsOverviewDTO();
+
+        if (categoryId == null) {
+            List<Category> rootCategories = this.categoryRepository.findAllByCompanyAndParentIsNull(SecurityUtils.companyId())
+                    .orElse(new ArrayList<>());
+            System.out.println("Number of root categories: " + rootCategories.size());
+            response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(rootCategories, year));
+        } else {
+            response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(List.of(this.categoryRepository.findCategoryByIdAndCompanyId(categoryId, SecurityUtils.companyId())
+                    .orElseThrow(() -> new RuntimeException("Category with id " + categoryId + " not found"))), year));
+        }
+        response.setMonthsTotalCosts(this.generateAllMonthsTotalCostHeader(response.getCategoryMonthsCostsDTOS()));
+        response.setTotalCosts(this.countTotalPrice(response.getMonthsTotalCosts().values()));
+
+        return response;
+    }
+
+    private HashMap<Integer, BigDecimal> generateAllMonthsTotalCostHeader(List<CategoryMonthsCostsDTO> categoryMonthsCostsDTOS) {
+        HashMap<Integer, BigDecimal> allMonthsCosts = new HashMap<>();
+        categoryMonthsCostsDTOS.forEach(categoryMonthsCostsDTO -> {
+            //pre kazdu kategoriu prejst celu hashmapu => prechadzame vsetky kluce
+            HashMap<Integer, BigDecimal> categoryMonthsCosts = categoryMonthsCostsDTO.getTotalMonthsCosts();
+            categoryMonthsCosts.keySet().stream().iterator().forEachRemaining(key -> {
+                if (allMonthsCosts.containsKey(key)) {
+                    BigDecimal tmp = allMonthsCosts.get(key).add(categoryMonthsCosts.get(key));
+                    allMonthsCosts.replace(key, tmp);
+                } else {
+                    allMonthsCosts.put(key, categoryMonthsCosts.get(key));
+                }
+            });
+        });
+        return allMonthsCosts;
+    }
+
+    private HashMap<Integer, BigDecimal> generateMonthsTotalPrice(List<Cost> costList) {
+        HashMap<Integer, BigDecimal> totalMonthsCosts = new HashMap<>();
+        costList.forEach(cost -> {
+            if (totalMonthsCosts.containsKey(cost.getPaymentDate().getMonthValue())) {
+                BigDecimal tmpTotalPrice = totalMonthsCosts.get(cost.getPaymentDate().getMonthValue()).add(cost.getTotalPrice());
+                totalMonthsCosts.replace(cost.getPaymentDate().getMonthValue(), tmpTotalPrice);
+            } else {
+                totalMonthsCosts.put(cost.getPaymentDate().getMonthValue(), cost.getTotalPrice());
+            }
+        });
+
+        return totalMonthsCosts;
+    }
+
+    private BigDecimal countTotalPrice(Collection<BigDecimal> prices) {
+        BigDecimal totalPrice = BigDecimal.ZERO;
+        for (BigDecimal price: prices) {
+            totalPrice = totalPrice.add(price);
+        }
+        return totalPrice;
+    }
+
+    private List<CategoryMonthsCostsDTO> generateCategoryMonthCosts(List<Category> categories, Integer year) {
+        List<CategoryMonthsCostsDTO> categoryMonthsCostsDTOS = new ArrayList<>();
+        categories.forEach(category -> {
+            List<Long> childrenIds = this.categoryRepository.findSubTreeIds(category.getId(), SecurityUtils.companyId());
+            System.out.println("Size: " + childrenIds.size());
+            List<Cost> costList = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds, year, SecurityUtils.companyId());
+            System.out.println("Costs size: " + costList.size());
+
+            CategoryMonthsCostsDTO categoryMonthsCostsDTO = new CategoryMonthsCostsDTO();
+            categoryMonthsCostsDTO.setCategoryName(category.getName());
+            categoryMonthsCostsDTO.setTotalMonthsCosts(this.generateMonthsTotalPrice(costList));
+            categoryMonthsCostsDTO.setCategoryTotalPrice(this.countTotalPrice(
+                    categoryMonthsCostsDTO.getTotalMonthsCosts().values()));
+            categoryMonthsCostsDTOS.add(categoryMonthsCostsDTO);
+        });
+
+        return categoryMonthsCostsDTOS;
     }
 
     private List<UserYearOverviewDTO> fillAllUsersYearsOverviewData() {
