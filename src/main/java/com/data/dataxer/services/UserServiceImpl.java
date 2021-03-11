@@ -33,15 +33,15 @@ public class UserServiceImpl implements UserService {
         return this.userRepository.findById(SecurityUtils.id()).orElseThrow(() -> new RuntimeException("User not found"));
     }
 
-    @Override
     // todo create camunda process
+    @Override
     public AppUser store(AppUser appUser) {
         appUser.setUid(this.createFirebaseUser(appUser));
+        appUser.setCompanies(List.of(SecurityUtils.defaultCompany()));
 
         return this.userRepository.save(appUser);
     }
 
-    // create user also for firebase
     private String createFirebaseUser(AppUser appUser) {
         UserRecord.CreateRequest createRequest = new UserRecord.CreateRequest();
 
@@ -61,18 +61,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<AppUser> all() {
-        return this.userRepository.getAll(SecurityUtils.companyId());
+        return this.userRepository.findAllByCompaniesIn(List.of(SecurityUtils.defaultCompany()));
     }
 
     @Override
     public List<AppUserOverviewDTO> overview() {
-        List<AppUser> appUsers = this.userRepository.getAll(SecurityUtils.companyId());
+        List<AppUser> appUsers = this.all();
         List<AppUserOverviewDTO> appUserOverviewDTOS = new ArrayList<>();
 
         appUsers.forEach(user -> {
             AppUserOverviewDTO appUserOverviewDTO = new AppUserOverviewDTO();
 
             appUserOverviewDTO.setId(user.getId());
+            appUserOverviewDTO.setUid(user.getUid());
             appUserOverviewDTO.setFullName(user.getFirstName() + ' ' + user.getLastName());
             appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), false));
             appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), true)));
@@ -99,5 +100,20 @@ public class UserServiceImpl implements UserService {
 
             return userRepository.save(user);
         }).orElse(null);
+    }
+
+    @Override
+    public AppUser getByUid(String uid) {
+        return this.userRepository.findByUidAndCompaniesIn(uid, List.of(SecurityUtils.defaultCompany())).orElseThrow(() -> new RuntimeException("User not found :)"));
+    }
+
+    @Override
+    public AppUser getByIdAndUid(Long id, String uid) {
+        return this.userRepository.findByIdAndUid(id, uid).orElseThrow(() -> new RuntimeException("User not found :)"));
+    }
+
+    @Override
+    public void destroy(String uid) {
+        this.userRepository.delete(this.getByUid(uid));
     }
 }

@@ -176,10 +176,20 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .limit(1);
 
         if (last) {
-            return jpaQuery.orderBy(QTime.time1.dateWork.desc()).fetch().get(0);
+            List<LocalDate> dates = jpaQuery.orderBy(QTime.time1.dateWork.desc()).fetch();
+
+            if (!dates.isEmpty()) {
+                return dates.get(0);
+            }
         } else {
-            return jpaQuery.orderBy(QTime.time1.dateWork.asc()).fetch().get(0);
+            List<LocalDate> dates = jpaQuery.orderBy(QTime.time1.dateWork.asc()).fetch();
+
+            if (!dates.isEmpty()) {
+                return dates.get(0);
+            }
         }
+
+        return null;
     }
 
     @Override
@@ -188,6 +198,8 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .select(QTime.time1.project.count())
                 .from(QTime.time1)
                 .groupBy(QTime.time1.project)
+                .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.user.id.eq(id))
                 .fetchCount();
     }
 

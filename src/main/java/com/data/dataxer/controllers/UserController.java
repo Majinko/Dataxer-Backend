@@ -32,6 +32,11 @@ public class UserController {
         return ResponseEntity.ok(userMapper.appUserToAppUserDTOs(this.userService.all()));
     }
 
+    @GetMapping("/{uid}")
+    public ResponseEntity<AppUserDTO> getByUid(@PathVariable String uid) {
+        return ResponseEntity.ok(userMapper.appUserToAppUserDTO(this.userService.getByUid(uid)));
+    }
+
     @GetMapping("/overview")
     public ResponseEntity<List<AppUserOverviewDTO>> overview() {
         return ResponseEntity.ok(this.userService.overview());
@@ -40,6 +45,11 @@ public class UserController {
     @GetMapping("/logged")
     public ResponseEntity<AppUserDTO> getLoggedUser() {
         return ResponseEntity.ok(userMapper.appUserToAppUserDTO(this.userService.loggedUser()));
+    }
+
+    @GetMapping("/destroy/{uid}")
+    public void destroy(@PathVariable String uid) {
+        this.userService.destroy(uid);
     }
 
     @PostMapping("/store")

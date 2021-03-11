@@ -23,7 +23,11 @@ public class Helpers {
 
 
     public static Long getDiffYears(LocalDate first, LocalDate last) {
-        return ChronoUnit.YEARS.between(first, last);
+        if (first != null && last != null) {
+            return ChronoUnit.YEARS.between(first, last);
+        }
+
+        return null;
     }
 
     public static Calendar getCalendar(Date date) {

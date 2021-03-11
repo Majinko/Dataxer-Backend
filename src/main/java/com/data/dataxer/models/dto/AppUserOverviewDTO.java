@@ -9,6 +9,7 @@ import java.time.LocalDate;
 @Setter
 public class AppUserOverviewDTO {
     Long id;
+    String uid;
     String fullName;
     LocalDate startWork;
     Long years;

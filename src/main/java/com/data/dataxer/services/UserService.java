@@ -15,4 +15,10 @@ public interface UserService {
     List<AppUserOverviewDTO> overview();
 
     AppUser update(AppUser appUserDTOtoAppUser);
+
+    AppUser getByUid(String uid);
+
+    AppUser getByIdAndUid(Long id, String uid);
+
+    void destroy(String uid);
 }
