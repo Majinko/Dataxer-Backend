@@ -13,7 +13,6 @@ public interface CostMapper {
     @Mapping(target = "project.categories", ignore = true)
     CostDTO costToCostDTO(Cost cost);
 
-    @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "files", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     CostDTO costToCostDTOPaginate(Cost cost);
