@@ -3,6 +3,7 @@ package com.data.dataxer.repositories;
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Company;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;

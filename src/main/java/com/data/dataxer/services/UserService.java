@@ -21,4 +21,6 @@ public interface UserService {
     AppUser getByIdAndUid(Long id, String uid);
 
     void destroy(String uid);
+
+    void addCompany(Long id);
 }

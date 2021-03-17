@@ -23,6 +23,5 @@ public class CompanyDTO {
     private String cin;
     private String tin;
     private String vatin;
-    private Boolean defaultCompany;
 
 }
