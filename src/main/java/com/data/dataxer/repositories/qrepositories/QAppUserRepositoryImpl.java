@@ -44,6 +44,7 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
         return Optional.ofNullable(
                 this.query.selectFrom(QAppUser.appUser)
                     .leftJoin(QAppUser.appUser.defaultCompany).fetchJoin()
+                    .leftJoin(QAppUser.appUser.roles).fetchJoin()
                     .where(QAppUser.appUser.uid.eq(uid))
                     .fetchOne()
         );
