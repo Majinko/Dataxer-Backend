@@ -34,7 +34,7 @@ public class Company implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<AppUser> appUsers = new ArrayList<>();
 
-    private Boolean defaultCompany;
+    /*private Boolean defaultCompany;*/
 
     private String logoUrl;
 

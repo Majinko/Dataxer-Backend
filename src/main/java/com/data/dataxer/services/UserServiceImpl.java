@@ -1,8 +1,10 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.AppUser;
+import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.repositories.AppUserRepository;
+import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.StringUtils;
@@ -22,11 +24,14 @@ public class UserServiceImpl implements UserService {
     private final FirebaseAuth firebaseAuth;
     private final AppUserRepository userRepository;
     private final QTimeRepository qTimeRepository;
+    private final CompanyRepository companyRepository;
 
-    public UserServiceImpl(FirebaseAuth firebaseAuth, AppUserRepository userRepository, QTimeRepository qTimeRepository) {
+    public UserServiceImpl(FirebaseAuth firebaseAuth, AppUserRepository userRepository, QTimeRepository qTimeRepository,
+                           CompanyRepository companyRepository) {
         this.firebaseAuth = firebaseAuth;
         this.userRepository = userRepository;
         this.qTimeRepository = qTimeRepository;
+        this.companyRepository = companyRepository;
     }
 
     @Override
@@ -118,5 +123,17 @@ public class UserServiceImpl implements UserService {
     @Override
     public void destroy(String uid) {
         this.userRepository.delete(this.getByUid(uid));
+    }
+
+    @Override
+    public void addCompany(Long id) {
+        Company company = this.companyRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Company with id " + id + " not found"));
+        AppUser appUser = SecurityUtils.loggedUser();
+
+        List<Company> userCompanies = appUser.getCompanies();
+        userCompanies.add(company);
+        appUser.setCompanies(userCompanies);
+        this.userRepository.save(appUser);
     }
 }

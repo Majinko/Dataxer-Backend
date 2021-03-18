@@ -58,6 +58,9 @@ public class AppUser implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Company> companies = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private Company defaultCompany;
+
     @Column(updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
