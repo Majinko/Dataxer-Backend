@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.dto.AppUserOverviewDTO;
+import com.data.dataxer.security.model.Role;
 
 import java.util.List;
 
@@ -21,4 +22,6 @@ public interface UserService {
     AppUser getByIdAndUid(Long id, String uid);
 
     void destroy(String uid);
+
+    void assignRoles(String uid, List<Role> roleDTOStoRoles);
 }

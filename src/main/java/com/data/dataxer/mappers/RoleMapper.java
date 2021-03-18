@@ -3,6 +3,7 @@ package com.data.dataxer.mappers;
 import com.data.dataxer.models.dto.RoleDTO;
 import com.data.dataxer.security.model.Role;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -13,4 +14,6 @@ public interface RoleMapper {
     RoleDTO roleToRoleDTO(Role role);
 
     List<RoleDTO> rolesToRoleDTOs(List<Role> roles);
+
+    List<Role> roleDTOStoRoles(List<RoleDTO> roleDTOS);
 }

@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface RoleService {
     List<Role> getAll();
+
+    void storeOrUpdate(Role role);
+
 }

@@ -1,4 +1,4 @@
-package com.data.dataxer.configs;
+package com.data.dataxer.security;
 
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.repositories.PrivilegeRepository;
@@ -16,7 +16,6 @@ import java.util.stream.Stream;
 @Component
 public class RoleConfig {
 
-    public static final String ROLE_USER = "ROLE_USER";
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
     private final RoleRepository roleRepository;
@@ -32,7 +31,6 @@ public class RoleConfig {
         List<Privilege> readPrivileges = this.initializeReadPrivileges();
         List<Privilege> writePrivileges = this.initializeWritePrivileges();
 
-        initializeRole(ROLE_USER, readPrivileges);
         initializeRole(ROLE_ADMIN, Stream.concat(readPrivileges.stream(), writePrivileges.stream()).collect(Collectors.toList()));
     }
 
