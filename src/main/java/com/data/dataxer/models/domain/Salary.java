@@ -17,6 +17,7 @@ public class Salary extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "uid", referencedColumnName = "uid")
     private AppUser user;
 
     @Enumerated(EnumType.STRING)

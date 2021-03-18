@@ -4,7 +4,6 @@ import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.repositories.CompanyRepository;
 import lombok.Getter;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,8 +14,8 @@ import java.util.List;
 
 @Getter
 public class FirebaseUserAuthenticationDetails implements UserDetails {
-    private AppUser user;
-    private List<Company> companies;
+    private final AppUser user;
+    private final List<Company> companies;
 
     public FirebaseUserAuthenticationDetails(AppUser user, CompanyRepository companyRepository) {
         this.user = user;

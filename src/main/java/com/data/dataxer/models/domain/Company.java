@@ -31,7 +31,7 @@ public class Company implements Serializable {
             joinColumns = @JoinColumn(name = "company_id"),
             inverseJoinColumns = @JoinColumn(name = "app_user_id")
     )
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<AppUser> appUsers = new ArrayList<>();
 
     private String logoUrl;

@@ -1,9 +1,8 @@
 package com.data.dataxer.security.service;
 
 import com.data.dataxer.models.domain.AppUser;
-import com.data.dataxer.models.domain.QAppUser;
-import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.AppUserRepository;
+import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.qrepositories.QAppUserRepository;
 import com.data.dataxer.security.model.FirebaseUserAuthenticationDetails;
 import com.google.firebase.auth.FirebaseToken;
@@ -16,8 +15,7 @@ public class FirebaseUserDetailService {
     private final QAppUserRepository qAppUserRepository;
     private final CompanyRepository companyRepository;
 
-    public FirebaseUserDetailService(AppUserRepository userRepository, CompanyRepository companyRepository,
-                                     QAppUserRepository qAppUserRepository) {
+    public FirebaseUserDetailService(AppUserRepository userRepository, CompanyRepository companyRepository, QAppUserRepository qAppUserRepository) {
         this.userRepository = userRepository;
         this.qAppUserRepository = qAppUserRepository;
         this.companyRepository = companyRepository;

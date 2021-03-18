@@ -26,8 +26,7 @@ public class UserServiceImpl implements UserService {
     private final QTimeRepository qTimeRepository;
     private final CompanyRepository companyRepository;
 
-    public UserServiceImpl(FirebaseAuth firebaseAuth, AppUserRepository userRepository, QTimeRepository qTimeRepository,
-                           CompanyRepository companyRepository) {
+    public UserServiceImpl(FirebaseAuth firebaseAuth, AppUserRepository userRepository, QTimeRepository qTimeRepository, CompanyRepository companyRepository) {
         this.firebaseAuth = firebaseAuth;
         this.userRepository = userRepository;
         this.qTimeRepository = qTimeRepository;
@@ -43,10 +42,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public AppUser store(AppUser appUser) {
         appUser.setUid(this.createFirebaseUser(appUser));
+        appUser.setDefaultCompany(SecurityUtils.defaultCompany());
 
-        this.addCompanyToUser(SecurityUtils.defaultCompany(), appUser);
+        AppUser savedUser = this.userRepository.save(appUser);
 
-        return this.userRepository.save(appUser);
+        this.addCompanyToUser(SecurityUtils.companyId(), savedUser);
+
+        return savedUser;
     }
 
     private String createFirebaseUser(AppUser appUser) {
@@ -127,7 +129,9 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void addCompanyToUser(Company company, AppUser appUser) {
+    private void addCompanyToUser(Long companyId, AppUser appUser) {
+        Company company = this.companyRepository.findByIdWithUsers(companyId);
+
         company.getAppUsers().add(appUser);
         this.companyRepository.save(company);
     }
