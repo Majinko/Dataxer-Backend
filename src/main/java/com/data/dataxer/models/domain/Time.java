@@ -19,6 +19,7 @@ public class Time extends BaseEntity {
     Project project;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "uid", referencedColumnName = "uid")
     AppUser user;
 
     @OneToOne(fetch = FetchType.LAZY)

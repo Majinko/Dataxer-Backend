@@ -26,6 +26,7 @@ public class Project extends BaseEntity {
     private Contact contact;
 
     @OneToOne
+    @JoinColumn(name = "uid", referencedColumnName = "uid")
     private AppUser user;
 
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
