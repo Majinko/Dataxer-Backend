@@ -1,10 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QDocumentPack;
-import com.data.dataxer.models.domain.QDocumentPackItem;
-import com.data.dataxer.models.domain.QInvoice;
-import com.data.dataxer.models.domain.QItem;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;

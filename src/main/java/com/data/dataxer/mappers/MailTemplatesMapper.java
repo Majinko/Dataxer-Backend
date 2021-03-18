@@ -6,9 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper
 public interface MailTemplatesMapper {
-
     MailTemplates mailTemplatesDTOToMailTemplates(MailTemplatesDTO mailTemplatesDTO);
 
     MailTemplatesDTO mailTemplatesToMailTemplatesDTO(MailTemplates mailTemplates);
-
 }

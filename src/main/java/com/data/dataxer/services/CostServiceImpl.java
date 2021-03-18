@@ -132,6 +132,11 @@ public class CostServiceImpl implements CostService {
         return this.store(newCost);
     }
 
+    @Override
+    public List<Cost> findAllByProject(Long projectId) {
+        return costRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
+    }
+
     private Cost generateNewCostFromRepeated(Cost repeatedCost) {
         Cost newCost = new Cost();
         BeanUtils.copyProperties(repeatedCost, newCost, "id", "dueDate", "createdDate", "isRepeated", "state");

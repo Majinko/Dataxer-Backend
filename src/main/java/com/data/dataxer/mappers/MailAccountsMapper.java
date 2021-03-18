@@ -6,9 +6,7 @@ import org.mapstruct.Mapper;
 
 @Mapper
 public interface MailAccountsMapper {
-
     MailAccounts mailAccountsDTOToMailAccounts(MailAccountsDTO mailAccountsDTO);
 
     MailAccountsDTO mailAccountsToMailAccountsDTO(MailAccounts mailAccounts);
-
 }

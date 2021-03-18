@@ -1,6 +1,8 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.DocumentPack;
+import com.data.dataxer.models.domain.DocumentPackItem;
+import com.data.dataxer.models.domain.PriceOffer;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.PriceOfferRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
@@ -9,6 +11,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class PriceOfferServiceImpl implements PriceOfferService {
@@ -79,5 +83,10 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     @Override
     public void destroy(Long id) {
         priceOfferRepository.delete(this.getByIdSimple(id));
+    }
+
+    @Override
+    public List<PriceOffer> findAllByProject(Long projectId) {
+        return this.priceOfferRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
     }
 }

@@ -150,6 +150,11 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
+    public List<Invoice> findAllByProject(Long projectId) {
+        return this.invoiceRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
+    }
+
+    @Override
     @Transactional
     public Invoice duplicate(Long id) {
         Invoice originalInvoice = this.getById(id);

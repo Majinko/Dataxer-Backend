@@ -136,4 +136,9 @@ public class InvoiceController {
     public ResponseEntity<List<InvoiceDTO>> findAllByRelatedDocuments(@PathVariable Long id) {
         return ResponseEntity.ok(invoiceMapper.invoicesToInvoicesDTOWithoutRelation(this.invoiceService.findAllByRelatedDocuments(id)));
     }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<InvoiceDTO>> findAllByProject(@PathVariable Long projectId) {
+        return ResponseEntity.ok(invoiceMapper.invoicesToInvoicesDTOWithoutRelation(this.invoiceService.findAllByProject(projectId)));
+    }
 }

@@ -115,7 +115,7 @@ public class TimeServiceImpl implements TimeService {
     @Override
     public List<Project> getLastUserWorkingProjects(Long userId) {
         List<Project> projects = new ArrayList<>();
-        List<Tuple> dataTuple = this.qTimeRepository.getUserLastProjects(userId, LIMIT, SecurityUtils.companyId());
+        List<Tuple> dataTuple = this.qTimeRepository.getUserLastProjects(SecurityUtils.id(), LIMIT, SecurityUtils.companyId());
         dataTuple.forEach(data -> projects.add(data.get(QTime.time1.project)));
 
         return projects;

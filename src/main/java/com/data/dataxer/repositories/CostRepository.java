@@ -10,17 +10,13 @@ import java.util.List;
 
 @Repository
 public interface CostRepository extends CrudRepository<Cost, Long> {
-    @Query(value = "SELECT * FROM cost c WHERE c.company_id IN ?1 AND c.deleted_at IS NULL", nativeQuery = true)
-    public List<Cost> findDefault(List<Long> companyIds, Pageable pageable);
-
-    @Query(value = "SELECT * FROM cost c WHERE c.company_id IN ?1 AND c.deleted_at IS NULL AND (?2)", nativeQuery = true)
-    public List<Cost> findWithFilter(List<Long> companyIds, String whereCondition, Pageable pageable);
-
-    @Query(value = "SELECT * FROM cost c WHERE c.is_repeated = true AND c.deleted_at IS NULL", nativeQuery = true)
+    @Query("SELECT c FROM Cost c where c.isRepeated = true  AND c.deletedAt is null ")
     public List<Cost> findAllRepeated();
 
     @Query("SELECT cost FROM Cost cost LEFT JOIN Contact contact ON contact.id = cost.contact.id")
     List<Cost> paginate(Pageable pageable, List<Long> companyIds);
 
     Cost findByIdAndCompanyId(Long invoiceId, Long companyId);
+
+    List<Cost> findAllByProjectIdAndCompanyId(Long projectId, Long companyId);
 }

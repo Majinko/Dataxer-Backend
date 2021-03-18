@@ -9,12 +9,13 @@ import java.util.List;
 
 @Mapper
 public interface TimeMapper {
-
+    @Mapping(target = "project.categories", ignore = true)
     Time timeDTOToTime(TimeDTO timeDTO);
 
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
+    @Mapping(target = "user.companies", ignore = true)
     TimeDTO timeToTimeDTO(Time time);
 
     List<TimeDTO> timeListToTimeDTOList(List<Time> times);

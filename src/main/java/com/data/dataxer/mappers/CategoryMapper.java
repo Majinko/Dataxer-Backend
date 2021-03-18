@@ -19,6 +19,7 @@ public interface CategoryMapper {
 
     List<Category> CategoryNestedDTOsToCategories(List<CategoryNestedDTO> categoryDTOS);
 
+    @Mapping(target = "parent", ignore = true)
     CategoryDTO toCategoryDTO(Category category);
 
     CategoryNestedDTO toCategoryNestedDTO(Category category);

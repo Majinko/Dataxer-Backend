@@ -4,6 +4,8 @@ import com.data.dataxer.models.domain.PriceOffer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface PriceOfferService {
     void store(PriceOffer priceOffer);
 
@@ -16,4 +18,6 @@ public interface PriceOfferService {
     PriceOffer getByIdSimple(Long id);
 
     void destroy(Long id);
+
+    List<PriceOffer> findAllByProject(Long projectId);
 }

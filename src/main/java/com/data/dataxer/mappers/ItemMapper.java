@@ -16,7 +16,6 @@ public interface ItemMapper {
     ItemPriceDTO toItemPriceDto(ItemPrice itemPrice);
 
     @Mapping(target = "itemPrice", expression = "java(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null))")
-    //@Mapping(target = "category.parent", ignore = true)
     ItemDTO itemToItemDto(Item item);
 
     @Mapping(target = "category.parent", ignore = true)
@@ -37,9 +36,4 @@ public interface ItemMapper {
 
     @IterableMapping(qualifiedByName = "itemToItemDTOWithPrice")
     List<ItemDTO> itemsToItemsDTOsWithPrice(List<Item> items);
-    
-    /*@AfterMapping
-    default void set(@MappingTarget ItemDTO itemDTO, Item item) {
-        itemDTO.setItemPrice(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null));
-    }*/
 }

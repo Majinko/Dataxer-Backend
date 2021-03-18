@@ -6,7 +6,5 @@ import org.mapstruct.Mapper;
 
 @Mapper
 public interface FileMapper {
-
     FileDTO fileToFileDTO(File file);
-
 }

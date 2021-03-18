@@ -47,4 +47,6 @@ public interface InvoiceService {
     Invoice changeTypeAndSave(Long id, String type, String number);
 
     List<Invoice> findAllByRelatedDocuments(Long documentId);
+
+    List<Invoice> findAllByProject(Long projectId);
 }

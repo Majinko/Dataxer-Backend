@@ -12,6 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/price-offer")
 public class PriceOfferController {
@@ -57,5 +59,10 @@ public class PriceOfferController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.priceOfferService.destroy(id);
+    }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<PriceOfferDTO>> findAllByProject(@PathVariable Long projectId) {
+        return ResponseEntity.ok(priceOfferMapper.priceOffersToPriceOfferDTOsWithoutRelation(this.priceOfferService.findAllByProject(projectId)));
     }
 }

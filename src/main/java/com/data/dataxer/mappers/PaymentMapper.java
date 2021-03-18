@@ -10,7 +10,6 @@ import java.util.List;
 
 @Mapper
 public interface PaymentMapper {
-
     Payment paymentDTOtoPayment(PaymentDTO paymentDTO);
 
     @Named(value = "paymentToPaymentDTOSimple")

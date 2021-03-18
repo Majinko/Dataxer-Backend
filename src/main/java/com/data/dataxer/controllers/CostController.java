@@ -15,6 +15,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/cost")
 public class CostController {
@@ -91,5 +93,10 @@ public class CostController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.costService.destroy(id);
+    }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<CostDTO>> findAllByProject(@PathVariable Long projectId) {
+        return ResponseEntity.ok(costMapper.costsToCostDTOsWithoutRelations(this.costService.findAllByProject(projectId)));
     }
 }

@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.dto.DocumentPackItemDTO;
 import com.data.dataxer.models.dto.InvoiceDTO;
+import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -14,7 +15,6 @@ import java.util.List;
 public interface InvoiceMapper {
     Invoice invoiceDTOtoInvoice(InvoiceDTO invoiceDTO);
 
-    @Named(value = "invoiceToInvoiceDTO")
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "project.contact", ignore = true)
     InvoiceDTO invoiceToInvoiceDTO(Invoice invoice);
@@ -29,7 +29,7 @@ public interface InvoiceMapper {
     @Named(value = "invoiceToInvoiceDtoWithoutRelation")
     InvoiceDTO invoiceToInvoiceDtoWithoutRelation(Invoice invoice);
 
-    @Named(value = "invoiceToInvoiceDtoWithoutRelation")
+    @IterableMapping(qualifiedByName = "invoiceToInvoiceDtoWithoutRelation")
     List<InvoiceDTO> invoicesToInvoicesDTOWithoutRelation(List<Invoice> invoices);
 
     @Mapping(target = "item.category", ignore = true)

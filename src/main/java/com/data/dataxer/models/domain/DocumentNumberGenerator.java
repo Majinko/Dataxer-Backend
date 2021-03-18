@@ -45,5 +45,4 @@ public class DocumentNumberGenerator extends BaseEntity {
         this.isDefault = isDefault;
         this.lastNumber = lastNumber;
     }
-
 }

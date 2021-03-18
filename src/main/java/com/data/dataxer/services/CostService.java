@@ -5,6 +5,8 @@ import com.data.dataxer.models.enums.CostState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface CostService {
 
     Cost store(Cost cost);
@@ -24,4 +26,6 @@ public interface CostService {
     Cost getByIdWithRelation(Long id);
 
     Cost duplicate(Long id);
+
+    List<Cost> findAllByProject(Long projectId);
 }

@@ -54,7 +54,7 @@ public class TaskController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(taskService.paginate(pageable, rqlFilter, sortExpression).map(taskMapper::taskToTaskDTO));
+        return ResponseEntity.ok(taskService.paginate(pageable, rqlFilter, sortExpression).map(taskMapper::taskToTaskDTOSimple));
     }
 
     @GetMapping("/{id}")
