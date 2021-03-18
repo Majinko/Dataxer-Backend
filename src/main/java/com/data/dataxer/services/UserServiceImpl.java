@@ -43,7 +43,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public AppUser store(AppUser appUser) {
         appUser.setUid(this.createFirebaseUser(appUser));
-        appUser.setCompanies(List.of(SecurityUtils.defaultCompany()));
+
+        this.addCompanyToUser(SecurityUtils.defaultCompany(), appUser);
 
         return this.userRepository.save(appUser);
     }
@@ -67,7 +68,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<AppUser> all() {
-        return this.userRepository.findAllByCompaniesIn(List.of(SecurityUtils.defaultCompany()));
+        return this.userRepository.findAllByDefaultCompanyId(SecurityUtils.companyId());
     }
 
     @Override
@@ -96,7 +97,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUser update(AppUser appUser) {
-        return this.userRepository.findByUidAndCompaniesIn(appUser.getUid(), List.of(SecurityUtils.defaultCompany())).map(user -> {
+        return this.userRepository.findByUidAndDefaultCompanyId(appUser.getUid(), SecurityUtils.companyId()).map(user -> {
 
             user.setFirstName(appUser.getFirstName());
             user.setLastName(appUser.getLastName());
@@ -112,7 +113,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUser getByUid(String uid) {
-        return this.userRepository.findByUidAndCompaniesIn(uid, List.of(SecurityUtils.defaultCompany())).orElseThrow(() -> new RuntimeException("User not found :)"));
+        return this.userRepository.findByUidAndDefaultCompanyId(uid, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("User not found :)"));
     }
 
     @Override
@@ -125,15 +126,9 @@ public class UserServiceImpl implements UserService {
         this.userRepository.delete(this.getByUid(uid));
     }
 
-    @Override
-    public void addCompany(Long id) {
-        Company company = this.companyRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Company with id " + id + " not found"));
-        AppUser appUser = SecurityUtils.loggedUser();
 
-        List<Company> userCompanies = appUser.getCompanies();
-        userCompanies.add(company);
-        appUser.setCompanies(userCompanies);
-        this.userRepository.save(appUser);
+    private void addCompanyToUser(Company company, AppUser appUser) {
+        company.getAppUsers().add(appUser);
+        this.companyRepository.save(company);
     }
 }

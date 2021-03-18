@@ -1,9 +1,7 @@
 package com.data.dataxer.repositories;
 
 import com.data.dataxer.models.domain.AppUser;
-import com.data.dataxer.models.domain.Company;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,8 +13,8 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
 
     Optional<AppUser> findByIdAndUid(Long id, String uid);
 
-    Optional<AppUser> findByUidAndCompaniesIn(String uid, List<Company> companies);
+    Optional<AppUser> findByUidAndDefaultCompanyId(String uid, Long companyId);
 
-    List<AppUser> findAllByCompaniesIn(List<Company> companies);
+    List<AppUser> findAllByDefaultCompanyId(Long companyId);
 }
 

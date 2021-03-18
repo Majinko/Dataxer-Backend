@@ -12,17 +12,13 @@ public interface TaskMapper {
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
-    @Mapping(target = "user.companies", ignore = true)
     @Mapping(target = "userFrom.roles", ignore = true)
-    @Mapping(target = "userFrom.companies", ignore = true)
     TaskDTO taskToTaskDTO(Task task);
 
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
-    @Mapping(target = "user.companies", ignore = true)
     @Mapping(target = "userFrom.roles", ignore = true)
-    @Mapping(target = "userFrom.companies", ignore = true)
     @Mapping(target = "files", ignore = true)
     TaskDTO taskToTaskDTOSimple(Task task);
 
@@ -30,8 +26,6 @@ public interface TaskMapper {
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
-    @Mapping(target = "user.companies", ignore = true)
     @Mapping(target = "userFrom.roles", ignore = true)
-    @Mapping(target = "userFrom.companies", ignore = true)
     TaskDTO taskToTaskDTOPaginate(Task task);
 }

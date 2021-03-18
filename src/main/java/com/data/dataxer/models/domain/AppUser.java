@@ -1,7 +1,6 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.security.model.Role;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
@@ -48,15 +47,6 @@ public class AppUser implements Serializable {
 
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Role> roles = new ArrayList<>();
-
-    @JsonIgnore
-    @JoinTable(
-            name = "app_user_companies",
-            joinColumns = @JoinColumn(name = "app_user_id"),
-            inverseJoinColumns = @JoinColumn(name = "company_id")
-    )
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<Company> companies = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY)
     private Company defaultCompany;

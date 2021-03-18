@@ -118,13 +118,13 @@ public class RoleConfig {
 
     private void initializeRole(String role, List<Privilege> privileges) {
         Role newRole = this.roleRepository.findRoleByName(role).orElse(null);
+
         if (newRole == null) {
             newRole = new Role();
             newRole.setName(role);
             newRole.setPrivileges(privileges);
             this.roleRepository.save(newRole);
         }
-
     }
 
     private String makeReadPrivilegeName(String className) {
@@ -134,5 +134,4 @@ public class RoleConfig {
     private String makeWritePrivilegeName(String className) {
         return className + "_WRITE";
     }
-
 }
