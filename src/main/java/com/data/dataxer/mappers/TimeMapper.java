@@ -15,6 +15,7 @@ public interface TimeMapper {
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
+    @Mapping(target = "user.defaultCompany", ignore = true)
     TimeDTO timeToTimeDTO(Time time);
 
     List<TimeDTO> timeListToTimeDTOList(List<Time> times);
