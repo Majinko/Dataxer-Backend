@@ -1,10 +1,12 @@
 package com.data.dataxer.controllers;
 
+import com.data.dataxer.mappers.RoleMapper;
 import com.data.dataxer.mappers.SalaryMapper;
 import com.data.dataxer.mappers.UserMapper;
 import com.data.dataxer.models.dto.AppUserDTO;
 import com.data.dataxer.models.dto.AppUserInitDTO;
 import com.data.dataxer.models.dto.AppUserOverviewDTO;
+import com.data.dataxer.models.dto.RoleDTO;
 import com.data.dataxer.services.SalaryService;
 import com.data.dataxer.services.UserService;
 import org.springframework.http.ResponseEntity;
@@ -19,12 +21,15 @@ public class UserController {
     private final UserMapper userMapper;
     private final SalaryService salaryService;
     private final SalaryMapper salaryMapper;
+    private final RoleMapper roleMapper;
 
-    public UserController(UserService userService, UserMapper userMapper, SalaryService salaryService, SalaryMapper salaryMapper) {
+    public UserController(UserService userService, UserMapper userMapper, SalaryService salaryService,
+                          SalaryMapper salaryMapper, RoleMapper roleMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.salaryService = salaryService;
         this.salaryMapper = salaryMapper;
+        this.roleMapper = roleMapper;
     }
 
     @GetMapping("/all")
@@ -65,8 +70,14 @@ public class UserController {
         ResponseEntity.ok(userMapper.appUserToAppUserDTO(userService.update(userMapper.appUserDTOtoAppUser(appUserDTO))));
     }
 
+
     @GetMapping("/switchCompany/{companyId}")
     public void switchCompany(@PathVariable Long companyId) {
         this.userService.switchCompany(companyId);
+    }
+
+    @PostMapping("/assignRoles/{uid}")
+    public void assignRoles(@PathVariable String uid, @RequestBody List<RoleDTO> roleDTOS) {
+        this.userService.assignRoles(uid, this.roleMapper.roleDTOStoRoles(roleDTOS));
     }
 }

@@ -6,6 +6,7 @@ import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.repositories.AppUserRepository;
 import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
+import com.data.dataxer.security.model.Role;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.StringUtils;
 import com.google.firebase.auth.FirebaseAuth;
@@ -21,6 +22,7 @@ import static com.data.dataxer.utils.Helpers.getDiffYears;
 
 @Service
 public class UserServiceImpl implements UserService {
+
     private final FirebaseAuth firebaseAuth;
     private final AppUserRepository userRepository;
     private final QTimeRepository qTimeRepository;
@@ -129,11 +131,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+
     public void switchCompany(Long companyId) {
         AppUser user = SecurityUtils.loggedUser();
 
         user.setDefaultCompany(this.companyRepository.getById(companyId));
+    }
 
+    public void assignRoles(String uid, List<Role> roles) {
+        AppUser user = this.getByUid(uid);
+        //first delete old roles
+        user.setRoles(null);
+        this.userRepository.save(user);
+
+        //assign new roles
+        user.setRoles(roles);
         this.userRepository.save(user);
     }
 

@@ -14,4 +14,9 @@ public interface PrivilegeRepository extends CrudRepository<Privilege, Long> {
     @Query("SELECT p.name FROM Privilege p WHERE p.name LIKE '%_WRITE'")
     List<String> findAllWritePrivileges();
 
+    List<Privilege> findAllByNameIn(List<String> names);
+
+    @Query("SELECT p FROM Privilege p")
+    List<Privilege> getAllPrivilege();
+
 }
