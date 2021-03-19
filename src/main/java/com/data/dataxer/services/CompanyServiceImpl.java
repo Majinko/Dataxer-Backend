@@ -1,6 +1,5 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.repositories.AppUserRepository;
 import com.data.dataxer.repositories.CompanyRepository;
@@ -82,14 +81,5 @@ public class CompanyServiceImpl implements CompanyService {
         }
 
         this.companyRepository.delete(c);
-    }
-
-    @Override
-    public void switchCompany(Long id) {
-        Company company = this.findById(id);
-
-        AppUser user = SecurityUtils.loggedUser();
-        user.setDefaultCompany(company);
-        this.appUserRepository.save(user);
     }
 }

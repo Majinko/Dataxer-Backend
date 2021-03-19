@@ -56,12 +56,11 @@ public class OverviewServiceImpl implements OverviewService {
                     Integer newUserDayTime = userTimeData.get(time.getUser()).get(time.getDateWork().getDayOfMonth()) + time.getTime();
                     userTimeData.get(time.getUser()).replace(time.getDateWork().getDayOfMonth(), newUserDayTime);
 
-                    BigDecimal newUserDayTotalPrice = userDayTotalPrice.get(time.getUser()).get(time.getDateWork().getDayOfMonth())
-                            .add(new BigDecimal(time.getTime() / 60 ).multiply(time.getPrice()));
+                    BigDecimal newUserDayTotalPrice = userDayTotalPrice.get(time.getUser()).get(time.getDateWork().getDayOfMonth()).add(time.getPrice());
                     userDayTotalPrice.get(time.getUser()).replace(time.getDateWork().getDayOfMonth(), newUserDayTotalPrice);
                 } else {
                     userTimeData.get(time.getUser()).put(time.getDateWork().getDayOfMonth(), time.getTime());
-                    userDayTotalPrice.get(time.getUser()).put(time.getDateWork().getDayOfMonth(), new BigDecimal(time.getTime() / 60 ).multiply(time.getPrice()));
+                    userDayTotalPrice.get(time.getUser()).put(time.getDateWork().getDayOfMonth(), time.getPrice());
                 }
             } else {
                 //user este ziadne data nema => staci z jednej hashmapy, user je v oboch alebo v ziadnej
@@ -71,7 +70,7 @@ public class OverviewServiceImpl implements OverviewService {
                 //zoberie pocet odpracovanych minut
                 userHours.put(time.getDateWork().getDayOfMonth(), time.getTime());
                 //vypocita celkovu cenu prace za dany cas v dany den => pouziva prepocet minut do desiatkovejsustavy
-                userHourDayPrice.put(time.getDateWork().getDayOfMonth(), new BigDecimal(time.getTime() / 60 ).multiply(time.getPrice()));
+                userHourDayPrice.put(time.getDateWork().getDayOfMonth(), time.getPrice());
 
                 userTimeData.put(time.getUser(), userHours);
                 userDayTotalPrice.put(time.getUser(), userHourDayPrice);

@@ -73,6 +73,11 @@ public class TimeController {
         return ResponseEntity.ok(this.projectMapper.projectToProjectDTOs(this.timeService.getAllUserProjects(userId)));
     }
 
+    @GetMapping("/lastUserTime")
+    public ResponseEntity<TimeDTO> getLastUserTime() {
+        return ResponseEntity.ok(this.timeMapper.timeToTimeDTOWithoutRelation(this.timeService.getLastUserTime()));
+    }
+
     //poslednych 5 projektov na ktorych user pracoval
     @GetMapping("/lastUserProjects")
     public ResponseEntity<List<ProjectDTO>> lastUserProjects(@RequestParam(value = "id") Long id) {

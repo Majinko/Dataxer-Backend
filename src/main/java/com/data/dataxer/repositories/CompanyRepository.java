@@ -15,4 +15,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     @Query("SELECT c FROM Company c left join fetch c.appUsers where c.id = ?1")
     Company findByIdWithUsers(Long id);
+
+    Company getById(Long id);
 }

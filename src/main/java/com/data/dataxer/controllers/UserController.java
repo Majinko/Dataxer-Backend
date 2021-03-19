@@ -64,4 +64,9 @@ public class UserController {
     public void update(@RequestBody AppUserDTO appUserDTO) {
         ResponseEntity.ok(userMapper.appUserToAppUserDTO(userService.update(userMapper.appUserDTOtoAppUser(appUserDTO))));
     }
+
+    @GetMapping("/switchCompany/{companyId}")
+    public void switchCompany(@PathVariable Long companyId) {
+        this.userService.switchCompany(companyId);
+    }
 }

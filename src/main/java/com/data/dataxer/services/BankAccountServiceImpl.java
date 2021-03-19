@@ -41,26 +41,24 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public List<BankAccount> findAll() {
-        return this.bankAccountRepository.findAllByCompanyIdIn(SecurityUtils.companyIds());
+        return this.bankAccountRepository.findAllByCompanyId(SecurityUtils.companyId());
     }
 
     @Override
     public BankAccount getById(Long id) {
-        return bankAccountRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds()).orElseThrow(
-                () -> new RuntimeException("Bank account not found")
-        );
+        return bankAccountRepository.findByIdAndCompanyId(id, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Bank account not found"));
     }
 
     @Override
     public BankAccount getDefaultBankAccount() {
-        return this.bankAccountRepository.findByIsDefaultAndCompanyIdIn(true, SecurityUtils.companyIds()).orElseThrow(
+        return this.bankAccountRepository.findByIsDefaultAndCompanyId(true, SecurityUtils.companyId()).orElseThrow(
                 () -> new RuntimeException("Default account not found, please set it")
         );
     }
 
     @Override
     public void setDefaultBankAccount(Long id) {
-        List<BankAccount> bankAccounts = bankAccountRepository.findAllByCompanyIdIn(SecurityUtils.companyIds());
+        List<BankAccount> bankAccounts = bankAccountRepository.findAllByCompanyId(SecurityUtils.companyId());
 
         bankAccounts.forEach(bankAccount -> {
             bankAccount.setIsDefault(bankAccount.getId().equals(id));

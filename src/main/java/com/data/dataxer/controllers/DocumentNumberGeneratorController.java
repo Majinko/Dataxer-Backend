@@ -48,8 +48,7 @@ public class DocumentNumberGeneratorController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.documentNumberGeneratorService.paginate(pageable, rqlFilter, sortExpression)
-                .map(this::convertToDocumentNumberGeneratorDTO));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.paginate(pageable, rqlFilter, sortExpression).map(this::convertToDocumentNumberGeneratorDTO));
     }
 
     @GetMapping("/generateNextByType/{documentType}")

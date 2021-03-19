@@ -1,10 +1,8 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.dto.MonthAndYearDTO;
 import com.data.dataxer.repositories.TimeRepository;
-import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -25,13 +23,11 @@ public class TimeServiceImpl implements TimeService {
     private final TimeRepository timeRepository;
     private final QTimeRepository qTimeRepository;
     private final QSalaryRepository qSalaryRepository;
-    private final QProjectRepository qProjectRepository;
 
-    public TimeServiceImpl(TimeRepository timeRepository, QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository, QProjectRepository qProjectRepository) {
+    public TimeServiceImpl(TimeRepository timeRepository, QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository) {
         this.timeRepository = timeRepository;
         this.qTimeRepository = qTimeRepository;
         this.qSalaryRepository = qSalaryRepository;
-        this.qProjectRepository = qProjectRepository;
     }
 
     @Override
@@ -94,6 +90,11 @@ public class TimeServiceImpl implements TimeService {
         dataTuple.forEach(tuple -> categories.add(tuple.get(QTime.time1.category)));
 
         return categories;
+    }
+
+    @Override
+    public Time getLastUserTime() {
+        return this.timeRepository.findFirstByUserIdAndCompanyIdAndDateWorkOrderByIdDesc(SecurityUtils.id(), SecurityUtils.companyId(), LocalDate.now());
     }
 
     @Override

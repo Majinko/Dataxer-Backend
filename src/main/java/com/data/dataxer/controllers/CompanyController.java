@@ -46,11 +46,6 @@ public class CompanyController {
         return ResponseEntity.ok(companyMapper.toCompanyDTO(this.companyService.getDefaultCompany()));
     }
 
-    @GetMapping("switch/{id}")
-    public void switchCompany(@PathVariable Long id) {
-        this.companyService.switchCompany(id);
-    }
-
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.companyService.destroy(id);

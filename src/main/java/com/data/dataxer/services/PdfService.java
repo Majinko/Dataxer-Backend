@@ -19,7 +19,7 @@ import java.io.OutputStream;
 public class PdfService {
     private static final String PDF_RESOURCES = "/templates/view/invoice/pdf-resources/";
 
-    private SpringTemplateEngine templateEngine;
+    private final SpringTemplateEngine templateEngine;
     private final InvoiceService invoiceService;
 
     public PdfService(SpringTemplateEngine templateEngine, InvoiceService invoiceService) {

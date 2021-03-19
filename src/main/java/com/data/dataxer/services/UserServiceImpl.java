@@ -128,6 +128,15 @@ public class UserServiceImpl implements UserService {
         this.userRepository.delete(this.getByUid(uid));
     }
 
+    @Override
+    public void switchCompany(Long companyId) {
+        AppUser user = SecurityUtils.loggedUser();
+
+        user.setDefaultCompany(this.companyRepository.getById(companyId));
+
+        this.userRepository.save(user);
+    }
+
 
     private void addCompanyToUser(Long companyId, AppUser appUser) {
         Company company = this.companyRepository.findByIdWithUsers(companyId);

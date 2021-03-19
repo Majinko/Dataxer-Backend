@@ -16,6 +16,4 @@ public interface CompanyService {
     Company getDefaultCompany();
 
     void destroy(Long id);
-
-    void switchCompany(Long id);
 }

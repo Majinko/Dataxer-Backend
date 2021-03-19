@@ -49,9 +49,9 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .build();
 
         if (!rqlFilter.equals("")) {
-            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
-                    .setMapping(pathMapping)));
+            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam().setMapping(pathMapping)));
         }
+
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Invoice> invoiceList = this.query.selectFrom(QInvoice.invoice)
