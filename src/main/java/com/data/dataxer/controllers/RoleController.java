@@ -23,8 +23,8 @@ public class RoleController {
         return ResponseEntity.ok(roleMapper.rolesToRoleDTOs(this.roleService.getAll()));
     }
 
-    @PostMapping("/store")
-    public void store(@RequestBody RoleDTO roleDTO) {
+    @PostMapping("/storeOrUpdate")
+    public void storeOrUpdate(@RequestBody RoleDTO roleDTO) {
         this.roleService.storeOrUpdate(this.roleMapper.roleDTOtoRole(roleDTO));
     }
 }

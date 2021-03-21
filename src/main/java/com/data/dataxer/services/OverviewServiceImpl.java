@@ -207,6 +207,7 @@ public class OverviewServiceImpl implements OverviewService {
             UserHourOverviewDTO userHourOverviewDTO = new UserHourOverviewDTO();
             userHourOverviewDTO.setFirstName(key.getFirstName());
             userHourOverviewDTO.setLastName(key.getLastName());
+            userHourOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
             userHourOverviewDTO.setUserTimePrices(userDayTotalPrice.get(key));
             userHourOverviewDTO.setSalaryType(userSalaryHashMap.get(key.getId()).getSalaryType());
             userHourOverviewDTO.setActiveHourPrice(userSalaryHashMap.get(key.getId()).getPrice());
@@ -226,6 +227,7 @@ public class OverviewServiceImpl implements OverviewService {
 
         //load just needed salaries
         List<Salary> userSalaries = this.qSalaryRepository.getSalariesForUsersByIds(userIds, SecurityUtils.companyId());
+
         for (Salary salary: userSalaries) {
             userSalaryHashMap.put(salary.getUser().getId(), salary);
         }
@@ -260,7 +262,7 @@ public class OverviewServiceImpl implements OverviewService {
     }
 
     private String convertMinutesTimeToHoursString(Integer minutes) {
-        return minutes / 3600 + ":" + (minutes % 3600)/60 + " /h";
+        return minutes / 3600 + ":" + (minutes % 3600)/60 + " h";
     }
 
     private List<Long> getUserIds(List<AppUser> users) {
@@ -270,5 +272,4 @@ public class OverviewServiceImpl implements OverviewService {
         }
         return userIds;
     }
-
 }

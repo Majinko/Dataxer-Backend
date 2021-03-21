@@ -102,7 +102,8 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         return this.query.selectFrom(QTime.time1)
                 .leftJoin(QTime.time1.user).fetchJoin()
                 .where(QTime.time1.company.id.eq(companyId))
-                .where(QTime.time1.dateWork.between(fromDate, toDate))
+                .where(QTime.time1.dateWork.goe(fromDate))
+                .where(QTime.time1.dateWork.loe(toDate))
                 .fetch();
     }
 
