@@ -39,9 +39,7 @@ public class OverviewController {
     }
 
     @GetMapping("/costsOverview")
-    public ResponseEntity<CategoryCostsOverviewDTO> costsOverview(@RequestParam(value = "year") Integer year,
-                                                                  @RequestParam(value = "parentId", defaultValue = "") Long categoryId) {
+    public ResponseEntity<CategoryCostsOverviewDTO> costsOverview(@RequestParam(value = "year") Integer year, @RequestParam(value = "parentId", defaultValue = "") Long categoryId) {
         return ResponseEntity.ok(this.overviewService.getCategoriesCostsForYear(year, categoryId));
     }
-
 }

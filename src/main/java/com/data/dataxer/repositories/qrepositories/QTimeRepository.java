@@ -37,4 +37,6 @@ public interface QTimeRepository {
     Integer sumUserTime(Long userId, Long companyId);
 
     List<Time> getAllTimeRecords(Long companyId);
+
+    List<Integer> getAllYears(Long companyId);
 }

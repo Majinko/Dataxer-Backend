@@ -68,6 +68,11 @@ public class TimeController {
         return ResponseEntity.ok(this.timeService.getAllUserMonths(userId));
     }
 
+    @GetMapping("/allWorkYears")
+    public ResponseEntity<List<Integer>> getAllYears() {
+        return ResponseEntity.ok(this.timeService.getAllYears());
+    }
+
     @GetMapping("/allUserProjects")
     public ResponseEntity<List<ProjectDTO>> getAllUserProjects(@RequestParam(value = "id") Long userId) {
         return ResponseEntity.ok(this.projectMapper.projectToProjectDTOs(this.timeService.getAllUserProjects(userId)));

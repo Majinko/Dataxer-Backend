@@ -20,7 +20,7 @@ public class RoleController {
 
     @GetMapping("/all")
     public ResponseEntity<List<RoleDTO>> all() {
-        return ResponseEntity.ok(roleMapper.rolesToRoleDTOs(this.roleService.getAll()));
+        return ResponseEntity.ok(roleMapper.rolesToRoleDTOsSimple(this.roleService.getAll()));
     }
 
     @PostMapping("/storeOrUpdate")

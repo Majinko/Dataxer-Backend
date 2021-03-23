@@ -208,9 +208,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private Invoice getOriginalProformaInvoiceFromTaxDocument(Long taxDocumentId) {
         List<Invoice> invoices = this.invoiceRepository.findAllByIdInAndCompanyId(
-                this.documentRelationsRepository.findOriginalDocumentIdByRelative(taxDocumentId, SecurityUtils.companyId())
-                        .stream().map(DocumentRelation::getDocumentId).collect(Collectors.toList()),
-                SecurityUtils.companyId()
+                this.documentRelationsRepository.findOriginalDocumentIdByRelative(taxDocumentId, SecurityUtils.companyId()).stream().map(DocumentRelation::getDocumentId).collect(Collectors.toList()), SecurityUtils.companyId()
         );
         for (Invoice invoice : invoices) {
             if (invoice.getDocumentType().equals(DocumentType.PROFORMA)) {

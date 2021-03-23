@@ -110,9 +110,7 @@ public class OverviewServiceImpl implements OverviewService {
         CategoryCostsOverviewDTO response = new CategoryCostsOverviewDTO();
 
         if (categoryId == null) {
-            List<Category> rootCategories = this.categoryRepository.findAllByCompanyAndParentIsNull(SecurityUtils.companyId())
-                    .orElse(new ArrayList<>());
-            System.out.println("Number of root categories: " + rootCategories.size());
+            List<Category> rootCategories = this.categoryRepository.findAllByCompanyAndParentIsNull(SecurityUtils.companyId()).orElse(new ArrayList<>());
             response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(rootCategories, year));
         } else {
             response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(List.of(this.categoryRepository.findCategoryByIdAndCompanyId(categoryId, SecurityUtils.companyId())
@@ -167,15 +165,13 @@ public class OverviewServiceImpl implements OverviewService {
         List<CategoryMonthsCostsDTO> categoryMonthsCostsDTOS = new ArrayList<>();
         categories.forEach(category -> {
             List<Long> childrenIds = this.categoryRepository.findSubTreeIds(category.getId(), SecurityUtils.companyId());
-            System.out.println("Size: " + childrenIds.size());
+
             List<Cost> costList = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds, year, SecurityUtils.companyId());
-            System.out.println("Costs size: " + costList.size());
 
             CategoryMonthsCostsDTO categoryMonthsCostsDTO = new CategoryMonthsCostsDTO();
             categoryMonthsCostsDTO.setCategoryName(category.getName());
             categoryMonthsCostsDTO.setTotalMonthsCosts(this.generateMonthsTotalPrice(costList));
-            categoryMonthsCostsDTO.setCategoryTotalPrice(this.countTotalPrice(
-                    categoryMonthsCostsDTO.getTotalMonthsCosts().values()));
+            categoryMonthsCostsDTO.setCategoryTotalPrice(this.countTotalPrice(categoryMonthsCostsDTO.getTotalMonthsCosts().values()));
             categoryMonthsCostsDTOS.add(categoryMonthsCostsDTO);
         });
 
@@ -189,6 +185,7 @@ public class OverviewServiceImpl implements OverviewService {
             UserYearOverviewDTO userYearOverviewDTO = new UserYearOverviewDTO();
             userYearOverviewDTO.setFirstName(key.getFirstName());
             userYearOverviewDTO.setLastName(key.getLastName());
+            userYearOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
             userYearOverviewDTO.setYearHours(this.generateUserHoursStringFromMinutes(userTimeData.get(key)));
             response.add(userYearOverviewDTO);
         });

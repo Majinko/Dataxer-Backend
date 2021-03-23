@@ -13,7 +13,6 @@ import java.util.Collection;
 @Setter
 @NoArgsConstructor
 public class Privilege  {
-
     public Privilege(String name) {
         this.name = name;
     }

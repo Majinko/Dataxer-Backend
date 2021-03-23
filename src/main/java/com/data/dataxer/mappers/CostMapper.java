@@ -21,10 +21,12 @@ public interface CostMapper {
     CostDTO cosToCostDTOWithoutRelations(Cost cost);
 
     @Mapping(target = "project.categories", ignore = true)
+    @Mapping(target = "project.contact", ignore = true)
     CostDTO costToCostDTO(Cost cost);
 
     @Mapping(target = "files", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
+    @Mapping(target = "project.contact", ignore = true)
     CostDTO costToCostDTOPaginate(Cost cost);
 
     @IterableMapping(qualifiedByName = "cosToCostDTOWithoutRelations")

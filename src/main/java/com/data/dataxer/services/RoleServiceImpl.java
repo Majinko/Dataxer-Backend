@@ -5,7 +5,6 @@ import com.data.dataxer.repositories.RoleRepository;
 import com.data.dataxer.security.model.Privilege;
 import com.data.dataxer.security.model.Role;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,6 +44,4 @@ public class RoleServiceImpl implements RoleService {
 
         return privileges;
     }
-
-
 }

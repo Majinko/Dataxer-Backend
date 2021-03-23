@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DocumentRelationsRepository extends CrudRepository<DocumentRelation, Long> {
-    // todo native query replace to jpa query
-
-    @Query(value = "SELECT * FROM document_relation WHERE company_id = ?2 AND relation_document_id = ?1", nativeQuery = true)
+    @Query("Select d FROM DocumentRelation d where d.relationDocumentId = ?1 and d.company.id = ?2")
     List<DocumentRelation> findOriginalDocumentIdByRelative(Long id, Long companyId);
 
     @Query("Select d FROM DocumentRelation d where d.documentId = ?1 and d.company.id = ?2")

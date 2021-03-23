@@ -98,6 +98,11 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
+    public List<Integer> getAllYears() {
+        return this.qTimeRepository.getAllYears(SecurityUtils.companyId());
+    }
+
+    @Override
     public List<MonthAndYearDTO> getAllUserMonths(Long userId) {
         List<MonthAndYearDTO> response = new ArrayList<>();
         List<Tuple> yearsAndMonths = this.qTimeRepository.getAllUserMonths(userId, SecurityUtils.companyId());

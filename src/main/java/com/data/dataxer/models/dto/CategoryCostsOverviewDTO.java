@@ -10,9 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 public class CategoryCostsOverviewDTO {
-
     private List<CategoryMonthsCostsDTO> categoryMonthsCostsDTOS;
     private HashMap<Integer, BigDecimal> monthsTotalCosts;
     private BigDecimal totalCosts;
-
 }

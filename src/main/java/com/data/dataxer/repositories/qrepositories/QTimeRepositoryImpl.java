@@ -102,8 +102,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         return this.query.selectFrom(QTime.time1)
                 .leftJoin(QTime.time1.user).fetchJoin()
                 .where(QTime.time1.company.id.eq(companyId))
-                .where(QTime.time1.dateWork.goe(fromDate))
-                .where(QTime.time1.dateWork.loe(toDate))
+                .where(QTime.time1.dateWork.between(fromDate, toDate))
                 .fetch();
     }
 
@@ -116,7 +115,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.dateWork.between(from, to))
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.user.id.eq(userId))
-                .orderBy(QTime.time1.id.desc())
+                .orderBy(QTime.time1.dateWork.desc())
                 .fetch();
     }
 
@@ -219,6 +218,16 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         return this.query.selectFrom(QTime.time1)
                 .leftJoin(QTime.time1.user).fetchJoin()
                 .where(QTime.time1.company.id.eq(companyId))
+                .fetch();
+    }
+
+    @Override
+    public List<Integer> getAllYears(Long companyId) {
+        return this.query.select(QTime.time1.dateWork.year())
+                .from(QTime.time1)
+                .groupBy(QTime.time1.dateWork.year())
+                .where(QTime.time1.company.id.eq(companyId))
+                .orderBy(QTime.time1.dateWork.year().desc())
                 .fetch();
     }
 

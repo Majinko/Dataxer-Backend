@@ -9,9 +9,7 @@ import java.util.HashMap;
 @Getter
 @Setter
 public class CategoryMonthsCostsDTO {
-
     private String categoryName;
     private HashMap<Integer, BigDecimal> totalMonthsCosts;
     private BigDecimal categoryTotalPrice;
-
 }

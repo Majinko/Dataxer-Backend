@@ -34,4 +34,6 @@ public interface TimeService {
     List<Category> lastProjectCategories(Long projectId);
 
     Time getLastUserTime();
+
+    List<Integer> getAllYears();
 }
