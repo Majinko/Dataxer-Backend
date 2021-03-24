@@ -56,9 +56,9 @@ public class QCostRepositoryImpl implements QCostRepository {
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Cost> costList = this.query.selectFrom(qCost)
-                .leftJoin(qCost.categories).fetchJoin()
                 .leftJoin(qCost.contact).fetchJoin()
                 .leftJoin(qCost.project).fetchJoin()
+                .leftJoin(qCost.categories).fetchJoin()
                 .where(predicate)
                 .where(qCost.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))

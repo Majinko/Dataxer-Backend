@@ -212,7 +212,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         );
         for (Invoice invoice : invoices) {
             if (invoice.getDocumentType().equals(DocumentType.PROFORMA)) {
-                return invoice;
+                // todo fix next time
+                return this.getById(invoice.getId());
             }
         }
         throw new RuntimeException("Proforma invoice not found to create summary invoice");
