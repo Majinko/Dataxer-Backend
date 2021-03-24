@@ -1,6 +1,7 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.Cost;
+import com.data.dataxer.models.domain.QCategory;
 import com.data.dataxer.models.domain.QCost;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -98,8 +99,9 @@ public class QCostRepositoryImpl implements QCostRepository {
     @Override
     public List<Cost> getCostsWhereCategoryIdIn(List<Long> categoryIds, Integer year, Long companyId) {
         return this.query.selectFrom(QCost.cost)
-                //.where(QCost.cost.category.id.in(categoryIds))
-                .where(QCost.cost.paymentDate.year().eq(year))
+                .join(QCost.cost.categories, QCategory.category)
+                .where(QCategory.category.id.in(categoryIds))
+                .where(QCost.cost.createdDate.year().eq(year))
                 .where(QCost.cost.company.id.eq(companyId))
                 .fetch();
     }

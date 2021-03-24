@@ -141,11 +141,11 @@ public class OverviewServiceImpl implements OverviewService {
     private HashMap<Integer, BigDecimal> generateMonthsTotalPrice(List<Cost> costList) {
         HashMap<Integer, BigDecimal> totalMonthsCosts = new HashMap<>();
         costList.forEach(cost -> {
-            if (totalMonthsCosts.containsKey(cost.getPaymentDate().getMonthValue())) {
-                BigDecimal tmpTotalPrice = totalMonthsCosts.get(cost.getPaymentDate().getMonthValue()).add(cost.getTotalPrice());
-                totalMonthsCosts.replace(cost.getPaymentDate().getMonthValue(), tmpTotalPrice);
+            if (totalMonthsCosts.containsKey(cost.getCreatedDate().getMonthValue())) {
+                BigDecimal tmpTotalPrice = totalMonthsCosts.get(cost.getCreatedDate().getMonthValue()).add(cost.getTotalPrice());
+                totalMonthsCosts.replace(cost.getCreatedDate().getMonthValue(), tmpTotalPrice);
             } else {
-                totalMonthsCosts.put(cost.getPaymentDate().getMonthValue(), cost.getTotalPrice());
+                totalMonthsCosts.put(cost.getCreatedDate().getMonthValue(), cost.getTotalPrice());
             }
         });
 
