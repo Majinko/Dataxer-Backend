@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.CategoryType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,6 +29,9 @@ public class Category extends BaseEntity{
     private Integer lft;
 
     private Integer rgt;
+
+    @Enumerated(EnumType.STRING)
+    CategoryType categoryType;
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)

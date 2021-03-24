@@ -39,6 +39,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
+
         Predicate predicate = new BooleanBuilder();
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
@@ -46,6 +47,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .put("invoice.state", QInvoice.invoice.state)
                 .put("invoice.contact.id", QInvoice.invoice.contact.id)
                 .put("invoice.contact.name", QInvoice.invoice.contact.name)
+                .put("invoice.documentType", QInvoice.invoice.documentType)
                 .build();
 
         if (!rqlFilter.equals("")) {

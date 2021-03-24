@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
@@ -55,7 +56,7 @@ public class QCostRepositoryImpl implements QCostRepository {
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Cost> costList = this.query.selectFrom(qCost)
-                .leftJoin(qCost.category).fetchJoin()
+                .leftJoin(qCost.categories).fetchJoin()
                 .leftJoin(qCost.contact).fetchJoin()
                 .leftJoin(qCost.project).fetchJoin()
                 .where(predicate)
@@ -77,23 +78,31 @@ public class QCostRepositoryImpl implements QCostRepository {
 
     @Override
     public Optional<Cost> getByIdWithRelation(Long id, Long companyId) {
-        return Optional.ofNullable(
-                this.constructGetAllByIdAndCompanyId(id, companyId)
-                        .leftJoin(QCost.cost.category).fetchJoin()
-                        .leftJoin(QCost.cost.contact).fetchJoin()
-                        .leftJoin(QCost.cost.project).fetchJoin()
-                        .leftJoin(QCost.cost.files).fetchJoin()
-                        .fetchOne()
-        );
+        Cost cost = this.constructGetAllByIdAndCompanyId(id, companyId)
+                .leftJoin(QCost.cost.contact).fetchJoin()
+                .leftJoin(QCost.cost.project).fetchJoin()
+                .leftJoin(QCost.cost.files).fetchJoin()
+                .fetchOne();
+
+        if (cost != null) {
+            cost.setCategories(
+                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, companyId)
+                            .leftJoin(QCost.cost.categories).fetchJoin()
+                            .fetchOne())
+                            .getCategories()
+            );
+        }
+
+        return Optional.ofNullable(cost);
     }
 
     @Override
     public List<Cost> getCostsWhereCategoryIdIn(List<Long> categoryIds, Integer year, Long companyId) {
         return this.query.selectFrom(QCost.cost)
-                    .where(QCost.cost.category.id.in(categoryIds))
-                    .where(QCost.cost.paymentDate.year().eq(year))
-                    .where(QCost.cost.company.id.eq(companyId))
-                    .fetch();
+                //.where(QCost.cost.category.id.in(categoryIds))
+                .where(QCost.cost.paymentDate.year().eq(year))
+                .where(QCost.cost.company.id.eq(companyId))
+                .fetch();
     }
 
     private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, Long companyId) {

@@ -1,10 +1,10 @@
 package com.data.dataxer.security;
-import com.data.dataxer.security.service.FirebaseUserDetailService;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
+import com.data.dataxer.security.service.FirebaseUserDetailService;
 import com.google.firebase.auth.FirebaseAuth;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -53,6 +53,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/api/auth/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/file/**").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/pdf/**").permitAll()
+                //.antMatchers(HttpMethod.GET, "/api/import/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin()

@@ -48,7 +48,7 @@ public class Contact extends BaseEntity {
     @Column(columnDefinition = "text")
     private String note;
 
-    @Column(length = 10)
+    @Column(length = 50)
     private String cin;
 
     private String tin;

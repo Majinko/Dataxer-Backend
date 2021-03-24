@@ -50,8 +50,8 @@ public class Cost extends BaseEntity {
 
     private String costOrder;
 
-    @OneToOne
-    private Category category;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    private List<Category> categories = new ArrayList<>();
 
     protected String number;
 

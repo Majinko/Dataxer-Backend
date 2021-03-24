@@ -20,10 +20,14 @@ public class AppUserOverviewDTO implements Comparable<AppUserOverviewDTO> {
 
     @Override
     public int compareTo(@NotNull AppUserOverviewDTO appUserOverviewDTO) {
-        if (this.getSumTime() == null || appUserOverviewDTO.getSumTime() == null) {
-            return 0;
+        if (appUserOverviewDTO.getSumTime() == null){
+            return -1;
         }
 
-        return this.getSumTime().compareTo(appUserOverviewDTO.getSumTime());
+        if (this.getSumTime() == null) {
+            return 1;
+        }
+
+        return appUserOverviewDTO.getSumTime().compareTo(this.getSumTime());
     }
 }

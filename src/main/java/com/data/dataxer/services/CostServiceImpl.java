@@ -47,8 +47,7 @@ public class CostServiceImpl implements CostService {
             cost.setProject(oldCost.getProject());
             cost.setTitle(oldCost.getTitle());
             cost.setCostOrder(oldCost.getCostOrder());
-            cost.setCategory(oldCost.getCategory());
-            cost.setCategory(oldCost.getCategory());
+            cost.setCategories(oldCost.getCategories());
             cost.setNumber(oldCost.getNumber());
             cost.setVariableSymbol(oldCost.getVariableSymbol());
             cost.setConstantSymbol(oldCost.getConstantSymbol());

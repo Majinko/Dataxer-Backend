@@ -7,7 +7,6 @@ import com.data.dataxer.security.model.Privilege;
 import com.data.dataxer.security.model.Role;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +25,7 @@ public class RoleConfig {
         this.privilegeRepository = privilegeRepository;
     }
 
-    @PostConstruct
+
     public void init() {
         List<Privilege> readPrivileges = this.initializeReadPrivileges();
         List<Privilege> writePrivileges = this.initializeWritePrivileges();
