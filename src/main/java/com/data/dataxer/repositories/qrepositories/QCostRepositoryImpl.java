@@ -99,7 +99,7 @@ public class QCostRepositoryImpl implements QCostRepository {
     public List<Cost> getCostsWhereCategoryIdIn(List<Long> categoryIds, Integer year, Long companyId) {
         return this.query.selectFrom(QCost.cost)
                 //.where(QCost.cost.category.id.in(categoryIds))
-                .where(QCost.cost.paymentDate.year().eq(year))
+                .where(QCost.cost.deliveredDate.year().eq(year))
                 .where(QCost.cost.company.id.eq(companyId))
                 .fetch();
     }
