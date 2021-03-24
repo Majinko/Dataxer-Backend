@@ -26,6 +26,4 @@ public class PrivilegeController {
     public ResponseEntity<List<PrivilegeDTO>> getAll() {
         return ResponseEntity.ok(this.privilegeMapper.privilegesToPrivilegeDTOS(this.privilegeService.getAll()));
     }
-
-
 }
