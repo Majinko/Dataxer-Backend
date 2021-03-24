@@ -48,7 +48,7 @@ public class OverviewServiceImpl implements OverviewService {
         this.userTimeData = new HashMap<>();
         this.userDayTotalPrice = new HashMap<>();
 
-        for (Time time: allUsersTimes) {
+        for (Time time : allUsersTimes) {
             //ak uz user data ma => staci z jednej hashmapy, user je v oboch alebo v ziadnej
             if (userTimeData.containsKey(time.getUser())) {
                 //ak uz dany den v mesiaci ma zaznam
@@ -113,8 +113,7 @@ public class OverviewServiceImpl implements OverviewService {
             List<Category> rootCategories = this.categoryRepository.findAllByCompanyAndParentIsNull(SecurityUtils.companyId()).orElse(new ArrayList<>());
             response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(rootCategories, year));
         } else {
-            response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(List.of(this.categoryRepository.findCategoryByIdAndCompanyId(categoryId, SecurityUtils.companyId())
-                    .orElseThrow(() -> new RuntimeException("Category with id " + categoryId + " not found"))), year));
+            response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(List.of(this.categoryRepository.findCategoryByIdAndCompanyId(categoryId, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Category with id " + categoryId + " not found"))), year));
         }
         response.setMonthsTotalCosts(this.generateAllMonthsTotalCostHeader(response.getCategoryMonthsCostsDTOS()));
         response.setTotalCosts(this.countTotalPrice(response.getMonthsTotalCosts().values()));
@@ -155,7 +154,7 @@ public class OverviewServiceImpl implements OverviewService {
 
     private BigDecimal countTotalPrice(Collection<BigDecimal> prices) {
         BigDecimal totalPrice = BigDecimal.ZERO;
-        for (BigDecimal price: prices) {
+        for (BigDecimal price : prices) {
             totalPrice = totalPrice.add(price);
         }
         return totalPrice;
@@ -225,7 +224,7 @@ public class OverviewServiceImpl implements OverviewService {
         //load just needed salaries
         List<Salary> userSalaries = this.qSalaryRepository.getSalariesForUsersByIds(userIds, SecurityUtils.companyId());
 
-        for (Salary salary: userSalaries) {
+        for (Salary salary : userSalaries) {
             userSalaryHashMap.put(salary.getUser().getId(), salary);
         }
 
@@ -234,7 +233,7 @@ public class OverviewServiceImpl implements OverviewService {
 
     private String countTotalUserHours(HashMap<Integer, Integer> usersHourInMinutes) {
         Integer totalMinutes = 0;
-        for (Integer dayMinutes: usersHourInMinutes.values()) {
+        for (Integer dayMinutes : usersHourInMinutes.values()) {
             totalMinutes += dayMinutes;
         }
         return this.convertMinutesTimeToHoursString(totalMinutes);
@@ -242,7 +241,7 @@ public class OverviewServiceImpl implements OverviewService {
 
     private BigDecimal countUserTotalPrice(HashMap<Integer, BigDecimal> userPrices) {
         BigDecimal totalPrice = BigDecimal.ZERO;
-        for (BigDecimal price: userPrices.values()) {
+        for (BigDecimal price : userPrices.values()) {
             totalPrice = totalPrice.add(price);
         }
         return totalPrice;
@@ -259,12 +258,12 @@ public class OverviewServiceImpl implements OverviewService {
     }
 
     private String convertMinutesTimeToHoursString(Integer minutes) {
-        return minutes / 3600 + ":" + (minutes % 3600)/60 + " h";
+        return minutes / 3600 + ":" + (minutes % 3600) / 60 + " h";
     }
 
     private List<Long> getUserIds(List<AppUser> users) {
         List<Long> userIds = new ArrayList<>();
-        for (AppUser user:users) {
+        for (AppUser user : users) {
             userIds.add(user.getId());
         }
         return userIds;

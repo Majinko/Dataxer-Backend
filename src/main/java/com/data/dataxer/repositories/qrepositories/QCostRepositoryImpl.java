@@ -58,7 +58,6 @@ public class QCostRepositoryImpl implements QCostRepository {
         List<Cost> costList = this.query.selectFrom(qCost)
                 .leftJoin(qCost.contact).fetchJoin()
                 .leftJoin(qCost.project).fetchJoin()
-                .leftJoin(qCost.categories).fetchJoin()
                 .where(predicate)
                 .where(qCost.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
