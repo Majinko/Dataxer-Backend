@@ -20,8 +20,8 @@ public class Item extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Category category;
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    private List<Category> categories = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
     private List<ItemPrice> itemPrices = new ArrayList<>();
@@ -52,6 +52,7 @@ public class Item extends BaseEntity {
 
     String manufacturer;
 
+    @Column(columnDefinition = "text")
     String web;
     String unit;
 

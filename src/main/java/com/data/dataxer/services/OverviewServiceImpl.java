@@ -111,6 +111,7 @@ public class OverviewServiceImpl implements OverviewService {
 
         if (categoryId == null) {
             List<Category> rootCategories = this.categoryRepository.findAllByCompanyAndParentIsNull(SecurityUtils.companyId()).orElse(new ArrayList<>());
+
             response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(rootCategories, year));
         } else {
             response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(List.of(this.categoryRepository.findCategoryByIdAndCompanyId(categoryId, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Category with id " + categoryId + " not found"))), year));
@@ -141,11 +142,11 @@ public class OverviewServiceImpl implements OverviewService {
     private HashMap<Integer, BigDecimal> generateMonthsTotalPrice(List<Cost> costList) {
         HashMap<Integer, BigDecimal> totalMonthsCosts = new HashMap<>();
         costList.forEach(cost -> {
-            if (totalMonthsCosts.containsKey(cost.getPaymentDate().getMonthValue())) {
-                BigDecimal tmpTotalPrice = totalMonthsCosts.get(cost.getPaymentDate().getMonthValue()).add(cost.getTotalPrice());
-                totalMonthsCosts.replace(cost.getPaymentDate().getMonthValue(), tmpTotalPrice);
+            if (totalMonthsCosts.containsKey(cost.getDeliveredDate().getMonthValue())) {
+                BigDecimal tmpTotalPrice = totalMonthsCosts.get(cost.getDeliveredDate().getMonthValue()).add(cost.getTotalPrice());
+                totalMonthsCosts.replace(cost.getDeliveredDate().getMonthValue(), tmpTotalPrice);
             } else {
-                totalMonthsCosts.put(cost.getPaymentDate().getMonthValue(), cost.getTotalPrice());
+                totalMonthsCosts.put(cost.getDeliveredDate().getMonthValue(), cost.getTotalPrice());
             }
         });
 
@@ -181,12 +182,14 @@ public class OverviewServiceImpl implements OverviewService {
         List<UserYearOverviewDTO> response = new ArrayList<>();
 
         userTimeData.keySet().iterator().forEachRemaining(key -> {
-            UserYearOverviewDTO userYearOverviewDTO = new UserYearOverviewDTO();
-            userYearOverviewDTO.setFirstName(key.getFirstName());
-            userYearOverviewDTO.setLastName(key.getLastName());
-            userYearOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
-            userYearOverviewDTO.setYearHours(this.generateUserHoursStringFromMinutes(userTimeData.get(key)));
-            response.add(userYearOverviewDTO);
+            if (key != null) {
+                UserYearOverviewDTO userYearOverviewDTO = new UserYearOverviewDTO();
+                userYearOverviewDTO.setFirstName(key.getFirstName());
+                userYearOverviewDTO.setLastName(key.getLastName());
+                userYearOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
+                userYearOverviewDTO.setYearHours(this.generateUserHoursStringFromMinutes(userTimeData.get(key)));
+                response.add(userYearOverviewDTO);
+            }
         });
 
         return response;
@@ -200,19 +203,23 @@ public class OverviewServiceImpl implements OverviewService {
         );
 
         userTimeData.keySet().iterator().forEachRemaining(key -> {
-            UserHourOverviewDTO userHourOverviewDTO = new UserHourOverviewDTO();
-            userHourOverviewDTO.setFirstName(key.getFirstName());
-            userHourOverviewDTO.setLastName(key.getLastName());
-            userHourOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
-            userHourOverviewDTO.setUserTimePrices(userDayTotalPrice.get(key));
-            userHourOverviewDTO.setSalaryType(userSalaryHashMap.get(key.getId()).getSalaryType());
-            userHourOverviewDTO.setActiveHourPrice(userSalaryHashMap.get(key.getId()).getPrice());
-            userHourOverviewDTO.setUserHours(this.generateUserHoursStringFromMinutes(userTimeData.get(key)));
-            if (userSalaryHashMap.get(key.getId()).getSalaryType() == SalaryType.HOUR) {
-                userHourOverviewDTO.setTotalUserPrice(this.countUserTotalPrice(userDayTotalPrice.get(key)));
+            if (userSalaryHashMap.get(key.getId()) != null) {
+                UserHourOverviewDTO userHourOverviewDTO = new UserHourOverviewDTO();
+                userHourOverviewDTO.setFirstName(key.getFirstName());
+                userHourOverviewDTO.setLastName(key.getLastName());
+                userHourOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
+                userHourOverviewDTO.setUserTimePrices(userDayTotalPrice.get(key));
+                userHourOverviewDTO.setSalaryType(userSalaryHashMap.get(key.getId()).getSalaryType());
+                userHourOverviewDTO.setActiveHourPrice(userSalaryHashMap.get(key.getId()).getPrice());
+                userHourOverviewDTO.setUserHours(this.generateUserHoursStringFromMinutes(userTimeData.get(key)));
+                if (userSalaryHashMap.get(key.getId()).getSalaryType() == SalaryType.HOUR) {
+                    userHourOverviewDTO.setTotalUserPrice(this.countUserTotalPrice(userDayTotalPrice.get(key)));
+                } else {
+                    userHourOverviewDTO.setTotalUserPrice(userSalaryHashMap.get(key.getId()).getPrice());
+                }
+                userHourOverviewDTO.setTotalUserHours(this.countTotalUserHours(userTimeData.get(key)));
+                filedResponse.add(userHourOverviewDTO);
             }
-            userHourOverviewDTO.setTotalUserHours(this.countTotalUserHours(userTimeData.get(key)));
-            filedResponse.add(userHourOverviewDTO);
         });
 
         return filedResponse;

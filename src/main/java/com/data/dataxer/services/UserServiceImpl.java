@@ -12,6 +12,9 @@ import com.data.dataxer.utils.StringUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -77,7 +80,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<AppUserOverviewDTO> overview() {
-        List<AppUser> appUsers = this.all();
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("id")));
+
+        List<AppUser> appUsers = this.userRepository.findAllByDefaultCompanyIdOrderByIdAsc(pageable, SecurityUtils.companyId());
         List<AppUserOverviewDTO> appUserOverviewDTOS = new ArrayList<>();
 
         appUsers.forEach(user -> {
@@ -88,8 +93,8 @@ public class UserServiceImpl implements UserService {
             appUserOverviewDTO.setFullName(user.getFirstName() + ' ' + user.getLastName());
             appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), false));
             appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), true)));
-            //appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.companyId()));
             appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.companyId()));
+            //appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.companyId()));
 
             appUserOverviewDTOS.add(appUserOverviewDTO);
         });
@@ -136,6 +141,8 @@ public class UserServiceImpl implements UserService {
         AppUser user = SecurityUtils.loggedUser();
 
         user.setDefaultCompany(this.companyRepository.getById(companyId));
+
+        userRepository.save(user);
     }
 
     public void assignRoles(String uid, List<Role> roles) {

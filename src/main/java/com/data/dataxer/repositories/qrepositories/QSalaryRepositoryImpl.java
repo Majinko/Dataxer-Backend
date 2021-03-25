@@ -24,7 +24,6 @@ public class QSalaryRepositoryImpl implements QSalaryRepository {
                 .from(QSalary.salary)
                 .where(QSalary.salary.user.eq(user))
                 .where(QSalary.salary.finish.isNull())
-                .where(QSalary.salary.isActive.eq(true))
                 .where(QSalary.salary.company.id.eq(companyId))
                 .fetchOne();
     }
@@ -35,7 +34,6 @@ public class QSalaryRepositoryImpl implements QSalaryRepository {
                 .leftJoin(QSalary.salary.user).fetchJoin()
                 .where(QSalary.salary.company.id.eq(companyId))
                 .where(QSalary.salary.finish.isNull())
-                .where(QSalary.salary.isActive.eq(true))
                 .where(QSalary.salary.user.id.in(userIds))
                 .fetch();
     }

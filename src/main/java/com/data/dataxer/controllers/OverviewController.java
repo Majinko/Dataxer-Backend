@@ -25,11 +25,7 @@ public class OverviewController {
     }
 
     @GetMapping("/usersHoursOverview")
-    public ResponseEntity<List<UserHourOverviewDTO>> userHourStatisticForMonth(
-            @RequestParam(value = "fromDate")
-                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
-            @RequestParam(value = "toDate")
-                    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+    public ResponseEntity<List<UserHourOverviewDTO>> userHourStatisticForMonth(@RequestParam(value = "fromDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate, @RequestParam(value = "toDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
         return ResponseEntity.ok(this.overviewService.getAllUsersHourOverview(fromDate, toDate));
     }
 

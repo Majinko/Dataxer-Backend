@@ -33,7 +33,7 @@ public interface InvoiceMapper {
     @IterableMapping(qualifiedByName = "invoiceToInvoiceDtoWithoutRelation")
     List<InvoiceDTO> invoicesToInvoicesDTOWithoutRelation(List<Invoice> invoices);
 
-    @Mapping(target = "item.category", ignore = true)
+    @Mapping(target = "item.categories", ignore = true)
     @Mapping(target = "item.supplier", ignore = true)
     DocumentPackItemDTO documentPackItemToDocumentPackItemDTO(DocumentPackItem documentPackItem);
 }

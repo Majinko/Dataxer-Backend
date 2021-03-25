@@ -1,10 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QCategory;
-import com.data.dataxer.models.domain.QContact;
-import com.data.dataxer.models.domain.QItem;
-import com.data.dataxer.models.domain.QItemPrice;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -16,6 +12,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -25,6 +22,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
@@ -39,19 +37,30 @@ public class QItemRepositoryImpl implements QItemRepository {
 
     @Override
     public Item getById(long id, Long companyId) {
-        QItem qItem = QItem.item;
-        QItemPrice qItemPrice = QItemPrice.itemPrice;
-        QCategory qCategory = QCategory.category;
-        QContact qContact = QContact.contact;
-
-        return query
-                .selectFrom(qItem)
-                .where(qItem.company.id.eq(companyId))
-                .where(qItem.id.eq(id))
-                .leftJoin(qItem.itemPrices, qItemPrice).fetchJoin()
-                .leftJoin(qItem.category, qCategory).fetchJoin()
-                .leftJoin(qItem.supplier, qContact).fetchJoin()
+        Item item = this.constructGetAllByIdAndCompanyId(id, companyId)
+                .where(QItem.item.company.id.eq(companyId))
+                .where(QItem.item.id.eq(id))
+                .leftJoin(QItem.item.itemPrices, QItemPrice.itemPrice).fetchJoin()
+                .leftJoin(QItem.item.supplier, QContact.contact).fetchJoin()
                 .fetchOne();
+
+        if (item != null) {
+            item.setCategories(
+                    Objects.requireNonNull(
+                            this.constructGetAllByIdAndCompanyId(id, companyId)
+                                    .leftJoin(QItem.item.categories, QCategory.category).fetchJoin()
+                                    .fetchOne())
+                            .getCategories()
+            );
+        }
+
+        return item;
+    }
+
+    private JPAQuery<Item> constructGetAllByIdAndCompanyId(Long id, Long companyId) {
+        return query.selectFrom(QItem.item)
+                .where(QItem.item.company.id.eq(companyId))
+                .where(QItem.item.id.eq(id));
     }
 
     @Override

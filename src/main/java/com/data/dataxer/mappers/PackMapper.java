@@ -1,16 +1,15 @@
 package com.data.dataxer.mappers;
 
+import com.data.dataxer.models.domain.ItemPrice;
 import com.data.dataxer.models.domain.Pack;
 import com.data.dataxer.models.domain.PackItem;
-import com.data.dataxer.models.domain.ItemPrice;
+import com.data.dataxer.models.dto.ItemPriceDTO;
 import com.data.dataxer.models.dto.PackDTO;
 import com.data.dataxer.models.dto.PackItemDTO;
-import com.data.dataxer.models.dto.ItemPriceDTO;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
@@ -35,7 +34,7 @@ public interface PackMapper {
             target = "item.itemPrice",
             expression = "java(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null))"
     )
-    @Mapping(target = "item.category", ignore = true)
+    @Mapping(target = "item.categories", ignore = true)
     @Mapping(target = "item.supplier", ignore = true)
     PackItemDTO packItemToPackItemDTO(PackItem packItem);
 

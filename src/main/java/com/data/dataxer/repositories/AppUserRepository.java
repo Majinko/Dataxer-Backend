@@ -1,6 +1,7 @@
 package com.data.dataxer.repositories;
 
 import com.data.dataxer.models.domain.AppUser;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -16,5 +17,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findByUidAndDefaultCompanyId(String uid, Long companyId);
 
     List<AppUser> findAllByDefaultCompanyId(Long companyId);
+
+    List<AppUser> findAllByDefaultCompanyIdOrderByIdAsc(Pageable pageable, Long companyId);
 }
 

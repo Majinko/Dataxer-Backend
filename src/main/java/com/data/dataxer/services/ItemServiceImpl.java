@@ -83,7 +83,7 @@ public class ItemServiceImpl implements ItemService {
     private void updateItem(Item item) {
         this.itemRepository.findById(item.getId()).map(i -> {
 
-            i.setCategory(item.getCategory());
+            i.setCategories(item.getCategories());
             i.setSupplier(item.getSupplier());
             i.setTitle(item.getTitle());
             i.setType(item.getType());

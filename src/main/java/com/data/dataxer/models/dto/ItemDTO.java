@@ -3,6 +3,9 @@ package com.data.dataxer.models.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 public class ItemDTO {
@@ -26,8 +29,8 @@ public class ItemDTO {
     String material;
 
     ContactDTO supplier;
-    CategoryDTO category;
     ItemPriceDTO itemPrice;
-
     StorageFileDTO preview;
+
+    private List<CategoryDTO> categories = new ArrayList<>();
 }

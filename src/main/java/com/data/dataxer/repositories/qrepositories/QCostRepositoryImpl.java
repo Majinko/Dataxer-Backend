@@ -1,6 +1,7 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.Cost;
+import com.data.dataxer.models.domain.QCategory;
 import com.data.dataxer.models.domain.QCost;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -55,15 +56,21 @@ public class QCostRepositoryImpl implements QCostRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Cost> costList = this.query.selectFrom(qCost)
-                .leftJoin(qCost.contact).fetchJoin()
-                .leftJoin(qCost.project).fetchJoin()
+        List<Long> costIds = this.query.selectFrom(qCost)
                 .where(predicate)
                 .where(qCost.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .select(qCost.id).fetch();
+
+        List<Cost> costList = this.query.selectFrom(qCost)
+                .leftJoin(qCost.contact).fetchJoin()
+                .leftJoin(qCost.project).fetchJoin()
+                .join(QCost.cost.categories, QCategory.category).fetchJoin()
+                .where(qCost.id.in(costIds))
                 .fetch();
+
 
         return new PageImpl<>(costList, pageable, getTotalCount(predicate));
     }
@@ -98,8 +105,9 @@ public class QCostRepositoryImpl implements QCostRepository {
     @Override
     public List<Cost> getCostsWhereCategoryIdIn(List<Long> categoryIds, Integer year, Long companyId) {
         return this.query.selectFrom(QCost.cost)
-                //.where(QCost.cost.category.id.in(categoryIds))
                 .where(QCost.cost.deliveredDate.year().eq(year))
+                .join(QCost.cost.categories, QCategory.category)
+                .where(QCategory.category.id.in(categoryIds))
                 .where(QCost.cost.company.id.eq(companyId))
                 .fetch();
     }
