@@ -19,5 +19,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     List<AppUser> findAllByDefaultCompanyId(Long companyId);
 
     List<AppUser> findAllByDefaultCompanyIdOrderByIdAsc(Pageable pageable, Long companyId);
+
+    Long countAllByDefaultCompanyId(Long companyId);
 }
 

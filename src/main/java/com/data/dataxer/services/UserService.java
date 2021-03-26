@@ -3,6 +3,8 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.security.model.Role;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,9 +14,7 @@ public interface UserService {
     AppUser store(AppUser appUser);
 
     List<AppUser> all();
-
-    List<AppUserOverviewDTO> overview();
-
+    
     AppUser update(AppUser appUserDTOtoAppUser);
 
     AppUser getByUid(String uid);
@@ -26,4 +26,6 @@ public interface UserService {
     void switchCompany(Long companyId);
 
     void assignRoles(String uid, List<Role> roleDTOStoRoles);
+
+    Page<AppUserOverviewDTO> overview(Pageable pageable);
 }

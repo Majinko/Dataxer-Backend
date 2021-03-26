@@ -12,9 +12,9 @@ import com.data.dataxer.utils.StringUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -79,9 +79,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<AppUserOverviewDTO> overview() {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.desc("id")));
-
+    public Page<AppUserOverviewDTO> overview(Pageable pageable) {
         List<AppUser> appUsers = this.userRepository.findAllByDefaultCompanyIdOrderByIdAsc(pageable, SecurityUtils.companyId());
         List<AppUserOverviewDTO> appUserOverviewDTOS = new ArrayList<>();
 
@@ -94,14 +92,14 @@ public class UserServiceImpl implements UserService {
             appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), false));
             appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), true)));
             appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.companyId()));
-            //appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.companyId()));
+            appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.companyId()));
 
             appUserOverviewDTOS.add(appUserOverviewDTO);
         });
 
         Collections.sort(appUserOverviewDTOS);
 
-        return appUserOverviewDTOS;
+        return new PageImpl<>(appUserOverviewDTOS, pageable, this.userRepository.countAllByDefaultCompanyId(SecurityUtils.companyId()));
     }
 
     @Override

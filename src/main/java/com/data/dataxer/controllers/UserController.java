@@ -9,6 +9,10 @@ import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.models.dto.RoleDTO;
 import com.data.dataxer.services.SalaryService;
 import com.data.dataxer.services.UserService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,8 +47,13 @@ public class UserController {
     }
 
     @GetMapping("/overview")
-    public ResponseEntity<List<AppUserOverviewDTO>> overview() {
-        return ResponseEntity.ok(this.userService.overview());
+    public ResponseEntity<Page<AppUserOverviewDTO>> overview(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "15") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+
+        return ResponseEntity.ok(this.userService.overview(pageable));
     }
 
     @GetMapping("/logged")
