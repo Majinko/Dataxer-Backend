@@ -10,12 +10,14 @@ import com.data.dataxer.models.dto.RoleDTO;
 import com.data.dataxer.services.SalaryService;
 import com.data.dataxer.services.UserService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
+@PreAuthorize("hasPermission(null, 'AppUser', 'AppUser')")
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;

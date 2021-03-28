@@ -5,6 +5,7 @@ import com.data.dataxer.models.dto.CategoryDTO;
 import com.data.dataxer.models.dto.CategoryNestedDTO;
 import com.data.dataxer.services.CategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/category")
+@PreAuthorize("hasPermission(null, 'Category', 'Category')")
 public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
