@@ -23,6 +23,8 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
@@ -52,21 +54,33 @@ public class QRoleRepositoryImpl implements QRoleRepository {
 
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Long> roleIds = this.query.select(QRole.role.id)
-                .from(QRole.role)
+        List<Long> roleIds = this.query.selectFrom(QRole.role)
                 .where(predicate)
                 .where(QRole.role.company.id.eq(companyId))
-                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
+                .select(QRole.role.id)
                 .fetch();
+
 
         List<Role> roleList = this.query.selectFrom(QRole.role)
                 .join(QRole.role.privileges, QPrivilege.privilege).fetchJoin()
                 .where(QRole.role.id.in(roleIds))
-                .fetch();
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
+                .fetch().stream().distinct().collect(Collectors.toList());
 
         return new PageImpl<>(roleList, pageable, getTotalCount(predicate));
+    }
+
+    @Override
+    public Optional<Role> getById(Long id, Long companyId) {
+        return Optional.ofNullable(
+                this.query.selectFrom(QRole.role)
+                .join(QRole.role.privileges, QPrivilege.privilege).fetchJoin()
+                .where(QRole.role.id.eq(id))
+                .where(QRole.role.company.id.eq(companyId))
+                .fetchOne()
+        );
     }
 
     private long getTotalCount(Predicate predicate) {

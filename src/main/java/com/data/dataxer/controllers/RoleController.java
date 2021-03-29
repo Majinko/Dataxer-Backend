@@ -48,7 +48,7 @@ public class RoleController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(roleService.paginate(pageable, rqlFilter, sortExpression).map(roleMapper::roleToRoleDTOSimple));
+        return ResponseEntity.ok(roleService.paginate(pageable, rqlFilter, sortExpression).map(roleMapper::roleToRoleDTO));
     }
 
     @GetMapping("/destroy/{id}")

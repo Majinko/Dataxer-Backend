@@ -63,7 +63,7 @@ public class RoleConfig {
         privileges.add(Time.class.getSimpleName());
         privileges.add(AppUser.class.getSimpleName());
 
-        List<String> existedPrivileges = this.privilegeRepository.findAllReadPrivileges();
+        List<String> existedPrivileges = this.privilegeRepository.findAllPrivileges();
         privileges.removeAll(existedPrivileges);
 
         privileges.forEach(privilegeName -> {

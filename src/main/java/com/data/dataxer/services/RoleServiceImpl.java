@@ -43,7 +43,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role getById(Long id) {
-        return this.roleRepository.findRoleByIdAndAndCompanyId(id, SecurityUtils.companyId())
+        return this.qRoleRepository.getById(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
     }
 
@@ -58,6 +58,9 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private List<Privilege> loadAndCheckPrivileges(List<String> privilegeNames) {
+        privilegeNames.forEach(name ->
+                System.out.println(name));
+
         List<Privilege> privileges = this.privilegeRepository.findAllByNameIn(privilegeNames);
 
         if (privilegeNames.size() != privileges.size()) {
