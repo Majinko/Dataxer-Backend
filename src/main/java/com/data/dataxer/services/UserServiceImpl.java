@@ -147,11 +147,7 @@ public class UserServiceImpl implements UserService {
 
     public void assignRoles(String uid, List<Role> roles) {
         AppUser user = this.getByUid(uid);
-        //first delete old roles
-        user.setRoles(null);
-        this.userRepository.save(user);
 
-        //assign new roles
         user.setRoles(roles);
         this.userRepository.save(user);
     }

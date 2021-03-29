@@ -4,12 +4,14 @@ import com.data.dataxer.mappers.BankAccountMapper;
 import com.data.dataxer.models.dto.BankAccountDTO;
 import com.data.dataxer.services.BankAccountService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/bank-account")
+@PreAuthorize("hasPermission(null, 'BankAccount', 'BankAccount')")
 public class BankAccountController {
     private final BankAccountService bankAccountService;
     private final BankAccountMapper bankAccountMapper;
