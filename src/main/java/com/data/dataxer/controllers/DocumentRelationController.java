@@ -4,12 +4,14 @@ import com.data.dataxer.mappers.DocumentRelationMapper;
 import com.data.dataxer.models.dto.DocumentRelationDTO;
 import com.data.dataxer.services.DocumentRelationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/relation")
+@PreAuthorize("hasPermission(null, 'DocumentRelation', 'DocumentRelation')")
 public class DocumentRelationController {
     private final DocumentRelationService documentRelationsService;
     private final DocumentRelationMapper documentRelationMapper;
