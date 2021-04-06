@@ -2,7 +2,10 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.CategoryMapper;
 import com.data.dataxer.mappers.ProjectMapper;
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.dto.CategoryDTO;
+import com.data.dataxer.models.dto.ProjectCategoriesOverviewDTO;
+import com.data.dataxer.models.dto.ProjectCategoryUserOverviewDTO;
 import com.data.dataxer.models.dto.ProjectDTO;
 import com.data.dataxer.services.ProjectService;
 import org.springframework.data.domain.Page;
@@ -14,6 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/project")
@@ -79,5 +83,11 @@ public class ProjectController {
     @GetMapping("/allProjectCategoriesByPosition")
     public ResponseEntity<List<CategoryDTO>> getAllProjectCategoriesOrderByDepthAndPosition(@RequestParam(value = "projectId") Long projectId) {
         return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.projectService.getAllProjectCategoriesOrderedByPosition(projectId)));
+    }
+
+    @GetMapping("/projectCategoryOverview/{id}")
+    public ResponseEntity<Map<String, List<ProjectCategoryUserOverviewDTO>>> getProjectCategoryOverview(@PathVariable Long id,
+                                                                                                    @RequestParam(value = "categoryParent", defaultValue = "") Long categoryParentId) {
+        return ResponseEntity.ok(this.projectService.getProjectCategoryOverview(id, categoryParentId));
     }
 }

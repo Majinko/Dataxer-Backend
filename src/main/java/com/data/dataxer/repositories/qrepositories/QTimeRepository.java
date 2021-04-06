@@ -39,4 +39,7 @@ public interface QTimeRepository {
     List<Time> getAllTimeRecords(Long companyId);
 
     List<Integer> getAllYears(Long companyId);
+
+    List<Tuple> getAllProjectUsersTimesWhereCategoryIn(List<Long> categoryIds, Long projectId, Long companyId);
+
 }

@@ -2,10 +2,13 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
+import com.data.dataxer.models.dto.ProjectCategoriesOverviewDTO;
+import com.data.dataxer.models.dto.ProjectCategoryUserOverviewDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface ProjectService {
     Project store(Project project);
@@ -25,4 +28,6 @@ public interface ProjectService {
     List<Category> getAllProjectCategories(Long projectId);
 
     List<Category> getAllProjectCategoriesOrderedByPosition(Long projectId);
+
+    Map<String, List<ProjectCategoryUserOverviewDTO>> getProjectCategoryOverview(Long id, Long categoryParentId);
 }

@@ -11,6 +11,7 @@ import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.data.dataxer.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -243,7 +244,7 @@ public class OverviewServiceImpl implements OverviewService {
         for (Integer dayMinutes : usersHourInMinutes.values()) {
             totalMinutes += dayMinutes;
         }
-        return this.convertMinutesTimeToHoursString(totalMinutes);
+        return StringUtils.convertMinutesTimeToHoursString(totalMinutes);
     }
 
     private BigDecimal countUserTotalPrice(HashMap<Integer, BigDecimal> userPrices) {
@@ -258,14 +259,10 @@ public class OverviewServiceImpl implements OverviewService {
         HashMap<Integer, String> generatedTimes = new HashMap<>();
 
         userHoursInMinutes.keySet().iterator().forEachRemaining(key -> {
-            generatedTimes.put(key, this.convertMinutesTimeToHoursString(userHoursInMinutes.get(key)));
+            generatedTimes.put(key, StringUtils.convertMinutesTimeToHoursString(userHoursInMinutes.get(key)));
         });
 
         return generatedTimes;
-    }
-
-    private String convertMinutesTimeToHoursString(Integer minutes) {
-        return minutes / 3600 + ":" + (minutes % 3600) / 60 + " h";
     }
 
     private List<Long> getUserIds(List<AppUser> users) {
