@@ -2,20 +2,20 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.CategoryMapper;
 import com.data.dataxer.mappers.ProjectMapper;
+import com.data.dataxer.mappers.TimeMapper;
 import com.data.dataxer.models.domain.Category;
-import com.data.dataxer.models.dto.CategoryDTO;
-import com.data.dataxer.models.dto.ProjectCategoriesOverviewDTO;
-import com.data.dataxer.models.dto.ProjectCategoryUserOverviewDTO;
-import com.data.dataxer.models.dto.ProjectDTO;
+import com.data.dataxer.models.dto.*;
 import com.data.dataxer.services.ProjectService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -26,11 +26,14 @@ public class ProjectController {
     private final ProjectService projectService;
     private final ProjectMapper projectMapper;
     private final CategoryMapper categoryMapper;
+    private final TimeMapper timeMapper;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper,
+                             CategoryMapper categoryMapper, TimeMapper timeMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.categoryMapper = categoryMapper;
+        this.timeMapper = timeMapper;
     }
 
     @PostMapping("/store")
@@ -89,5 +92,21 @@ public class ProjectController {
     public ResponseEntity<Map<String, List<ProjectCategoryUserOverviewDTO>>> getProjectCategoryOverview(@PathVariable Long id,
                                                                                                     @RequestParam(value = "categoryParent", defaultValue = "") Long categoryParentId) {
         return ResponseEntity.ok(this.projectService.getProjectCategoryOverview(id, categoryParentId));
+    }
+
+    @GetMapping("/projectTime/{id}")
+    public ResponseEntity<ProjectTimeOverviewDTO> getProjectUsersTimesOverview(
+            @PathVariable Long id,
+            @RequestParam(value = "dateFrom") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(value = "dateTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @RequestParam(value = "categoryName", defaultValue = "_all_") String categoryName,
+            @RequestParam(value = "user", defaultValue = "") String userUid
+            ) {
+        ProjectTimeOverviewDTO response = new ProjectTimeOverviewDTO();
+
+        response.setTimeList(this.timeMapper.timeListToTimeDTOList(this.projectService.getProjectUsersTimesOverview(id, dateFrom, dateTo, categoryName, userUid)));
+        response.setTimeForThisYear(this.projectService.getProjectTimeForThisYear(id));
+
+        return ResponseEntity.ok(response);
     }
 }

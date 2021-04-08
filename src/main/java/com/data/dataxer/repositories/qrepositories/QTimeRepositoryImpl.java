@@ -17,12 +17,16 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Visitor;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.util.StreamUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -238,6 +242,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 QTime.time1.category.id, QTime.time1.category.name, QTime.time1.time.sum(), QTime.time1.price.sum())
                 .from(QTime.time1)
                 .join(QTime.time1.category)
+                .join(QTime.time1.user)
                 .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.category.id.in(categoryIds))
@@ -247,6 +252,41 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .groupBy(QTime.time1.user.firstName)
                 .groupBy(QTime.time1.user.lastName)
                 .fetch();
+    }
+
+    @Override
+    public List<Time> getProjectAllUsersTimes(Long id, Category category, LocalDate dateFrom, LocalDate dateTo, String userUid, Long companyId) {
+        BooleanBuilder predicate = new BooleanBuilder();
+        BooleanBuilder userPredicate = new BooleanBuilder();
+        if (category != null) {
+            predicate.and(QTime.time1.category.id.eq(category.getId()));
+        }
+        if (!userUid.isEmpty()) {
+            userPredicate.and(QTime.time1.user.uid.eq(userUid));
+        }
+        return this.query.selectFrom(QTime.time1)
+                .leftJoin(QTime.time1.category).fetchJoin()
+                .leftJoin(QTime.time1.user).fetchJoin()
+                .leftJoin(QTime.time1.project).fetchJoin()
+                .where(QTime.time1.project.id.eq(id))
+                .where(predicate)
+                .where(userPredicate)
+                .where(QTime.time1.dateWork.goe(dateFrom))
+                .where(QTime.time1.dateWork.loe(dateTo))
+                .where(QTime.time1.company.id.eq(companyId))
+                .orderBy(QTime.time1.user.id.desc())
+                .orderBy(QTime.time1.dateWork.desc())
+                .fetch();
+    }
+
+    @Override
+    public Integer getTotalProjectTimeForYear(Long id, Integer year, Long companyId) {
+        return this.query.select(QTime.time1.time.sum())
+                .from(QTime.time1)
+                .where(QTime.time1.project.id.eq(id))
+                .where(QTime.time1.dateWork.year().eq(year))
+                .where(QTime.time1.company.id.eq(companyId))
+                .fetchOne();
     }
 
     private long getTotalCount(Predicate predicate) {

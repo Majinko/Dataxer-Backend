@@ -1,10 +1,7 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.Category;
-import com.data.dataxer.models.domain.Project;
-import com.data.dataxer.models.domain.QCategory;
+import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QTime;
-import com.data.dataxer.models.dto.ProjectCategoriesOverviewDTO;
 import com.data.dataxer.models.dto.ProjectCategoryUserOverviewDTO;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.ProjectRepository;
@@ -13,13 +10,13 @@ import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.StringUtils;
 import com.querydsl.core.Tuple;
-import com.querydsl.core.types.dsl.NumberExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -114,6 +111,21 @@ public class ProjectServiceImpl implements ProjectService {
         });
 
         return response;
+    }
+
+    @Override
+    public List<Time> getProjectUsersTimesOverview(Long id, LocalDate dateFrom, LocalDate dateTo, String categoryName, String userUid) {
+        Category category = categoryName.equals("_all_") ? null :
+                this.categoryRepository.findCategoryByName(categoryName, SecurityUtils.companyId()).orElse(null);
+
+        return this.qTimeRepository.getProjectAllUsersTimes(id, category,dateFrom, dateTo, userUid, SecurityUtils.companyId());
+    }
+
+    @Override
+    public String getProjectTimeForThisYear(Long id) {
+        Integer currentYear = LocalDate.now().getYear();
+
+        return StringUtils.convertMinutesTimeToHoursString(this.qTimeRepository.getTotalProjectTimeForYear(id, currentYear, SecurityUtils.companyId()));
     }
 
     private BigDecimal countHourNetto(Integer timeSum, BigDecimal priceSum) {

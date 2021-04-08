@@ -1,5 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
 import com.querydsl.core.Tuple;
@@ -42,4 +43,7 @@ public interface QTimeRepository {
 
     List<Tuple> getAllProjectUsersTimesWhereCategoryIn(List<Long> categoryIds, Long projectId, Long companyId);
 
+    List<Time> getProjectAllUsersTimes(Long id, Category category, LocalDate dateFrom, LocalDate dateTo, String userUid, Long companyId);
+
+    Integer getTotalProjectTimeForYear(Long id, Integer year, Long companyId);
 }
