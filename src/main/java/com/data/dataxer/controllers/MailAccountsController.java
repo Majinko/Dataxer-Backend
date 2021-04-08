@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/mailAccounts")
-@PreAuthorize("hasPermission(null, 'MailAccounts', 'MailAccounts')")
+@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class MailAccountsController {
 
     private final MailAccountsService mailAccountsService;

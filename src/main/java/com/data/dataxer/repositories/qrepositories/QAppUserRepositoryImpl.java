@@ -10,7 +10,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -54,14 +53,17 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
             appUserSetRolePrivileges(appUser);
         }
         return Optional.ofNullable(appUser);
-        /*return Optional.ofNullable(
-                this.query.selectFrom(QAppUser.appUser)
-                    .leftJoin(QAppUser.appUser.defaultCompany).fetchJoin()
-                    .leftJoin(QAppUser.appUser.roles).fetchJoin()
-                    .leftJoin(QAppUser.appUser.roles)
-                    .where(QAppUser.appUser.uid.eq(uid))
-                    .fetchOne()
-        );*/
+    }
+
+    @Override
+    public Optional<AppUser> findUserWithRolesAndPrivileges(String uid, Long companyId) {
+        return Optional.ofNullable(
+                query.selectFrom(QAppUser.appUser)
+                        .leftJoin(QAppUser.appUser.roles, QRole.role).fetchJoin()
+                        .where(QAppUser.appUser.uid.eq(uid))
+                        .where(QAppUser.appUser.defaultCompany.id.eq(companyId))
+                        .fetchOne()
+        );
     }
 
     private void appUserSetRolePrivileges(AppUser appUser) {

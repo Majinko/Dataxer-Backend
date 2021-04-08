@@ -10,4 +10,6 @@ public interface TimeRepository extends JpaRepository<Time, Long> {
     List<Time> findByCategoryIdIn(List<Long> ids);
 
     Time findFirstByUserIdAndCompanyIdAndDateWorkOrderByIdDesc(Long userId, Long companyId, LocalDate dateWork);
+
+    List<Time> findAllBySalaryIdAndAndCompanyId(Long salaryId, Long companyId);
 }

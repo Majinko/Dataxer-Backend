@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/mailTemplates")
-@PreAuthorize("hasPermission(null, 'MailTemplates', 'MailTemplates')")
+@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class MailTemplatesController {
 
     private final MailTemplatesService mailTemplatesService;

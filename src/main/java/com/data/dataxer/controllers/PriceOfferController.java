@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/price-offer")
-@PreAuthorize("hasPermission(null, 'PriceOffer', 'PriceOffer')")
+@PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class PriceOfferController {
     private final PriceOfferService priceOfferService;
     private final PriceOfferMapper priceOfferMapper;

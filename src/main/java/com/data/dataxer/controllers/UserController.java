@@ -14,14 +14,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/user")
-@PreAuthorize("hasPermission(null, 'AppUser', 'AppUser')")
+//@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class UserController {
     private final UserService userService;
     private final UserMapper userMapper;
@@ -48,6 +47,16 @@ public class UserController {
         return ResponseEntity.ok(userMapper.appUserToAppUserDTO(this.userService.getByUid(uid)));
     }
 
+    @GetMapping("/edit/{uid}")
+    public ResponseEntity<AppUserDTO> edit(@PathVariable String uid) {
+        return ResponseEntity.ok(userMapper.appUserToAppUserDTOWithRoles(this.userService.userWithRoles(uid)));
+    }
+
+    @GetMapping("/overview/{uid}")
+    public ResponseEntity<AppUserOverviewDTO> userOverview(@PathVariable String uid) {
+        return ResponseEntity.ok(this.userService.userOverview(uid));
+    }
+
     @GetMapping("/overview")
     public ResponseEntity<Page<AppUserOverviewDTO>> overview(
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -58,9 +67,10 @@ public class UserController {
         return ResponseEntity.ok(this.userService.overview(pageable));
     }
 
+    // todo move to other controller
     @GetMapping("/logged")
     public ResponseEntity<AppUserDTO> getLoggedUser() {
-        return ResponseEntity.ok(userMapper.appUserToAppUserDTO(this.userService.loggedUser()));
+        return ResponseEntity.ok(userMapper.appUserToAppUserDTOWithRoles(this.userService.loggedUser()));
     }
 
     @GetMapping("/destroy/{uid}")
@@ -78,9 +88,8 @@ public class UserController {
 
     @PostMapping("/update")
     public void update(@RequestBody AppUserDTO appUserDTO) {
-        ResponseEntity.ok(userMapper.appUserToAppUserDTO(userService.update(userMapper.appUserDTOtoAppUser(appUserDTO))));
+        ResponseEntity.ok(userMapper.appUserToAppUserDTO(userService.update(userMapper.appUserDTOtoAppUserWithRoles(appUserDTO))));
     }
-
 
     @GetMapping("/switchCompany/{companyId}")
     public void switchCompany(@PathVariable Long companyId) {

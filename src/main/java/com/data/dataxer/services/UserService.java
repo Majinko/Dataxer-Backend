@@ -28,4 +28,8 @@ public interface UserService {
     void assignRoles(String uid, List<Role> roleDTOStoRoles);
 
     Page<AppUserOverviewDTO> overview(Pageable pageable);
+
+    AppUser userWithRoles(String uid);
+
+    AppUserOverviewDTO userOverview(String uid);
 }

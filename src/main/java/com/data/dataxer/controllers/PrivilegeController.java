@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/privilege")
-@PreAuthorize("hasPermission(null, 'Privilege', 'Privilege')")
+@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class PrivilegeController {
 
     private final PrivilegeService privilegeService;

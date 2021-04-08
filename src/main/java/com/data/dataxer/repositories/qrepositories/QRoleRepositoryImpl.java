@@ -83,6 +83,7 @@ public class QRoleRepositoryImpl implements QRoleRepository {
         );
     }
 
+
     private long getTotalCount(Predicate predicate) {
         QRole qRole = QRole.role;
 

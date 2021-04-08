@@ -1,10 +1,13 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.mappers.RoleMapper;
+import com.data.dataxer.mappers.SalaryMapper;
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.repositories.AppUserRepository;
 import com.data.dataxer.repositories.CompanyRepository;
+import com.data.dataxer.repositories.SalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.security.model.Role;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -12,6 +15,7 @@ import com.data.dataxer.utils.StringUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,21 +30,25 @@ import static com.data.dataxer.utils.Helpers.getDiffYears;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final FirebaseAuth firebaseAuth;
-    private final AppUserRepository userRepository;
-    private final QTimeRepository qTimeRepository;
-    private final CompanyRepository companyRepository;
+    @Autowired
+    private FirebaseAuth firebaseAuth;
+    @Autowired
+    private AppUserRepository userRepository;
+    @Autowired
+    private QTimeRepository qTimeRepository;
+    @Autowired
+    private CompanyRepository companyRepository;
+    @Autowired
+    private SalaryRepository salaryRepository;
+    @Autowired
+    private SalaryMapper salaryMapper;
+    @Autowired
+    private RoleMapper roleMapper;
 
-    public UserServiceImpl(FirebaseAuth firebaseAuth, AppUserRepository userRepository, QTimeRepository qTimeRepository, CompanyRepository companyRepository) {
-        this.firebaseAuth = firebaseAuth;
-        this.userRepository = userRepository;
-        this.qTimeRepository = qTimeRepository;
-        this.companyRepository = companyRepository;
-    }
 
     @Override
     public AppUser loggedUser() {
-        return this.userRepository.findById(SecurityUtils.id()).orElseThrow(() -> new RuntimeException("User not found"));
+        return SecurityUtils.loggedUser();
     }
 
     // todo create camunda process
@@ -84,22 +92,31 @@ public class UserServiceImpl implements UserService {
         List<AppUserOverviewDTO> appUserOverviewDTOS = new ArrayList<>();
 
         appUsers.forEach(user -> {
-            AppUserOverviewDTO appUserOverviewDTO = new AppUserOverviewDTO();
-
-            appUserOverviewDTO.setId(user.getId());
-            appUserOverviewDTO.setUid(user.getUid());
-            appUserOverviewDTO.setFullName(user.getFirstName() + ' ' + user.getLastName());
-            appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), false));
-            appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), true)));
-            appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.companyId()));
-            appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.companyId()));
-
-            appUserOverviewDTOS.add(appUserOverviewDTO);
+            appUserOverviewDTOS.add(fillAppUserOverview(user, false));
         });
 
         Collections.sort(appUserOverviewDTOS);
 
         return new PageImpl<>(appUserOverviewDTOS, pageable, this.userRepository.countAllByDefaultCompanyId(SecurityUtils.companyId()));
+    }
+
+    private AppUserOverviewDTO fillAppUserOverview(AppUser user, Boolean moreData) {
+        AppUserOverviewDTO appUserOverviewDTO = new AppUserOverviewDTO();
+
+        appUserOverviewDTO.setId(user.getId());
+        appUserOverviewDTO.setUid(user.getUid());
+        appUserOverviewDTO.setFullName(user.getFirstName() + ' ' + user.getLastName());
+        appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), false));
+        appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), true)));
+        appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.companyId()));
+        appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.companyId()));
+
+        if (moreData) {
+            appUserOverviewDTO.setRoles(roleMapper.rolesToRoleDTOs(user.getRoles()));
+            appUserOverviewDTO.setSalary(salaryMapper.salaryToSalaryDTO(salaryRepository.findByUserUidAndFinishIsNull(user.getUid())));
+        }
+
+        return appUserOverviewDTO;
     }
 
     @Override
@@ -113,9 +130,26 @@ public class UserServiceImpl implements UserService {
             user.setCity(appUser.getCity());
             user.setPostalCode(appUser.getPostalCode());
             user.setCountry(appUser.getCountry());
+            user.setRoles(appUser.getRoles());
 
             return userRepository.save(user);
         }).orElse(null);
+    }
+
+    @Override
+    public AppUser userWithRoles(String uid) {
+        AppUser appUser = this.userRepository.findByUidAndDefaultCompanyIdWithRoles(uid, SecurityUtils.companyId());
+
+        appUser.getRoles().forEach(r -> {
+            r.setPrivileges(null);
+        });
+
+        return appUser;
+    }
+
+    @Override
+    public AppUserOverviewDTO userOverview(String uid) {
+        return this.fillAppUserOverview(this.userWithRoles(uid), true);
     }
 
     @Override

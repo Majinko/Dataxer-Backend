@@ -6,9 +6,14 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface RoleRepository extends CrudRepository<Role, Long> {
+    @Query("SELECT DISTINCT r from  Role r join fetch r.privileges where r.company.id = ?1 ")
     List<Role> findAllByCompanyId(Long companyId);
+
+    @Query("SELECT r from  Role r join fetch r.privileges where r.company.id = ?1")
+    Set<Role> findAllByCompanyIdSet(Long companyId);
 
     Optional<Role> findRoleByName(String name);
 

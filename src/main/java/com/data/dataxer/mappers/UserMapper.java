@@ -20,6 +20,13 @@ public interface UserMapper {
     @Mapping(target = "createdAt", ignore = true)
     AppUser appUserDTOtoAppUser(AppUserDTO userDTO);
 
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    AppUser appUserDTOtoAppUserWithRoles(AppUserDTO userDTO);
+
+    AppUserDTO appUserToAppUserDTOWithRoles(AppUser user);
+
     @Named(value = "appUserToAppUserDTOSimple")
     @Mapping(target = "roles", ignore = true)
     AppUserDTO appUserToAppUserDTOSimple(AppUser appUser);

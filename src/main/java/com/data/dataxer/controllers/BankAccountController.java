@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bank-account")
-@PreAuthorize("hasPermission(null, 'BankAccount', 'BankAccount')")
+@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class BankAccountController {
     private final BankAccountService bankAccountService;
     private final BankAccountMapper bankAccountMapper;

@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/relation")
-@PreAuthorize("hasPermission(null, 'DocumentRelation', 'DocumentRelation')")
+@PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class DocumentRelationController {
     private final DocumentRelationService documentRelationsService;
     private final DocumentRelationMapper documentRelationMapper;

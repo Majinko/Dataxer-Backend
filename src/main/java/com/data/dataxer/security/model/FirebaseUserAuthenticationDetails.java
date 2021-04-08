@@ -28,7 +28,6 @@ public class FirebaseUserAuthenticationDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         return getGrantedAuthorities(getPrivileges(user.getRoles()));
     }
 

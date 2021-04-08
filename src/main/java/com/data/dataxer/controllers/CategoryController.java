@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/category")
-@PreAuthorize("hasPermission(null, 'Category', 'Category')")
+@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;

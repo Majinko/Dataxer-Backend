@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/role")
-@PreAuthorize("hasPermission(null, 'Role', 'Role')")
+@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class RoleController {
     @Autowired
     RoleService roleService;

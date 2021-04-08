@@ -4,7 +4,6 @@ import com.data.dataxer.mappers.CompanyMapper;
 import com.data.dataxer.models.dto.CompanyDTO;
 import com.data.dataxer.services.CompanyService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/company")
-@PreAuthorize("hasPermission(null, 'Company', 'Company')")
+//@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class CompanyController {
     private final CompanyService companyService;
     private final CompanyMapper companyMapper;

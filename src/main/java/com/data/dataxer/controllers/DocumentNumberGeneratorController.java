@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/numberGenerator")
-@PreAuthorize("hasPermission(null, 'DocumentNumberGenerator', 'DocumentNumberGenerator')")
+@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class DocumentNumberGeneratorController {
 
     private final DocumentNumberGeneratorService documentNumberGeneratorService;

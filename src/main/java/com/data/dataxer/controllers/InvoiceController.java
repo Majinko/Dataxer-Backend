@@ -25,7 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/invoice")
-@PreAuthorize("hasPermission(null, 'Invoice', 'Invoice')")
+@PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class InvoiceController {
     private final PdfService pdfService;
     private final InvoiceService invoiceService;
