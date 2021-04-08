@@ -82,4 +82,7 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     @Query(value = "SELECT c FROM Category c WHERE c.id = ?1 AND c.company.id = ?2")
     Optional<Category> findCategoryByIdAndCompanyId(Long id, Long companyId);
+
+    @Query(value = "SELECT c FROM Category c WHERE c.parent.id = ?1 AND c.company.id = ?2")
+    Optional<List<Category>> findCategoryChildren(Long parentId, Long companyId);
 }

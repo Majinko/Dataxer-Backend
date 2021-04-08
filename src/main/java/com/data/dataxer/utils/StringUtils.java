@@ -45,4 +45,8 @@ public class StringUtils {
 
         return password;
     }
+
+    public static String convertMinutesTimeToHoursString(Integer seconds) {
+        return seconds / 3600 + ":" + (seconds % 3600) / 60 + " h";
+    }
 }

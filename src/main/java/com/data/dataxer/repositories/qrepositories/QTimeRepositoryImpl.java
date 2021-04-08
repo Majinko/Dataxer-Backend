@@ -1,10 +1,10 @@
 package com.data.dataxer.repositories.qrepositories;
 
 
-import com.data.dataxer.models.domain.Project;
+import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QCategory;
 import com.data.dataxer.models.domain.QTask;
 import com.data.dataxer.models.domain.QTime;
-import com.data.dataxer.models.domain.Time;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -17,6 +17,7 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
@@ -228,6 +229,23 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .groupBy(QTime.time1.dateWork.year())
                 .where(QTime.time1.company.id.eq(companyId))
                 .orderBy(QTime.time1.dateWork.year().desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Tuple> getAllProjectUsersTimesWhereCategoryIn(List<Long> categoryIds, Long projectId, Long companyId) {
+        return this.query.select(QTime.time1.user.uid, QTime.time1.user.firstName, QTime.time1.user.lastName,
+                QTime.time1.category.id, QTime.time1.category.name, QTime.time1.time.sum(), QTime.time1.price.sum())
+                .from(QTime.time1)
+                .join(QTime.time1.category)
+                .where(QTime.time1.project.id.eq(projectId))
+                .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.category.id.in(categoryIds))
+                .groupBy(QTime.time1.user.uid)
+                .groupBy(QTime.time1.category.id)
+                .groupBy(QTime.time1.category.name)
+                .groupBy(QTime.time1.user.firstName)
+                .groupBy(QTime.time1.user.lastName)
                 .fetch();
     }
 

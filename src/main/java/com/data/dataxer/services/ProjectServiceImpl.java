@@ -2,26 +2,40 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
+import com.data.dataxer.models.domain.QCategory;
+import com.data.dataxer.models.domain.QTime;
+import com.data.dataxer.models.dto.ProjectCategoriesOverviewDTO;
+import com.data.dataxer.models.dto.ProjectCategoryUserOverviewDTO;
+import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.ProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QProjectRepository;
+import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.data.dataxer.utils.StringUtils;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.types.dsl.NumberExpression;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
     private final ProjectRepository projectRepository;
     private final QProjectRepository qProjectRepository;
+    private final QTimeRepository qTimeRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, QProjectRepository qProjectRepository) {
+    public ProjectServiceImpl(ProjectRepository projectRepository, QProjectRepository qProjectRepository,
+                              QTimeRepository qTimeRepository, CategoryRepository categoryRepository) {
         this.projectRepository = projectRepository;
         this.qProjectRepository = qProjectRepository;
+        this.qTimeRepository = qTimeRepository;
+        this.categoryRepository = categoryRepository;
     }
 
     @Override
@@ -72,4 +86,41 @@ public class ProjectServiceImpl implements ProjectService {
 
         return categories;
     }
+
+    @Override
+    public Map<String, List<ProjectCategoryUserOverviewDTO>> getProjectCategoryOverview(Long id, Long categoryParentId) {
+        HashMap<String, List<ProjectCategoryUserOverviewDTO>> response = new HashMap<>();
+
+        List<Category> categoriesCondition = categoryParentId == null
+                ? this.categoryRepository.findAllByCompanyAndParentIsNull(SecurityUtils.companyId()).orElse(new ArrayList<>())
+                : this.categoryRepository.findCategoryChildren(categoryParentId, SecurityUtils.companyId()).orElse(new ArrayList<>());
+
+        List<Tuple> timeResult = this.qTimeRepository.getAllProjectUsersTimesWhereCategoryIn(categoriesCondition.stream().map(Category::getId).collect(Collectors.toList()),
+                id, SecurityUtils.companyId());
+
+        timeResult.forEach(time -> {
+            ProjectCategoryUserOverviewDTO projectCategoryUserOverviewDTO = new ProjectCategoryUserOverviewDTO();
+            projectCategoryUserOverviewDTO.setFullName(time.get(QTime.time1.user.firstName) + " " + time.get(QTime.time1.user.lastName));
+            projectCategoryUserOverviewDTO.setHours(StringUtils.convertMinutesTimeToHoursString(time.get(QTime.time1.time.sum())));
+            projectCategoryUserOverviewDTO.setHourNetto(this.countHourNetto(time.get(QTime.time1.time.sum()), time.get(QTime.time1.price.sum())));
+            projectCategoryUserOverviewDTO.setPriceNetto(time.get(QTime.time1.price.sum()));
+            if (response.containsKey(time.get(QTime.time1.category.name))) {
+                response.get(time.get(QTime.time1.category.name)).add(projectCategoryUserOverviewDTO);
+            } else {
+                List<ProjectCategoryUserOverviewDTO> projectCategoryUserOverviewList = new ArrayList<>();
+                projectCategoryUserOverviewList.add(projectCategoryUserOverviewDTO);
+                response.put(time.get(QTime.time1.category.name), projectCategoryUserOverviewList);
+            }
+        });
+
+        return response;
+    }
+
+    private BigDecimal countHourNetto(Integer timeSum, BigDecimal priceSum) {
+        BigDecimal minutePrice = priceSum.divide(new BigDecimal(timeSum/60));
+
+        return minutePrice.multiply(new BigDecimal(60)).setScale(2, RoundingMode.UP);
+    }
+
+
 }
