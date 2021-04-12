@@ -267,15 +267,14 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         return this.query.selectFrom(QTime.time1)
                 .leftJoin(QTime.time1.category).fetchJoin()
                 .leftJoin(QTime.time1.user).fetchJoin()
-                .leftJoin(QTime.time1.project).fetchJoin()
                 .where(QTime.time1.project.id.eq(id))
                 .where(predicate)
                 .where(userPredicate)
                 .where(QTime.time1.dateWork.goe(dateFrom))
                 .where(QTime.time1.dateWork.loe(dateTo))
                 .where(QTime.time1.company.id.eq(companyId))
-                .orderBy(QTime.time1.user.id.desc())
                 .orderBy(QTime.time1.dateWork.desc())
+                .orderBy(QTime.time1.user.id.desc())
                 .fetch();
     }
 

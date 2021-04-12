@@ -104,7 +104,7 @@ public class ProjectController {
             ) {
         ProjectTimeOverviewDTO response = new ProjectTimeOverviewDTO();
 
-        response.setTimeList(this.timeMapper.timeListToTimeDTOList(this.projectService.getProjectUsersTimesOverview(id, dateFrom, dateTo, categoryName, userUid)));
+        response.setTimeList(this.timeMapper.timeListToTimeDTOListSimple(this.projectService.getProjectUsersTimesOverview(id, dateFrom, dateTo, categoryName, userUid)));
         response.setTimeForThisYear(this.projectService.getProjectTimeForThisYear(id));
 
         return ResponseEntity.ok(response);
