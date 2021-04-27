@@ -49,6 +49,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("project.id", QProject.project.id)
+                .put("project.title", QProject.project.title)
                 .build();
 
         if (!rqlFilter.equals("")) {
@@ -88,6 +89,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
                 .where(QProject.project.title.containsIgnoreCase(queryString))
                 .fetch();
     }
+
 
     private long getTotalCount(Predicate predicate) {
         QProject qProject = QProject.project;

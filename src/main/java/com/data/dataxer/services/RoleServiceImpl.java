@@ -58,9 +58,6 @@ public class RoleServiceImpl implements RoleService {
     }
 
     private List<Privilege> loadAndCheckPrivileges(List<String> privilegeNames) {
-        privilegeNames.forEach(name ->
-                System.out.println(name));
-
         List<Privilege> privileges = this.privilegeRepository.findAllByNameIn(privilegeNames);
 
         if (privilegeNames.size() != privileges.size()) {

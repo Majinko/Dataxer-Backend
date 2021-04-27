@@ -41,9 +41,19 @@ public interface QTimeRepository {
 
     List<Integer> getAllYears(Long companyId);
 
-    List<Tuple> getAllProjectUsersTimesWhereCategoryIn(List<Long> categoryIds, Long projectId, Long companyId);
-
     List<Time> getProjectAllUsersTimes(Long id, Category category, LocalDate dateFrom, LocalDate dateTo, String userUid, Long companyId);
 
     Integer getTotalProjectTimeForYear(Long id, Integer year, Long companyId);
+
+    List<Integer> getProjectYears(Long id, Long companyId);
+
+    Tuple getUserProjectCategoryHoursAndPrice(Long projectId, String userUid, List<Long> categoryIds, Long companyId);
+
+    Integer getUserProjectTimeBetweenYears(Long projectId, Integer startYear, Integer endYear, String uid, Long companyId);
+
+    List<Tuple> getUserActiveMonths(Long projectId, Integer startYear, Integer endYear, String uid, Long companyId);
+
+    List<Tuple> getProjectAllUsersActiveMonth(Long projectId, Integer startYear, Integer endYear, Long companyId);
+
+    List<Tuple> getAllProjectUsers(Long id, Long companyId);
 }

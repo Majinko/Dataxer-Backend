@@ -49,4 +49,8 @@ public class StringUtils {
     public static String convertMinutesTimeToHoursString(Integer seconds) {
         return seconds / 3600 + ":" + (seconds % 3600) / 60 + " h";
     }
+
+    public static String getAppUserFullName(String firstName, String lastName) {
+        return firstName + " " + lastName;
+    }
 }
