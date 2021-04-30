@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class StringUtils {
-
     public static String removeWhiteLetters(String input) {
         return input.replaceAll("\\s+", "");
     }
@@ -17,11 +16,11 @@ public class StringUtils {
     }
 
     public static String generateString(String base, int length) {
-        String generated = "";
+        StringBuilder generated = new StringBuilder();
         while (generated.length() < length) {
-            generated += base;
+            generated.append(base);
         }
-        return generated;
+        return generated.toString();
     }
 
     public static String generateRandomTextPassword() {
@@ -39,11 +38,9 @@ public class StringUtils {
 
         Collections.shuffle(pwdChars);
 
-        String password = pwdChars.stream()
+        return pwdChars.stream()
                 .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
                 .toString();
-
-        return password;
     }
 
     public static String convertMinutesTimeToHoursString(Integer seconds) {
