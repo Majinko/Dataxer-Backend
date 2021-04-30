@@ -165,6 +165,10 @@ public class ProjectServiceImpl implements ProjectService {
 
         BigDecimal coefficient = new BigDecimal((userTimeBetweenYears/3600) / userActiveMonths);
 
+        if (coefficient.equals(BigDecimal.ZERO)) {
+            coefficient = BigDecimal.ONE;
+        }
+
         return projectTotalCost.divide(allActiveMonths, 2, RoundingMode.HALF_UP).divide(coefficient, 2, RoundingMode.HALF_UP);
     }
 
