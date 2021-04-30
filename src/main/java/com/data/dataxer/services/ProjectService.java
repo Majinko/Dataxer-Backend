@@ -3,7 +3,6 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
-import com.data.dataxer.models.dto.ProjectCategoriesOverviewDTO;
 import com.data.dataxer.models.dto.ProjectCategoryUserOverviewDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -89,6 +89,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
                 .fetch();
     }
 
+
     private long getTotalCount(Predicate predicate) {
         QProject qProject = QProject.project;
 

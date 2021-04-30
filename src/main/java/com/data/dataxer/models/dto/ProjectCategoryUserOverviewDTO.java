@@ -9,10 +9,14 @@ import java.math.BigDecimal;
 @Setter
 public class ProjectCategoryUserOverviewDTO {
 
-    private String hours;
+    private String categoryName;
+    private String hoursInCategory;
+
     private BigDecimal hourNetto;
     private BigDecimal priceNetto;
 
-    private String fullName;
+    private BigDecimal hourBrutto;
+    private BigDecimal priceBrutto;
+
 
 }
