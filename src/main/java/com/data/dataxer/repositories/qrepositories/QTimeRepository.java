@@ -56,4 +56,6 @@ public interface QTimeRepository {
     List<Tuple> getProjectAllUsersActiveMonth(Long projectId, Integer startYear, Integer endYear, Long companyId);
 
     List<Tuple> getAllProjectUsers(Long id, Long companyId);
+
+    List<Tuple> getProjectUsersTimePriceSums(Long id, Long companyId);
 }

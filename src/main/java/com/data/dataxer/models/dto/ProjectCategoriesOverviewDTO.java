@@ -10,7 +10,7 @@ import java.util.List;
 @Setter
 public class ProjectCategoriesOverviewDTO {
 
-    private List<ProjectCategoryUserOverviewDTO> userOverviewDTOList;
+    private List<ProjectTimePriceOverviewDTO> userOverviewDTOList;
 
     private Category category;
 

@@ -7,10 +7,10 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class ProjectCategoryUserOverviewDTO {
+public class ProjectTimePriceOverviewDTO {
 
-    private String categoryName;
-    private String hoursInCategory;
+    private String name;
+    private String hours;
 
     private BigDecimal hourNetto;
     private BigDecimal priceNetto;
