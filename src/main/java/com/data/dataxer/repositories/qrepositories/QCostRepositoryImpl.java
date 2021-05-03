@@ -117,8 +117,9 @@ public class QCostRepositoryImpl implements QCostRepository {
     public BigDecimal getProjectCostsForYears(Integer firstYear, Integer lastYear, Long companyId) {
         return this.query.select(QCost.cost.totalPrice.sum())
                 .from(QCost.cost)
-                .where(QCost.cost.createdDate.year().goe(firstYear))
-                .where(QCost.cost.createdDate.year().loe(lastYear))
+                .where(QCost.cost.isInternal.eq(Boolean.FALSE))
+                .where(QCost.cost.deliveredDate.year().goe(firstYear))
+                .where(QCost.cost.deliveredDate.year().loe(lastYear))
                 .where(QCost.cost.company.id.eq(companyId))
                 .fetchOne();
     }

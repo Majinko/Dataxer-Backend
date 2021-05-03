@@ -305,6 +305,34 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
+    public List<Tuple> getProjectUsersTimePriceSums(Long id, Long companyId) {
+        return this.query.select(QTime.time1.time.sum(), QTime.time1.price.sum(), QTime.time1.user.uid,
+                QTime.time1.user.firstName, QTime.time1.user.lastName)
+                .from(QTime.time1)
+                .where(QTime.time1.project.id.eq(id))
+                .where(QTime.time1.project.company.id.eq(companyId))
+                .groupBy(QTime.time1.user.uid)
+                .groupBy(QTime.time1.user.firstName)
+                .groupBy(QTime.time1.user.lastName)
+                .fetch();
+    }
+
+    @Override
+    public List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> categoryIds, Long companyId) {
+        return this.query.select(QTime.time1.user.uid, QTime.time1.user.firstName, QTime.time1.user.lastName,
+                QTime.time1.time.sum(), QTime.time1.price.sum())
+                .from(QTime.time1)
+                .leftJoin(QTime.time1.user)
+                .where(QTime.time1.project.id.eq(id))
+                .where(QTime.time1.category.id.in(categoryIds))
+                .where(QTime.time1.company.id.eq(companyId))
+                .groupBy(QTime.time1.user.uid)
+                .groupBy(QTime.time1.user.firstName)
+                .groupBy(QTime.time1.user.lastName)
+                .fetch();
+    }
+
+    @Override
     public List<Time> getProjectAllUsersTimes(Long id, Category category, LocalDate dateFrom, LocalDate dateTo, String userUid, Long companyId) {
         BooleanBuilder predicate = new BooleanBuilder();
         BooleanBuilder userPredicate = new BooleanBuilder();
@@ -344,6 +372,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .from(QTime.time1)
                 .where(QTime.time1.project.id.eq(id))
                 .where(QTime.time1.company.id.eq(companyId))
+                .groupBy(QTime.time1.dateWork.year())
                 .orderBy(QTime.time1.dateWork.year().asc())
                 .fetch();
     }
