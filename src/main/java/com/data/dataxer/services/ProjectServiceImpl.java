@@ -95,6 +95,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<Category> parentCategories = categoryParentId == null
                 ? this.categoryRepository.findAllByCompanyAndParentIsNull(SecurityUtils.companyId()).orElse(new ArrayList<>())
                 : this.categoryRepository.findCategoryChildren(categoryParentId, SecurityUtils.companyId()).orElse(new ArrayList<>());
+
         HashMap<Category, List<Long>> parentCategoriesChildren = new HashMap<>();
         parentCategories.forEach(category -> {
             List<Long> childrenCategories = this.categoryRepository.findSubTreeIds(category.getId(), SecurityUtils.companyId());
@@ -102,11 +103,10 @@ public class ProjectServiceImpl implements ProjectService {
         });
 
         List<Integer> projectYears = this.getAllProjectYears(id);
-        for (Integer year: projectYears) {
-        }
         if (projectYears.size() < 1) {
             return response;
         }
+
         BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
 
         parentCategories.forEach(category -> {
@@ -120,15 +120,14 @@ public class ProjectServiceImpl implements ProjectService {
                 ProjectTimePriceOverviewDTO projectTimePriceOverviewDTO = new ProjectTimePriceOverviewDTO();
                 projectTimePriceOverviewDTO.setName(userName);
                 projectTimePriceOverviewDTO.setHours(StringUtils.convertMinutesTimeToHoursString(userData.get(QTime.time1.time.sum())));
-
                 projectTimePriceOverviewDTO.setPriceNetto(userData.get(QTime.time1.price.sum()));
                 projectTimePriceOverviewDTO.setHourNetto(this.countHourNetto(userData.get(QTime.time1.time.sum()), userData.get(QTime.time1.price.sum())));
-
                 projectTimePriceOverviewDTO.setHourBrutto(projectTimePriceOverviewDTO.getHourNetto().add(costToHour));
                 projectTimePriceOverviewDTO.setPriceBrutto(
                         projectTimePriceOverviewDTO.getHourNetto().equals(projectTimePriceOverviewDTO.getHourBrutto()) ? projectTimePriceOverviewDTO.getPriceNetto() :
                                 new BigDecimal((userData.get(QTime.time1.time.sum()) / 3600)).multiply(projectTimePriceOverviewDTO.getHourBrutto()).setScale(2, RoundingMode.HALF_UP)
                 );
+
                 responseValue.add(projectTimePriceOverviewDTO);
             });
             if (responseValue.size() > 0) {
