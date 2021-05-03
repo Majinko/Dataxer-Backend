@@ -59,7 +59,7 @@ public class CompanyServiceImpl implements CompanyService {
             company.setPhone(oldCompany.getPhone());
             company.setWeb(oldCompany.getWeb());
             company.setIban(oldCompany.getIban());
-            company.setCin(oldCompany.getTin());
+            company.setCin(oldCompany.getCin());
             company.setTin(oldCompany.getTin());
             company.setVatin(oldCompany.getVatin());
 

@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class ProjectCategoryUserOverviewDTO {
-
     private String categoryName;
     private String hoursInCategory;
 
@@ -17,6 +16,4 @@ public class ProjectCategoryUserOverviewDTO {
 
     private BigDecimal hourBrutto;
     private BigDecimal priceBrutto;
-
-
 }

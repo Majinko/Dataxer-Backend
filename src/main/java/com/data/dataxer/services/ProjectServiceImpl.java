@@ -1,7 +1,9 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.Category;
+import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.QTime;
+import com.data.dataxer.models.domain.Time;
 import com.data.dataxer.models.dto.ProjectCategoryUserOverviewDTO;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.ProjectRepository;
@@ -82,7 +84,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<Category> getAllProjectCategoriesOrderedByPosition(Long projectId) {
         List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.companyId()).getCategories();
         categories.sort(Comparator.comparing(Category::getLft));
-       // Collections.sort(categories, Comparator.comparing(Category::getDepth).thenComparing(Category::getPosition));
+        // Collections.sort(categories, Comparator.comparing(Category::getDepth).thenComparing(Category::getPosition));
 
         return categories;
     }
@@ -112,6 +114,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             for (Category category : parentCategories) {
                 Tuple userCategoryHoursAndPrice = this.qTimeRepository.getUserProjectCategoryHoursAndPrice(id, user.get(QTime.time1.user.uid), parentCategoriesChildren.get(category), SecurityUtils.companyId());
+
                 if (userCategoryHoursAndPrice.get(QTime.time1.time.sum()) == null) {
                     //if user have no time with category we are continue in next iteration
                     continue;
@@ -144,7 +147,7 @@ public class ProjectServiceImpl implements ProjectService {
         Category category = categoryName.equals("_all_") ? null :
                 this.categoryRepository.findCategoryByName(categoryName, SecurityUtils.companyId()).orElse(null);
 
-        return this.qTimeRepository.getProjectAllUsersTimes(id, category,dateFrom, dateTo, userUid, SecurityUtils.companyId());
+        return this.qTimeRepository.getProjectAllUsersTimes(id, category, dateFrom, dateTo, userUid, SecurityUtils.companyId());
     }
 
     @Override
@@ -163,13 +166,13 @@ public class ProjectServiceImpl implements ProjectService {
             return new BigDecimal(userActiveMonths);
         }
 
-        BigDecimal coefficient = new BigDecimal((userTimeBetweenYears/3600) / userActiveMonths);
+        BigDecimal coefficient = new BigDecimal((userTimeBetweenYears / 3600) / userActiveMonths);
 
-        return projectTotalCost.divide(allActiveMonths, 2, RoundingMode.HALF_UP).divide(coefficient, 2, RoundingMode.HALF_UP);
+        return coefficient.compareTo(BigDecimal.ZERO) != 0 ? projectTotalCost.divide(allActiveMonths, 2, RoundingMode.HALF_UP).divide(coefficient, 2, RoundingMode.HALF_UP) : new BigDecimal(0);
     }
 
     private BigDecimal countHourNetto(Integer timeSum, BigDecimal priceSum) {
-        BigDecimal minutePrice = priceSum.divide(new BigDecimal(timeSum/60), 2 , RoundingMode.HALF_UP);
+        BigDecimal minutePrice = priceSum.divide(new BigDecimal(timeSum / 60), 2, RoundingMode.HALF_UP);
 
         return minutePrice.multiply(new BigDecimal(60)).setScale(2, RoundingMode.HALF_UP);
     }

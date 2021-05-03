@@ -3,8 +3,10 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.CategoryMapper;
 import com.data.dataxer.mappers.ProjectMapper;
 import com.data.dataxer.mappers.TimeMapper;
-import com.data.dataxer.models.domain.Category;
-import com.data.dataxer.models.dto.*;
+import com.data.dataxer.models.dto.CategoryDTO;
+import com.data.dataxer.models.dto.ProjectCategoryUserOverviewDTO;
+import com.data.dataxer.models.dto.ProjectDTO;
+import com.data.dataxer.models.dto.ProjectTimeOverviewDTO;
 import com.data.dataxer.services.ProjectService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,8 +30,7 @@ public class ProjectController {
     private final CategoryMapper categoryMapper;
     private final TimeMapper timeMapper;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper,
-                             CategoryMapper categoryMapper, TimeMapper timeMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper, TimeMapper timeMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.categoryMapper = categoryMapper;
