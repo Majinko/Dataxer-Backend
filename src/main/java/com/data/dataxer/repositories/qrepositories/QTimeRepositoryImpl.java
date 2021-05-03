@@ -326,6 +326,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.project.id.eq(id))
                 .where(QTime.time1.category.id.in(categoryIds))
                 .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.user.uid.isNotNull())
                 .groupBy(QTime.time1.user.uid)
                 .groupBy(QTime.time1.user.firstName)
                 .groupBy(QTime.time1.user.lastName)
