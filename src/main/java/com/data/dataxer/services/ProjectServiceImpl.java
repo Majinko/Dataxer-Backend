@@ -12,7 +12,6 @@ import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.StringUtils;
 import com.querydsl.core.Tuple;
-import org.bouncycastle.util.Times;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -104,13 +103,11 @@ public class ProjectServiceImpl implements ProjectService {
 
         List<Integer> projectYears = this.getAllProjectYears(id);
         for (Integer year: projectYears) {
-            System.out.println("Rok: " + year);
         }
         if (projectYears.size() < 1) {
             return response;
         }
         BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
-        System.out.println("Project total cost: " + projectTotalCost);
 
         parentCategories.forEach(category -> {
             List<Tuple> categoryUsersData = this.qTimeRepository.getAllProjectUserCategoryData(id, parentCategoriesChildren.get(category), SecurityUtils.companyId());
@@ -119,7 +116,6 @@ public class ProjectServiceImpl implements ProjectService {
             categoryUsersData.forEach(userData -> {
                 String userName = StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName));
                 BigDecimal costToHour = this.getUserCostToHour(id, projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
-                System.out.println("CostToHour: " + costToHour);
 
                 ProjectTimePriceOverviewDTO projectTimePriceOverviewDTO = new ProjectTimePriceOverviewDTO();
                 projectTimePriceOverviewDTO.setName(userName);
