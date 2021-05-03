@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
 import com.querydsl.core.Tuple;
+import org.bouncycastle.util.Times;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -58,4 +59,6 @@ public interface QTimeRepository {
     List<Tuple> getAllProjectUsers(Long id, Long companyId);
 
     List<Tuple> getProjectUsersTimePriceSums(Long id, Long companyId);
+
+    List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> longs, Long companyId);
 }

@@ -12,6 +12,7 @@ import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.StringUtils;
 import com.querydsl.core.Tuple;
+import org.bouncycastle.util.Times;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -102,39 +103,41 @@ public class ProjectServiceImpl implements ProjectService {
         });
 
         List<Integer> projectYears = this.getAllProjectYears(id);
-        List<Tuple> projectUsers = this.qTimeRepository.getAllProjectUsers(id, SecurityUtils.companyId());
+        for (Integer year: projectYears) {
+            System.out.println("Rok: " + year);
+        }
+        if (projectYears.size() < 1) {
+            return response;
+        }
         BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
+        System.out.println("Project total cost: " + projectTotalCost);
 
-        projectUsers.forEach(user -> {
-            String fullName = StringUtils.getAppUserFullName(user.get(QTime.time1.user.firstName), user.get(QTime.time1.user.lastName));
-            BigDecimal costToHour = this.getUserCostToHour(id, projectYears.get(0), projectYears.get(projectYears.size() - 1), user.get(QTime.time1.user.uid), projectTotalCost);
+        parentCategories.forEach(category -> {
+            List<Tuple> categoryUsersData = this.qTimeRepository.getAllProjectUserCategoryData(id, parentCategoriesChildren.get(category), SecurityUtils.companyId());
 
             List<ProjectTimePriceOverviewDTO> responseValue = new ArrayList<>();
-
-            for (Category category : parentCategories) {
-                Tuple userCategoryHoursAndPrice = this.qTimeRepository.getUserProjectCategoryHoursAndPrice(id, user.get(QTime.time1.user.uid), parentCategoriesChildren.get(category), SecurityUtils.companyId());
-                if (userCategoryHoursAndPrice.get(QTime.time1.time.sum()) == null) {
-                    //if user have no time with category we are continue in next iteration
-                    continue;
-                }
+            categoryUsersData.forEach(userData -> {
+                String userName = StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName));
+                BigDecimal costToHour = this.getUserCostToHour(id, projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
+                System.out.println("CostToHour: " + costToHour);
 
                 ProjectTimePriceOverviewDTO projectTimePriceOverviewDTO = new ProjectTimePriceOverviewDTO();
-                projectTimePriceOverviewDTO.setName(category.getName());
-                projectTimePriceOverviewDTO.setHours(StringUtils.convertMinutesTimeToHoursString(userCategoryHoursAndPrice.get(QTime.time1.time.sum())));
+                projectTimePriceOverviewDTO.setName(userName);
+                projectTimePriceOverviewDTO.setHours(StringUtils.convertMinutesTimeToHoursString(userData.get(QTime.time1.time.sum())));
 
-                projectTimePriceOverviewDTO.setPriceNetto(userCategoryHoursAndPrice.get(QTime.time1.price.sum()));
-                projectTimePriceOverviewDTO.setHourNetto(this.countHourNetto(userCategoryHoursAndPrice.get(QTime.time1.time.sum()), userCategoryHoursAndPrice.get(QTime.time1.price.sum())));
+                projectTimePriceOverviewDTO.setPriceNetto(userData.get(QTime.time1.price.sum()));
+                projectTimePriceOverviewDTO.setHourNetto(this.countHourNetto(userData.get(QTime.time1.time.sum()), userData.get(QTime.time1.price.sum())));
 
                 projectTimePriceOverviewDTO.setHourBrutto(projectTimePriceOverviewDTO.getHourNetto().add(costToHour));
                 projectTimePriceOverviewDTO.setPriceBrutto(
                         projectTimePriceOverviewDTO.getHourNetto().equals(projectTimePriceOverviewDTO.getHourBrutto()) ? projectTimePriceOverviewDTO.getPriceNetto() :
-                                new BigDecimal((userCategoryHoursAndPrice.get(QTime.time1.time.sum()) / 3600)).multiply(projectTimePriceOverviewDTO.getHourBrutto()).setScale(2, RoundingMode.HALF_UP)
+                                new BigDecimal((userData.get(QTime.time1.time.sum()) / 3600)).multiply(projectTimePriceOverviewDTO.getHourBrutto()).setScale(2, RoundingMode.HALF_UP)
                 );
-
                 responseValue.add(projectTimePriceOverviewDTO);
+            });
+            if (responseValue.size() > 0) {
+                response.put(category.getName(), responseValue);
             }
-
-            response.put(fullName, responseValue);
         });
 
         return response;
