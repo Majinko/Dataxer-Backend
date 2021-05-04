@@ -96,6 +96,7 @@ public class ProjectServiceImpl implements ProjectService {
         List<Category> parentCategories = categoryParentId == null
                 ? this.categoryRepository.findAllByCompanyAndParentIsNull(SecurityUtils.companyId()).orElse(new ArrayList<>())
                 : this.categoryRepository.findCategoryChildren(categoryParentId, SecurityUtils.companyId()).orElse(new ArrayList<>());
+
         HashMap<Category, List<Long>> parentCategoriesChildren = new HashMap<>();
 
         parentCategories.forEach(category -> {
@@ -114,7 +115,6 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
-        System.out.println("Project total cost: " + projectTotalCost);
 
         parentCategories.forEach(category -> {
             List<Tuple> categoryUsersData = this.qTimeRepository.getAllProjectUserCategoryData(id, parentCategoriesChildren.get(category), SecurityUtils.companyId());
@@ -123,20 +123,14 @@ public class ProjectServiceImpl implements ProjectService {
             categoryUsersData.forEach(userData -> {
                 String userName = StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName));
                 BigDecimal costToHour = this.getUserCostToHour(id, projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
-                System.out.println("CostToHour: " + costToHour);
 
                 ProjectTimePriceOverviewDTO projectTimePriceOverviewDTO = new ProjectTimePriceOverviewDTO();
                 projectTimePriceOverviewDTO.setName(userName);
                 projectTimePriceOverviewDTO.setHours(StringUtils.convertMinutesTimeToHoursString(userData.get(QTime.time1.time.sum())));
-
                 projectTimePriceOverviewDTO.setPriceNetto(userData.get(QTime.time1.price.sum()));
-                projectTimePriceOverviewDTO.setHourNetto(this.countHourNetto(userData.get(QTime.time1.time.sum()), userData.get(QTime.time1.price.sum())));
 
-                projectTimePriceOverviewDTO.setHourBrutto(projectTimePriceOverviewDTO.getHourNetto().add(costToHour));
-                projectTimePriceOverviewDTO.setPriceBrutto(
-                        projectTimePriceOverviewDTO.getHourNetto().equals(projectTimePriceOverviewDTO.getHourBrutto()) ? projectTimePriceOverviewDTO.getPriceNetto() :
-                                new BigDecimal((userData.get(QTime.time1.time.sum()) / 3600)).multiply(projectTimePriceOverviewDTO.getHourBrutto()).setScale(2, RoundingMode.HALF_UP)
-                );
+                prepareProjectTimePriceOverviewDTO(userData, costToHour, projectTimePriceOverviewDTO);
+
                 responseValue.add(projectTimePriceOverviewDTO);
             });
             if (responseValue.size() > 0) {
@@ -145,6 +139,15 @@ public class ProjectServiceImpl implements ProjectService {
         });
 
         return response;
+    }
+
+    private void prepareProjectTimePriceOverviewDTO(Tuple userData, BigDecimal costToHour, ProjectTimePriceOverviewDTO projectTimePriceOverviewDTO) {
+        projectTimePriceOverviewDTO.setHourNetto(this.countHourNetto(userData.get(QTime.time1.time.sum()), userData.get(QTime.time1.price.sum())));
+        projectTimePriceOverviewDTO.setHourBrutto(projectTimePriceOverviewDTO.getHourNetto().add(costToHour));
+        projectTimePriceOverviewDTO.setPriceBrutto(
+                projectTimePriceOverviewDTO.getHourNetto().equals(projectTimePriceOverviewDTO.getHourBrutto()) ? projectTimePriceOverviewDTO.getPriceNetto() :
+                        new BigDecimal((userData.get(QTime.time1.time.sum()) / 3600)).multiply(projectTimePriceOverviewDTO.getHourBrutto()).setScale(2, RoundingMode.HALF_UP)
+        );
     }
 
     @Override
@@ -182,13 +185,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             projectTimePriceOverviewDTO.setPriceNetto(tuple.get(QTime.time1.price.sum()));
             projectManHoursDTO.setSumPriceNetto(projectManHoursDTO.getSumPriceNetto().add(tuple.get(QTime.time1.price.sum())));
-            projectTimePriceOverviewDTO.setHourNetto(this.countHourNetto(tuple.get(QTime.time1.time.sum()), tuple.get(QTime.time1.price.sum())));
-
-            projectTimePriceOverviewDTO.setHourBrutto(projectTimePriceOverviewDTO.getHourNetto().add(costToHour));
-            projectTimePriceOverviewDTO.setPriceBrutto(
-                    projectTimePriceOverviewDTO.getHourNetto().equals(projectTimePriceOverviewDTO.getHourBrutto()) ? projectTimePriceOverviewDTO.getPriceNetto() :
-                            new BigDecimal((tuple.get(QTime.time1.time.sum()) / 3600)).multiply(projectTimePriceOverviewDTO.getHourBrutto()).setScale(2, RoundingMode.HALF_UP)
-            );
+            prepareProjectTimePriceOverviewDTO(tuple, costToHour, projectTimePriceOverviewDTO);
             projectManHoursDTO.setSumPriceBrutto(projectManHoursDTO.getSumPriceBrutto().add(projectTimePriceOverviewDTO.getPriceBrutto()));
             projectTimePriceOverviewDTOList.add(projectTimePriceOverviewDTO);
         });
