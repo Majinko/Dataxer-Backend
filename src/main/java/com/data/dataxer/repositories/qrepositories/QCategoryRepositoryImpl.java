@@ -114,4 +114,13 @@ public class QCategoryRepositoryImpl implements QCategoryRepository {
                 .where(QCategory.category.company.id.eq(companyId))
                 .fetch();
     }
+
+    @Override
+    public void updateCategoryPosition(Long id, long position, Long companyId) {
+        this.query.update(QCategory.category)
+                .set(QCategory.category.position, position)
+                .where(QCategory.category.id.eq(id))
+                .where(QCategory.category.company.id.eq(companyId))
+                .execute();
+    }
 }

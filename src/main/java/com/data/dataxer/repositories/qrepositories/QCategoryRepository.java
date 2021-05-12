@@ -28,4 +28,6 @@ public interface QCategoryRepository {
     List<Category> getCategoriesToIncrementRgt(Integer rgt, Integer rgt1, Long companyId);
 
     List<Category> getCategoriesToIncrementLft(Integer lft, Integer rgt, Long companyId);
+
+    void updateCategoryPosition(Long id, long i, Long companyId);
 }
