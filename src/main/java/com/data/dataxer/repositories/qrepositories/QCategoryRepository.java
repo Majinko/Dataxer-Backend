@@ -3,10 +3,11 @@ package com.data.dataxer.repositories.qrepositories;
 import com.data.dataxer.models.domain.Category;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface QCategoryRepository {
 
-    Category getBaseRoot(Long companyId);
+    Optional<Category> getBaseRoot(Long companyId);
 
     Category findChildWithHighestRgt(Category parent, Long companyId);
 
@@ -20,4 +21,11 @@ public interface QCategoryRepository {
 
     List<Category> findSubTree(Category category, Long companyId);
 
+    List<Category> findSiblingsWithHigherPosition(Category category, Long companyId);
+
+    long getCountOfChildren(Long id, Long companyId);
+
+    List<Category> getCategoriesToIncrementRgt(Integer rgt, Integer rgt1, Long companyId);
+
+    List<Category> getCategoriesToIncrementLft(Integer lft, Integer rgt, Long companyId);
 }

@@ -32,6 +32,8 @@ public class Category extends BaseEntity{
 
     private Integer depth;
 
+    private Long position;
+
     @Enumerated(EnumType.STRING)
     CategoryType categoryType;
 

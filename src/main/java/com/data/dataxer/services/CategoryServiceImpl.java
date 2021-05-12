@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.qrepositories.QCategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.google.firebase.database.snapshot.ChildrenNode;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -20,31 +21,39 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    @Transactional
     public void updateTree(List<Category> categories, Category category) {
         if (!categories.isEmpty()) {
-            categories.forEach(c -> {
-                Category cc = categoryRepository.findByIdAndCompanyIdIn(c.getId(), SecurityUtils.companyIds());
-
-                cc.setParent(category);
-                categoryRepository.save(cc);
-
-                if (!c.getChildren().isEmpty()) {
-                    this.updateTree(c.getChildren(), c);
+            if (category == null) {
+                category = this.qCategoryRepository.getBaseRoot(SecurityUtils.companyId()).orElse(null);
+            }
+            for (int i = 0; i <= categories.size() - 1; i++) {
+                Category processedCategory = categories.get(i);
+                List<Category> children = processedCategory.getChildren();
+                //need little change for FE => moved category has just id and name, missing lft, rgt
+                if (processedCategory.getParent() == null || processedCategory.getLft() == null || processedCategory.getRgt() == null) {
+                    System.out.println("Loading.....");
+                    processedCategory = this.qCategoryRepository.getById(processedCategory.getId(), SecurityUtils.companyId());
                 }
-            });
+                if (processedCategory.getPosition() != (long) i) {
+                    processedCategory.setPosition((long) i);
+                }
+                if (processedCategory.getParent().getId() != category.getId()) {
+                    List<Category> categoriesToReAdd = removeFromOldParent(processedCategory);
+                    this.addChild(category, processedCategory);
+                    categoriesToReAdd.forEach(category1 -> this.addChild(category1.getParent(), category1));
+                }
+                this.updateTree(children, processedCategory);
+            }
         }
     }
 
-
-
-    //***********************************************************************
-    //new implementation
     @Override
     @Transactional
     public Category store(Category category) {
         //if parent is null parent is baseRoot
         if (category.getParent() == null) {
-            Category baseRoot = this.qCategoryRepository.getBaseRoot(SecurityUtils.companyId());
+            Category baseRoot = this.qCategoryRepository.getBaseRoot(SecurityUtils.companyId()).orElse(null);
             if ( baseRoot == null ) {
                 baseRoot = this.createBaseRoot();
             }
@@ -58,15 +67,15 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public List<Category> all() {
         return categoryRepository
-                .findAllByDepthGreaterThanAndCompanyIdInOrderByDepthAscLftAsc(-1, SecurityUtils.companyIds())
+                .findAllByDepthGreaterThanAndCompanyIdInOrderByDepthAscPositionAsc(-1, SecurityUtils.companyIds())
                 .orElse(new ArrayList<>());
     }
+
     @Override
     public List<Category> nested() {
-        Category baseRoot = this.qCategoryRepository.getBaseRoot(SecurityUtils.companyId());
-        return categoryRepository.findAllByDepthGreaterThanAndCompanyIdInAndParentIsOrderByDepthAscLftAsc(-1, SecurityUtils.companyIds(), baseRoot).orElse(new ArrayList<>());
+        Category baseRoot = this.qCategoryRepository.getBaseRoot(SecurityUtils.companyId()).orElse(null);
+        return categoryRepository.findAllByDepthGreaterThanAndCompanyIdInAndParentIsOrderByDepthAscPositionAsc(-1, SecurityUtils.companyIds(), baseRoot).orElse(new ArrayList<>());
     }
-
     @Override
     @Transactional
     public void delete(Long id) {
@@ -77,6 +86,7 @@ public class CategoryServiceImpl implements CategoryService {
     private Category addChild(Category parent, Category child) {
         Category childWithHighestRgt = this.qCategoryRepository.findChildWithHighestRgt(parent, SecurityUtils.companyId());
         Integer childLft;
+        Long position = this.qCategoryRepository.getCountOfChildren(parent.getId(), SecurityUtils.companyId());
         if (childWithHighestRgt == null) {
             childLft = parent.getLft() + 1;
             this.qCategoryRepository.findByLftGreaterEqualThan(childLft, SecurityUtils.companyId()).forEach(
@@ -86,7 +96,6 @@ public class CategoryServiceImpl implements CategoryService {
                     category -> category.setRgt(category.getRgt() + 2)
             );
         } else {
-            System.out.println("Name =>" + childWithHighestRgt.getName());
             childLft = childWithHighestRgt.getRgt() + 1;
             this.qCategoryRepository.findByLftGreaterThan(childWithHighestRgt.getRgt(), SecurityUtils.companyId()).forEach(
                     category -> category.setLft(category.getLft() + 2)
@@ -99,6 +108,9 @@ public class CategoryServiceImpl implements CategoryService {
         child.setLft(childLft);
         child.setRgt(childRgt);
         child.setDepth(parent.getDepth() + 1);
+        if (child.getPosition() == null) {
+            child.setPosition(position);
+        }
         child.setParent(parent);
         return this.categoryRepository.save(child);
     }
@@ -112,8 +124,16 @@ public class CategoryServiceImpl implements CategoryService {
         this.qCategoryRepository.findByRgtGreaterThan(category.getRgt(), SecurityUtils.companyId()).forEach(
                 category1 -> category1.setRgt(category1.getRgt() - decrement)
         );
-        //this.categoryRepository.delete(category);
+        decrementSiblingsPosition(category);
         removed.forEach(category1 -> this.categoryRepository.delete(category1));
+    }
+
+    private void decrementSiblingsPosition(Category category) {
+        List<Category> siblings = this.qCategoryRepository.findSiblingsWithHigherPosition(category, SecurityUtils.companyId());
+        siblings.forEach(sibling -> {
+            sibling.setPosition(sibling.getPosition() - 1);
+        });
+        //this.categoryRepository.saveAll(siblings);
     }
 
     private Category createBaseRoot() {
@@ -123,5 +143,29 @@ public class CategoryServiceImpl implements CategoryService {
         baseRoot.setRgt(2);
         baseRoot.setDepth(-1);
         return this.categoryRepository.save(baseRoot);
+    }
+
+    private List<Category> removeFromOldParent(Category category) {
+        List<Category> subTree = this.qCategoryRepository.findSubTree(category, SecurityUtils.companyId());
+        subTree.remove(category);
+
+        Integer decrement = category.getRgt() - category.getLft() + 1;
+
+        List<Category> categoriesToUpdate = this.qCategoryRepository.findByLftGreaterThan(category.getRgt(), SecurityUtils.companyId());
+        categoriesToUpdate.forEach(category1 -> category1.setLft(category1.getLft() - decrement)
+        );
+        this.categoryRepository.saveAll(categoriesToUpdate);
+
+        categoriesToUpdate = this.qCategoryRepository.findByRgtGreaterThan(category.getRgt(), SecurityUtils.companyId());
+        categoriesToUpdate.forEach(category1 -> category1.setRgt(category1.getRgt() - decrement)
+        );
+        this.categoryRepository.saveAll(categoriesToUpdate);
+
+        return subTree;
+        /*subTree.forEach(category1 -> {
+            category1.setLft(null);
+            category1.setRgt(null);
+        });
+        this.categoryRepository.saveAll(subTree);*/
     }
 }

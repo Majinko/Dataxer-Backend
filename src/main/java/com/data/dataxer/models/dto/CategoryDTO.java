@@ -9,5 +9,9 @@ import lombok.Setter;
 public class CategoryDTO {
     private Long id;
     private String name;
+    private Integer lft;
+    private Integer rgt;
+    private Long position;
+    private Integer depth;
     private CategoryDTO parent;
 }
