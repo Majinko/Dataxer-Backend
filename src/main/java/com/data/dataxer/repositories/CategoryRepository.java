@@ -11,10 +11,10 @@ import java.util.Optional;
 @Repository
 public interface CategoryRepository extends CrudRepository<Category, Long> {
     Category findByIdAndCompanyIdIn(Long id, List<Long> companyIds);
-    Optional<List<Category>> findAllByCompanyIdIn(List<Long> companyIds);
 
-    /*@EntityGraph(attributePaths = "children")*/
-    Optional<List<Category>> findAllByCompanyIdInAndParentIsNull(List<Long> companyIds);
+    Optional<List<Category>> findAllByDepthGreaterThanAndCompanyIdInOrderByDepthAscPositionAsc(Integer depth, List<Long> companyIds);
+
+    Optional<List<Category>> findAllByDepthGreaterThanAndCompanyIdInAndParentIsOrderByDepthAscPositionAsc(Integer depth, List<Long> companyIds, Category parent);
 
     /**
      * Retrieves all nodes with no child nodes (i.e. leaf nodes).

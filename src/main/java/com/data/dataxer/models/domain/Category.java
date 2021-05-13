@@ -30,6 +30,10 @@ public class Category extends BaseEntity{
 
     private Integer rgt;
 
+    private Integer depth;
+
+    private Long position;
+
     @Enumerated(EnumType.STRING)
     CategoryType categoryType;
 
@@ -40,6 +44,7 @@ public class Category extends BaseEntity{
 
     @JsonIgnore
     @OneToMany(mappedBy = "parent", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
+    @OrderBy("lft")
     private List<Category> children = new ArrayList<Category>();
 
     private LocalDateTime deletedAt;
