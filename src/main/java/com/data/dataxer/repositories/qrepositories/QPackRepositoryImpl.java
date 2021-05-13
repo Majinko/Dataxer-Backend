@@ -1,10 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QItem;
-import com.data.dataxer.models.domain.QItemPrice;
-import com.data.dataxer.models.domain.QPack;
-import com.data.dataxer.models.domain.QPackItem;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -67,17 +63,12 @@ public class QPackRepositoryImpl implements QPackRepository {
 
     @Override
     public Pack getById(Long id, Long companyId) {
-        QPack qPack = QPack.pack;
-        QPackItem qPackItem = QPackItem.packItem;
-        QItem qItem = QItem.item;
-        QItemPrice qItemPrice = QItemPrice.itemPrice;
-
-        return query.selectFrom(qPack)
-                .where(qPack.company.id.eq(companyId))
-                .where(qPack.id.eq(id))
-                .leftJoin(qPack.packItems, qPackItem).orderBy(qPackItem.position.desc()).fetchJoin()
-                .leftJoin(qPackItem.item, qItem).fetchJoin()
-                .leftJoin(qItem.itemPrices, qItemPrice).fetchJoin()
+        return query.selectFrom(QPack.pack)
+                .where(QPack.pack.company.id.eq(companyId))
+                .where(QPack.pack.id.eq(id))
+                .leftJoin(QPack.pack.packItems, QPackItem.packItem).orderBy(QPackItem.packItem.position.desc()).fetchJoin()
+                .leftJoin(QPackItem.packItem.item, QItem.item).fetchJoin()
+                .leftJoin(QItem.item.itemPrices, QItemPrice.itemPrice).fetchJoin()
                 .fetchOne();
     }
 

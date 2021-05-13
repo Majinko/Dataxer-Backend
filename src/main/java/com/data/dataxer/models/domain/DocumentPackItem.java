@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 @Entity
@@ -41,7 +40,8 @@ public class DocumentPackItem extends BaseEntity {
 
     private BigDecimal totalPrice;
 
-    public DocumentPackItem() {}
+    public DocumentPackItem() {
+    }
 
     public DocumentPackItem(DocumentPackItem packItem, DocumentPack pack) {
         this.pack = pack;

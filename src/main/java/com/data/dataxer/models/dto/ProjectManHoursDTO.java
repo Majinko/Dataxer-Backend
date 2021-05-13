@@ -9,15 +9,13 @@ import java.util.List;
 @Getter
 @Setter
 public class ProjectManHoursDTO {
-
     private BigDecimal sumPriceNetto;
     private BigDecimal sumPriceBrutto;
 
-    List<ProjectTimePriceOverviewDTO> projectTimePriceOverviewDTOList;
+    List<UserTimePriceOverviewDTO> userTimePriceOverviewList;
 
     public ProjectManHoursDTO() {
         this.sumPriceNetto = BigDecimal.ZERO;
         this.sumPriceBrutto = BigDecimal.ZERO;
     }
-
 }

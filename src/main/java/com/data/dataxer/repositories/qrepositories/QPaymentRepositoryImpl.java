@@ -94,8 +94,9 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
                 Invoice invoice = this.query.selectFrom(qInvoice)
                         .where(qInvoice.id.eq(documentId))
                         .fetchOne();
+
                 if (invoice != null) {
-                    return invoice.getTotalPrice();
+                    return invoice.getTotalPrice().subtract(invoice.getDiscount() != null ? invoice.countDiscountTotalPrice() : new BigDecimal(0));
                 } else {
                     throw new RuntimeException("Invoice with id" + documentId + "not found");
                 }

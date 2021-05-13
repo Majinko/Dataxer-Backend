@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/project")
@@ -87,8 +86,9 @@ public class ProjectController {
     }
 
     @GetMapping("/projectCategoryOverview/{id}")
-    public ResponseEntity<Map<String, List<ProjectTimePriceOverviewDTO>>> getProjectCategoryOverview(@PathVariable Long id,
-                                                                                                     @RequestParam(value = "categoryParent", defaultValue = "") Long categoryParentId) {
+    public ResponseEntity<List<ProjectTimePriceOverviewCategoryDTO>> getProjectCategoryOverview(
+            @PathVariable Long id,
+            @RequestParam(value = "categoryParent", defaultValue = "") Long categoryParentId) {
         return ResponseEntity.ok(this.projectService.getProjectCategoryOverview(id, categoryParentId));
     }
 
@@ -99,7 +99,7 @@ public class ProjectController {
             @RequestParam(value = "dateTo") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
             @RequestParam(value = "categoryName", defaultValue = "_all_") String categoryName,
             @RequestParam(value = "user", defaultValue = "") String userUid
-            ) {
+    ) {
         ProjectTimeOverviewDTO response = new ProjectTimeOverviewDTO();
 
         response.setTimeList(this.timeMapper.timeListToTimeDTOListSimple(this.projectService.getProjectUsersTimesOverview(id, dateFrom, dateTo, categoryName, userUid)));

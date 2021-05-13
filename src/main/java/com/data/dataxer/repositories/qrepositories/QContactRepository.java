@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QContactRepository {
-
     List<Contact> allWithProjects(List<Long> companyIds);
 
     Page<Contact> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
