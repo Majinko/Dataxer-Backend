@@ -15,4 +15,6 @@ public interface CategoryService {
     void updateTree(List<Category> categories, Category category);
 
     void delete(Long id);
+
+    void recreateTree();
 }

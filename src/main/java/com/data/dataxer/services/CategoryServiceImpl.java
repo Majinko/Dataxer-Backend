@@ -4,7 +4,6 @@ import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.qrepositories.QCategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
-import com.google.firebase.database.snapshot.ChildrenNode;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -164,4 +163,37 @@ public class CategoryServiceImpl implements CategoryService {
 
         return subTree;
     }
+
+    //*********** Recreate categories after import ****************************
+
+    @Override
+    @Transactional
+    public void recreateTree() {
+        Category baseCategory = this.qCategoryRepository.getBaseRoot(SecurityUtils.companyId()).orElse(null);
+        if (baseCategory != null) {
+            return;
+        }
+
+        //reset lft rgt to null for all
+        this.qCategoryRepository.updateOldCategoryLftAndRgtToNull(SecurityUtils.companyId());
+        baseCategory = this.createBaseRoot();
+
+        addAllCategoryChildren(baseCategory);
+    }
+
+    private void addAllCategoryChildren(Category processedCategory) {
+        List<Category> oldCategoryChildren;
+        if (processedCategory.getName().equals("BASE")) {
+            oldCategoryChildren = this.qCategoryRepository.getAllOldRootCategories(SecurityUtils.companyId());
+        } else {
+            oldCategoryChildren = this.qCategoryRepository.getOldCategoryChildren(processedCategory, SecurityUtils.companyId());
+        }
+        for (Category category : oldCategoryChildren) {
+            addChild(processedCategory, category, null);
+            addAllCategoryChildren(category);
+        }
+    }
+
+    //*************************************************************************
+
 }

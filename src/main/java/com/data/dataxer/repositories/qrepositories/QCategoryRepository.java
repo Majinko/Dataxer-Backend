@@ -25,9 +25,11 @@ public interface QCategoryRepository {
 
     long getCountOfChildren(Long id, Long companyId);
 
-    List<Category> getCategoriesToIncrementRgt(Integer rgt, Integer rgt1, Long companyId);
-
-    List<Category> getCategoriesToIncrementLft(Integer lft, Integer rgt, Long companyId);
-
     void updateCategoryPosition(Long id, long i, Long companyId);
+
+    List<Category> getAllOldRootCategories(Long companyId);
+
+    List<Category> getOldCategoryChildren(Category processedCategory, Long companyId);
+
+    void updateOldCategoryLftAndRgtToNull(Long companyId);
 }
