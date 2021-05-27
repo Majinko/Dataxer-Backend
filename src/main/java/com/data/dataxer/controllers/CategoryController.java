@@ -48,4 +48,9 @@ public class CategoryController {
     public void destroy(@PathVariable Long id) {
         categoryService.delete(id);
     }
+
+    @PostMapping("/recreateTree")
+    public void recreateTree() {
+        this.categoryService.recreateTree();
+    }
 }

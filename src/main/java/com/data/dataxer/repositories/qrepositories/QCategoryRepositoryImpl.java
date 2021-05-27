@@ -98,24 +98,6 @@ public class QCategoryRepositoryImpl implements QCategoryRepository {
     }
 
     @Override
-    public List<Category> getCategoriesToIncrementRgt(Integer processedCategoryRgt, Integer newParentRgt, Long companyId) {
-        return this.query.selectFrom(QCategory.category)
-                .where(QCategory.category.rgt.goe(newParentRgt))
-                .where(QCategory.category.rgt.lt(processedCategoryRgt))
-                .where(QCategory.category.company.id.eq(companyId))
-                .fetch();
-    }
-
-    @Override
-    public List<Category> getCategoriesToIncrementLft(Integer processedCategoryLft, Integer newParentRgt, Long companyId) {
-        return this.query.selectFrom(QCategory.category)
-                .where(QCategory.category.lft.lt(processedCategoryLft))
-                .where(QCategory.category.lft.gt(newParentRgt))
-                .where(QCategory.category.company.id.eq(companyId))
-                .fetch();
-    }
-
-    @Override
     public void updateCategoryPosition(Long id, long position, Long companyId) {
         this.query.update(QCategory.category)
                 .set(QCategory.category.position, position)
@@ -123,4 +105,35 @@ public class QCategoryRepositoryImpl implements QCategoryRepository {
                 .where(QCategory.category.company.id.eq(companyId))
                 .execute();
     }
+
+    //***************************************************
+    // Queries for recreating category tree
+    //***************************************************
+
+    @Override
+    public List<Category> getAllOldRootCategories(Long companyId) {
+        return this.query.selectFrom(QCategory.category)
+                .where(QCategory.category.parent.isNull())
+                .where(QCategory.category.depth.isNull())
+                .where(QCategory.category.company.id.eq(companyId))
+                .fetch();
+    }
+
+    @Override
+    public List<Category> getOldCategoryChildren(Category processedCategory, Long companyId) {
+        return this.query.selectFrom(QCategory.category)
+                .where(QCategory.category.parent.id.eq(processedCategory.getId()))
+                .where(QCategory.category.company.id.eq(companyId))
+                .fetch();
+    }
+
+    @Override
+    public void updateOldCategoryLftAndRgtToNull(Long companyId) {
+        this.query.update(QCategory.category)
+                .setNull(QCategory.category.lft)
+                .setNull(QCategory.category.rgt)
+                .where(QCategory.category.company.id.eq(companyId))
+                .execute();
+    }
+
 }
