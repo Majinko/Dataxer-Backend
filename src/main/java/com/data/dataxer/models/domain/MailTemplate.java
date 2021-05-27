@@ -13,8 +13,7 @@ import java.time.LocalDateTime;
 @Setter
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE mail_templates SET deleted_at = now() WHERE id = ?")
-public class MailTemplates extends BaseEntity {
-
+public class MailTemplate extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,5 +25,4 @@ public class MailTemplates extends BaseEntity {
     private String emailContent;
 
     private LocalDateTime deletedAt;
-
 }

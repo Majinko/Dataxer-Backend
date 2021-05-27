@@ -10,7 +10,6 @@ import com.lowagie.text.DocumentException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -79,7 +78,7 @@ public class InvoiceController {
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
             @RequestParam(value = "sortExpression", defaultValue = "sort(-invoice.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Pageable pageable = PageRequest.of(page, size);
 
         return ResponseEntity.ok(invoiceService.paginate(pageable, rqlFilter, sortExpression).map(invoiceMapper::invoiceToInvoiceDTOSimple));
     }

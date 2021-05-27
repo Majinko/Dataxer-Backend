@@ -1,19 +1,22 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.MailTemplates;
+import com.data.dataxer.models.domain.MailTemplate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface MailTemplatesService {
 
-    void store(MailTemplates mailTemplates);
+    void store(MailTemplate mailTemplates);
 
-    void update(MailTemplates mailTemplates);
+    void update(MailTemplate mailTemplates);
 
-    MailTemplates getById(Long id);
+    MailTemplate getById(Long id);
 
-    Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression);
+    Page<MailTemplate> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
     void destroy(Long id);
 
+    List<MailTemplate> getAll();
 }

@@ -48,7 +48,7 @@ public class RoleConfig {
         privileges.add(Invoice.class.getSimpleName());
         privileges.add(Item.class.getSimpleName());
         privileges.add(MailAccounts.class.getSimpleName());
-        privileges.add(MailTemplates.class.getSimpleName());
+        privileges.add(MailTemplate.class.getSimpleName());
         privileges.add("Overview");
         privileges.add(Pack.class.getSimpleName());
         privileges.add(Payment.class.getSimpleName());

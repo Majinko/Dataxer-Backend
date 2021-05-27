@@ -56,8 +56,8 @@ public class PackController {
         return ResponseEntity.ok(packDTO);
     }
 
-    @GetMapping("/search/{q}")
-    public ResponseEntity<List<PackDTO>> search(@PathVariable String q) {
+    @GetMapping("/search")
+    public ResponseEntity<List<PackDTO>> search(@RequestParam(value = "q", defaultValue = "") String q) {
         return ResponseEntity.ok(packMapper.packToPackDTOsSimple(packService.search(q)));
     }
 

@@ -44,7 +44,8 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("invoice.id", QInvoice.invoice.id)
-                .put("invoice.state", QInvoice.invoice.state)
+                .put("invoice.title", QInvoice.invoice.title)
+                .put("invoice.document_type", QInvoice.invoice.documentType)
                 .put("invoice.contact.id", QInvoice.invoice.contact.id)
                 .put("invoice.contact.name", QInvoice.invoice.contact.name)
                 .put("invoice.project.id", QInvoice.invoice.project.id)

@@ -7,11 +7,9 @@ import java.time.LocalDateTime;
 
 @Getter
 @Setter
-public class MailTemplatesDTO {
-
+public class MailTemplateDTO {
     private Long id;
     private String emailSubject;
     private String emailContent;
     private LocalDateTime deletedAt;
-
 }

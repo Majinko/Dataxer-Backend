@@ -1,7 +1,7 @@
 package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.MailTemplatesMapper;
-import com.data.dataxer.models.dto.MailTemplatesDTO;
+import com.data.dataxer.models.dto.MailTemplateDTO;
 import com.data.dataxer.services.MailTemplatesService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +10,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/mailTemplates")
@@ -25,24 +27,31 @@ public class MailTemplatesController {
     }
 
     @PostMapping("/store")
-    public void store(@RequestBody MailTemplatesDTO mailTemplatesDTO) {
-        this.mailTemplatesService.store(this.mailTemplatesMapper.mailTemplatesDTOToMailTemplates(mailTemplatesDTO));
+    public void store(@RequestBody MailTemplateDTO mailTemplatesDTO) {
+        this.mailTemplatesService.store(this.mailTemplatesMapper.mailTemplateDTOToMailTemplates(mailTemplatesDTO));
     }
 
     @PostMapping("/update")
-    public void update(@RequestBody MailTemplatesDTO mailTemplatesDTO) {
-        this.mailTemplatesService.update(this.mailTemplatesMapper.mailTemplatesDTOToMailTemplates(mailTemplatesDTO));
+    public void update(@RequestBody MailTemplateDTO mailTemplatesDTO) {
+        this.mailTemplatesService.update(this.mailTemplatesMapper.mailTemplateDTOToMailTemplates(mailTemplatesDTO));
     }
 
     @GetMapping("/getById/{id}")
-    public ResponseEntity<MailTemplatesDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<MailTemplateDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(
-                this.mailTemplatesMapper.mailTemplatesToMailTemplatesDTO(this.mailTemplatesService.getById(id))
+                this.mailTemplatesMapper.mailTemplateToMailTemplatesDTO(this.mailTemplatesService.getById(id))
+        );
+    }
+
+    @GetMapping("/getAll")
+    public ResponseEntity<List<MailTemplateDTO>> getAll() {
+        return ResponseEntity.ok(
+            this.mailTemplatesMapper.mailTemplatesToMailTemplatesDTO(this.mailTemplatesService.getAll())
         );
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
-    public ResponseEntity<Page<MailTemplatesDTO>> paginate(
+    public ResponseEntity<Page<MailTemplateDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
@@ -52,7 +61,7 @@ public class MailTemplatesController {
 
         return ResponseEntity.ok(
                 this.mailTemplatesService.paginate(pageable, rqlFilter, sortExpression)
-                    .map(mailTemplatesMapper::mailTemplatesToMailTemplatesDTO)
+                        .map(mailTemplatesMapper::mailTemplateToMailTemplatesDTO)
         );
     }
 
