@@ -5,8 +5,8 @@ import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.dto.ProjectManHoursDTO;
 import com.data.dataxer.models.dto.ProjectTimePriceOverviewDTO;
 import com.data.dataxer.repositories.CategoryRepository;
+import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.ProjectRepository;
-import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.*;
 
 @Service
@@ -27,16 +28,16 @@ public class ProjectServiceImpl implements ProjectService {
     private final QProjectRepository qProjectRepository;
     private final QTimeRepository qTimeRepository;
     private final CategoryRepository categoryRepository;
-    private final QCostRepository qCostRepository;
+    private final CostRepository costRepository;
 
     public ProjectServiceImpl(ProjectRepository projectRepository, QProjectRepository qProjectRepository,
                               QTimeRepository qTimeRepository, CategoryRepository categoryRepository,
-                              QCostRepository qCostRepository) {
+                              CostRepository costRepository) {
         this.projectRepository = projectRepository;
         this.qProjectRepository = qProjectRepository;
         this.qTimeRepository = qTimeRepository;
         this.categoryRepository = categoryRepository;
-        this.qCostRepository = qCostRepository;
+        this.costRepository = costRepository;
     }
 
     @Override
@@ -115,7 +116,7 @@ public class ProjectServiceImpl implements ProjectService {
             List<ProjectTimePriceOverviewDTO> responseValue = new ArrayList<>();
             categoryUsersData.forEach(userData -> {
                 String userName = StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName));
-                BigDecimal costToHour = this.getUserCostToHour(id, projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
+                BigDecimal costToHour = this.getUserCostToHour(projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
 
                 ProjectTimePriceOverviewDTO projectTimePriceOverviewDTO = new ProjectTimePriceOverviewDTO();
                 projectTimePriceOverviewDTO.setName(userName);
@@ -160,11 +161,14 @@ public class ProjectServiceImpl implements ProjectService {
 
         List<Integer> projectYears = this.getAllProjectYears(id);
         BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
+        System.out.println("Project total cost: " + projectTotalCost);
+        System.out.println("Project first year: " + projectYears.get(0));
+        System.out.println("Project last year: " + projectYears.get(projectYears.size() - 1));
 
         List<Tuple> userTimesPriceSums = this.qTimeRepository.getProjectUsersTimePriceSums(id, SecurityUtils.companyId());
 
         userTimesPriceSums.forEach(tuple -> {
-            BigDecimal costToHour = this.getUserCostToHour(id, projectYears.get(0), projectYears.get(projectYears.size() - 1), tuple.get(QTime.time1.user.uid), projectTotalCost);
+            BigDecimal costToHour = this.getUserCostToHour(projectYears.get(0), projectYears.get(projectYears.size() - 1), tuple.get(QTime.time1.user.uid), projectTotalCost);
 
             ProjectTimePriceOverviewDTO projectTimePriceOverviewDTO = new ProjectTimePriceOverviewDTO();
 
@@ -188,16 +192,16 @@ public class ProjectServiceImpl implements ProjectService {
         return projectManHoursDTO;
     }
 
-    private BigDecimal getUserCostToHour(Long projectId, Integer startYear, Integer endYear, String userUid, BigDecimal projectTotalCost) {
-        int userTimeBetweenYears = this.qTimeRepository.getUserProjectTimeBetweenYears(projectId, startYear, endYear, userUid, SecurityUtils.companyId());
-        int userActiveMonths = this.qTimeRepository.getUserActiveMonths(projectId, startYear, endYear, userUid, SecurityUtils.companyId()).size();
-        BigDecimal allActiveMonths = new BigDecimal(this.qTimeRepository.getProjectAllUsersActiveMonth(projectId, startYear, endYear, SecurityUtils.companyId()).size());
+    private BigDecimal getUserCostToHour(Integer startYear, Integer endYear, String userUid, BigDecimal projectTotalCost) {
+        int userTimeBetweenYears = this.qTimeRepository.getUserProjectTimeBetweenYears(startYear, endYear, userUid, SecurityUtils.companyId());
+        int userActiveMonths = this.qTimeRepository.getUserActiveMonths(startYear, endYear, userUid, SecurityUtils.companyId()).size();
+        BigDecimal allActiveMonths = new BigDecimal(this.qTimeRepository.getProjectAllUsersActiveMonth(startYear, endYear, SecurityUtils.companyId()).size());
 
         if (userActiveMonths == 0) {
             return new BigDecimal(userActiveMonths);
         }
 
-        BigDecimal coefficient = new BigDecimal((userTimeBetweenYears/3600) / userActiveMonths);
+        BigDecimal coefficient = new BigDecimal((this.convertTimeSecondsToHours(userTimeBetweenYears)) / userActiveMonths).setScale(2, RoundingMode.HALF_UP);
 
         if (coefficient.equals(BigDecimal.ZERO)) {
             coefficient = BigDecimal.ONE;
@@ -217,7 +221,13 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private BigDecimal getProjectTotalCostForYears(Integer firstYear, Integer lastYear) {
-        return this.qCostRepository.getProjectCostsForYears(firstYear, lastYear, SecurityUtils.companyId());
+        LocalDate firstYearStart = LocalDate.of(firstYear, Month.JANUARY, 1);
+        LocalDate lastYearEnd = LocalDate.of(lastYear, Month.DECEMBER, 31);
+        return this.costRepository.getProjectTotalCostBetweenYears(firstYearStart, lastYearEnd, Boolean.FALSE, Boolean.FALSE, SecurityUtils.companyId());
+        //return this.qCostRepository.getProjectCostsForYears(firstYear, lastYear, costWithCategoryIds, SecurityUtils.companyId()).setScale(2, RoundingMode.HALF_UP);
     }
 
+    private double convertTimeSecondsToHours(int time) {
+        return (double) time/60/60;
+    }
 }
