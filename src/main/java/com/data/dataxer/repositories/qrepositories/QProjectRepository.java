@@ -1,5 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
+import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Project;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,4 +14,6 @@ public interface QProjectRepository {
     Project getById(Long id, Long companyId);
 
     List<Project> search(Long companyId, String queryString);
+
+    List<AppUser> findAllProjectUsers(Long projectId,  Long companyId);
 }

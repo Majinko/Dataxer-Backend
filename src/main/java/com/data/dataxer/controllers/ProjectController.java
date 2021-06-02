@@ -113,4 +113,9 @@ public class ProjectController {
     public ResponseEntity<ProjectManHoursDTO> getProjectManHours(@PathVariable Long id) {
         return ResponseEntity.ok(this.projectService.getProjectManHours(id));
     }
+
+    @GetMapping("/evaluation/{id}")
+    public void projectEvaluationProfit(@PathVariable Long id) {
+        this.projectService.projectEvaluationProfit(id);
+    }
 }

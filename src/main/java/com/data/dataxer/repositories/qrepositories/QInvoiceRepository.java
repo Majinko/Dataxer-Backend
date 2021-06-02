@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.Invoice;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 public interface QInvoiceRepository {
@@ -14,4 +15,6 @@ public interface QInvoiceRepository {
     Optional<Invoice> getById(Long id);
 
     Optional<Invoice> getByIdSimple(Long id, Long companyId);
+
+    BigDecimal getProjectPriceSum(Long id, Long companyId);
 }

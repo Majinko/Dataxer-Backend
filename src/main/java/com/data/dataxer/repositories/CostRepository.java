@@ -26,4 +26,7 @@ public interface CostRepository extends CrudRepository<Cost, Long> {
     @Query("SELECT sum(c.totalPrice) FROM Cost c WHERE c.deliveredDate >= ?1 AND c.deliveredDate <= ?2 AND c.isInternal = ?3 AND c.isRepeated = ?4 AND c.categories.size > 0 AND c.company.id = ?5 ")
     BigDecimal getProjectTotalCostBetweenYears(LocalDate firstYearStart, LocalDate lastYearEnd, Boolean isInternal, Boolean isRepeated, Long companyId);
 
+    @Query("SELECT sum(c.totalPrice) FROM Cost c WHERE c.company.id = ?1")
+    BigDecimal getProjectCostSum(Long companyId);
+
 }

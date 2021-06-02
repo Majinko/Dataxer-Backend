@@ -1,5 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
+import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.QProject;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
@@ -87,6 +88,14 @@ public class QProjectRepositoryImpl implements QProjectRepository {
         return query.selectFrom(QProject.project)
                 .where(QProject.project.company.id.eq(companyId))
                 .where(QProject.project.title.containsIgnoreCase(queryString))
+                .fetch();
+    }
+
+    @Override
+    public List<AppUser> findAllProjectUsers(Long projectId, Long companyId) {
+        return this.query.selectFrom(QProject.project.user)
+                .where(QProject.project.id.eq(projectId))
+                .where(QProject.project.company.id.eq(companyId))
                 .fetch();
     }
 

@@ -23,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -118,6 +119,15 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(qInvoice.id.eq(id))
                 .where(QInvoice.invoice.company.id.eq(companyId))
                 .fetchOne());
+    }
+
+    @Override
+    public BigDecimal getProjectPriceSum(Long id, Long companyId) {
+        return this.query.select(QInvoice.invoice.totalPrice.sum())
+                .from(QInvoice.invoice)
+                .where(QInvoice.invoice.project.id.eq(id))
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .fetchOne();
     }
 
     private long getTotalCount(Predicate predicate) {
