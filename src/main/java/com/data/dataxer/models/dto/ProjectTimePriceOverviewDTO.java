@@ -9,19 +9,17 @@ import java.math.RoundingMode;
 @Getter
 public class ProjectTimePriceOverviewDTO {
 
-    private String name;
+    private final String name;
     private String hours;
 
-    private Integer seconds;
-    private BigDecimal costToHour;
+    private final Integer seconds;
+    private final BigDecimal costToHour;
 
     private BigDecimal hourNetto;
-    private BigDecimal priceNetto;
+    private final BigDecimal priceNetto;
 
     private BigDecimal hourBrutto;
     private BigDecimal priceBrutto;
-
-    public ProjectTimePriceOverviewDTO() {}
 
     public ProjectTimePriceOverviewDTO(String name, Integer seconds, BigDecimal costToHour, BigDecimal priceNetto) {
         this.name = name;
