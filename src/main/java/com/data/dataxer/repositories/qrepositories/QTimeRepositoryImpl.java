@@ -248,23 +248,22 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public Integer getUserProjectTimeBetweenYears(Long projectId, Integer startYear, Integer endYear, String uid, Long companyId) {
+    public Integer getUserProjectTimeBetweenYears(Integer startYear, Integer endYear, String uid, Long companyId) {
         return this.query.select(QTime.time1.time.sum())
                 .from(QTime.time1)
-                .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.user.uid.eq(uid))
                 .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.salary.isNotNull())
                 .where(QTime.time1.dateWork.year().goe(startYear))
                 .where(QTime.time1.dateWork.year().loe(endYear))
                 .fetchOne();
     }
 
     @Override
-    public List<Tuple> getUserActiveMonths(Long projectId, Integer startYear, Integer endYear, String uid, Long companyId) {
+    public List<Tuple> getUserActiveMonths(Integer startYear, Integer endYear, String uid, Long companyId) {
         return this.query.select(QTime.time1.dateWork.month(), QTime.time1.dateWork.year(), QTime.time1.user.uid)
                 .from(QTime.time1)
                 .leftJoin(QTime.time1.salary)
-                .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.user.uid.eq(uid))
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.dateWork.year().goe(startYear))
@@ -277,15 +276,14 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Tuple> getProjectAllUsersActiveMonth(Long projectId, Integer startYear, Integer endYear, Long companyId) {
+    public List<Tuple> getProjectAllUsersActiveMonth(Integer startYear, Integer endYear, Long companyId) {
         return this.query.select(QTime.time1.dateWork.month(), QTime.time1.dateWork.year(), QTime.time1.user.uid)
                 .from(QTime.time1)
                 .leftJoin(QTime.time1.salary)
-                .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.dateWork.year().goe(startYear))
                 .where(QTime.time1.dateWork.year().loe(endYear))
-                .where(QTime.time1.salary.isActive.eq(true))
+                .where(QTime.time1.salary.isActive.eq(Boolean.TRUE))
                 .groupBy(QTime.time1.dateWork.month())
                 .groupBy(QTime.time1.dateWork.year())
                 .groupBy(QTime.time1.user.uid)
