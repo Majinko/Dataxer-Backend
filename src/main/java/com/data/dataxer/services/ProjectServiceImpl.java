@@ -111,14 +111,9 @@ public class ProjectServiceImpl implements ProjectService {
             List<UserTimePriceOverviewDTO> responseValue = new ArrayList<>();
 
             categoryUsersData.forEach(userData -> {
-<<<<<<< HEAD
                 UserTimePriceOverviewDTO projectTimePriceOverviewDTO = new UserTimePriceOverviewDTO();
 
                 BigDecimal costToHour = this.getUserCostToHour(id, projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
-=======
-                String userName = StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName));
-                BigDecimal costToHour = this.getUserCostToHour(projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
->>>>>>> e33e6932e9c8dc0dd9723896f9e8ff48ee0ddd23
 
                 projectTimePriceOverviewDTO.setName(StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName)));
                 projectTimePriceOverviewDTO.setHours(userData.get(QTime.time1.time.sum()));
@@ -222,11 +217,7 @@ public class ProjectServiceImpl implements ProjectService {
             return new BigDecimal(userActiveMonths);
         }
 
-<<<<<<< HEAD
-        BigDecimal coefficient = new BigDecimal((userTimeBetweenYears / 3600) / userActiveMonths);
-=======
         BigDecimal coefficient = new BigDecimal((this.convertTimeSecondsToHours(userTimeBetweenYears)) / userActiveMonths).setScale(2, RoundingMode.HALF_UP);
->>>>>>> e33e6932e9c8dc0dd9723896f9e8ff48ee0ddd23
 
         if (coefficient.equals(BigDecimal.ZERO)) {
             coefficient = BigDecimal.ONE;
@@ -251,11 +242,8 @@ public class ProjectServiceImpl implements ProjectService {
         return this.costRepository.getProjectTotalCostBetweenYears(firstYearStart, lastYearEnd, Boolean.FALSE, Boolean.FALSE, SecurityUtils.companyId());
         //return this.qCostRepository.getProjectCostsForYears(firstYear, lastYear, costWithCategoryIds, SecurityUtils.companyId()).setScale(2, RoundingMode.HALF_UP);
     }
-<<<<<<< HEAD
-=======
 
     private double convertTimeSecondsToHours(int time) {
         return (double) time/60/60;
     }
->>>>>>> e33e6932e9c8dc0dd9723896f9e8ff48ee0ddd23
 }
