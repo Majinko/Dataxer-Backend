@@ -13,4 +13,6 @@ public interface MailTemplatesMapper {
     MailTemplateDTO mailTemplateToMailTemplatesDTO(MailTemplate mailTemplates);
 
     List<MailTemplateDTO> mailTemplatesToMailTemplatesDTO(List<MailTemplate> mailTemplates);
+
+    List<MailTemplate> mailTemplatesDTOtoMailTemplates(List<MailTemplateDTO> mailTemplates);
 }

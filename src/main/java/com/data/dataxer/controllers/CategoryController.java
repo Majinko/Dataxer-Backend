@@ -49,7 +49,7 @@ public class CategoryController {
         categoryService.delete(id);
     }
 
-    @PostMapping("/recreateTree")
+    @GetMapping("/recreateTree")
     public void recreateTree() {
         this.categoryService.recreateTree();
     }

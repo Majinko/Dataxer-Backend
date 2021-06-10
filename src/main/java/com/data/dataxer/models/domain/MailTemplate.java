@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.MailTemplateType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -23,6 +24,9 @@ public class MailTemplate extends BaseEntity {
 
     @Column(nullable = false, columnDefinition = "TEXT")
     private String emailContent;
+
+    @Enumerated(EnumType.STRING)
+    MailTemplateType mailTemplateType;
 
     private LocalDateTime deletedAt;
 }

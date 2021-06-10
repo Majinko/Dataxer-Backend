@@ -46,8 +46,13 @@ public class MailTemplatesController {
     @GetMapping("/getAll")
     public ResponseEntity<List<MailTemplateDTO>> getAll() {
         return ResponseEntity.ok(
-            this.mailTemplatesMapper.mailTemplatesToMailTemplatesDTO(this.mailTemplatesService.getAll())
+                this.mailTemplatesMapper.mailTemplatesToMailTemplatesDTO(this.mailTemplatesService.getAll())
         );
+    }
+
+    @PostMapping("/storeOrUpdateAll")
+    public void storeOrUpdateAll(@RequestBody List<MailTemplateDTO> mailTemplates) {
+        this.mailTemplatesService.storeOrUpdateAll(this.mailTemplatesMapper.mailTemplatesDTOtoMailTemplates(mailTemplates));
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)

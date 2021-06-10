@@ -60,6 +60,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
                 .where(predicate)
+                .where(QPriceOffer.priceOffer.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())

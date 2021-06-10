@@ -188,6 +188,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice taxDocument = this.getById(taxDocumentId);
 
         Invoice summaryInvoice = new Invoice();
+
         BeanUtils.copyProperties(taxDocument, summaryInvoice,
                 "id", "packs", "title", "note", "number", "state", "discount", "price",
                 "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
@@ -296,9 +297,11 @@ public class InvoiceServiceImpl implements InvoiceService {
         DocumentPackItem documentPackItem = new DocumentPackItem();
 
         documentPackItem.setTitle(this.generateSummaryInvoicePackTitle(taxDocumentNumber, taxDocumentCreated, taxDocumentVariableSymbol));
+        documentPackItem.setQty(1f);
         documentPackItem.setTax(taxDocumentPack.getTax());
         documentPackItem.setPrice(taxDocumentPack.getPrice().negate());
         documentPackItem.setTotalPrice(taxDocumentPack.getTotalPrice().negate());
+        documentPackItem.setDiscount(BigDecimal.valueOf(0));
 
         return documentPackItem;
     }

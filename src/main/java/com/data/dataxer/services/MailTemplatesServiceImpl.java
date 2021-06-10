@@ -55,4 +55,9 @@ public class MailTemplatesServiceImpl implements MailTemplatesService {
     public List<MailTemplate> getAll() {
         return this.mailTemplatesRepository.findAllByCompanyId(SecurityUtils.companyId());
     }
+
+    @Override
+    public void storeOrUpdateAll(List<MailTemplate> mailTemplatesDTOtoMailTemplates) {
+        this.mailTemplatesRepository.saveAll(mailTemplatesDTOtoMailTemplates);
+    }
 }

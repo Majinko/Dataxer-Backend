@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.InvoiceMapper;
 import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.models.enums.DocumentState;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.services.DocumentNumberGeneratorService;
 import com.data.dataxer.services.InvoiceService;
 import com.data.dataxer.services.PdfService;
@@ -47,13 +48,15 @@ public class InvoiceController {
 
     @PostMapping("/store/{oldInvoiceId}")
     public void store(@RequestBody InvoiceDTO invoiceDTO, @PathVariable Long oldInvoiceId) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType(), true);
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType().equals(DocumentType.PROFORMA) ? DocumentType.PROFORMA : DocumentType.INVOICE, true);
 
         this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), oldInvoiceId);
     }
 
     @RequestMapping(value = "/storeSummaryInvoice", method = RequestMethod.POST)
     public void storeTaxDocument(@RequestParam(value = "id1") Long taxDocumentId, @RequestParam(value = "id2") Long proformaId, @RequestBody InvoiceDTO invoiceDTO) {
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.INVOICE, true);
+
         this.invoiceService.storeSummaryInvoice(this.invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), taxDocumentId, proformaId);
     }
 

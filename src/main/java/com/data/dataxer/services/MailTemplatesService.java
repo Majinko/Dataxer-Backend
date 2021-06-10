@@ -19,4 +19,6 @@ public interface MailTemplatesService {
     void destroy(Long id);
 
     List<MailTemplate> getAll();
+
+    void storeOrUpdateAll(List<MailTemplate> mailTemplatesDTOtoMailTemplates);
 }
