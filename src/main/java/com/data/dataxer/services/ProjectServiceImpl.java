@@ -113,7 +113,7 @@ public class ProjectServiceImpl implements ProjectService {
             categoryUsersData.forEach(userData -> {
                 UserTimePriceOverviewDTO projectTimePriceOverviewDTO = new UserTimePriceOverviewDTO();
 
-                BigDecimal costToHour = this.getUserCostToHour(id, projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
+                BigDecimal costToHour = this.getUserCostToHour(projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
 
                 projectTimePriceOverviewDTO.setName(StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName)));
                 projectTimePriceOverviewDTO.setHours(userData.get(QTime.time1.time.sum()));
