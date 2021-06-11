@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QTime;
+import com.data.dataxer.models.dto.EvaluationDTO;
 import com.data.dataxer.models.dto.ProjectManHoursDTO;
 import com.data.dataxer.models.dto.ProjectTimePriceOverviewDTO;
 import com.data.dataxer.repositories.CategoryRepository;
@@ -176,18 +177,28 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public void projectEvaluationProfit(Long id) {
+        EvaluationDTO evaluationDTO = new EvaluationDTO();
         BigDecimal projectInvoicesPriceSum = this.qInvoiceRepository.getProjectPriceSum(id, SecurityUtils.companyId());
         BigDecimal projectCostPriceSum = this.costRepository.getProjectCostSum(SecurityUtils.companyId());
 
         List<Tuple> projectUserData = this.qTimeRepository.getProjectUsersTimePriceSums(id, SecurityUtils.companyId());
 
-        projectUserData.forEach(data -> {
-            //BigDecimal hourNetto = this.countHourNetto(data.get(QTime.time1.time.sum()), data.get(QTime.time1.price.sum()));
+        BigDecimal priceBruttoSum = BigDecimal.ZERO;
+        Integer timeSum = 0;
 
+        for (Tuple data:projectUserData) {
+            priceBruttoSum = priceBruttoSum.add(data.get(QTime.time1.price.sum()));
+            timeSum += data.get(QTime.time1.time.sum());
+        }
 
-        });
+        BigDecimal costs = projectCostPriceSum.add(priceBruttoSum);
+        BigDecimal price = projectInvoicesPriceSum.subtract(costs);
 
-
+        evaluationDTO.setProfit(price);
+        evaluationDTO.setProfitManHour(price.divide(new BigDecimal((double) timeSum/60/60).setScale(2, RoundingMode.HALF_UP))
+                .setScale(2, RoundingMode.HALF_UP));
+        costs = costs.equals(BigDecimal.ZERO) ? BigDecimal.ONE : costs;
+        evaluationDTO.setRebate(price.divide(costs).setScale(4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP));
     }
 
     private ProjectTimePriceOverviewDTO getProjectOverviewData(String userName, String uid, Integer seconds, BigDecimal priceNetto, List<Integer> projectYears, BigDecimal projectTotalCost) {
