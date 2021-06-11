@@ -1,6 +1,11 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QDocumentPack;
+import com.data.dataxer.models.domain.QDocumentPackItem;
+import com.data.dataxer.models.domain.QInvoice;
+import com.data.dataxer.models.domain.QItem;
+import com.data.dataxer.models.enums.DocumentType;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -116,6 +121,18 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(qInvoice.id.eq(id))
                 .where(QInvoice.invoice.company.id.eq(companyId))
                 .fetchOne());
+    }
+
+    @Override
+    public List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, Long companyId) {
+        return this.query.selectFrom(QInvoice.invoice)
+                .leftJoin(QInvoice.invoice.contact).fetchJoin()
+                .leftJoin(QInvoice.invoice.project).fetchJoin()
+                .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
+                .where(QInvoice.invoice.id.in(ids))
+                .where(QInvoice.invoice.documentType.eq(type))
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .fetch();
     }
 
     private long getTotalCount(Predicate predicate) {
