@@ -2,6 +2,7 @@ package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.Category;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,7 +12,7 @@ public interface QCategoryRepository {
 
     Category findChildWithHighestRgt(Category parent, Long companyId);
 
-    Category getById(Long id, Long companyId);
+    Optional<Category> getById(Long id, Long companyId);
 
     List<Category> findByLftGreaterEqualThan(Integer lft, Long companyId);
 
@@ -32,4 +33,8 @@ public interface QCategoryRepository {
     List<Category> getOldCategoryChildren(Category processedCategory, Long companyId);
 
     void updateOldCategoryLftAndRgtToNull(Long companyId);
+
+    Optional<List<Category>> getAllRootCategories(Long companyId);
+
+    Optional<List<Category>> getChildren(Long parentId, Long companyId);
 }
