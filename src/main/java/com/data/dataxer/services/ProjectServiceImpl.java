@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.domain.Time;
+import com.data.dataxer.models.dto.EvaluationDTO;
 import com.data.dataxer.models.dto.ProjectManHoursDTO;
 import com.data.dataxer.models.dto.ProjectTimePriceOverviewCategoryDTO;
 import com.data.dataxer.models.dto.UserTimePriceOverviewDTO;
@@ -11,6 +12,7 @@ import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.ProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QCategoryRepository;
+import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -35,16 +37,19 @@ public class ProjectServiceImpl implements ProjectService {
     private final CategoryRepository categoryRepository;
     private final CostRepository costRepository;
     private final QCategoryRepository qCategoryRepository;
+    private final QInvoiceRepository qInvoiceRepository;
 
     public ProjectServiceImpl(ProjectRepository projectRepository, QProjectRepository qProjectRepository,
                               QTimeRepository qTimeRepository, CategoryRepository categoryRepository,
-                              CostRepository costRepository, QCategoryRepository qCategoryRepository) {
+                              CostRepository costRepository, QCategoryRepository qCategoryRepository,
+                              QInvoiceRepository qInvoiceRepository) {
         this.projectRepository = projectRepository;
         this.qProjectRepository = qProjectRepository;
         this.qTimeRepository = qTimeRepository;
         this.categoryRepository = categoryRepository;
         this.costRepository = costRepository;
         this.qCategoryRepository = qCategoryRepository;
+        this.qInvoiceRepository = qInvoiceRepository;
     }
 
     @Override
@@ -99,15 +104,8 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ProjectTimePriceOverviewCategoryDTO> getProjectCategoryOverview(Long id, Long categoryParentId) {
         List<ProjectTimePriceOverviewCategoryDTO> response = new ArrayList<>();
 
-        List<Integer> projectYears = this.getAllProjectYears(id);
-
-        if (projectYears.size() < 1) {
-            return response;
-        }
-
         List<Category> parentCategories = this.prepareParentCategories(categoryParentId);
         Map<Category, List<Long>> parentCategoriesChildren = this.prepareParentCategoriesChildren(parentCategories);
-        BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
 
         parentCategories.forEach(category -> {
             List<Tuple> categoryUsersData = this.qTimeRepository.getAllProjectUserCategoryData(id, parentCategoriesChildren.get(category), SecurityUtils.companyId());
@@ -117,13 +115,7 @@ public class ProjectServiceImpl implements ProjectService {
             categoryUsersData.forEach(userData -> {
                 UserTimePriceOverviewDTO projectTimePriceOverviewDTO = new UserTimePriceOverviewDTO();
 
-                BigDecimal costToHour = this.getUserCostToHour(projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
-
-                projectTimePriceOverviewDTO.setName(StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName)));
-                projectTimePriceOverviewDTO.setHours(userData.get(QTime.time1.time.sum()));
-                projectTimePriceOverviewDTO.setPriceNetto(userData.get(QTime.time1.price.sum()));
-
-                prepareProjectTimePriceOverviewDTO(userData, costToHour, projectTimePriceOverviewDTO);
+                prepareProjectTimePriceOverviewDTO(id, userData, projectTimePriceOverviewDTO);
 
                 responseValue.add(projectTimePriceOverviewDTO);
             });
@@ -154,7 +146,20 @@ public class ProjectServiceImpl implements ProjectService {
         return parentCategoriesChildren;
     }
 
-    private void prepareProjectTimePriceOverviewDTO(Tuple userData, BigDecimal costToHour, UserTimePriceOverviewDTO projectTimePriceOverviewDTO) {
+    private void prepareProjectTimePriceOverviewDTO(Long id, Tuple userData, UserTimePriceOverviewDTO projectTimePriceOverviewDTO) {
+        List<Integer> projectYears = this.getAllProjectYears(id);
+
+        if (projectYears.size() < 1) {
+            return;
+        }
+
+        BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
+        BigDecimal costToHour = this.getUserCostToHour(projectYears.get(0), projectYears.get(projectYears.size() - 1), userData.get(QTime.time1.user.uid), projectTotalCost);
+
+        projectTimePriceOverviewDTO.setName(StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName)));
+        projectTimePriceOverviewDTO.setHours(userData.get(QTime.time1.time.sum()));
+
+        projectTimePriceOverviewDTO.setPriceNetto(userData.get(QTime.time1.price.sum()));
         projectTimePriceOverviewDTO.setHourNetto(this.countHourNetto(userData.get(QTime.time1.time.sum()), userData.get(QTime.time1.price.sum())));
         projectTimePriceOverviewDTO.setHourBrutto(projectTimePriceOverviewDTO.getHourNetto().add(costToHour));
         projectTimePriceOverviewDTO.setPriceBrutto(
@@ -184,31 +189,48 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectManHoursDTO projectManHoursDTO = new ProjectManHoursDTO();
         List<UserTimePriceOverviewDTO> projectTimePriceOverviewDTOList = new ArrayList<>();
 
-        List<Integer> projectYears = this.getAllProjectYears(id);
-        BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
-
         List<Tuple> userTimesPriceSums = this.qTimeRepository.getProjectUsersTimePriceSums(id, SecurityUtils.companyId());
 
         userTimesPriceSums.forEach(tuple -> {
-            BigDecimal costToHour = this.getUserCostToHour(projectYears.get(0), projectYears.get(projectYears.size() - 1), tuple.get(QTime.time1.user.uid), projectTotalCost);
-
             UserTimePriceOverviewDTO projectTimePriceOverviewDTO = new UserTimePriceOverviewDTO();
 
-            projectTimePriceOverviewDTO.setName(StringUtils.getAppUserFullName(tuple.get(QTime.time1.user.firstName), tuple.get(QTime.time1.user.lastName)));
-            projectTimePriceOverviewDTO.setHours(tuple.get(QTime.time1.time.sum()));
+            prepareProjectTimePriceOverviewDTO(id, tuple, projectTimePriceOverviewDTO);
 
-            projectTimePriceOverviewDTO.setPriceNetto(tuple.get(QTime.time1.price.sum()));
             projectManHoursDTO.setSumPriceNetto(projectManHoursDTO.getSumPriceNetto().add(tuple.get(QTime.time1.price.sum())));
-
-            prepareProjectTimePriceOverviewDTO(tuple, costToHour, projectTimePriceOverviewDTO);
-
             projectManHoursDTO.setSumPriceBrutto(projectManHoursDTO.getSumPriceBrutto().add(projectTimePriceOverviewDTO.getPriceBrutto()));
+
             projectTimePriceOverviewDTOList.add(projectTimePriceOverviewDTO);
         });
 
         projectManHoursDTO.setUserTimePriceOverviewList(projectTimePriceOverviewDTOList);
 
         return projectManHoursDTO;
+    }
+
+    @Override
+    public void projectEvaluationProfit(Long id) {
+        EvaluationDTO evaluationDTO = new EvaluationDTO();
+        BigDecimal projectInvoicesPriceSum = this.qInvoiceRepository.getProjectPriceSum(id, SecurityUtils.companyId());
+        BigDecimal projectCostPriceSum = this.costRepository.getProjectCostSum(SecurityUtils.companyId());
+
+        List<Tuple> projectUserData = this.qTimeRepository.getProjectUsersTimePriceSums(id, SecurityUtils.companyId());
+
+        BigDecimal priceBruttoSum = BigDecimal.ZERO;
+        Integer timeSum = 0;
+
+        for (Tuple data:projectUserData) {
+            priceBruttoSum = priceBruttoSum.add(data.get(QTime.time1.price.sum()));
+            timeSum += data.get(QTime.time1.time.sum());
+        }
+
+        BigDecimal costs = projectCostPriceSum.add(priceBruttoSum);
+        BigDecimal price = projectInvoicesPriceSum.subtract(costs);
+
+        evaluationDTO.setProfit(price);
+        evaluationDTO.setProfitManHour(price.divide(new BigDecimal((double) timeSum/60/60).setScale(2, RoundingMode.HALF_UP))
+                .setScale(2, RoundingMode.HALF_UP));
+        costs = costs.equals(BigDecimal.ZERO) ? BigDecimal.ONE : costs;
+        evaluationDTO.setRebate(price.divide(costs).setScale(4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP));
     }
 
     private BigDecimal getUserCostToHour(Integer startYear, Integer endYear, String userUid, BigDecimal projectTotalCost) {

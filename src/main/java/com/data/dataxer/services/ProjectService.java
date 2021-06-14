@@ -37,4 +37,6 @@ public interface ProjectService {
     String getProjectTimeForThisYear(Long id);
 
     ProjectManHoursDTO getProjectManHours(Long id);
+
+    void projectEvaluationProfit(Long id);
 }
