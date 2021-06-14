@@ -88,6 +88,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
                 return cost != null ? cost.getTotalPrice() : null;
             case INVOICE:
             case PROFORMA:
+            case SUMMARY_INVOICE:
             case TAX_DOCUMENT:
                 QInvoice qInvoice = QInvoice.invoice;
 

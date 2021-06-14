@@ -56,7 +56,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             });
         });
 
-        if (invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT)) {
+        if (invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT) || invoice.getDocumentType().equals(DocumentType.SUMMARY_INVOICE)) {
             invoice.setPaymentDate(LocalDate.now());
         }
 
@@ -185,11 +185,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public Invoice generateSummaryInvoice(Long taxDocumentId) {
         Invoice proformaInvoice = this.getOriginalProformaInvoiceFromTaxDocument(taxDocumentId);
-        Invoice taxDocument = this.getById(taxDocumentId);
+
+        List<Long> allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(proformaInvoice.getId(), SecurityUtils.companyId())
+                .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
+        List<Invoice> taxDocuments = this.qInvoiceRepository.getAllInvoicesIdInAndType(allRelatedDocumentIds, DocumentType.TAX_DOCUMENT, SecurityUtils.companyId());
 
         Invoice summaryInvoice = new Invoice();
 
-        BeanUtils.copyProperties(taxDocument, summaryInvoice,
+        BeanUtils.copyProperties(proformaInvoice, summaryInvoice,
                 "id", "packs", "title", "note", "number", "state", "discount", "price",
                 "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
                 "paymentMethod", "invoiceType");
@@ -197,9 +200,11 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         List<DocumentPack> summaryInvoicePacks = new ArrayList<>(proformaInvoice.getPacks());
 
-        for (DocumentPack documentPack : taxDocument.getPacks()) {
-            summaryInvoicePacks.add(this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(),
-                    taxDocument.getCreatedDate(), taxDocument.getVariableSymbol()));
+        for (Invoice taxDocument : taxDocuments) {
+            for (DocumentPack documentPack : taxDocument.getPacks()) {
+                summaryInvoicePacks.add(this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(),
+                        taxDocument.getCreatedDate(), taxDocument.getVariableSymbol()));
+            }
         }
 
         summaryInvoice.setPacks(summaryInvoicePacks);

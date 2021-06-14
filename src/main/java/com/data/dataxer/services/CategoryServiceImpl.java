@@ -31,7 +31,8 @@ public class CategoryServiceImpl implements CategoryService {
                 List<Category> children = processedCategory.getChildren();
                 //need little change for FE => moved category has just id and name, missing lft, rgt
                 if (processedCategory.getParent() == null || processedCategory.getLft() == null || processedCategory.getRgt() == null || processedCategory.getPosition() == null) {
-                    processedCategory = this.qCategoryRepository.getById(processedCategory.getId(), SecurityUtils.companyId());
+                    processedCategory = this.qCategoryRepository.getById(processedCategory.getId(), SecurityUtils.companyId())
+                            .orElseThrow(() -> new RuntimeException("Processed category is null"));
                 }
                 if (processedCategory.getPosition() != i) {
                     this.qCategoryRepository.updateCategoryPosition(processedCategory.getId(), i, SecurityUtils.companyId());
@@ -57,7 +58,8 @@ public class CategoryServiceImpl implements CategoryService {
             }
             return this.addChild(baseRoot, category, null);
         } else {
-            Category parent = this.qCategoryRepository.getById(category.getParent().getId(), SecurityUtils.companyId());
+            Category parent = this.qCategoryRepository.getById(category.getParent().getId(), SecurityUtils.companyId())
+                    .orElseThrow(() -> new RuntimeException("Parent category is null"));
             return this.addChild(parent, category, null);
         }
     }

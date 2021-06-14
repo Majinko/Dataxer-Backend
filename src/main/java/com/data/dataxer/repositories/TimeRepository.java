@@ -12,4 +12,6 @@ public interface TimeRepository extends JpaRepository<Time, Long> {
     Time findFirstByUserIdAndCompanyIdAndDateWorkOrderByIdDesc(Long userId, Long companyId, LocalDate dateWork);
 
     List<Time> findAllBySalaryIdAndAndCompanyId(Long salaryId, Long companyId);
+
+    List<Time> findAllByCompanyId(Long companyId);
 }

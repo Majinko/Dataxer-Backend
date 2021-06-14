@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -40,11 +41,11 @@ public class QCategoryRepositoryImpl implements QCategoryRepository {
     }
 
     @Override
-    public Category getById(Long id, Long companyId) {
-        return this.query.selectFrom(QCategory.category)
+    public Optional<Category> getById(Long id, Long companyId) {
+        return Optional.ofNullable(this.query.selectFrom(QCategory.category)
                 .where(QCategory.category.id.eq(id))
                 .where(QCategory.category.company.id.eq(companyId))
-                .fetchOne();
+                .fetchOne());
     }
 
     @Override
@@ -106,8 +107,25 @@ public class QCategoryRepositoryImpl implements QCategoryRepository {
                 .execute();
     }
 
+    @Override
+    public Optional<List<Category>> getAllRootCategories(Long companyId) {
+        return Optional.ofNullable(this.query.selectFrom(QCategory.category)
+                .where(QCategory.category.depth.eq(0))
+                .where(QCategory.category.company.id.eq(companyId))
+                .fetch());
+    }
+
+    @Override
+    public Optional<List<Category>> getChildren(Long parentId, Long companyId) {
+        return Optional.ofNullable(this.query.selectFrom(QCategory.category)
+                .where(QCategory.category.parent.id.eq(parentId))
+                .where(QCategory.category.company.id.eq(companyId))
+                .fetch());
+    }
+
     //***************************************************
     // Queries for recreating category tree
+
     //***************************************************
 
     @Override

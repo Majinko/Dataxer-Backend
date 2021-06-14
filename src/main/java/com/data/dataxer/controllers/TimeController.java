@@ -65,6 +65,11 @@ public class TimeController {
         return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(from, to)));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<TimeDTO>> all() {
+        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.all()));
+    }
+
     @GetMapping("/userMonths")
     public ResponseEntity<List<MonthAndYearDTO>> getAllUserMonths(@RequestParam(value = "id") Long userId) {
         return ResponseEntity.ok(this.timeService.getAllUserMonths(userId));

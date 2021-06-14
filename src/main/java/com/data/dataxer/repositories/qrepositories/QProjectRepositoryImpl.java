@@ -50,11 +50,14 @@ public class QProjectRepositoryImpl implements QProjectRepository {
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("project.id", QProject.project.id)
                 .put("project.title", QProject.project.title)
+                .put("project.number", QProject.project.number)
+                .put("project.contact.name", QProject.project.contact.name)
                 .build();
 
         if (!rqlFilter.equals("")) {
             predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam().setMapping(pathMapping)));
         }
+
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Project> projectList = this.query.selectFrom(qProject)
