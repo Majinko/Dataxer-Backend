@@ -1,6 +1,7 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.MailTemplate;
+import com.data.dataxer.models.enums.MailTemplateType;
 import com.data.dataxer.repositories.MailTemplatesRepository;
 import com.data.dataxer.repositories.qrepositories.QMailTemplatesRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -57,7 +58,12 @@ public class MailTemplatesServiceImpl implements MailTemplatesService {
     }
 
     @Override
-    public void storeOrUpdateAll(List<MailTemplate> mailTemplatesDTOtoMailTemplates) {
-        this.mailTemplatesRepository.saveAll(mailTemplatesDTOtoMailTemplates);
+    public List<MailTemplate> storeOrUpdateAll(List<MailTemplate> mailTemplates) {
+        return (List<MailTemplate>) this.mailTemplatesRepository.saveAll(mailTemplates);
+    }
+
+    @Override
+    public MailTemplate getByType(String type) {
+        return this.mailTemplatesRepository.findByType(MailTemplateType.valueOf(type), SecurityUtils.companyId());
     }
 }

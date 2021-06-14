@@ -7,6 +7,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
@@ -25,6 +26,7 @@ public class MailTemplate extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String emailContent;
 
+    @NotNull
     @Enumerated(EnumType.STRING)
     MailTemplateType mailTemplateType;
 

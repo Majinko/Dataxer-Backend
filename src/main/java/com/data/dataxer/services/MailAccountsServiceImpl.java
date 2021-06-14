@@ -99,7 +99,9 @@ public class MailAccountsServiceImpl implements MailAccountsService {
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+
             helper.setFrom(mailSender.getUsername());
+
             if (emailSubject != null && emailContent != null && !emailSubject.isEmpty() && !emailContent.isEmpty() ) {
                 helper.setSubject(emailSubject);
                 helper.setText(emailContent, true);
@@ -145,5 +147,4 @@ public class MailAccountsServiceImpl implements MailAccountsService {
 
         return mailSender;
     }
-
 }

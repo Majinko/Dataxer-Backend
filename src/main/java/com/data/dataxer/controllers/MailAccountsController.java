@@ -74,5 +74,4 @@ public class MailAccountsController {
     public void sendEmail(@RequestBody MailDataDTO mailDataDTO) {
         this.mailAccountsService.sendEmail(mailDataDTO.getSubject(), mailDataDTO.getContent(), mailDataDTO.getParticipantIds(), mailDataDTO.getCompanyId(), mailDataDTO.getTemplateId());
     }
-
 }

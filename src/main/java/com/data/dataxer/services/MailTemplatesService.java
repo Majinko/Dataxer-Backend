@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface MailTemplatesService {
-
     void store(MailTemplate mailTemplates);
 
     void update(MailTemplate mailTemplates);
@@ -20,5 +19,7 @@ public interface MailTemplatesService {
 
     List<MailTemplate> getAll();
 
-    void storeOrUpdateAll(List<MailTemplate> mailTemplatesDTOtoMailTemplates);
+    List<MailTemplate> storeOrUpdateAll(List<MailTemplate> mailTemplatesDTOtoMailTemplates);
+
+    MailTemplate getByType(String type);
 }

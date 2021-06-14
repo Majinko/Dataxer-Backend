@@ -10,5 +10,6 @@ public class MailTemplateDTO {
     private Long id;
     private String emailSubject;
     private String emailContent;
+
     private MailTemplateType mailTemplateType;
 }

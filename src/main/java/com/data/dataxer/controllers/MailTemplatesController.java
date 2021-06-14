@@ -43,6 +43,13 @@ public class MailTemplatesController {
         );
     }
 
+    @GetMapping("/getByType/{type}")
+    public ResponseEntity<MailTemplateDTO> getByType(@PathVariable String type) {
+        return ResponseEntity.ok(
+                this.mailTemplatesMapper.mailTemplateToMailTemplatesDTO(this.mailTemplatesService.getByType(type))
+        );
+    }
+
     @GetMapping("/getAll")
     public ResponseEntity<List<MailTemplateDTO>> getAll() {
         return ResponseEntity.ok(
@@ -51,8 +58,10 @@ public class MailTemplatesController {
     }
 
     @PostMapping("/storeOrUpdateAll")
-    public void storeOrUpdateAll(@RequestBody List<MailTemplateDTO> mailTemplates) {
-        this.mailTemplatesService.storeOrUpdateAll(this.mailTemplatesMapper.mailTemplatesDTOtoMailTemplates(mailTemplates));
+    public ResponseEntity<List<MailTemplateDTO>> storeOrUpdateAll(@RequestBody List<MailTemplateDTO> mailTemplates) {
+        return ResponseEntity.ok(
+                this.mailTemplatesMapper.mailTemplatesToMailTemplatesDTO(this.mailTemplatesService.storeOrUpdateAll(this.mailTemplatesMapper.mailTemplatesDTOtoMailTemplates(mailTemplates)))
+        );
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)

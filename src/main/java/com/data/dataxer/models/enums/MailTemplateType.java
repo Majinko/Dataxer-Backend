@@ -4,6 +4,9 @@ public enum MailTemplateType {
     INVOICE("invoice"),
     PROFORMA("proforma");
 
+    public final String type;
+
     MailTemplateType(String type) {
+        this.type = type;
     }
 }

@@ -10,6 +10,7 @@ import com.data.dataxer.models.dto.UserTimePriceOverviewDTO;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.ProjectRepository;
+import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -32,15 +33,17 @@ public class ProjectServiceImpl implements ProjectService {
     private final QTimeRepository qTimeRepository;
     private final CategoryRepository categoryRepository;
     private final CostRepository costRepository;
+    private final QCostRepository qCostRepository;
 
     public ProjectServiceImpl(ProjectRepository projectRepository, QProjectRepository qProjectRepository,
                               QTimeRepository qTimeRepository, CategoryRepository categoryRepository,
-                              CostRepository costRepository) {
+                              CostRepository costRepository, QCostRepository qCostRepository) {
         this.projectRepository = projectRepository;
         this.qProjectRepository = qProjectRepository;
         this.qTimeRepository = qTimeRepository;
         this.categoryRepository = categoryRepository;
         this.costRepository = costRepository;
+        this.qCostRepository = qCostRepository;
     }
 
     @Override
@@ -239,8 +242,8 @@ public class ProjectServiceImpl implements ProjectService {
     private BigDecimal getProjectTotalCostForYears(Integer firstYear, Integer lastYear) {
         LocalDate firstYearStart = LocalDate.of(firstYear, Month.JANUARY, 1);
         LocalDate lastYearEnd = LocalDate.of(lastYear, Month.DECEMBER, 31);
+
         return this.costRepository.getProjectTotalCostBetweenYears(firstYearStart, lastYearEnd, Boolean.FALSE, Boolean.FALSE, SecurityUtils.companyId());
-        //return this.qCostRepository.getProjectCostsForYears(firstYear, lastYear, costWithCategoryIds, SecurityUtils.companyId()).setScale(2, RoundingMode.HALF_UP);
     }
 
     private double convertTimeSecondsToHours(int time) {

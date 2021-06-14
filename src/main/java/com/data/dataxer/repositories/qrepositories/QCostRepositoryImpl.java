@@ -114,7 +114,7 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public BigDecimal getProjectCostsForYears(Integer firstYear, Integer lastYear, Long companyId) {
+    public BigDecimal getProjectCostsForYears(Integer firstYear, Integer lastYear, Long projectId, Long companyId) {
         return this.query.select(QCost.cost.totalPrice.sum())
                 .from(QCost.cost)
                 .where(QCost.cost.isRepeated.eq(Boolean.FALSE))
@@ -122,6 +122,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .where(QCost.cost.deliveredDate.year().goe(firstYear))
                 .where(QCost.cost.deliveredDate.year().loe(lastYear))
                 .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.project.id.eq(projectId))
                 .fetchOne();
     }
 

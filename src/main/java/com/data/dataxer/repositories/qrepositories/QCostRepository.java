@@ -17,6 +17,5 @@ public interface QCostRepository {
 
     List<Cost> getCostsWhereCategoryIdIn(List<Long> categoryIds, Integer year, Long companyId);
 
-    BigDecimal
-    getProjectCostsForYears(Integer firstYear, Integer lastYear, Long companyId);
+    BigDecimal getProjectCostsForYears(Integer firstYear, Integer lastYear, Long projectId, Long companyId);
 }
