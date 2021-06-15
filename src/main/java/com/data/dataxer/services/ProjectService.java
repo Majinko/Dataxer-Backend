@@ -3,6 +3,7 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
+import com.data.dataxer.models.dto.EvaluationDTO;
 import com.data.dataxer.models.dto.ProjectManHoursDTO;
 import com.data.dataxer.models.dto.ProjectTimePriceOverviewCategoryDTO;
 import org.springframework.data.domain.Page;
@@ -37,4 +38,6 @@ public interface ProjectService {
     String getProjectTimeForThisYear(Long id);
 
     ProjectManHoursDTO getProjectManHours(Long id);
+
+    EvaluationDTO projectEvaluationProfit(Long id);
 }

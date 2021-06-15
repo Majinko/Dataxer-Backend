@@ -60,4 +60,6 @@ public interface QTimeRepository {
     List<Tuple> getProjectUsersTimePriceSums(Long id, Long companyId);
 
     List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> longs, Long companyId);
+
+    List<Time> getAllProjectTimesOrdered(Long projectId, Long companyId);
 }
