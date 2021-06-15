@@ -377,6 +377,15 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .fetch();
     }
 
+    @Override
+    public List<Time> getAllProjectTimesOrdered(Long projectId, Long companyId) {
+        return this.query.select(QTime.time1)
+                .where(QTime.time1.project.id.eq(projectId))
+                .where(QTime.time1.company.id.eq(companyId))
+                .orderBy(QTime.time1.dateWork.asc())
+                .fetch();
+    }
+
     private long getTotalCount(Predicate predicate) {
         QTime qTime = QTime.time1;
 

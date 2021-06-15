@@ -114,7 +114,7 @@ public class ProjectController {
     }
 
     @GetMapping("/evaluation/{id}")
-    public void projectEvaluationProfit(@PathVariable Long id) {
-        this.projectService.projectEvaluationProfit(id);
+    public ResponseEntity<EvaluationDTO> projectEvaluationProfit(@PathVariable Long id) {
+        return ResponseEntity.ok(this.projectService.projectEvaluationProfit(id));
     }
 }

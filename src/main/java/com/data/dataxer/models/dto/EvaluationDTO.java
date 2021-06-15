@@ -13,4 +13,10 @@ public class EvaluationDTO {
     private BigDecimal profitManHour;
     private BigDecimal rebate;
 
+    private BigDecimal project;
+    private BigDecimal projectStatistic;
+    private BigDecimal realization;
+
+    private ProjectStatisticDTO projectStatisticDTO;
+
 }

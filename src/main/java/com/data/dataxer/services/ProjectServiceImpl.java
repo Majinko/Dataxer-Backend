@@ -4,10 +4,7 @@ import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.domain.Time;
-import com.data.dataxer.models.dto.EvaluationDTO;
-import com.data.dataxer.models.dto.ProjectManHoursDTO;
-import com.data.dataxer.models.dto.ProjectTimePriceOverviewCategoryDTO;
-import com.data.dataxer.models.dto.UserTimePriceOverviewDTO;
+import com.data.dataxer.models.dto.*;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.ProjectRepository;
@@ -26,6 +23,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -208,7 +206,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void projectEvaluationProfit(Long id) {
+    public EvaluationDTO projectEvaluationProfit(Long id) {
         EvaluationDTO evaluationDTO = new EvaluationDTO();
         BigDecimal projectInvoicesPriceSum = this.qInvoiceRepository.getProjectPriceSum(id, SecurityUtils.companyId());
         BigDecimal projectCostPriceSum = this.costRepository.getProjectCostSum(SecurityUtils.companyId());
@@ -231,6 +229,55 @@ public class ProjectServiceImpl implements ProjectService {
                 .setScale(2, RoundingMode.HALF_UP));
         costs = costs.equals(BigDecimal.ZERO) ? BigDecimal.ONE : costs;
         evaluationDTO.setRebate(price.divide(costs).setScale(4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP));
+        evaluationDTO.setProjectStatisticDTO(prepareProjectStatisticDTO(id, projectInvoicesPriceSum, projectCostPriceSum));
+        evaluationDTO.setProjectStatistic(projectInvoicesPriceSum.subtract(evaluationDTO.getProjectStatisticDTO().getProjectPayedInternalCosts())
+                .subtract(evaluationDTO.getProjectStatisticDTO().getProjectRunningCosts()).setScale(2, RoundingMode.HALF_UP));
+        evaluationDTO.setProject(BigDecimal.ZERO.subtract(evaluationDTO.getProjectStatisticDTO().getProjectPayedInternalCosts()
+                .subtract(evaluationDTO.getProjectStatisticDTO().getProjectRunningCosts())));
+        //nevidim to nikde vyuzite v old dataxer
+        //evaluationDTO.setRealization();
+
+        return evaluationDTO;
+    }
+
+    private ProjectStatisticDTO prepareProjectStatisticDTO(Long id, BigDecimal projectPrice, BigDecimal projectCosts) {
+        ProjectStatisticDTO projectStatisticDTO = new ProjectStatisticDTO();
+
+        List<Time> projectOrderedTimes = this.qTimeRepository.getAllProjectTimesOrdered(id, SecurityUtils.companyId());
+
+        List<UserTimePriceOverviewDTO> userTimePriceDataList = new ArrayList<>();
+        List<Tuple> userTimesPriceSums = this.qTimeRepository.getProjectUsersTimePriceSums(id, SecurityUtils.companyId());
+
+        for (Tuple data : userTimesPriceSums) {
+            UserTimePriceOverviewDTO userData = new UserTimePriceOverviewDTO();
+            prepareProjectTimePriceOverviewDTO(id, data, userData);
+            userTimePriceDataList.add(userData);
+        }
+
+        int totalProjectTime = 0;
+        BigDecimal projectHourNettoSum = BigDecimal.ZERO;
+        BigDecimal projectHourBruttoSum = BigDecimal.ZERO;
+
+        for (UserTimePriceOverviewDTO processedData : userTimePriceDataList) {
+            totalProjectTime += processedData.getHours();
+            projectHourNettoSum = projectHourNettoSum.add(processedData.getHourNetto());
+            projectHourBruttoSum = projectHourBruttoSum.add(processedData.getHourBrutto());
+        }
+
+        projectStatisticDTO.setProjectStart(projectOrderedTimes.get(0).getDateWork());
+        projectStatisticDTO.setProjectEnd(projectOrderedTimes.get(projectOrderedTimes.size() - 1).getDateWork());
+        projectStatisticDTO.setProjectTakeInMonths(Period.between(projectStatisticDTO.getProjectStart(), projectStatisticDTO.getProjectEnd()).getMonths());
+        projectStatisticDTO.setProjectManHours(StringUtils.convertMinutesTimeToHoursString(totalProjectTime));
+        projectStatisticDTO.setAverageManHoursForMonth(StringUtils.convertMinutesTimeToHoursString(totalProjectTime/userTimesPriceSums.size()));
+        projectStatisticDTO.setAverageHourNetto(projectHourNettoSum.divide(new BigDecimal(convertTimeSecondsToHours(totalProjectTime))).setScale(2, RoundingMode.HALF_UP));
+        projectStatisticDTO.setAverageHourBrutto(projectHourBruttoSum.divide(new BigDecimal(convertTimeSecondsToHours(totalProjectTime))).setScale(2, RoundingMode.HALF_UP));
+        projectStatisticDTO.setProjectPayedPrice(projectPrice);
+        projectStatisticDTO.setProjectPayedCosts(projectCosts);
+        projectStatisticDTO.setProjectPayedInternalCosts(projectHourNettoSum);
+        projectStatisticDTO.setProjectHourBruttoSum(projectHourBruttoSum);
+        projectStatisticDTO.setProjectRunningCosts(projectHourBruttoSum.subtract(projectHourNettoSum));
+
+        return projectStatisticDTO;
     }
 
     private BigDecimal getUserCostToHour(Integer startYear, Integer endYear, String userUid, BigDecimal projectTotalCost) {
