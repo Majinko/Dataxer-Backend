@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class UserTimePriceOverviewDTO {
+
     private String name;
     private Integer hours;
 
@@ -16,5 +17,6 @@ public class UserTimePriceOverviewDTO {
 
     private BigDecimal hourBrutto;
     private BigDecimal priceBrutto;
+
 }
 

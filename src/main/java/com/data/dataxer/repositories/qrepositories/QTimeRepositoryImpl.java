@@ -301,6 +301,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .from(QTime.time1)
                 .where(QTime.time1.project.id.eq(id))
                 .where(QTime.time1.project.company.id.eq(companyId))
+                .where(QTime.time1.user.uid.isNotNull())
                 .groupBy(QTime.time1.user.uid)
                 .groupBy(QTime.time1.user.firstName)
                 .groupBy(QTime.time1.user.lastName)
@@ -365,6 +366,15 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.company.id.eq(companyId))
                 .groupBy(QTime.time1.dateWork.year())
                 .orderBy(QTime.time1.dateWork.year().asc())
+                .fetch();
+    }
+
+    @Override
+    public List<Time> getAllProjectTimesOrdered(Long projectId, Long companyId) {
+        return this.query.select(QTime.time1)
+                .where(QTime.time1.project.id.eq(projectId))
+                .where(QTime.time1.company.id.eq(companyId))
+                .orderBy(QTime.time1.dateWork.asc())
                 .fetch();
     }
 
