@@ -103,8 +103,8 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public List<Time> all() {
-        return this.timeRepository.findAllByCompanyId(SecurityUtils.companyId());
+    public List<Time> allByUser(String userUid) {
+        return this.timeRepository.findAllByCompanyIdAndUserUid(SecurityUtils.companyId(), userUid);
     }
 
     @Override

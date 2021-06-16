@@ -37,5 +37,5 @@ public interface TimeService {
 
     List<Integer> getAllYears();
 
-    List<Time> all();
+    List<Time> allByUser(String userUid);
 }

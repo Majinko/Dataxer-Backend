@@ -65,9 +65,11 @@ public class TimeController {
         return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(from, to)));
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<List<TimeDTO>> all() {
-        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.all()));
+    @GetMapping("/allByUser")
+    public ResponseEntity<List<TimeDTO>> allByUser(
+            @RequestParam(value = "uId") String userUid
+    ) {
+        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOListSimple(this.timeService.allByUser(userUid)));
     }
 
     @GetMapping("/userMonths")

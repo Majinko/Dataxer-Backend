@@ -2,9 +2,6 @@ package com.data.dataxer.repositories.qrepositories;
 
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QCategory;
-import com.data.dataxer.models.domain.QTask;
-import com.data.dataxer.models.domain.QTime;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -17,16 +14,11 @@ import com.querydsl.core.Tuple;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.Visitor;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.StreamUtils;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
