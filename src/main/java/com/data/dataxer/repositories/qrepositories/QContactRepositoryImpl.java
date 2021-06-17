@@ -1,6 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.QContact;
 import com.data.dataxer.models.domain.QProject;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
@@ -70,7 +70,7 @@ public class QContactRepositoryImpl implements QContactRepository {
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Contact> contactList = this.query.selectFrom(qContact)
-                .leftJoin(qContact.projects).fetchJoin()
+               // .leftJoin(qContact.projects).fetchJoin()
                 .where(predicate)
                 .where(qContact.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))

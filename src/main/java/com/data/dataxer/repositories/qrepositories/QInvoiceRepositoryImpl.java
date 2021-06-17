@@ -1,6 +1,11 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QDocumentPack;
+import com.data.dataxer.models.domain.QDocumentPackItem;
+import com.data.dataxer.models.domain.QInvoice;
+import com.data.dataxer.models.domain.QItem;
+import com.data.dataxer.models.enums.DocumentType;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -19,6 +24,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -44,9 +50,11 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("invoice.id", QInvoice.invoice.id)
-                .put("invoice.state", QInvoice.invoice.state)
+                .put("invoice.title", QInvoice.invoice.title)
+                .put("invoice.document_type", QInvoice.invoice.documentType)
                 .put("invoice.contact.id", QInvoice.invoice.contact.id)
                 .put("invoice.contact.name", QInvoice.invoice.contact.name)
+                .put("invoice.project.id", QInvoice.invoice.project.id)
                 .put("invoice.documentType", QInvoice.invoice.documentType)
                 .build();
 
@@ -114,6 +122,27 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(qInvoice.id.eq(id))
                 .where(QInvoice.invoice.company.id.eq(companyId))
                 .fetchOne());
+    }
+
+    @Override
+    public List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, Long companyId) {
+        return this.query.selectFrom(QInvoice.invoice)
+                .leftJoin(QInvoice.invoice.contact).fetchJoin()
+                .leftJoin(QInvoice.invoice.project).fetchJoin()
+                .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
+                .where(QInvoice.invoice.id.in(ids))
+                .where(QInvoice.invoice.documentType.eq(type))
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .fetch();
+    }
+
+    @Override
+    public BigDecimal getProjectPriceSum(Long id, Long companyId) {
+        return this.query.select(QInvoice.invoice.totalPrice.sum())
+                .from(QInvoice.invoice)
+                .where(QInvoice.invoice.project.id.eq(id))
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .fetchOne();
     }
 
     private long getTotalCount(Predicate predicate) {

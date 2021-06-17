@@ -88,14 +88,16 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
                 return cost != null ? cost.getTotalPrice() : null;
             case INVOICE:
             case PROFORMA:
+            case SUMMARY_INVOICE:
             case TAX_DOCUMENT:
                 QInvoice qInvoice = QInvoice.invoice;
 
                 Invoice invoice = this.query.selectFrom(qInvoice)
                         .where(qInvoice.id.eq(documentId))
                         .fetchOne();
+
                 if (invoice != null) {
-                    return invoice.getTotalPrice();
+                    return invoice.getTotalPrice().subtract(invoice.getDiscount() != null ? invoice.countDiscountTotalPrice() : new BigDecimal(0));
                 } else {
                     throw new RuntimeException("Invoice with id" + documentId + "not found");
                 }

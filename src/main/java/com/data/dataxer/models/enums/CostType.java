@@ -1,7 +1,7 @@
 package com.data.dataxer.models.enums;
 
 public enum CostType {
-
+    // todo zahrnut v inporte
     INVOICE("invoice"),
     OTHER("other");
 

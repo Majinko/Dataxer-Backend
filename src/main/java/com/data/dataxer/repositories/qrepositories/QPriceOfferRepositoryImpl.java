@@ -1,11 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QDocumentPack;
-import com.data.dataxer.models.domain.QDocumentPackItem;
-import com.data.dataxer.models.domain.QInvoice;
-import com.data.dataxer.models.domain.QItem;
-import com.data.dataxer.models.domain.QPriceOffer;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -24,7 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
@@ -45,8 +42,10 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("priceOffer.id", QPriceOffer.priceOffer.id)
+                .put("priceOffer.title", QPriceOffer.priceOffer.title)
                 .put("priceOffer.state", QPriceOffer.priceOffer.state)
                 .put("priceOffer.contact.id", QPriceOffer.priceOffer.contact.id)
+                .put("priceOffer.project.id", QPriceOffer.priceOffer.project.id)
                 .put("priceOffer.contact.name", QPriceOffer.priceOffer.contact.name)
                 .build();
 
@@ -61,6 +60,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
                 .where(predicate)
+                .where(QPriceOffer.priceOffer.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .limit(pageable.getPageSize())
                 .offset(pageable.getOffset())
@@ -80,7 +80,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .fetchOne();
 
         // price offer pack set items
-        if (priceOffer != null) {
+        if (priceOffer != null && !priceOffer.getPacks().isEmpty()) {
             priceOfferPackSetItems(priceOffer);
         }
 

@@ -2,6 +2,7 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.services.InvoiceService;
 import com.data.dataxer.services.PdfService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/api/pdf")
+@PreAuthorize("hasPermission(null, 'Pdf', 'Pdf')")
 public class PdfController {
     private final PdfService pdfService;
     private final InvoiceService invoiceService;

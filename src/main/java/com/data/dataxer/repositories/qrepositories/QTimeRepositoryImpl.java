@@ -1,10 +1,7 @@
 package com.data.dataxer.repositories.qrepositories;
 
 
-import com.data.dataxer.models.domain.Project;
-import com.data.dataxer.models.domain.QTask;
-import com.data.dataxer.models.domain.QTime;
-import com.data.dataxer.models.domain.Time;
+import com.data.dataxer.models.domain.*;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -228,6 +225,156 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .groupBy(QTime.time1.dateWork.year())
                 .where(QTime.time1.company.id.eq(companyId))
                 .orderBy(QTime.time1.dateWork.year().desc())
+                .fetch();
+    }
+
+    @Override
+    public Tuple getUserProjectCategoryHoursAndPrice(Long projectId, String userUid, List<Long> categoryIds, Long companyId) {
+        return this.query.select(QTime.time1.time.sum(), QTime.time1.price.sum())
+                .from(QTime.time1)
+                .where(QTime.time1.project.id.eq(projectId))
+                .where(QTime.time1.user.uid.eq(userUid))
+                .where(QTime.time1.category.id.in(categoryIds))
+                .where(QTime.time1.company.id.eq(companyId))
+                .fetchOne();
+    }
+
+    @Override
+    public Integer getUserProjectTimeBetweenYears(Integer startYear, Integer endYear, String uid, Long companyId) {
+        return this.query.select(QTime.time1.time.sum())
+                .from(QTime.time1)
+                .where(QTime.time1.user.uid.eq(uid))
+                .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.salary.isNotNull())
+                .where(QTime.time1.dateWork.year().goe(startYear))
+                .where(QTime.time1.dateWork.year().loe(endYear))
+                .fetchOne();
+    }
+
+    @Override
+    public List<Tuple> getUserActiveMonths(Integer startYear, Integer endYear, String uid, Long companyId) {
+        return this.query.select(QTime.time1.dateWork.month(), QTime.time1.dateWork.year(), QTime.time1.user.uid)
+                .from(QTime.time1)
+                .leftJoin(QTime.time1.salary)
+                .where(QTime.time1.user.uid.eq(uid))
+                .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.dateWork.year().goe(startYear))
+                .where(QTime.time1.dateWork.year().loe(endYear))
+                .where(QTime.time1.salary.isActive.eq(Boolean.TRUE))
+                .groupBy(QTime.time1.dateWork.month())
+                .groupBy(QTime.time1.dateWork.year())
+                .groupBy(QTime.time1.user.uid)
+                .fetch();
+    }
+
+    @Override
+    public List<Tuple> getProjectAllUsersActiveMonth(Integer startYear, Integer endYear, Long companyId) {
+        return this.query.select(QTime.time1.dateWork.month(), QTime.time1.dateWork.year(), QTime.time1.user.uid)
+                .from(QTime.time1)
+                .leftJoin(QTime.time1.salary)
+                .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.dateWork.year().goe(startYear))
+                .where(QTime.time1.dateWork.year().loe(endYear))
+                .where(QTime.time1.salary.isActive.eq(Boolean.TRUE))
+                .groupBy(QTime.time1.dateWork.month())
+                .groupBy(QTime.time1.dateWork.year())
+                .groupBy(QTime.time1.user.uid)
+                .fetch();
+    }
+
+    @Override
+    public List<Tuple> getAllProjectUsers(Long id, Long companyId) {
+        return this.query.select(QTime.time1.user.uid, QTime.time1.user.firstName, QTime.time1.user.lastName)
+                .from(QTime.time1)
+                .where(QTime.time1.project.id.eq(id))
+                .where(QTime.time1.company.id.eq(companyId))
+                .groupBy(QTime.time1.user.uid)
+                .groupBy(QTime.time1.user.firstName)
+                .groupBy(QTime.time1.user.lastName)
+                .fetch();
+    }
+
+    @Override
+    public List<Tuple> getProjectUsersTimePriceSums(Long id, Long companyId) {
+        return this.query.select(QTime.time1.time.sum(), QTime.time1.price.sum(), QTime.time1.user.uid,
+                QTime.time1.user.firstName, QTime.time1.user.lastName)
+                .from(QTime.time1)
+                .where(QTime.time1.project.id.eq(id))
+                .where(QTime.time1.project.company.id.eq(companyId))
+                .where(QTime.time1.user.uid.isNotNull())
+                .groupBy(QTime.time1.user.uid)
+                .groupBy(QTime.time1.user.firstName)
+                .groupBy(QTime.time1.user.lastName)
+                .fetch();
+    }
+
+    @Override
+    public List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> categoryIds, Long companyId) {
+        return this.query.select(QTime.time1.user.uid, QTime.time1.user.firstName, QTime.time1.user.lastName,
+                QTime.time1.time.sum(), QTime.time1.price.sum())
+                .from(QTime.time1)
+                .leftJoin(QTime.time1.user)
+                .where(QTime.time1.project.id.eq(id))
+                .where(QTime.time1.category.id.in(categoryIds))
+                .where(QTime.time1.company.id.eq(companyId))
+                .where(QTime.time1.user.uid.isNotNull())
+                .groupBy(QTime.time1.user.uid)
+                .groupBy(QTime.time1.user.firstName)
+                .groupBy(QTime.time1.user.lastName)
+                .fetch();
+    }
+
+    @Override
+    public List<Time> getProjectAllUsersTimes(Long id, Category category, LocalDate dateFrom, LocalDate dateTo, String userUid, Long companyId) {
+        BooleanBuilder predicate = new BooleanBuilder();
+        BooleanBuilder userPredicate = new BooleanBuilder();
+        if (category != null) {
+            predicate.and(QTime.time1.category.id.eq(category.getId()));
+        }
+        if (!userUid.isEmpty()) {
+            userPredicate.and(QTime.time1.user.uid.eq(userUid));
+        }
+        return this.query.selectFrom(QTime.time1)
+                .leftJoin(QTime.time1.category).fetchJoin()
+                .leftJoin(QTime.time1.user).fetchJoin()
+                .where(QTime.time1.project.id.eq(id))
+                .where(predicate)
+                .where(userPredicate)
+                .where(QTime.time1.dateWork.goe(dateFrom))
+                .where(QTime.time1.dateWork.loe(dateTo))
+                .where(QTime.time1.company.id.eq(companyId))
+                .orderBy(QTime.time1.dateWork.desc())
+                .orderBy(QTime.time1.user.id.desc())
+                .fetch();
+    }
+
+    @Override
+    public Integer getTotalProjectTimeForYear(Long id, Integer year, Long companyId) {
+        return this.query.select(QTime.time1.time.sum())
+                .from(QTime.time1)
+                .where(QTime.time1.project.id.eq(id))
+                .where(QTime.time1.dateWork.year().eq(year))
+                .where(QTime.time1.company.id.eq(companyId))
+                .fetchOne();
+    }
+
+    @Override
+    public List<Integer> getProjectYears(Long id, Long companyId) {
+        return this.query.select(QTime.time1.dateWork.year())
+                .from(QTime.time1)
+                .where(QTime.time1.project.id.eq(id))
+                .where(QTime.time1.company.id.eq(companyId))
+                .groupBy(QTime.time1.dateWork.year())
+                .orderBy(QTime.time1.dateWork.year().asc())
+                .fetch();
+    }
+
+    @Override
+    public List<Time> getAllProjectTimesOrdered(Long projectId, Long companyId) {
+        return this.query.select(QTime.time1)
+                .where(QTime.time1.project.id.eq(projectId))
+                .where(QTime.time1.company.id.eq(companyId))
+                .orderBy(QTime.time1.dateWork.asc())
                 .fetch();
     }
 

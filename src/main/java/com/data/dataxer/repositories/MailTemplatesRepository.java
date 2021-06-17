@@ -1,7 +1,16 @@
 package com.data.dataxer.repositories;
 
-import com.data.dataxer.models.domain.MailTemplates;
+import com.data.dataxer.models.domain.MailTemplate;
+import com.data.dataxer.models.enums.MailTemplateType;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-public interface MailTemplatesRepository extends CrudRepository<MailTemplates, Long> {
+import java.util.List;
+
+public interface MailTemplatesRepository extends CrudRepository<MailTemplate, Long> {
+    @Query("SELECT mt FROM MailTemplate mt where mt.company.id = ?1")
+    List<MailTemplate> findAllByCompanyId(Long companyId);
+
+    @Query("SELECT mt from  MailTemplate  mt where mt.mailTemplateType = ?1 and mt.company.id = ?2")
+    MailTemplate findByType(MailTemplateType type, Long companyId);
 }

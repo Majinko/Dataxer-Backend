@@ -1,7 +1,7 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.models.domain.MailTemplates;
-import com.data.dataxer.models.domain.QMailTemplates;
+import com.data.dataxer.models.domain.MailTemplate;
+import com.data.dataxer.models.domain.QMailTemplate;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -36,30 +36,26 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
     }
 
     @Override
-    public Optional<MailTemplates> getById(Long id, Long companyId) {
-        QMailTemplates qMailTemplates = QMailTemplates.mailTemplates;
-
+    public Optional<MailTemplate> getById(Long id, Long companyId) {
         return Optional.ofNullable(
-            this.query.selectFrom(qMailTemplates)
-                .where(qMailTemplates.id.eq(id))
-                .where(qMailTemplates.company.id.eq(companyId))
+            this.query.selectFrom(QMailTemplate.mailTemplate)
+                .where(QMailTemplate.mailTemplate.id.eq(id))
+                .where(QMailTemplate.mailTemplate.company.id.eq(companyId))
                 .fetchOne()
         );
     }
 
     @Override
-    public Page<MailTemplates> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<MailTemplate> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
 
-        QMailTemplates qMailTemplates = QMailTemplates.mailTemplates;
-
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
-                .put("mailTemplates.id", QMailTemplates.mailTemplates.id)
-                .put("mailTemplates.emailSubject", QMailTemplates.mailTemplates.emailSubject)
-                .put("mailTemplates.emailContent", QMailTemplates.mailTemplates.emailContent)
-                .put("mailTemplates.company.id", QMailTemplates.mailTemplates.company.id)
+                .put("mailTemplates.id", QMailTemplate.mailTemplate.id)
+                .put("mailTemplates.emailSubject", QMailTemplate.mailTemplate.emailSubject)
+                .put("mailTemplates.emailContent", QMailTemplate.mailTemplate.emailContent)
+                .put("mailTemplates.company.id", QMailTemplate.mailTemplate.company.id)
                 .build();
 
         if (!rqlFilter.equals("")) {
@@ -68,9 +64,9 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<MailTemplates> mailTemplatesList = this.query.selectFrom(qMailTemplates)
+        List<MailTemplate> mailTemplatesList = this.query.selectFrom(QMailTemplate.mailTemplate)
                 .where(predicate)
-                .where(qMailTemplates.company.id.eq(companyId))
+                .where(QMailTemplate.mailTemplate.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -80,21 +76,17 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
     }
 
     @Override
-    public long updateByMailTemplates(MailTemplates mailTemplates, Long companyId) {
-        QMailTemplates qMailTemplates = QMailTemplates.mailTemplates;
-
-        return this.query.update(qMailTemplates)
-                .set(qMailTemplates.emailSubject, mailTemplates.getEmailSubject())
-                .set(qMailTemplates.emailContent, mailTemplates.getEmailContent())
-                .where(qMailTemplates.id.eq(mailTemplates.getId()))
-                .where(qMailTemplates.company.id.eq(companyId))
+    public long updateByMailTemplates(MailTemplate mailTemplates, Long companyId) {
+        return this.query.update(QMailTemplate.mailTemplate)
+                .set(QMailTemplate.mailTemplate.emailSubject, mailTemplates.getEmailSubject())
+                .set(QMailTemplate.mailTemplate.emailContent, mailTemplates.getEmailContent())
+                .where(QMailTemplate.mailTemplate.id.eq(mailTemplates.getId()))
+                .where(QMailTemplate.mailTemplate.company.id.eq(companyId))
                 .execute();
     }
 
     private long getTotalCount(Predicate predicate) {
-        QMailTemplates qMailTemplates = QMailTemplates.mailTemplates;
-
-        return this.query.selectFrom(qMailTemplates)
+        return this.query.selectFrom(QMailTemplate.mailTemplate)
                 .where(predicate)
                 .fetchCount();
     }

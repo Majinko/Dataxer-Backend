@@ -2,7 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.MailAccounts;
-import com.data.dataxer.models.domain.MailTemplates;
+import com.data.dataxer.models.domain.MailTemplate;
 import com.data.dataxer.models.enums.MailAccountState;
 import com.data.dataxer.repositories.MailAccountsRepository;
 import com.data.dataxer.repositories.qrepositories.QMailAccountsRepository;
@@ -99,12 +99,14 @@ public class MailAccountsServiceImpl implements MailAccountsService {
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+
             helper.setFrom(mailSender.getUsername());
+
             if (emailSubject != null && emailContent != null && !emailSubject.isEmpty() && !emailContent.isEmpty() ) {
                 helper.setSubject(emailSubject);
                 helper.setText(emailContent, true);
             } else if (templateId != null) {
-                MailTemplates mailTemplates = this.mailTemplatesService.getById(templateId);
+                MailTemplate mailTemplates = this.mailTemplatesService.getById(templateId);
                 helper.setSubject(mailTemplates.getEmailSubject());
                 helper.setText(mailTemplates.getEmailContent(), true);
             } else {
@@ -145,5 +147,4 @@ public class MailAccountsServiceImpl implements MailAccountsService {
 
         return mailSender;
     }
-
 }

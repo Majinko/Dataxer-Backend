@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -110,6 +111,19 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .where(QCategory.category.id.in(categoryIds))
                 .where(QCost.cost.company.id.eq(companyId))
                 .fetch();
+    }
+
+    @Override
+    public BigDecimal getProjectCostsForYears(Integer firstYear, Integer lastYear, Long projectId, Long companyId) {
+        return this.query.select(QCost.cost.totalPrice.sum())
+                .from(QCost.cost)
+                .where(QCost.cost.isRepeated.eq(Boolean.FALSE))
+                .where(QCost.cost.isInternal.eq(Boolean.FALSE))
+                .where(QCost.cost.deliveredDate.year().goe(firstYear))
+                .where(QCost.cost.deliveredDate.year().loe(lastYear))
+                .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.project.id.eq(projectId))
+                .fetchOne();
     }
 
     private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, Long companyId) {

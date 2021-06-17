@@ -103,6 +103,11 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
+    public List<Time> allByUser(String userUid) {
+        return this.timeRepository.findAllByCompanyIdAndUserUid(SecurityUtils.companyId(), userUid);
+    }
+
+    @Override
     public List<MonthAndYearDTO> getAllUserMonths(Long userId) {
         List<MonthAndYearDTO> response = new ArrayList<>();
         List<Tuple> yearsAndMonths = this.qTimeRepository.getAllUserMonths(userId, SecurityUtils.companyId());

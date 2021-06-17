@@ -4,18 +4,16 @@ import com.data.dataxer.mappers.StorageMapper;
 import com.data.dataxer.models.dto.StorageFileDTO;
 import com.data.dataxer.services.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/storage")
+@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class StorageController {
     @Autowired
     StorageService storageService;

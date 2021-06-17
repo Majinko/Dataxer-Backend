@@ -9,9 +9,7 @@ import javax.persistence.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Entity
 @Setter
@@ -25,7 +23,8 @@ public class DocumentPack implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     private DocumentBase document;
 
-    private Enum<DocumentType> type;
+    @Enumerated(EnumType.STRING)
+    private DocumentType type;
 
     @OneToMany(mappedBy = "pack", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     List<DocumentPackItem> packItems = new ArrayList<>();
@@ -37,6 +36,8 @@ public class DocumentPack implements Serializable {
     Integer tax;
 
     private Boolean customPrice;
+
+    private Boolean showItems;
 
     private BigDecimal price;
 

@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.InvoiceMapper;
 import com.data.dataxer.models.dto.InvoiceDTO;
 import com.data.dataxer.models.enums.DocumentState;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.services.DocumentNumberGeneratorService;
 import com.data.dataxer.services.InvoiceService;
 import com.data.dataxer.services.PdfService;
@@ -10,8 +11,8 @@ import com.lowagie.text.DocumentException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
@@ -24,6 +25,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/invoice")
+@PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class InvoiceController {
     private final PdfService pdfService;
     private final InvoiceService invoiceService;
@@ -46,13 +48,15 @@ public class InvoiceController {
 
     @PostMapping("/store/{oldInvoiceId}")
     public void store(@RequestBody InvoiceDTO invoiceDTO, @PathVariable Long oldInvoiceId) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType(), true);
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType().equals(DocumentType.PROFORMA) ? DocumentType.PROFORMA : DocumentType.INVOICE, true);
 
         this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), oldInvoiceId);
     }
 
     @RequestMapping(value = "/storeSummaryInvoice", method = RequestMethod.POST)
     public void storeTaxDocument(@RequestParam(value = "id1") Long taxDocumentId, @RequestParam(value = "id2") Long proformaId, @RequestBody InvoiceDTO invoiceDTO) {
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.INVOICE, true);
+
         this.invoiceService.storeSummaryInvoice(this.invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), taxDocumentId, proformaId);
     }
 
@@ -77,7 +81,7 @@ public class InvoiceController {
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
             @RequestParam(value = "sortExpression", defaultValue = "sort(-invoice.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Pageable pageable = PageRequest.of(page, size);
 
         return ResponseEntity.ok(invoiceService.paginate(pageable, rqlFilter, sortExpression).map(invoiceMapper::invoiceToInvoiceDTOSimple));
     }

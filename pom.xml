@@ -21,6 +21,7 @@
         <org.projectlombok.version>1.18.4</org.projectlombok.version>
         <firebase.admin.version>6.10.0</firebase.admin.version>
         <org.liquibase.version>3.4.1</org.liquibase.version>
+        <org.hibernate.validator>5.0.3.Final</org.hibernate.validator>
     </properties>
 
     <dependencies>
@@ -51,6 +52,18 @@
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
             <version>${jjwt.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>${org.hibernate.validator}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.glassfish</groupId>
+            <artifactId>javax.el</artifactId>
+            <version>3.0.0</version>
         </dependency>
 
         <dependency>

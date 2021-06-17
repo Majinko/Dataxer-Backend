@@ -56,7 +56,7 @@ public class InvoiceServiceImpl implements InvoiceService {
             });
         });
 
-        if (invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT)) {
+        if (invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT) || invoice.getDocumentType().equals(DocumentType.SUMMARY_INVOICE)) {
             invoice.setPaymentDate(LocalDate.now());
         }
 
@@ -185,10 +185,14 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public Invoice generateSummaryInvoice(Long taxDocumentId) {
         Invoice proformaInvoice = this.getOriginalProformaInvoiceFromTaxDocument(taxDocumentId);
-        Invoice taxDocument = this.getById(taxDocumentId);
+
+        List<Long> allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(proformaInvoice.getId(), SecurityUtils.companyId())
+                .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
+        List<Invoice> taxDocuments = this.qInvoiceRepository.getAllInvoicesIdInAndType(allRelatedDocumentIds, DocumentType.TAX_DOCUMENT, SecurityUtils.companyId());
 
         Invoice summaryInvoice = new Invoice();
-        BeanUtils.copyProperties(taxDocument, summaryInvoice,
+
+        BeanUtils.copyProperties(proformaInvoice, summaryInvoice,
                 "id", "packs", "title", "note", "number", "state", "discount", "price",
                 "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
                 "paymentMethod", "invoiceType");
@@ -196,11 +200,26 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         List<DocumentPack> summaryInvoicePacks = new ArrayList<>(proformaInvoice.getPacks());
 
-        for (DocumentPack documentPack : taxDocument.getPacks()) {
-            summaryInvoicePacks.add(this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(),
-                    taxDocument.getCreatedDate(), taxDocument.getVariableSymbol()));
+        HashMap<Integer, DocumentPack> taxesPacks = new HashMap<>();
+        for (Invoice taxDocument : taxDocuments) {
+            for (DocumentPack documentPack : taxDocument.getPacks()) {
+                DocumentPack responsePack = this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(),
+                        taxDocument.getCreatedDate(), taxDocument.getVariableSymbol());
+                if (taxesPacks.containsKey(documentPack.getTax())) {
+                    DocumentPack pack = taxesPacks.get(documentPack.getTax());
+                    pack.setPrice(pack.getPrice().add(responsePack.getPrice()));
+                    pack.setTotalPrice(pack.getTotalPrice().add(responsePack.getTotalPrice()));
+                    List<DocumentPackItem> items = new ArrayList<>(pack.getPackItems());
+                    items.addAll(new ArrayList<>(responsePack.getPackItems()));
+                    pack.setPackItems(items);
+                    taxesPacks.replace(documentPack.getTax(), pack);
+                } else {
+                    taxesPacks.put(documentPack.getTax(), responsePack);
+                }
+            }
         }
 
+        summaryInvoicePacks.addAll(new ArrayList<>(taxesPacks.values()));
         summaryInvoice.setPacks(summaryInvoicePacks);
 
         return summaryInvoice;
@@ -296,9 +315,11 @@ public class InvoiceServiceImpl implements InvoiceService {
         DocumentPackItem documentPackItem = new DocumentPackItem();
 
         documentPackItem.setTitle(this.generateSummaryInvoicePackTitle(taxDocumentNumber, taxDocumentCreated, taxDocumentVariableSymbol));
+        documentPackItem.setQty(1f);
         documentPackItem.setTax(taxDocumentPack.getTax());
         documentPackItem.setPrice(taxDocumentPack.getPrice().negate());
         documentPackItem.setTotalPrice(taxDocumentPack.getTotalPrice().negate());
+        documentPackItem.setDiscount(BigDecimal.valueOf(0));
 
         return documentPackItem;
     }

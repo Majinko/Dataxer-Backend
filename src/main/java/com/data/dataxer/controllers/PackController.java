@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/pack")
+@PreAuthorize("hasPermission(null, 'Pack', 'Pack')")
 public class PackController {
     private final PackMapper packMapper;
     private final PackService packService;
@@ -54,8 +56,8 @@ public class PackController {
         return ResponseEntity.ok(packDTO);
     }
 
-    @GetMapping("/search/{q}")
-    public ResponseEntity<List<PackDTO>> search(@PathVariable String q) {
+    @GetMapping("/search")
+    public ResponseEntity<List<PackDTO>> search(@RequestParam(value = "q", defaultValue = "") String q) {
         return ResponseEntity.ok(packMapper.packToPackDTOsSimple(packService.search(q)));
     }
 

@@ -1,5 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
+import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
 import com.querydsl.core.Tuple;
@@ -39,4 +40,26 @@ public interface QTimeRepository {
     List<Time> getAllTimeRecords(Long companyId);
 
     List<Integer> getAllYears(Long companyId);
+
+    List<Time> getProjectAllUsersTimes(Long id, Category category, LocalDate dateFrom, LocalDate dateTo, String userUid, Long companyId);
+
+    Integer getTotalProjectTimeForYear(Long id, Integer year, Long companyId);
+
+    List<Integer> getProjectYears(Long id, Long companyId);
+
+    Tuple getUserProjectCategoryHoursAndPrice(Long projectId, String userUid, List<Long> categoryIds, Long companyId);
+
+    Integer getUserProjectTimeBetweenYears(Integer startYear, Integer endYear, String uid, Long companyId);
+
+    List<Tuple> getUserActiveMonths(Integer startYear, Integer endYear, String uid, Long companyId);
+
+    List<Tuple> getProjectAllUsersActiveMonth(Integer startYear, Integer endYear, Long companyId);
+
+    List<Tuple> getAllProjectUsers(Long id, Long companyId);
+
+    List<Tuple> getProjectUsersTimePriceSums(Long id, Long companyId);
+
+    List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> longs, Long companyId);
+
+    List<Time> getAllProjectTimesOrdered(Long projectId, Long companyId);
 }

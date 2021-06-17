@@ -6,6 +6,7 @@ import com.data.dataxer.models.dto.UserYearOverviewDTO;
 import com.data.dataxer.services.OverviewService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/overview")
+@PreAuthorize("hasPermission(null, 'Overview', 'Overview')")
 public class OverviewController {
 
     private final OverviewService overviewService;

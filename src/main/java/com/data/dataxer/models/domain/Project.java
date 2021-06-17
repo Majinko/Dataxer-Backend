@@ -3,6 +3,8 @@ package com.data.dataxer.models.domain;
 import com.data.dataxer.models.enums.ProjectState;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -29,7 +31,8 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "uid", referencedColumnName = "uid")
     private AppUser user;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> categories = new ArrayList<>();
 
     private String title;

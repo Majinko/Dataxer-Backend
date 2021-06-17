@@ -36,4 +36,6 @@ public interface TimeService {
     Time getLastUserTime();
 
     List<Integer> getAllYears();
+
+    List<Time> allByUser(String userUid);
 }

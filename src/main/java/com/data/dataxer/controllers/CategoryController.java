@@ -5,6 +5,7 @@ import com.data.dataxer.models.dto.CategoryDTO;
 import com.data.dataxer.models.dto.CategoryNestedDTO;
 import com.data.dataxer.services.CategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/category")
+@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
@@ -45,5 +47,10 @@ public class CategoryController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         categoryService.delete(id);
+    }
+
+    @GetMapping("/recreateTree")
+    public void recreateTree() {
+        this.categoryService.recreateTree();
     }
 }

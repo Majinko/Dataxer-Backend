@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/time")
+@PreAuthorize("hasPermission(null, 'Time', 'Time')")
 public class TimeController {
 
     private final TimeService timeService;
@@ -61,6 +63,13 @@ public class TimeController {
     @GetMapping("/allForPeriod")
     public ResponseEntity<List<TimeDTO>> allForPeriod(@RequestParam(value = "from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from, @RequestParam(value = "to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
         return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(from, to)));
+    }
+
+    @GetMapping("/allByUser")
+    public ResponseEntity<List<TimeDTO>> allByUser(
+            @RequestParam(value = "uId") String userUid
+    ) {
+        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOListSimple(this.timeService.allByUser(userUid)));
     }
 
     @GetMapping("/userMonths")

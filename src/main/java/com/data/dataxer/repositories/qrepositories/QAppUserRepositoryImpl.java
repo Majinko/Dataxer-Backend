@@ -3,7 +3,9 @@ package com.data.dataxer.repositories.qrepositories;
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.QAppUser;
 import com.data.dataxer.models.domain.QCompany;
-import com.querydsl.jpa.JPAExpressions;
+import com.data.dataxer.security.model.Privilege;
+import com.data.dataxer.security.model.QPrivilege;
+import com.data.dataxer.security.model.QRole;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Repository;
 
@@ -41,12 +43,35 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
 
     @Override
     public Optional<AppUser> findByUid(String uid) {
+        AppUser appUser = this.query.selectFrom(QAppUser.appUser)
+                .leftJoin(QAppUser.appUser.defaultCompany).fetchJoin()
+                .leftJoin(QAppUser.appUser.roles).fetchJoin()
+                .where(QAppUser.appUser.uid.eq(uid))
+                .fetchOne();
+
+        if (appUser != null) {
+            appUserSetRolePrivileges(appUser);
+        }
+        return Optional.ofNullable(appUser);
+    }
+
+    @Override
+    public Optional<AppUser> findUserWithRolesAndPrivileges(String uid, Long companyId) {
         return Optional.ofNullable(
-                this.query.selectFrom(QAppUser.appUser)
-                    .leftJoin(QAppUser.appUser.defaultCompany).fetchJoin()
-                    .leftJoin(QAppUser.appUser.roles).fetchJoin()
-                    .where(QAppUser.appUser.uid.eq(uid))
-                    .fetchOne()
+                query.selectFrom(QAppUser.appUser)
+                        .leftJoin(QAppUser.appUser.roles, QRole.role).fetchJoin()
+                        .where(QAppUser.appUser.uid.eq(uid))
+                        .where(QAppUser.appUser.defaultCompany.id.eq(companyId))
+                        .fetchOne()
         );
+    }
+
+    private void appUserSetRolePrivileges(AppUser appUser) {
+        appUser.getRoles().forEach(role -> {
+            List<Privilege> privileges = this.query.selectFrom(QPrivilege.privilege)
+                    .where(QPrivilege.privilege.roles.contains(role))
+                    .fetch();
+            role.setPrivileges(privileges);
+        });
     }
 }

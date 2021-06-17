@@ -1,11 +1,13 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.MailTemplateType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Entity
@@ -13,8 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE mail_templates SET deleted_at = now() WHERE id = ?")
-public class MailTemplates extends BaseEntity {
-
+public class MailTemplate extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -25,6 +26,9 @@ public class MailTemplates extends BaseEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String emailContent;
 
-    private LocalDateTime deletedAt;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    MailTemplateType mailTemplateType;
 
+    private LocalDateTime deletedAt;
 }

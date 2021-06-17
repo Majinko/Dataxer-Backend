@@ -11,5 +11,11 @@ import java.util.List;
 public class CategoryNestedDTO {
     private Long id;
     private String name;
+    private Integer lft;
+    private Integer rgt;
+    private Integer depth;
+    private Long position;
+
+    private CategoryDTO parent;
     private List<CategoryNestedDTO> children = new ArrayList<>();
 }

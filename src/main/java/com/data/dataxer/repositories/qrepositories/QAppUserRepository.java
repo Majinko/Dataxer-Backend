@@ -11,4 +11,6 @@ public interface QAppUserRepository {
     List<AppUser> findWhereDefaultCompanyIs(Long companyId);
 
     Optional<AppUser> findByUid(String uid);
+
+    Optional<AppUser> findUserWithRolesAndPrivileges(String uid, Long companyId);
 }

@@ -4,7 +4,6 @@ import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.dto.CompanyDTO;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
@@ -15,7 +14,6 @@ public interface CompanyMapper {
     CompanyMapper INSTANCE = Mappers.getMapper(CompanyMapper.class);
 
     @Named(value = "useMe")
-    /*@Mapping(target = "billingInformation", ignore = true)*/
     CompanyDTO toCompanyDTO(Company company);
 
     CompanyDTO toCompanyWithBillingInfoDTO(Company company);
