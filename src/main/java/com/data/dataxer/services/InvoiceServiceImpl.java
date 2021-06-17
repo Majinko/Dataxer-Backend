@@ -200,13 +200,26 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         List<DocumentPack> summaryInvoicePacks = new ArrayList<>(proformaInvoice.getPacks());
 
+        HashMap<Integer, DocumentPack> taxesPacks = new HashMap<>();
         for (Invoice taxDocument : taxDocuments) {
             for (DocumentPack documentPack : taxDocument.getPacks()) {
-                summaryInvoicePacks.add(this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(),
-                        taxDocument.getCreatedDate(), taxDocument.getVariableSymbol()));
+                DocumentPack responsePack = this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(),
+                        taxDocument.getCreatedDate(), taxDocument.getVariableSymbol());
+                if (taxesPacks.containsKey(documentPack.getTax())) {
+                    DocumentPack pack = taxesPacks.get(documentPack.getTax());
+                    pack.setPrice(pack.getPrice().add(responsePack.getPrice()));
+                    pack.setTotalPrice(pack.getTotalPrice().add(responsePack.getTotalPrice()));
+                    List<DocumentPackItem> items = new ArrayList<>(pack.getPackItems());
+                    items.addAll(new ArrayList<>(responsePack.getPackItems()));
+                    pack.setPackItems(items);
+                    taxesPacks.replace(documentPack.getTax(), pack);
+                } else {
+                    taxesPacks.put(documentPack.getTax(), responsePack);
+                }
             }
         }
 
+        summaryInvoicePacks.addAll(new ArrayList<>(taxesPacks.values()));
         summaryInvoice.setPacks(summaryInvoicePacks);
 
         return summaryInvoice;
