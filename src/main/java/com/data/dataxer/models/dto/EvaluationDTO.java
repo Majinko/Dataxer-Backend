@@ -8,7 +8,6 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class EvaluationDTO {
-
     private BigDecimal profit;
     private BigDecimal profitManHour;
     private BigDecimal rebate;
@@ -18,5 +17,4 @@ public class EvaluationDTO {
     private BigDecimal realization;
 
     private ProjectStatisticDTO projectStatisticDTO;
-
 }

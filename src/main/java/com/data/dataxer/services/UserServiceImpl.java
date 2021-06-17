@@ -77,7 +77,11 @@ public class UserServiceImpl implements UserService {
             userRecord = firebaseAuth.createUser(createRequest);
             return userRecord.getUid();
         } catch (FirebaseAuthException e) {
-            throw new RuntimeException("User with email " + appUser.getEmail() + ", is already registered");
+            if ("email-already-exists".equals(e.getErrorCode())) {
+                throw new RuntimeException("User with email " + appUser.getEmail() + ", is already registered");
+            } else {
+                throw new RuntimeException("something wrong :(");
+            }
         }
     }
 

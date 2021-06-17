@@ -24,5 +24,4 @@ public class ProjectStatisticDTO {
 
     //just for other math purpose
     private BigDecimal projectHourBruttoSum;
-
 }
