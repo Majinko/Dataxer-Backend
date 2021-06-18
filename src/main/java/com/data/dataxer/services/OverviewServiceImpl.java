@@ -7,7 +7,6 @@ import com.data.dataxer.models.dto.UserHourOverviewDTO;
 import com.data.dataxer.models.dto.UserYearOverviewDTO;
 import com.data.dataxer.models.enums.SalaryType;
 import com.data.dataxer.repositories.CategoryRepository;
-import com.data.dataxer.repositories.qrepositories.QCategoryRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
@@ -30,20 +29,17 @@ public class OverviewServiceImpl implements OverviewService {
     private final QSalaryRepository qSalaryRepository;
     private final QCostRepository qCostRepository;
     private final CategoryRepository categoryRepository;
-    private final QCategoryRepository qCategoryRepository;
 
     private HashMap<AppUser, HashMap<Integer, Integer>> userTimeData;
     private HashMap<AppUser, HashMap<Integer, BigDecimal>> userDayTotalPrice;
 
 
     public OverviewServiceImpl(QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository,
-                               QCostRepository qCostRepository, CategoryRepository categoryRepository,
-                               QCategoryRepository qCategoryRepository) {
+                               QCostRepository qCostRepository, CategoryRepository categoryRepository) {
         this.qTimeRepository = qTimeRepository;
         this.qSalaryRepository = qSalaryRepository;
         this.qCostRepository = qCostRepository;
         this.categoryRepository = categoryRepository;
-        this.qCategoryRepository = qCategoryRepository;
     }
 
     @Override
@@ -115,11 +111,11 @@ public class OverviewServiceImpl implements OverviewService {
         CategoryCostsOverviewDTO response = new CategoryCostsOverviewDTO();
 
         if (categoryId == null) {
-            List<Category> rootCategories = this.qCategoryRepository.getAllRootCategories(SecurityUtils.companyId()).orElse(new ArrayList<>());
+            List<Category> rootCategories = this.categoryRepository.findByParentIdIsNullAndCompanyId(SecurityUtils.companyId()).orElse(new ArrayList<>());
 
             response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(rootCategories, year));
         } else {
-            response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(List.of(this.qCategoryRepository.getById(categoryId, SecurityUtils.companyId())
+            response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(List.of(this.categoryRepository.findByIdAndCompanyId(categoryId, SecurityUtils.companyId())
                     .orElseThrow(() -> new RuntimeException("Category with id " + categoryId + " not found"))), year));
         }
         response.setMonthsTotalCosts(this.generateAllMonthsTotalCostHeader(response.getCategoryMonthsCostsDTOS()));
@@ -170,8 +166,7 @@ public class OverviewServiceImpl implements OverviewService {
     private List<CategoryMonthsCostsDTO> generateCategoryMonthCosts(List<Category> categories, Integer year) {
         List<CategoryMonthsCostsDTO> categoryMonthsCostsDTOS = new ArrayList<>();
         categories.forEach(category -> {
-            List<Long> childrenIds = this.qCategoryRepository.findSubTree(category, SecurityUtils.companyId())
-                    .stream().map(Category::getId).collect(Collectors.toList());
+            List<Long> childrenIds = this.categoryRepository.findAllChildIds(category.getId() ,SecurityUtils.companyId());
 
             List<Cost> costList = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds, year, SecurityUtils.companyId());
 

@@ -8,7 +8,6 @@ import com.data.dataxer.models.dto.*;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.ProjectRepository;
-import com.data.dataxer.repositories.qrepositories.QCategoryRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
@@ -25,7 +24,6 @@ import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -34,19 +32,17 @@ public class ProjectServiceImpl implements ProjectService {
     private final QTimeRepository qTimeRepository;
     private final CategoryRepository categoryRepository;
     private final CostRepository costRepository;
-    private final QCategoryRepository qCategoryRepository;
     private final QInvoiceRepository qInvoiceRepository;
 
     public ProjectServiceImpl(ProjectRepository projectRepository, QProjectRepository qProjectRepository,
                               QTimeRepository qTimeRepository, CategoryRepository categoryRepository,
-                              CostRepository costRepository, QCategoryRepository qCategoryRepository,
+                              CostRepository costRepository,
                               QInvoiceRepository qInvoiceRepository) {
         this.projectRepository = projectRepository;
         this.qProjectRepository = qProjectRepository;
         this.qTimeRepository = qTimeRepository;
         this.categoryRepository = categoryRepository;
         this.costRepository = costRepository;
-        this.qCategoryRepository = qCategoryRepository;
         this.qInvoiceRepository = qInvoiceRepository;
     }
 
@@ -93,7 +89,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<Category> getAllProjectCategoriesOrderedByPosition(Long projectId) {
         List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.companyId()).getCategories();
-        categories.sort(Comparator.comparing(Category::getLft));
+        categories.sort(Comparator.comparing(Category::getPosition));
 
         return categories;
     }
@@ -128,16 +124,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     private List<Category> prepareParentCategories(Long categoryParentId) {
         return categoryParentId == null
-                ? this.qCategoryRepository.getAllRootCategories(SecurityUtils.companyId()).orElse(new ArrayList<>())
-                : this.qCategoryRepository.getChildren(categoryParentId, SecurityUtils.companyId()).orElse(new ArrayList<>());
+                ? this.categoryRepository.findByParentIdIsNullAndCompanyId(SecurityUtils.companyId()).orElse(new ArrayList<>())
+                : this.categoryRepository.findAllByIdInAndCompanyId(this.categoryRepository.findAllChildIds(categoryParentId, SecurityUtils.companyId()), SecurityUtils.companyId());
     }
 
     private Map<Category, List<Long>> prepareParentCategoriesChildren(List<Category> parentCategories) {
         HashMap<Category, List<Long>> parentCategoriesChildren = new HashMap<>();
 
         parentCategories.forEach(category -> {
-            List<Long> childrenCategories = this.qCategoryRepository.findSubTree(category, SecurityUtils.companyId())
-                    .stream().map(Category::getId).collect(Collectors.toList());
+            List<Long> childrenCategories = this.categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyId());
             parentCategoriesChildren.put(category, childrenCategories);
         });
 
@@ -216,7 +211,7 @@ public class ProjectServiceImpl implements ProjectService {
         BigDecimal priceBruttoSum = BigDecimal.ZERO;
         Integer timeSum = 0;
 
-        for (Tuple data:projectUserData) {
+        for (Tuple data : projectUserData) {
             priceBruttoSum = priceBruttoSum.add(data.get(QTime.time1.price.sum()));
             timeSum += data.get(QTime.time1.time.sum());
         }
@@ -225,7 +220,7 @@ public class ProjectServiceImpl implements ProjectService {
         BigDecimal price = projectInvoicesPriceSum.subtract(costs);
 
         evaluationDTO.setProfit(price);
-        evaluationDTO.setProfitManHour(price.divide(new BigDecimal((double) timeSum/60/60).setScale(2, RoundingMode.HALF_UP))
+        evaluationDTO.setProfitManHour(price.divide(new BigDecimal((double) timeSum / 60 / 60).setScale(2, RoundingMode.HALF_UP))
                 .setScale(2, RoundingMode.HALF_UP));
         costs = costs.equals(BigDecimal.ZERO) ? BigDecimal.ONE : costs;
         evaluationDTO.setRebate(price.divide(costs).setScale(4, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP));
@@ -268,7 +263,7 @@ public class ProjectServiceImpl implements ProjectService {
         projectStatisticDTO.setProjectEnd(projectOrderedTimes.get(projectOrderedTimes.size() - 1).getDateWork());
         projectStatisticDTO.setProjectTakeInMonths(Period.between(projectStatisticDTO.getProjectStart(), projectStatisticDTO.getProjectEnd()).getMonths());
         projectStatisticDTO.setProjectManHours(StringUtils.convertMinutesTimeToHoursString(totalProjectTime));
-        projectStatisticDTO.setAverageManHoursForMonth(StringUtils.convertMinutesTimeToHoursString(totalProjectTime/userTimesPriceSums.size()));
+        projectStatisticDTO.setAverageManHoursForMonth(StringUtils.convertMinutesTimeToHoursString(totalProjectTime / userTimesPriceSums.size()));
         projectStatisticDTO.setAverageHourNetto(projectHourNettoSum.divide(new BigDecimal(convertTimeSecondsToHours(totalProjectTime))).setScale(2, RoundingMode.HALF_UP));
         projectStatisticDTO.setAverageHourBrutto(projectHourBruttoSum.divide(new BigDecimal(convertTimeSecondsToHours(totalProjectTime))).setScale(2, RoundingMode.HALF_UP));
         projectStatisticDTO.setProjectPayedPrice(projectPrice);
@@ -316,6 +311,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private double convertTimeSecondsToHours(int time) {
-        return (double) time/60/60;
+        return (double) time / 60 / 60;
     }
 }

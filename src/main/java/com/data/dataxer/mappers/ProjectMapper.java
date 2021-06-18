@@ -29,8 +29,5 @@ public interface ProjectMapper {
     @IterableMapping(qualifiedByName = "projectToProjectDTOSimple")
     List<ProjectDTO> projectToProjectDTOs(List<Project> projects);
 
-    @Mapping(target = "parent", ignore = true)
-    CategoryDTO categoryToCategoryDTO(Category category);
-
     List<CategoryDTO> categoryListToCategoryDTOs(List<Category> categories);
 }
