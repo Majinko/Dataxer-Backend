@@ -20,5 +20,5 @@ public interface QInvoiceRepository {
 
     List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, Long companyId);
 
-    BigDecimal getProjectPriceSum(Long id, Long companyId);
+    Optional<BigDecimal> getProjectPriceSum(Long id, Long companyId);
 }

@@ -137,12 +137,12 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public BigDecimal getProjectPriceSum(Long id, Long companyId) {
-        return this.query.select(QInvoice.invoice.totalPrice.sum())
+    public Optional<BigDecimal> getProjectPriceSum(Long id, Long companyId) {
+        return Optional.ofNullable(this.query.select(QInvoice.invoice.totalPrice.sum())
                 .from(QInvoice.invoice)
                 .where(QInvoice.invoice.project.id.eq(id))
                 .where(QInvoice.invoice.company.id.eq(companyId))
-                .fetchOne();
+                .fetchOne());
     }
 
     private long getTotalCount(Predicate predicate) {

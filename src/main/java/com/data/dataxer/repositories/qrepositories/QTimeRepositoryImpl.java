@@ -2,6 +2,8 @@ package com.data.dataxer.repositories.qrepositories;
 
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QTask;
+import com.data.dataxer.models.domain.QTime;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -371,7 +373,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
 
     @Override
     public List<Time> getAllProjectTimesOrdered(Long projectId, Long companyId) {
-        return this.query.select(QTime.time1)
+        return this.query.selectFrom(QTime.time1)
                 .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.company.id.eq(companyId))
                 .orderBy(QTime.time1.dateWork.asc())
