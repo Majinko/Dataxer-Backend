@@ -23,7 +23,10 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -128,18 +131,7 @@ public class ProjectServiceImpl implements ProjectService {
     private List<Category> prepareParentCategories(Long categoryParentId) {
         return categoryParentId == null
                 ? this.categoryRepository.findByParentIdIsNullAndCompanyId(SecurityUtils.companyId()).orElse(new ArrayList<>())
-                : this.categoryRepository.findAllByIdInAndCompanyId(this.categoryRepository.findAllChildIdsHasTime(categoryParentId, SecurityUtils.companyId()), SecurityUtils.companyId());
-    }
-
-    private Map<Category, List<Long>> prepareParentCategoriesChildren(List<Category> parentCategories) {
-        HashMap<Category, List<Long>> parentCategoriesChildren = new HashMap<>();
-
-        parentCategories.forEach(category -> {
-            List<Long> childrenCategories = this.categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyId());
-            parentCategoriesChildren.put(category, childrenCategories);
-        });
-
-        return parentCategoriesChildren;
+                : this.categoryRepository.findAllByParentIdAndCompanyId(categoryParentId, SecurityUtils.companyId());
     }
 
     private void prepareProjectTimePriceOverviewDTO(List<Integer> projectYears, BigDecimal projectTotalCost, Tuple userData, UserTimePriceOverviewDTO projectTimePriceOverviewDTO) {

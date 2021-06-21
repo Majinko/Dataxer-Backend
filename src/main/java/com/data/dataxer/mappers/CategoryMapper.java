@@ -13,6 +13,12 @@ public interface CategoryMapper {
 
     List<Category> toCategories(List<CategoryDTO> categoryDTOS);
 
-    List<Category> CategoryNestedDTOsToCategories(List<CategoryNestedDTO> categoryDTOS);
+    List<Category> categoryNestedDTOsToCategories(List<CategoryNestedDTO> categoryDTOS);
+
+    CategoryNestedDTO categoryNestedDtoToCategory(Category category);
+
+    CategoryDTO toCategoryDTO(Category category);
+
+    Category categoryDTOtoCategory(CategoryDTO categoryDTO);
 }
 

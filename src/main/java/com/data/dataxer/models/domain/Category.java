@@ -5,12 +5,11 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,4 +31,7 @@ public class Category extends BaseEntity {
     private Integer position;
 
     private LocalDateTime deletedAt;
+
+    @Transient
+    private List<Category> children = new ArrayList<>();
 }

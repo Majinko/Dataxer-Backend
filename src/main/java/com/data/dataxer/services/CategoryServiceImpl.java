@@ -9,6 +9,7 @@ import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
+    private int position = 0;
     private final CategoryRepository categoryRepository;
 
     public CategoryServiceImpl(CategoryRepository categoryRepository) {
@@ -17,6 +18,40 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> all() {
-        return this.categoryRepository.findAllByCompanyId(SecurityUtils.companyId());
+        return this.categoryRepository.findAllByCompanyIdOrderByPositionAsc(SecurityUtils.companyId());
+    }
+
+    @Override
+    public Category store(Category category) {
+        return this.categoryRepository.save(category);
+    }
+
+    @Override
+    public void updateTree(List<Category> categories, Category category) {
+        if (!categories.isEmpty()) {
+            categories.forEach(c -> {
+                if (c != null) {
+                    Category cc = categoryRepository.findByIdAndCompanyId(c.getId(), SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Category not found"));
+
+                    cc.setPosition(this.position++);
+                    cc.setParentId(category == null ? null : category.getId());
+
+                    categoryRepository.save(cc);
+
+                    if (!c.getChildren().isEmpty()) {
+                        this.updateTree(c.getChildren(), c);
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    public void delete(Long id) {
+        if (!this.categoryRepository.findAllByParentIdAndCompanyId(id, SecurityUtils.companyId()).isEmpty()) {
+           throw new RuntimeException("Category has children :(");
+        }
+
+        this.categoryRepository.deleteById(id);
     }
 }

@@ -14,9 +14,11 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     Optional<Category> findByIdAndCompanyId(Long id, Long companyId);
 
-    List<Category> findAllByCompanyId(Long companyId);
+    List<Category> findAllByCompanyIdOrderByPositionAsc(Long companyId);
 
     List<Category> findAllByIdInAndCompanyId(List<Long> ids, Long companyId);
+
+    List<Category> findAllByParentIdAndCompanyId(Long parentId, Long companyId);
 
     @Query("SELECT c FROM Category c WHERE c.name = ?1 AND c.company.id = ?2")
     Optional<Category> findCategoryByName(String categoryName, Long companyId);
