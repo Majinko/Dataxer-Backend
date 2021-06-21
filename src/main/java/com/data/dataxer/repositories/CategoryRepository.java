@@ -23,7 +23,12 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
 
     @Query(
-            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id = ?2 and category.parent_id = ids.id) SELECT * FROM ids where ids.id in (SELECT category_id from time);",
+            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id = ?2 and category.parent_id = ids.id) SELECT * FROM ids;",
             nativeQuery = true)
     List<Long> findAllChildIds(Long categoryId, Long companyId);
+
+    @Query(
+            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id = ?2 and category.parent_id = ids.id) SELECT * FROM ids where ids.id in (SELECT category_id from time);",
+            nativeQuery = true)
+    List<Long> findAllChildIdsHasTime(Long categoryId, Long companyId);
 }
