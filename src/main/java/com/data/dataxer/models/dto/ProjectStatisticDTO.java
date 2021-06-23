@@ -9,7 +9,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class ProjectStatisticDTO {
-
     private LocalDate projectStart;
     private LocalDate projectEnd;
     private Integer projectTakeInMonths;

@@ -39,5 +39,5 @@ public interface ProjectService {
 
     ProjectManHoursDTO getProjectManHours(Long id);
 
-    EvaluationDTO projectEvaluationProfit(Long id);
+    EvaluationDTO projectEvaluationProfit(Long id, String dataType);
 }
