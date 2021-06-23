@@ -196,8 +196,21 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public EvaluationDTO projectEvaluationProfit(Long id) {
+    public EvaluationDTO projectEvaluationProfit(Long id, EvaluationPreparationDTO preparedData) {
         EvaluationDTO evaluationDTO = new EvaluationDTO();
+
+        evaluationDTO.setProjectStatisticDTO(prepareProjectStatisticDTO(id, preparedData.getProjectInvoicesPriceSum(), preparedData.getProjectCostPriceSum()));
+        evaluationDTO.setProjectStatistic(preparedData.getProjectInvoicesPriceSum().subtract(evaluationDTO.getProjectStatisticDTO().getProjectPayedInternalCosts()));
+        evaluationDTO.setProject(BigDecimal.ZERO.subtract(evaluationDTO.getProjectStatisticDTO().getProjectPayedInternalCosts()
+                .subtract(evaluationDTO.getProjectStatisticDTO().getProjectRunningCosts())));
+
+        return evaluationDTO;
+    }
+
+    @Override
+    public EvaluationPreparationDTO evaluationPreparationProjectData(Long id) {
+        EvaluationPreparationDTO response = new EvaluationPreparationDTO();
+
         BigDecimal projectInvoicesPriceSum = this.qInvoiceRepository.getProjectPriceSum(id, SecurityUtils.companyId()).orElse(BigDecimal.ZERO);
         BigDecimal projectCostPriceSum = this.costRepository.getProjectCostSum(SecurityUtils.companyId());
 
@@ -210,24 +223,18 @@ public class ProjectServiceImpl implements ProjectService {
             priceBruttoSum = priceBruttoSum.add(data.get(QTime.time1.price.sum()));
             timeSum += data.get(QTime.time1.time.sum());
         }
-
         BigDecimal costs = projectCostPriceSum.add(priceBruttoSum).setScale(2, RoundingMode.HALF_UP);
-        BigDecimal price = projectInvoicesPriceSum.subtract(costs).setScale(2, RoundingMode.HALF_UP);
 
-        evaluationDTO.setProfit(price);
-        BigDecimal hourTime = new BigDecimal((double) timeSum / 3600).setScale(2, RoundingMode.HALF_UP);
-        evaluationDTO.setProfitManHour(price.divide(hourTime, 2, RoundingMode.HALF_UP));
+        response.setProjectInvoicesPriceSum(projectInvoicesPriceSum);
+        response.setProjectCostPriceSum(projectCostPriceSum);
+        response.setHourTime(new BigDecimal((double) timeSum / 3600).setScale(2, RoundingMode.HALF_UP));
+        response.setProfit(projectInvoicesPriceSum.subtract(costs));
+        response.setProfitManHour(response.getProfit().divide(response.getHourTime(), 2, RoundingMode.HALF_UP));
         costs = costs.equals(BigDecimal.ZERO) ? BigDecimal.ONE : costs;
-        evaluationDTO.setRebate(price.divide(costs, 2, RoundingMode.HALF_UP).multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP));
-        evaluationDTO.setProjectStatisticDTO(prepareProjectStatisticDTO(id, projectInvoicesPriceSum, projectCostPriceSum));
-        evaluationDTO.setProjectStatistic(projectInvoicesPriceSum.subtract(evaluationDTO.getProjectStatisticDTO().getProjectPayedInternalCosts())
-                .subtract(evaluationDTO.getProjectStatisticDTO().getProjectRunningCosts()).setScale(2, RoundingMode.HALF_UP));
-        evaluationDTO.setProject(BigDecimal.ZERO.subtract(evaluationDTO.getProjectStatisticDTO().getProjectPayedInternalCosts()
-                .subtract(evaluationDTO.getProjectStatisticDTO().getProjectRunningCosts())));
-        //nevidim to nikde vyuzite v old dataxer
-        //evaluationDTO.setRealization();
+        response.setRebate(response.getProfit().divide(costs, 2, RoundingMode.HALF_UP)
+                .multiply(new BigDecimal(100)).setScale(2, RoundingMode.HALF_UP));
 
-        return evaluationDTO;
+        return response;
     }
 
     private ProjectStatisticDTO prepareProjectStatisticDTO(Long id, BigDecimal projectPrice, BigDecimal projectCosts) {

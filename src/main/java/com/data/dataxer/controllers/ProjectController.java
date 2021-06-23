@@ -113,8 +113,14 @@ public class ProjectController {
         return ResponseEntity.ok(this.projectService.getProjectManHours(id));
     }
 
-    @GetMapping("/evaluation/{id}")
-    public ResponseEntity<EvaluationDTO> projectEvaluationProfit(@PathVariable Long id) {
-        return ResponseEntity.ok(this.projectService.projectEvaluationProfit(id));
+    @GetMapping("/prepareEvaluation/{id}")
+    public ResponseEntity<EvaluationPreparationDTO> projectEvaluationPreparation(@PathVariable Long id) {
+        return  ResponseEntity.ok(this.projectService.evaluationPreparationProjectData(id));
+    }
+
+    @PostMapping("/evaluation/{id}")
+    public ResponseEntity<EvaluationDTO> projectEvaluationProfit(@PathVariable Long id,
+                                                                 @RequestBody EvaluationPreparationDTO preparedData) {
+        return ResponseEntity.ok(this.projectService.projectEvaluationProfit(id, preparedData));
     }
 }
