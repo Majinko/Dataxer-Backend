@@ -155,8 +155,14 @@ public class OverviewServiceImpl implements OverviewService {
         return response;
     }
 
+    /**
+     *
+     * @param params Obsahuje LocalDate posledneho behu tasku
+     * @param company Nie je null ked spusta task -> task nema session a setnutu default company tak beriu podla company id z tasku
+     * @return
+     */
     @Override
-    public String executeUsersYearsHours(String params) {
+    public String executeUsersYearsHours(String params, Company company) {
         LocalDate processFromDate = null;
         LocalDate processToDate;
         if (params != null) {
@@ -166,10 +172,12 @@ public class OverviewServiceImpl implements OverviewService {
             processToDate = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
         }
 
-        List<Tuple> usersTimesToProcess = this.qTimeRepository.getAllUserTimesFromDateToDate(processFromDate, processToDate, SecurityUtils.companyId());
+        Long companyId = company != null ?  company.getId() : SecurityUtils.companyId();
+
+        List<Tuple> usersTimesToProcess = this.qTimeRepository.getAllUserTimesFromDateToDate(processFromDate, processToDate, companyId);
 
         HashMap<String, AppUser> mappedUsers = new HashMap<>();
-        List<AppUser> users = this.appUserRepository.findAllByDefaultCompanyId(SecurityUtils.companyId());
+        List<AppUser> users = this.appUserRepository.findAllByDefaultCompanyId(companyId);
         users.forEach(user ->  mappedUsers.put(user.getUid(), user));
 
         //kazdy riadok je unikatny pre usera, rok a mesiac
@@ -179,6 +187,11 @@ public class OverviewServiceImpl implements OverviewService {
             usersOverviewData.setYear(tuple.get(QTime.time1.dateWork.year()));
             usersOverviewData.setMonth(tuple.get(QTime.time1.dateWork.month()));
             usersOverviewData.setYearMonthHours(tuple.get(QTime.time1.time.sum()));
+            if (company != null) {
+                usersOverviewData.setCompany(company);
+            } else {
+                usersOverviewData.setCompany(SecurityUtils.defaultCompany());
+            }
             this.usersOverviewDataRepository.save(usersOverviewData);
         });
 

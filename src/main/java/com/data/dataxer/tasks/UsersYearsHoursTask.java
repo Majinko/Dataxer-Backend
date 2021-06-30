@@ -2,12 +2,12 @@ package com.data.dataxer.tasks;
 
 import com.data.dataxer.models.domain.BackGroundTask;
 import com.data.dataxer.repositories.BackGroundTaskRepository;
-import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.services.OverviewService;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Component
 public class UsersYearsHoursTask {
@@ -20,12 +20,14 @@ public class UsersYearsHoursTask {
         this.backGroundTaskRepository = backGroundTaskRepository;
     }
 
-    @Scheduled(cron = "0 0 1 1 * *")
+    @Scheduled(cron = "0 23 23 30 * *")
     void execute() {
-        BackGroundTask task = this.backGroundTaskRepository.findBackGroundTaskByNameAndCompanyId(UsersYearsHoursTask.class.getName(), SecurityUtils.companyId());
-        task.setParams(this.overviewService.executeUsersYearsHours(task.getParams()));
-        task.setLastExecution(LocalDate.now());
-        this.backGroundTaskRepository.save(task);
+        List<BackGroundTask> tasks = this.backGroundTaskRepository.findBackGroundTaskByNameAndCompanyId(UsersYearsHoursTask.class.getName());
+        tasks.forEach(task -> {
+            task.setParams(this.overviewService.executeUsersYearsHours(task.getParams(), task.getCompany()));
+            task.setLastExecution(LocalDate.now());
+            this.backGroundTaskRepository.save(task);
+        });
     }
 
     public void executeNow() {
