@@ -13,4 +13,6 @@ public interface OverviewService {
     List<UserYearOverviewDTO> getAllUsersYearsOverview();
 
     CategoryCostsOverviewDTO getCategoriesCostsForYear(Integer year, Long categoryId);
+
+    String executeUsersYearsHours(String params);
 }

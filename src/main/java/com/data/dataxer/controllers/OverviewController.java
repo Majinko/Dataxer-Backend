@@ -31,6 +31,7 @@ public class OverviewController {
         return ResponseEntity.ok(this.overviewService.getAllUsersHourOverview(fromDate, toDate));
     }
 
+    //potrebuje optimalizovat
     @GetMapping("/userYearsOverview")
     public ResponseEntity<List<UserYearOverviewDTO>> userYearStatistic() {
         return ResponseEntity.ok(this.overviewService.getAllUsersYearsOverview());
