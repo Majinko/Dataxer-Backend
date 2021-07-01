@@ -37,7 +37,7 @@ public interface QTimeRepository {
 
     Integer sumUserTime(Long userId, Long companyId);
 
-    List<Time> getAllTimeRecords(Long companyId);
+    List<Time> getAllTimeRecordsFromTo(LocalDate from, LocalDate to, Long companyId);
 
     List<Integer> getAllYears(Long companyId);
 
@@ -62,4 +62,6 @@ public interface QTimeRepository {
     List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> longs, Long companyId);
 
     List<Time> getAllProjectTimesOrdered(Long projectId, Long companyId);
+
+    List<Tuple> getAllUserTimesFromDateToDate(LocalDate processFromDate, LocalDate processToDate, Long companyId);
 }

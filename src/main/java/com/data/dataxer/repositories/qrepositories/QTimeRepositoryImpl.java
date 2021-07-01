@@ -211,9 +211,11 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Time> getAllTimeRecords(Long companyId) {
+    public List<Time> getAllTimeRecordsFromTo(LocalDate from, LocalDate to, Long companyId) {
         return this.query.selectFrom(QTime.time1)
                 .leftJoin(QTime.time1.user).fetchJoin()
+                .where(QTime.time1.dateWork.goe(from))
+                .where(QTime.time1.dateWork.loe(to))
                 .where(QTime.time1.company.id.eq(companyId))
                 .fetch();
     }
@@ -376,6 +378,25 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.company.id.eq(companyId))
                 .leftJoin(QTime.time1.user, QAppUser.appUser).fetchJoin()
                 .orderBy(QTime.time1.dateWork.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<Tuple> getAllUserTimesFromDateToDate(LocalDate processFromDate, LocalDate processToDate, Long companyId) {
+        BooleanBuilder condition = new BooleanBuilder();
+
+        if (processFromDate != null) {
+            condition.and(QTime.time1.dateWork.goe(processFromDate));
+        }
+        condition.and(QTime.time1.dateWork.loe(processToDate));
+
+        return this.query.select(QTime.time1.user.uid, QTime.time1.time.sum(), QTime.time1.dateWork.year(), QTime.time1.dateWork.month())
+                .from(QTime.time1)
+                .where(condition)
+                .where(QTime.time1.company.id.eq(companyId))
+                .groupBy(QTime.time1.user.uid)
+                .groupBy(QTime.time1.dateWork.year())
+                .groupBy(QTime.time1.dateWork.month())
                 .fetch();
     }
 
