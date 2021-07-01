@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.CategoryType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -29,6 +30,9 @@ public class Category extends BaseEntity {
     private Integer depth;
 
     private Integer position;
+
+    @Enumerated(EnumType.STRING)
+    private CategoryType categoryType;
 
     private LocalDateTime deletedAt;
 

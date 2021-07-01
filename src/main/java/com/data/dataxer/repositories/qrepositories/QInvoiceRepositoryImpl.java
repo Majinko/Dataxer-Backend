@@ -1,10 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QDocumentPack;
-import com.data.dataxer.models.domain.QDocumentPackItem;
-import com.data.dataxer.models.domain.QInvoice;
-import com.data.dataxer.models.domain.QItem;
 import com.data.dataxer.models.enums.DocumentType;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -137,7 +133,16 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Optional<BigDecimal> getProjectPriceSum(Long id, Long companyId) {
+    public List<Invoice> getAllProjectInvoices(Long projectId, Long companyId) {
+        return query
+                .selectFrom(QInvoice.invoice)
+                .where(QInvoice.invoice.project.id.eq(projectId))
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .fetch();
+    }
+
+    @Override
+    public Optional<BigDecimal> getProjectInvoiceSum(Long id, Long companyId) {
         return Optional.ofNullable(this.query.select(QInvoice.invoice.totalPrice.sum())
                 .from(QInvoice.invoice)
                 .where(QInvoice.invoice.project.id.eq(id))

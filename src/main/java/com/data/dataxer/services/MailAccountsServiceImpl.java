@@ -1,8 +1,6 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.MailAccounts;
-import com.data.dataxer.models.domain.MailTemplate;
 import com.data.dataxer.models.enums.MailAccountState;
 import com.data.dataxer.repositories.MailAccountsRepository;
 import com.data.dataxer.repositories.qrepositories.QMailAccountsRepository;
@@ -92,29 +90,19 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     }
 
     @Override
-    public void sendEmail(String emailSubject, String emailContent, List<Long> contactIds, Long companyId, Long templateId) {
+    public void sendEmail(String emailSubject, String emailContent, List<String> emails) {
         try {
-            JavaMailSenderImpl mailSender = this.getMailSenderByCompanyId(companyId);
-            List<Contact> participants = this.contactService.getContactByIds(contactIds);
+            JavaMailSenderImpl mailSender = this.getMailSenderByCompanyId(SecurityUtils.companyId());
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
 
             helper.setFrom(mailSender.getUsername());
+            helper.setSubject(emailSubject);
+            helper.setText(emailContent, true);
 
-            if (emailSubject != null && emailContent != null && !emailSubject.isEmpty() && !emailContent.isEmpty() ) {
-                helper.setSubject(emailSubject);
-                helper.setText(emailContent, true);
-            } else if (templateId != null) {
-                MailTemplate mailTemplates = this.mailTemplatesService.getById(templateId);
-                helper.setSubject(mailTemplates.getEmailSubject());
-                helper.setText(mailTemplates.getEmailContent(), true);
-            } else {
-                throw new RuntimeException("Missing required mail subject and email content, or template id");
-            }
-
-            for (Contact participant: participants) {
-                helper.setTo(participant.getEmail());
+            for (String email : emails) {
+                helper.setTo(email);
                 mailSender.send(mimeMessage);
             }
         } catch (MessagingException e) {

@@ -1,9 +1,6 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.Category;
-import com.data.dataxer.models.domain.Project;
-import com.data.dataxer.models.domain.QTime;
-import com.data.dataxer.models.domain.Time;
+import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.dto.*;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.CostRepository;
@@ -196,19 +193,17 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public EvaluationDTO projectEvaluationProfit(Long id, String dataType) {
-        Project project = this.getById(id);
-        EvaluationDTO evaluationDTO = new EvaluationDTO();
+    public EvaluationPreparationDTO evaluationPreparationProjectData(Long id) {
+        EvaluationPreparationDTO response = new EvaluationPreparationDTO();
 
-        if (!project.getCategories().isEmpty()){
+        List<Cost> costs = this.costRepository.findAllByProjectIdAndCompanyId(id, SecurityUtils.companyId());
+        List<Invoice> invoices = this.qInvoiceRepository.getAllProjectInvoices(id, SecurityUtils.companyId());
+        List<Time> times = this.qTimeRepository.getAllProjectTimesOrdered(id, SecurityUtils.companyId());
 
-
-        }
-
-        return evaluationDTO;
+        return response;
     }
 
-    private ProjectStatisticDTO prepareProjectStatisticDTO(Long id, BigDecimal projectPrice) {
+    private ProjectStatisticDTO prepareProjectStatisticDTO(Long id) {
         ProjectStatisticDTO projectStatisticDTO = new ProjectStatisticDTO();
         List<Integer> projectYears = this.getAllProjectYears(id);
 
@@ -238,7 +233,7 @@ public class ProjectServiceImpl implements ProjectService {
             projectStatisticDTO.setAverageManHoursForMonth(StringUtils.convertMinutesTimeToHoursString(totalProjectTime / userTimesPriceSums.size()));
             projectStatisticDTO.setAverageHourNetto(projectHourNettoSum.divide(new BigDecimal(convertTimeSecondsToHours(totalProjectTime)), 2, RoundingMode.HALF_UP));
             projectStatisticDTO.setAverageHourBrutto(projectHourBruttoSum.divide(new BigDecimal(convertTimeSecondsToHours(totalProjectTime)), 2, RoundingMode.HALF_UP));
-            projectStatisticDTO.setProjectPayedPrice(projectPrice);
+            //projectStatisticDTO.setProjectPayedPrice(projectPrice);
             projectStatisticDTO.setProjectPayedCosts(projectTotalCost);
             projectStatisticDTO.setProjectPayedInternalCosts(projectHourNettoSum);
             projectStatisticDTO.setProjectHourBruttoSum(projectHourBruttoSum);

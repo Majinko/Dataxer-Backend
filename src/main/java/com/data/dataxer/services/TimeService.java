@@ -38,4 +38,6 @@ public interface TimeService {
     List<Integer> getAllYears();
 
     List<Time> allByUser(String userUid);
+
+    List<Time> allByProject(Long projectId);
 }

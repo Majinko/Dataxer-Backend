@@ -9,7 +9,7 @@ public interface CategoryService {
 
     Category store(Category category);
 
-    void updateTree(List<Category> categories, Category category);
+    void updateTree(List<Category> categories);
 
     void delete(Long id);
 }

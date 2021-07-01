@@ -2,7 +2,8 @@ package com.data.dataxer.models.enums;
 
 public enum MailTemplateType {
     INVOICE("invoice"),
-    PROFORMA("proforma");
+    PROFORMA("proforma"),
+    TASK("task");
 
     public final String type;
 

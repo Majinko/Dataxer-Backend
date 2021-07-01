@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/mailAccounts")
 @PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class MailAccountsController {
-
     private final MailAccountsService mailAccountsService;
     private final MailAccountsMapper mailAccountsMapper;
 
@@ -72,6 +71,6 @@ public class MailAccountsController {
 
     @PostMapping("/sendEmail")
     public void sendEmail(@RequestBody MailDataDTO mailDataDTO) {
-        this.mailAccountsService.sendEmail(mailDataDTO.getSubject(), mailDataDTO.getContent(), mailDataDTO.getParticipantIds(), mailDataDTO.getCompanyId(), mailDataDTO.getTemplateId());
+        this.mailAccountsService.sendEmail(mailDataDTO.getSubject(), mailDataDTO.getContent(), mailDataDTO.getEmails());
     }
 }

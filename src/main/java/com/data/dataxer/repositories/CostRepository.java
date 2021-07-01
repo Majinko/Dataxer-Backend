@@ -27,5 +27,4 @@ public interface CostRepository extends CrudRepository<Cost, Long> {
 
     @Query("SELECT sum(c.totalPrice) FROM Cost c WHERE c.company.id = ?1")
     BigDecimal getProjectCostSum(Long companyId);
-
 }

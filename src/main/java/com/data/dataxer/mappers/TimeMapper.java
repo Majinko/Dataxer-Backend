@@ -2,7 +2,6 @@ package com.data.dataxer.mappers;
 
 import com.data.dataxer.models.domain.Time;
 import com.data.dataxer.models.dto.TimeDTO;
-import jdk.jfr.Name;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -28,6 +27,13 @@ public interface TimeMapper {
     @Mapping(target = "user.defaultCompany", ignore = true)
     TimeDTO timeToTimeDTOSimple(Time time);
 
+    @Named("timeToTimeDTOWithoutRelations")
+    @Mapping(target = "project", ignore = true)
+    @Mapping(target = "user.roles", ignore = true)
+    @Mapping(target = "user.defaultCompany", ignore = true)
+    @Mapping(target = "category", ignore = true)
+    TimeDTO timeToTimeDTOWithoutRelations(Time time);
+
 
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "user", ignore = true)
@@ -39,4 +45,7 @@ public interface TimeMapper {
 
     @IterableMapping(qualifiedByName = "timeToTimeDTOSimple")
     List<TimeDTO> timeListToTimeDTOListSimple(List<Time> times);
+
+    @IterableMapping(qualifiedByName = "timeToTimeDTOWithoutRelations")
+    List<TimeDTO> timeListToTimeDTOWithoutRelations(List<Time> times);
 }

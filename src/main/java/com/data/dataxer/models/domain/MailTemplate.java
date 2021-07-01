@@ -1,3 +1,4 @@
+
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.models.enums.MailTemplateType;

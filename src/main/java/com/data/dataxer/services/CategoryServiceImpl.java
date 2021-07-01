@@ -3,18 +3,19 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
     private int position = 0;
-    private final CategoryRepository categoryRepository;
 
-    public CategoryServiceImpl(CategoryRepository categoryRepository) {
-        this.categoryRepository = categoryRepository;
-    }
+    @Autowired
+    private CategoryRepository categoryRepository;
+
 
     @Override
     public List<Category> all() {
@@ -27,19 +28,25 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public void updateTree(List<Category> categories, Category category) {
+    public void updateTree(List<Category> categories) {
+        List<Category> updateCategories = new ArrayList<>();
+
+        this.prepareTree(categories, updateCategories, null);
+
+        this.categoryRepository.saveAll(updateCategories);
+    }
+
+    public void prepareTree(List<Category> categories, List<Category> updateCategories, Category category) {
         if (!categories.isEmpty()) {
             categories.forEach(c -> {
                 if (c != null) {
-                    Category cc = categoryRepository.findByIdAndCompanyId(c.getId(), SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Category not found"));
+                    c.setPosition(this.position++);
+                    c.setParentId(category == null ? null : category.getId());
 
-                    cc.setPosition(this.position++);
-                    cc.setParentId(category == null ? null : category.getId());
-
-                    categoryRepository.save(cc);
+                    updateCategories.add(c);
 
                     if (!c.getChildren().isEmpty()) {
-                        this.updateTree(c.getChildren(), c);
+                        this.prepareTree(c.getChildren(), updateCategories, c);
                     }
                 }
             });
@@ -49,7 +56,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public void delete(Long id) {
         if (!this.categoryRepository.findAllByParentIdAndCompanyId(id, SecurityUtils.companyId()).isEmpty()) {
-           throw new RuntimeException("Category has children :(");
+            throw new RuntimeException("Category has children :(");
         }
 
         this.categoryRepository.deleteById(id);

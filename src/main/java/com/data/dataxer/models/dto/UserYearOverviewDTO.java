@@ -8,11 +8,9 @@ import java.util.HashMap;
 @Getter
 @Setter
 public class UserYearOverviewDTO {
-
     private String firstName;
     private String lastName;
     private String fullName;
 
     private HashMap<Integer, String> yearHours;
-
 }

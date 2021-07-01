@@ -40,6 +40,10 @@ public class TaskController {
                 this.storageService.store(storageMapper.storageFileDTOtoStorage(file), task.getId(), "task");
             });
         }
+
+        if (uploadContext.getObject().isSendEmail()) {
+            //todo
+        }
     }
 
     @PostMapping("/update")

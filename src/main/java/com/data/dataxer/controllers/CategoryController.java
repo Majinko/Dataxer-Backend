@@ -34,7 +34,7 @@ public class CategoryController {
 
     @PostMapping("/updateTree")
     public void updateTree(@RequestBody List<CategoryNestedDTO> categoryDTOS) {
-        categoryService.updateTree(categoryMapper.categoryNestedDTOsToCategories(categoryDTOS), null);
+        categoryService.updateTree(categoryMapper.categoryNestedDTOsToCategories(categoryDTOS));
     }
 
     @GetMapping("/destroy/{id}")

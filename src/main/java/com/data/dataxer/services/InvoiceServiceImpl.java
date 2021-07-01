@@ -203,8 +203,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         HashMap<Integer, DocumentPack> taxesPacks = new HashMap<>();
         for (Invoice taxDocument : taxDocuments) {
             for (DocumentPack documentPack : taxDocument.getPacks()) {
-                DocumentPack responsePack = this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(),
-                        taxDocument.getCreatedDate(), taxDocument.getVariableSymbol());
+                DocumentPack responsePack = this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(), taxDocument.getCreatedDate(), taxDocument.getVariableSymbol());
                 if (taxesPacks.containsKey(documentPack.getTax())) {
                     DocumentPack pack = taxesPacks.get(documentPack.getTax());
                     pack.setPrice(pack.getPrice().add(responsePack.getPrice()));

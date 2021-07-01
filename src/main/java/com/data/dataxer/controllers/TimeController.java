@@ -72,6 +72,11 @@ public class TimeController {
         return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOListSimple(this.timeService.allByUser(userUid)));
     }
 
+    @GetMapping("/allByProject/{projectId}")
+    public ResponseEntity<List<TimeDTO>> allByProject(@PathVariable Long projectId) {
+        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOWithoutRelations(this.timeService.allByProject(projectId)));
+    }
+
     @GetMapping("/userMonths")
     public ResponseEntity<List<MonthAndYearDTO>> getAllUserMonths(@RequestParam(value = "id") Long userId) {
         return ResponseEntity.ok(this.timeService.getAllUserMonths(userId));

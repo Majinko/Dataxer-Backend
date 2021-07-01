@@ -113,8 +113,9 @@ public class ProjectController {
         return ResponseEntity.ok(this.projectService.getProjectManHours(id));
     }
 
-    @GetMapping("/evaluation/{id}/{dataType}")
-    public ResponseEntity<EvaluationDTO> projectEvaluationProfit(@PathVariable Long id, @PathVariable String dataType) {
-        return ResponseEntity.ok(this.projectService.projectEvaluationProfit(id, dataType));
+    //todo remove
+    @GetMapping("/prepareEvaluation/{id}")
+    public ResponseEntity<EvaluationPreparationDTO> projectEvaluationPreparation(@PathVariable Long id) {
+        return  ResponseEntity.ok(this.projectService.evaluationPreparationProjectData(id));
     }
 }

@@ -15,9 +15,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
-    private  EntryPointUnauthorizedHandler unauthorizedHandler;
-    private  FirebaseUserDetailService firebaseUserDetailService;
-    private  FirebaseAuth firebaseAuth;
+    private EntryPointUnauthorizedHandler unauthorizedHandler;
+    private FirebaseUserDetailService firebaseUserDetailService;
+    private FirebaseAuth firebaseAuth;
 
     public WebSecurity(EntryPointUnauthorizedHandler unauthorizedHandler, FirebaseUserDetailService firebaseUserDetailService, FirebaseAuth firebaseAuth) {
         this.unauthorizedHandler = unauthorizedHandler;
@@ -40,7 +40,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.cors().and().exceptionHandling()
+        http.cors()
+                .and().exceptionHandling()
                 .authenticationEntryPoint(unauthorizedHandler)
                 .and()
                 .sessionManagement()
