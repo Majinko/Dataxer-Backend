@@ -96,8 +96,8 @@ public class OverviewServiceImpl implements OverviewService {
         HashMap<AppUser, HashMap<Integer, Integer>> preparedData = new HashMap<>();
 
         List<UsersOverviewData> data = this.usersOverviewDataRepository.findAllByCompanyId(SecurityUtils.companyId());
-        List<Time> thisMonthData = this.qTimeRepository.getAllTimeRecordsFromTo(LocalDate.now().with(TemporalAdjusters.firstDayOfMonth()),
-                LocalDate.now().with(TemporalAdjusters.lastDayOfMonth()), SecurityUtils.companyId());
+        List<Time> todayData = this.qTimeRepository.getAllTimeRecordsFromTo(LocalDate.now(),
+                LocalDate.now(), SecurityUtils.companyId());
 
         //najprv spracujeme ulozene statisticke data
         data.forEach(dataToProcess -> {
@@ -117,7 +117,7 @@ public class OverviewServiceImpl implements OverviewService {
             }
         });
 
-        thisMonthData.forEach(dataToProcess -> {
+        todayData.forEach(dataToProcess -> {
             if (preparedData.containsKey(dataToProcess.getUser())) {
                 HashMap<Integer, Integer> partialResponse = preparedData.get(dataToProcess.getUser());
                 if (partialResponse.containsKey(dataToProcess.getDateWork().getYear())) {
@@ -166,10 +166,10 @@ public class OverviewServiceImpl implements OverviewService {
         LocalDate processFromDate = null;
         LocalDate processToDate;
         if (params != null) {
-            processFromDate = LocalDate.parse(params).plusMonths(1).with(TemporalAdjusters.firstDayOfMonth());
-            processToDate = LocalDate.parse(params).plusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+            processFromDate = LocalDate.parse(params).plusDays(1);
+            processToDate = LocalDate.parse(params).plusDays(1);
         } else {
-            processToDate = LocalDate.now().minusMonths(1).with(TemporalAdjusters.lastDayOfMonth());
+            processToDate = LocalDate.now().minusDays(1);
         }
 
         Long companyId = company != null ?  company.getId() : SecurityUtils.companyId();
@@ -182,15 +182,24 @@ public class OverviewServiceImpl implements OverviewService {
 
         //kazdy riadok je unikatny pre usera, rok a mesiac
         usersTimesToProcess.forEach(tuple -> {
-            UsersOverviewData usersOverviewData = new UsersOverviewData();
-            usersOverviewData.setUser(mappedUsers.get(tuple.get(QTime.time1.user.uid)));
-            usersOverviewData.setYear(tuple.get(QTime.time1.dateWork.year()));
-            usersOverviewData.setMonth(tuple.get(QTime.time1.dateWork.month()));
-            usersOverviewData.setYearMonthHours(tuple.get(QTime.time1.time.sum()));
-            if (company != null) {
-                usersOverviewData.setCompany(company);
+            UsersOverviewData usersOverviewData = this.usersOverviewDataRepository.findByUserUidAndYearAndMonthAndCompanyId(
+                    tuple.get(QTime.time1.user.uid), tuple.get(QTime.time1.dateWork.year()), tuple.get(QTime.time1.dateWork.month()), companyId
+            );
+            if (usersOverviewData == null) {
+                usersOverviewData = new UsersOverviewData();
+                usersOverviewData.setUser(mappedUsers.get(tuple.get(QTime.time1.user.uid)));
+                usersOverviewData.setYear(tuple.get(QTime.time1.dateWork.year()));
+                usersOverviewData.setMonth(tuple.get(QTime.time1.dateWork.month()));
+                usersOverviewData.setYearMonthHours(tuple.get(QTime.time1.time.sum()));
+                if (company != null) {
+                    usersOverviewData.setCompany(company);
+                } else {
+                    usersOverviewData.setCompany(SecurityUtils.defaultCompany());
+                }
             } else {
-                usersOverviewData.setCompany(SecurityUtils.defaultCompany());
+                usersOverviewData.setYearMonthHours(
+                        usersOverviewData.getYearMonthHours() + tuple.get(QTime.time1.time.sum())
+                );
             }
             this.usersOverviewDataRepository.save(usersOverviewData);
         });

@@ -9,4 +9,6 @@ public interface UsersOverviewDataRepository extends JpaRepository<UsersOverview
 
     List<UsersOverviewData> findAllByCompanyId(Long companyId);
 
+    UsersOverviewData findByUserUidAndYearAndMonthAndCompanyId(String uid, Integer year, Integer month, Long companyId);
+
 }

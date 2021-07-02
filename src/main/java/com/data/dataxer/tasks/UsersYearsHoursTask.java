@@ -20,7 +20,7 @@ public class UsersYearsHoursTask {
         this.backGroundTaskRepository = backGroundTaskRepository;
     }
 
-    @Scheduled(cron = "0 0 1 1 * *")
+    @Scheduled(cron = "0 0 0 * * *")
     void execute() {
         List<BackGroundTask> tasks = this.backGroundTaskRepository.findBackGroundTaskByNameAndCompanyId(UsersYearsHoursTask.class.getName());
         tasks.forEach(task -> {
