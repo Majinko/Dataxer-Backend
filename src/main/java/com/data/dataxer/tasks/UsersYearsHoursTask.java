@@ -33,5 +33,4 @@ public class UsersYearsHoursTask {
     public void executeNow() {
         execute();
     }
-
 }

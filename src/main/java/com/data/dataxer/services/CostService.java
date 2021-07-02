@@ -1,7 +1,7 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Cost;
-import com.data.dataxer.models.enums.CostState;
+import com.data.dataxer.models.enums.DocumentState;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,7 +17,7 @@ public interface CostService {
 
     void taskExecute();
 
-    Cost changeState(Long id, CostState state);
+    Cost changeState(Long id, DocumentState state);
 
     void destroy(Long id);
 

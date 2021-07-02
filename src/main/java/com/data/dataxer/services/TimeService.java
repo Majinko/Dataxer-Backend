@@ -23,7 +23,7 @@ public interface TimeService {
 
     Page<Time> paginate(Pageable pageable, String rqlFilter, String sortExpression);
 
-    List<Time> allForPeriod(LocalDate from, LocalDate to);
+    List<Time> allForPeriod(LocalDate from, LocalDate to, String rqlFilter);
 
     List<MonthAndYearDTO> getAllUserMonths(Long userId);
 

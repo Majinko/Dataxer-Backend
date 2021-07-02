@@ -21,7 +21,7 @@ public interface QTimeRepository {
 
     List<Time> getHourOverviewForAllUsers(LocalDate fromDate, LocalDate toDate, Long companyId);
 
-    List<Time> allForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId);
+    List<Time> allForPeriod(LocalDate from, LocalDate to, String rqlFilter, Long userId, Long companyId);
 
     List<Tuple> getAllUserMonths(Long userId, Long companyId);
 

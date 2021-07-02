@@ -1,9 +1,9 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.mappers.HashMapConverter;
-import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.models.enums.CostType;
 import com.data.dataxer.models.enums.CostsPeriods;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
@@ -65,7 +65,7 @@ public class Cost extends BaseEntity {
     private String note;
 
     @Enumerated(EnumType.STRING)
-    private CostState state;
+    private DocumentState state;
 
     @Enumerated(EnumType.STRING)
     private CostType type;

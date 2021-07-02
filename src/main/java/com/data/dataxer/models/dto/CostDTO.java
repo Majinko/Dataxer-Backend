@@ -2,9 +2,9 @@ package com.data.dataxer.models.dto;
 
 import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.Project;
-import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.models.enums.CostType;
 import com.data.dataxer.models.enums.CostsPeriods;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,7 +19,7 @@ import java.util.List;
 public class CostDTO {
     private Long id;
 
-    private CostState state;
+    private DocumentState state;
     private CostType type;
     private PaymentMethod paymentMethod;
     private CostsPeriods period;

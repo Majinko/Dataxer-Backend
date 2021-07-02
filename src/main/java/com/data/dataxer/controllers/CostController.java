@@ -4,7 +4,7 @@ import com.data.dataxer.mappers.CostMapper;
 import com.data.dataxer.mappers.StorageMapper;
 import com.data.dataxer.models.dto.CostDTO;
 import com.data.dataxer.models.dto.UploadContextDTO;
-import com.data.dataxer.models.enums.CostState;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.services.CostService;
 import com.data.dataxer.services.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class CostController {
     }
 
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<CostDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.getByIdWithRelation(id)));
     }
@@ -83,7 +83,7 @@ public class CostController {
     @GetMapping("/changeState")
     public ResponseEntity<CostDTO> changeState(
             @RequestParam(value = "id") Long id,
-            @RequestParam(value = "state", defaultValue = "PAYED") CostState state) {
+            @RequestParam(value = "state", defaultValue = "PAYED") DocumentState state) {
         return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.changeState(id, state)));
     }
 

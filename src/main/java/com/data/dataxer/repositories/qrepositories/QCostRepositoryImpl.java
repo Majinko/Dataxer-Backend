@@ -49,6 +49,10 @@ public class QCostRepositoryImpl implements QCostRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("cost.id", QCost.cost.id)
+                .put("cost.state", QCost.cost.state)
+                .put("cost.contact.id", QCost.cost.contact.id)
+                .put("cost.contact.name", QCost.cost.contact.name)
+                .put("cost.project.id", QCost.cost.project.id)
                 .build();
 
         if (!rqlFilter.equals("")) {

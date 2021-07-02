@@ -1,7 +1,7 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Cost;
-import com.data.dataxer.models.enums.CostState;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -99,7 +99,7 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public Cost changeState(Long id, CostState state) {
+    public Cost changeState(Long id, DocumentState state) {
         Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         oldCost.setState(state);

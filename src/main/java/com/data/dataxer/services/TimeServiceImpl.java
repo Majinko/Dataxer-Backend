@@ -78,8 +78,8 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public List<Time> allForPeriod(LocalDate from, LocalDate to) {
-        return this.qTimeRepository.allForPeriod(from, to, SecurityUtils.id(), SecurityUtils.companyId());
+    public List<Time> allForPeriod(LocalDate from, LocalDate to, String rqlFilter) {
+        return this.qTimeRepository.allForPeriod(from, to, rqlFilter, SecurityUtils.id(), SecurityUtils.companyId());
     }
 
     @Override

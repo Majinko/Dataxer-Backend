@@ -98,13 +98,10 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     private void priceOfferPackSetItems(PriceOffer priceOffer) {
-        QDocumentPackItem qDocumentPackItem = QDocumentPackItem.documentPackItem;
-        QItem qItem = QItem.item;
-
-        List<DocumentPackItem> priceOfferPackItems = query.selectFrom(qDocumentPackItem)
-                .where(qDocumentPackItem.pack.id.in(priceOffer.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
-                .leftJoin(qDocumentPackItem.item, qItem).fetchJoin()
-                .orderBy(qDocumentPackItem.position.asc())
+        List<DocumentPackItem> priceOfferPackItems = query.selectFrom(QDocumentPackItem.documentPackItem)
+                .where(QDocumentPackItem.documentPackItem.pack.id.in(priceOffer.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
+                .leftJoin(QDocumentPackItem.documentPackItem.item, QItem.item).fetchJoin()
+                .orderBy(QDocumentPackItem.documentPackItem.position.asc())
                 .fetch();
 
         // price offer pack set items
@@ -121,5 +118,4 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .where(predicate)
                 .fetchCount();
     }
-
 }

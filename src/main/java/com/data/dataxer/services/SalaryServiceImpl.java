@@ -63,6 +63,7 @@ public class SalaryServiceImpl implements SalaryService {
     public void update(Salary salary) {
         List<Time> times = this.timeRepository.findAllBySalaryIdAndAndCompanyId(salary.getId(), SecurityUtils.companyId());
 
+        //todo update and time price
         salaryRepository.findByIdAndAndCompanyId(salary.getId(), SecurityUtils.companyId()).map(s -> {
             s.setPrice(salary.getPrice());
             s.setIsActive(salary.getIsActive());

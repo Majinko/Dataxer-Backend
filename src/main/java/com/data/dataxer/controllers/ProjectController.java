@@ -50,7 +50,7 @@ public class ProjectController {
         return ResponseEntity.ok(projectService.paginate(pageable, rqlFilter, sortExpression).map(projectMapper::projectToProjectDTOWithoutCategory));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<ProjectDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.getById(id)));
     }

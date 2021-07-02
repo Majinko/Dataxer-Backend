@@ -104,7 +104,20 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Time> allForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId) {
+    public List<Time> allForPeriod(LocalDate from, LocalDate to, String rqlFilter, Long userId, Long companyId) {
+        DefaultFilterParser filterParser = new DefaultFilterParser();
+        Predicate predicate = new BooleanBuilder();
+
+        Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
+                .put("time.id", QTime.time1.id)
+                .put("time.project.id", QTime.time1.project.id)
+                .build();
+
+        if (!rqlFilter.equals("")) {
+            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
+                    .setMapping(pathMapping)));
+        }
+
         return this.query.selectFrom(QTime.time1)
                 .leftJoin(QTime.time1.user).fetchJoin()
                 .leftJoin(QTime.time1.project).fetchJoin()
@@ -112,6 +125,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.dateWork.between(from, to))
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.user.id.eq(userId))
+                .where(predicate)
                 .orderBy(QTime.time1.dateWork.desc())
                 .fetch();
     }

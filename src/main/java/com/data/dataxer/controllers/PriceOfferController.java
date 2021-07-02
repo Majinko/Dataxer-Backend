@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/price-offer")
+@RequestMapping("/api/priceOffer")
 @PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class PriceOfferController {
     private final PriceOfferService priceOfferService;
@@ -46,14 +46,14 @@ public class PriceOfferController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
-            @RequestParam(value = "sortExpression", defaultValue = "sort(+priceOffer.id)") String sortExpression
+            @RequestParam(value = "sortExpression", defaultValue = "sort(-priceOffer.id)") String sortExpression
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
         return ResponseEntity.ok(priceOfferService.paginate(pageable, rqlFilter, sortExpression).map(priceOfferMapper::priceOfferToPriceOfferDTOSimple));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<PriceOfferDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTO(this.priceOfferService.getById(id)));
     }
