@@ -29,7 +29,6 @@ import static com.data.dataxer.utils.Helpers.getDiffYears;
 
 @Service
 public class UserServiceImpl implements UserService {
-
     @Autowired
     private FirebaseAuth firebaseAuth;
     @Autowired

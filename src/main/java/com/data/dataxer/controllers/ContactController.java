@@ -46,7 +46,7 @@ public class ContactController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
-            @RequestParam(value = "sortExpression", defaultValue = "sort(+contact.id)") String sortExpression
+            @RequestParam(value = "sortExpression", defaultValue = "sort(-contact.id)") String sortExpression
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 

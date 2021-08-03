@@ -1,5 +1,6 @@
 package com.data.dataxer.models.dto;
 
+import com.data.dataxer.models.enums.CompanyTaxType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,5 +24,7 @@ public class CompanyDTO {
     private String cin;
     private String tin;
     private String vatin;
-
+    private String logoUrl;
+    private String signatureUrl;
+    private CompanyTaxType companyTaxType;
 }

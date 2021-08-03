@@ -126,7 +126,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.user.id.eq(userId))
                 .where(predicate)
-                .orderBy(QTime.time1.dateWork.desc())
+                .orderBy(QTime.time1.id.desc())
                 .fetch();
     }
 
