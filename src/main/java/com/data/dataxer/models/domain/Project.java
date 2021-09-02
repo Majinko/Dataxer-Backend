@@ -31,6 +31,10 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "uid", referencedColumnName = "uid")
     private AppUser user;
 
+    //json obsahujuci uid userov s profitom
+    @Column(columnDefinition = "TEXT")
+    private String profitUsers;
+
     @NotFound(action = NotFoundAction.IGNORE)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<Category> categories = new ArrayList<>();
