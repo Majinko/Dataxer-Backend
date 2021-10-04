@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.CategoryMapper;
 import com.data.dataxer.mappers.ProjectMapper;
 import com.data.dataxer.mappers.TimeMapper;
+import com.data.dataxer.mappers.UserMapper;
 import com.data.dataxer.models.dto.*;
 import com.data.dataxer.services.ProjectService;
 import org.springframework.data.domain.Page;
@@ -25,12 +26,15 @@ public class ProjectController {
     private final ProjectMapper projectMapper;
     private final CategoryMapper categoryMapper;
     private final TimeMapper timeMapper;
+    private final UserMapper userMapper;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper, TimeMapper timeMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper,
+                             TimeMapper timeMapper, UserMapper userMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.categoryMapper = categoryMapper;
         this.timeMapper = timeMapper;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/store")
@@ -117,5 +121,15 @@ public class ProjectController {
     @GetMapping("/prepareEvaluation/{id}")
     public ResponseEntity<EvaluationPreparationDTO> projectEvaluationPreparation(@PathVariable Long id) {
         return  ResponseEntity.ok(this.projectService.evaluationPreparationProjectData(id));
+    }
+
+    @PostMapping("/addProfitUser/{id}")
+    public void addProfitUser(@PathVariable Long id, @RequestBody AppUserDTO appUserDTO) {
+        this.projectService.addProfitUser(id, this.userMapper.appUserDTOtoAppUser(appUserDTO));
+    }
+
+    @PostMapping("/removeProfitUser/{id}")
+    public void removeProfitUser(@PathVariable Long id, @RequestBody AppUserDTO appUserDTO) {
+        this.projectService.removeProfitUser(id, this.userMapper.appUserDTOtoAppUser(appUserDTO));
     }
 }
