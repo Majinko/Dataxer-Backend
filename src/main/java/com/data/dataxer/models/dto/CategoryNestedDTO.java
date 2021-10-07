@@ -11,8 +11,9 @@ import java.util.List;
 public class CategoryNestedDTO {
     private Long id;
     private String name;
+    private Long depth;
     private Long position;
+    private Long parentId;
 
-    private CategoryDTO parent;
     private List<CategoryNestedDTO> children = new ArrayList<>();
 }

@@ -12,4 +12,6 @@ public interface CategoryService {
     void updateTree(List<Category> categories);
 
     void delete(Long id);
+
+    List<Category> allByType(String type);
 }

@@ -1,7 +1,6 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QTime;
 import com.data.dataxer.models.dto.CategoryCostsOverviewDTO;
 import com.data.dataxer.models.dto.CategoryMonthsCostsDTO;
 import com.data.dataxer.models.dto.UserHourOverviewDTO;
@@ -16,41 +15,36 @@ import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.StringUtils;
 import com.querydsl.core.Tuple;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class OverviewServiceImpl implements OverviewService {
+    @Autowired
+    private QTimeRepository qTimeRepository;
 
-    private final QTimeRepository qTimeRepository;
-    private final QSalaryRepository qSalaryRepository;
-    private final QCostRepository qCostRepository;
-    private final CategoryRepository categoryRepository;
-    private final UsersOverviewDataRepository usersOverviewDataRepository;
-    private final AppUserRepository appUserRepository;
+    @Autowired
+    private QSalaryRepository qSalaryRepository;
+
+    @Autowired
+    private QCostRepository qCostRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private UsersOverviewDataRepository usersOverviewDataRepository;
+
+    @Autowired
+    private AppUserRepository appUserRepository;
 
     private HashMap<AppUser, HashMap<Integer, Integer>> userTimeData;
     private HashMap<AppUser, HashMap<Integer, BigDecimal>> userDayTotalPrice;
-
-
-    public OverviewServiceImpl(QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository,
-                               QCostRepository qCostRepository, CategoryRepository categoryRepository,
-                               UsersOverviewDataRepository usersOverviewDataRepository, AppUserRepository appUserRepository) {
-        this.qTimeRepository = qTimeRepository;
-        this.qSalaryRepository = qSalaryRepository;
-        this.qCostRepository = qCostRepository;
-        this.categoryRepository = categoryRepository;
-        this.usersOverviewDataRepository = usersOverviewDataRepository;
-        this.appUserRepository = appUserRepository;
-    }
 
     @Override
     public List<UserHourOverviewDTO> getAllUsersHourOverview(LocalDate fromDate, LocalDate toDate) {
@@ -96,8 +90,7 @@ public class OverviewServiceImpl implements OverviewService {
         HashMap<AppUser, HashMap<Integer, Integer>> preparedData = new HashMap<>();
 
         List<UsersOverviewData> data = this.usersOverviewDataRepository.findAllByCompanyId(SecurityUtils.companyId());
-        List<Time> todayData = this.qTimeRepository.getAllTimeRecordsFromTo(LocalDate.now(),
-                LocalDate.now(), SecurityUtils.companyId());
+        List<Time> todayData = this.qTimeRepository.getAllTimeRecordsFromTo(LocalDate.now(), LocalDate.now(), SecurityUtils.companyId());
 
         //najprv spracujeme ulozene statisticke data
         data.forEach(dataToProcess -> {
@@ -146,9 +139,11 @@ public class OverviewServiceImpl implements OverviewService {
 
             response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(rootCategories, year));
         } else {
-            response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(List.of(this.categoryRepository.findByIdAndCompanyId(categoryId, SecurityUtils.companyId())
-                    .orElseThrow(() -> new RuntimeException("Category with id " + categoryId + " not found"))), year));
+            List<Category> categories = this.categoryRepository.findAllByParentIdAndCompanyId(categoryId, SecurityUtils.companyId());
+
+            response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(categories, year));
         }
+
         response.setMonthsTotalCosts(this.generateAllMonthsTotalCostHeader(response.getCategoryMonthsCostsDTOS()));
         response.setTotalCosts(this.countTotalPrice(response.getMonthsTotalCosts().values()));
 
@@ -156,8 +151,7 @@ public class OverviewServiceImpl implements OverviewService {
     }
 
     /**
-     *
-     * @param params Obsahuje LocalDate posledneho behu tasku
+     * @param params  Obsahuje LocalDate posledneho behu tasku
      * @param company Nie je null ked spusta task -> task nema session a setnutu default company tak beriu podla company id z tasku
      * @return
      */
@@ -172,13 +166,13 @@ public class OverviewServiceImpl implements OverviewService {
             processToDate = LocalDate.now().minusDays(1);
         }
 
-        Long companyId = company != null ?  company.getId() : SecurityUtils.companyId();
+        Long companyId = company != null ? company.getId() : SecurityUtils.companyId();
 
         List<Tuple> usersTimesToProcess = this.qTimeRepository.getAllUserTimesFromDateToDate(processFromDate, processToDate, companyId);
 
         HashMap<String, AppUser> mappedUsers = new HashMap<>();
         List<AppUser> users = this.appUserRepository.findAllByDefaultCompanyId(companyId);
-        users.forEach(user ->  mappedUsers.put(user.getUid(), user));
+        users.forEach(user -> mappedUsers.put(user.getUid(), user));
 
         //kazdy riadok je unikatny pre usera, rok a mesiac
         usersTimesToProcess.forEach(tuple -> {
@@ -248,17 +242,30 @@ public class OverviewServiceImpl implements OverviewService {
 
     private List<CategoryMonthsCostsDTO> generateCategoryMonthCosts(List<Category> categories, Integer year) {
         List<CategoryMonthsCostsDTO> categoryMonthsCostsDTOS = new ArrayList<>();
+
         categories.forEach(category -> {
-            List<Long> childrenIds = this.categoryRepository.findAllChildIds(category.getId() ,SecurityUtils.companyId());
+            List<Long> childrenIds = this.categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyId());
 
             List<Cost> costList = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds, year, SecurityUtils.companyId());
+            List<Cost> onlyChildrenCost = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds.stream().filter(childId -> !childId.equals(category.getId())).collect(Collectors.toList()), year, SecurityUtils.companyId());
 
-            CategoryMonthsCostsDTO categoryMonthsCostsDTO = new CategoryMonthsCostsDTO();
-            categoryMonthsCostsDTO.setCategoryName(category.getName());
-            categoryMonthsCostsDTO.setTotalMonthsCosts(this.generateMonthsTotalPrice(costList));
-            categoryMonthsCostsDTO.setCategoryTotalPrice(this.countTotalPrice(categoryMonthsCostsDTO.getTotalMonthsCosts().values()));
-            categoryMonthsCostsDTOS.add(categoryMonthsCostsDTO);
+            if (!costList.isEmpty()) {
+                CategoryMonthsCostsDTO categoryMonthsCostsDTO = new CategoryMonthsCostsDTO();
+
+                categoryMonthsCostsDTO.setCategoryId(category.getId());
+                categoryMonthsCostsDTO.setCategoryParentId(category.getParentId());
+                categoryMonthsCostsDTO.setCategoryName(category.getName());
+                categoryMonthsCostsDTO.setCategoryDepth(category.getDepth());
+                categoryMonthsCostsDTO.setTotalMonthsCosts(this.generateMonthsTotalPrice(costList));
+                categoryMonthsCostsDTO.setCategoryTotalPrice(this.countTotalPrice(categoryMonthsCostsDTO.getTotalMonthsCosts().values()));
+                //categoryMonthsCostsDTO.setHasChildren(childrenIds.stream().filter(c -> !c.equals(category.getId())).count() != 0);
+                categoryMonthsCostsDTO.setHasChildren(!onlyChildrenCost.isEmpty());
+
+                categoryMonthsCostsDTOS.add(categoryMonthsCostsDTO);
+            }
         });
+
+        Collections.sort(categoryMonthsCostsDTOS);
 
         return categoryMonthsCostsDTOS;
     }

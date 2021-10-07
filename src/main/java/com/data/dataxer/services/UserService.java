@@ -14,7 +14,7 @@ public interface UserService {
     AppUser store(AppUser appUser);
 
     List<AppUser> all();
-    
+
     AppUser update(AppUser appUserDTOtoAppUser);
 
     AppUser getByUid(String uid);
@@ -32,4 +32,8 @@ public interface UserService {
     AppUser userWithRoles(String uid);
 
     AppUserOverviewDTO userOverview(String uid);
+
+    AppUser connect(String uid);
+
+    AppUser disconnect(String uid);
 }

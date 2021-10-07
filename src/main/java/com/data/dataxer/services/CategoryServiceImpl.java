@@ -1,18 +1,16 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
+import com.data.dataxer.models.enums.CategoryType;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
-    private int position = 0;
-
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -29,28 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void updateTree(List<Category> categories) {
-        List<Category> updateCategories = new ArrayList<>();
-
-        this.prepareTree(categories, updateCategories, null);
-
-        this.categoryRepository.saveAll(updateCategories);
-    }
-
-    public void prepareTree(List<Category> categories, List<Category> updateCategories, Category category) {
-        if (!categories.isEmpty()) {
-            categories.forEach(c -> {
-                if (c != null) {
-                    c.setPosition(this.position++);
-                    c.setParentId(category == null ? null : category.getId());
-
-                    updateCategories.add(c);
-
-                    if (!c.getChildren().isEmpty()) {
-                        this.prepareTree(c.getChildren(), updateCategories, c);
-                    }
-                }
-            });
-        }
+        this.categoryRepository.saveAll(categories);
     }
 
     @Override
@@ -60,5 +37,10 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         this.categoryRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Category> allByType(String type) {
+        return this.categoryRepository.findAllByType(CategoryType.valueOf(type), SecurityUtils.companyIds());
     }
 }

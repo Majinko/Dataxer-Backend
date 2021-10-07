@@ -72,6 +72,7 @@ public class UserServiceImpl implements UserService {
 
         UserRecord userRecord;
 
+
         try {
             userRecord = firebaseAuth.createUser(createRequest);
             return userRecord.getUid();
@@ -153,6 +154,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public AppUserOverviewDTO userOverview(String uid) {
         return this.fillAppUserOverview(this.userWithRoles(uid), true);
+    }
+
+    @Override
+    public AppUser connect(String uid) {
+        AppUser appUser = this.getByUid(uid);
+
+        appUser.setConnected(true);
+
+        userRepository.save(appUser);
+
+        return appUser;
+    }
+
+    @Override
+    public AppUser disconnect(String uid) {
+        AppUser appUser = this.getByUid(uid);
+
+        appUser.setConnected(false);
+
+        userRepository.save(appUser);
+
+        return appUser;
     }
 
     @Override

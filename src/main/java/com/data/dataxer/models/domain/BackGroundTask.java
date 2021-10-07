@@ -2,7 +2,6 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,7 +13,6 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class BackGroundTask extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,6 +22,4 @@ public class BackGroundTask extends BaseEntity {
     private LocalDate lastExecution;
 
     private String params;
-
-
 }

@@ -85,6 +85,8 @@ public class QItemRepositoryImpl implements QItemRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("item.id", QItem.item.id)
+                .put("item.title", QItem.item.title)
+                .put("item.contact.id", QItem.item.supplier.id)
                 .build();
 
         if (!rqlFilter.equals("")) {

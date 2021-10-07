@@ -1,6 +1,7 @@
 package com.data.dataxer.repositories;
 
 import com.data.dataxer.models.domain.Category;
+import com.data.dataxer.models.enums.CategoryType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -25,7 +26,7 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
 
     @Query(
-            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id = ?2 and category.parent_id = ids.id) SELECT * FROM ids;",
+            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id = ?2 and category.deleted_at is null and category.parent_id = ids.id) SELECT * FROM ids;",
             nativeQuery = true)
     List<Long> findAllChildIds(Long categoryId, Long companyId);
 
@@ -33,4 +34,7 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
             value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id = ?2 and category.parent_id = ids.id) SELECT * FROM ids where ids.id in (SELECT category_id from time);",
             nativeQuery = true)
     List<Long> findAllChildIdsHasTime(Long categoryId, Long companyId);
+
+    @Query("SELECT c FROM Category c where c.categoryType = ?1 and c.company.id in ?2")
+    List<Category> findAllByType(CategoryType categoryType, List<Long> companyIds);
 }

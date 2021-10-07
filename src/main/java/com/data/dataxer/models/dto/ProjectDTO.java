@@ -20,6 +20,7 @@ public class ProjectDTO {
     private ProjectState state;
     private String address;
     private Float area;
+    private Float projectProfit;
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
 

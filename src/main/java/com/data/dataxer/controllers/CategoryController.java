@@ -27,6 +27,11 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.all()));
     }
 
+    @GetMapping("/allByType/{type}")
+    public ResponseEntity<List<CategoryDTO>> allByType(@PathVariable String type) {
+        return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.allByType(type)));
+    }
+
     @PostMapping("/store")
     public ResponseEntity<CategoryDTO> store(@RequestBody CategoryDTO categoryDTO) {
         return ResponseEntity.ok(categoryMapper.toCategoryDTO(this.categoryService.store(categoryMapper.categoryDTOtoCategory(categoryDTO))));

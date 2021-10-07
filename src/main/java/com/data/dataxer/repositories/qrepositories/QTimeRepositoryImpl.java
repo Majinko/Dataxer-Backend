@@ -1,6 +1,5 @@
 package com.data.dataxer.repositories.qrepositories;
 
-
 import com.data.dataxer.models.domain.*;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -104,13 +103,17 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Time> allForPeriod(LocalDate from, LocalDate to, String rqlFilter, Long userId, Long companyId) {
+    public List<Time> allForPeriod(String rqlFilter, Long userId, Long companyId) {
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("time.id", QTime.time1.id)
                 .put("time.project.id", QTime.time1.project.id)
+                .put("time.category.id", QTime.time1.category.id)
+                .put("time.description", QTime.time1.description)
+                .put("time.start", QTime.time1.dateWork)
+                .put("time.end", QTime.time1.dateWork)
                 .build();
 
         if (!rqlFilter.equals("")) {
@@ -122,7 +125,6 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .leftJoin(QTime.time1.user).fetchJoin()
                 .leftJoin(QTime.time1.project).fetchJoin()
                 .join(QTime.time1.category).fetchJoin()
-                .where(QTime.time1.dateWork.between(from, to))
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.user.id.eq(userId))
                 .where(predicate)
@@ -156,25 +158,27 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Tuple> getUserLastProjects(Long userId, Long limit, Long companyId) {
-        return this.query.selectDistinct(QTime.time1.project, QTime.time1.dateWork, QTime.time1.id)
+    public List<Tuple> getUserLastProjects(Long userId, Long limit, Long offset, Long companyId) {
+        return this.query
+                .selectDistinct(QTime.time1.project, QTime.time1.dateWork, QTime.time1.id)
                 .from(QTime.time1)
                 .leftJoin(QTime.time1.project)
                 .where(QTime.time1.user.id.eq(userId))
                 .where(QTime.time1.company.id.eq(companyId))
-                .orderBy(QTime.time1.dateWork.desc(), QTime.time1.id.desc())
+                .orderBy(QTime.time1.id.desc())
+                .offset(0)
                 .limit(limit)
                 .fetch();
     }
 
     @Override
-    public List<Tuple> getProjectLastCategories(Long projectId, Long limit, Long companyId) {
-        return this.query.selectDistinct(QTime.time1.category, QTime.time1.dateWork, QTime.time1.id)
+    public List<Category> getProjectLastCategories(Long projectId, Long limit, Long companyId, String uid) {
+        return this.query.selectDistinct(QTime.time1.category)
                 .from(QTime.time1)
                 .leftJoin(QTime.time1.category)
                 .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.company.id.eq(companyId))
-                .orderBy(QTime.time1.dateWork.desc(), QTime.time1.id.desc())
+                .where(QTime.time1.user.uid.eq(uid))
                 .limit(limit)
                 .fetch();
     }
@@ -313,7 +317,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     @Override
     public List<Tuple> getProjectUsersTimePriceSums(Long id, Long companyId) {
         return this.query.select(QTime.time1.time.sum(), QTime.time1.price.sum(), QTime.time1.user.uid,
-                QTime.time1.user.firstName, QTime.time1.user.lastName)
+                        QTime.time1.user.firstName, QTime.time1.user.lastName)
                 .from(QTime.time1)
                 .where(QTime.time1.project.id.eq(id))
                 .where(QTime.time1.project.company.id.eq(companyId))
@@ -327,7 +331,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     @Override
     public List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> categoryIds, Long companyId) {
         return this.query.select(QTime.time1.user.uid, QTime.time1.user.firstName, QTime.time1.user.lastName,
-                QTime.time1.time.sum(), QTime.time1.price.sum())
+                        QTime.time1.time.sum(), QTime.time1.price.sum())
                 .from(QTime.time1)
                 .leftJoin(QTime.time1.user)
                 .where(QTime.time1.project.id.eq(id))

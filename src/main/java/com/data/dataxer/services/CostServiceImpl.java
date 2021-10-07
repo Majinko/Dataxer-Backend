@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -134,6 +135,15 @@ public class CostServiceImpl implements CostService {
     @Override
     public List<Cost> findAllByProject(Long projectId) {
         return costRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
+    }
+
+    @Override
+    public List<Integer> getCostsYears() {
+        List<Integer> years = this.qCostRepository.getCostsYears(SecurityUtils.companyId());
+
+        years.sort(Collections.reverseOrder());
+
+        return years;
     }
 
     private Cost generateNewCostFromRepeated(Cost repeatedCost) {

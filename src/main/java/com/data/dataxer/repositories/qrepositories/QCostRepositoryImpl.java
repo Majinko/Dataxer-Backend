@@ -130,6 +130,15 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .fetchOne();
     }
 
+    @Override
+    public List<Integer> getCostsYears(Long companyId) {
+        return this.query.select(QCost.cost.deliveredDate.year())
+                .from(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
+                .groupBy(QCost.cost.deliveredDate.year())
+                .fetch();
+    }
+
     private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, Long companyId) {
         return query.selectFrom(QCost.cost)
                 .where(QCost.cost.company.id.eq(companyId))

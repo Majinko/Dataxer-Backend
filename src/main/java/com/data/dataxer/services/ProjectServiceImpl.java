@@ -20,10 +20,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.Period;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -174,7 +171,6 @@ public class ProjectServiceImpl implements ProjectService {
             BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
             List<Tuple> userTimesPriceSums = this.qTimeRepository.getProjectUsersTimePriceSums(id, SecurityUtils.companyId());
 
-
             userTimesPriceSums.forEach(tuple -> {
                 UserTimePriceOverviewDTO projectTimePriceOverviewDTO = new UserTimePriceOverviewDTO();
 
@@ -185,6 +181,8 @@ public class ProjectServiceImpl implements ProjectService {
 
                 projectTimePriceOverviewDTOList.add(projectTimePriceOverviewDTO);
             });
+
+            Collections.sort(projectTimePriceOverviewDTOList);
 
             projectManHoursDTO.setUserTimePriceOverviewList(projectTimePriceOverviewDTOList);
         }

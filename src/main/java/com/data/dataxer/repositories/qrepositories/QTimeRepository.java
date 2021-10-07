@@ -21,15 +21,15 @@ public interface QTimeRepository {
 
     List<Time> getHourOverviewForAllUsers(LocalDate fromDate, LocalDate toDate, Long companyId);
 
-    List<Time> allForPeriod(LocalDate from, LocalDate to, String rqlFilter, Long userId, Long companyId);
+    List<Time> allForPeriod(String rqlFilter, Long userId, Long companyId);
 
     List<Tuple> getAllUserMonths(Long userId, Long companyId);
 
     List<Project> getAllUserProjects(Long userId, Long companyId);
 
-    List<Tuple> getUserLastProjects(Long userId, Long limit, Long companyId);
+    List<Tuple> getUserLastProjects(Long userId, Long limit, Long offset, Long companyId);
 
-    List<Tuple> getProjectLastCategories(Long projectId, Long limit, Long companyId);
+    List<Category> getProjectLastCategories(Long projectId, Long limit, Long companyId, String uid);
 
     LocalDate getUserFirstLastRecord(Long userId, Long companyId, Boolean last);
 

@@ -12,13 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -61,11 +59,8 @@ public class TimeController {
     }
 
     @GetMapping("/allForPeriod")
-    public ResponseEntity<List<TimeDTO>> allForPeriod(
-            @RequestParam(value = "from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
-            @RequestParam(value = "to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to,
-            @RequestParam(value = "filters", defaultValue = "") String rqlFilter) {
-        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(from, to, rqlFilter)));
+    public ResponseEntity<List<TimeDTO>> allForPeriod(@RequestParam(value = "filters", defaultValue = "") String rqlFilter) {
+        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(rqlFilter)));
     }
 
     @GetMapping("/allByUser")

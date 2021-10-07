@@ -45,7 +45,7 @@ public class AppUser implements Serializable {
 
     private String country;
 
-    @Column(nullable = false)
+    @Column(name = "connected")
     private Boolean connected = false;
 
     @ManyToMany(fetch = FetchType.LAZY)

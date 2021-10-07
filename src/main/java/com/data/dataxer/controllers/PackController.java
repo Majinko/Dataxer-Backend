@@ -47,7 +47,7 @@ public class PackController {
         return ResponseEntity.ok(this.packService.paginate(pageable, rqlFilter, sortExpression).map(packMapper::packToPackDTOSimple));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<PackDTO> getById(@PathVariable Long id) {
         PackDTO packDTO = packMapper.packToPackDTO(this.packService.getById(id));
 
