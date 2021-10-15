@@ -10,11 +10,16 @@ import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.StringUtils;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -199,6 +204,45 @@ public class ProjectServiceImpl implements ProjectService {
         List<Time> times = this.qTimeRepository.getAllProjectTimesOrdered(id, SecurityUtils.companyId());
 
         return response;
+    }
+
+    @Override
+    public void addProfitUser(Long id, AppUser user) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Project project = this.qProjectRepository.getById(id, SecurityUtils.companyId());
+
+        try {
+            Set<String> uniqueUsers = new HashSet<>();
+            if (project.getProfitUsers() != null && project.getProfitUsers() != "") {
+                uniqueUsers = new HashSet<>(objectMapper.readValue(project.getProfitUsers(), new TypeReference<List<String>>(){}));
+            }
+            uniqueUsers.add(user.getUid());
+            project.setProfitUsers(objectMapper.writeValueAsString(uniqueUsers));
+            this.projectRepository.save(project);
+        } catch (JsonMappingException e) {
+        } catch (JsonParseException e) {
+        } catch (IOException e) {
+            throw new RuntimeException("JSON parsing failed");
+        }
+    }
+
+    @Override
+    public void removeProfitUser(Long id, AppUser user) {
+        ObjectMapper objectMapper = new ObjectMapper();
+        Project project = this.qProjectRepository.getById(id, SecurityUtils.companyId());
+
+        try {
+            if (project.getProfitUsers() != null && project.getProfitUsers() != "") {
+                Set<String> uniqueUsers = new HashSet<>(objectMapper.readValue(project.getProfitUsers(), new TypeReference<List<String>>(){}));
+                uniqueUsers.remove(user.getUid());
+                project.setProfitUsers(objectMapper.writeValueAsString(uniqueUsers));
+                this.projectRepository.save(project);
+            }
+        } catch (JsonMappingException e) {
+        } catch (JsonParseException e) {
+        } catch (IOException e) {
+            throw new RuntimeException("JSON parsing failed");
+        }
     }
 
     private ProjectStatisticDTO prepareProjectStatisticDTO(Long id) {

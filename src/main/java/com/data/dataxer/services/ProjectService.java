@@ -1,5 +1,6 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Project;
 import com.data.dataxer.models.domain.Time;
@@ -40,4 +41,8 @@ public interface ProjectService {
     ProjectManHoursDTO getProjectManHours(Long id);
 
     EvaluationPreparationDTO evaluationPreparationProjectData(Long id);
+
+    void addProfitUser(Long id, AppUser user);
+
+    void removeProfitUser(Long id, AppUser user);
 }
