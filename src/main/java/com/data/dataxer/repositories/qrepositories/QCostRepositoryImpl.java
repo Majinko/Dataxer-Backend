@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -49,6 +50,7 @@ public class QCostRepositoryImpl implements QCostRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("cost.id", QCost.cost.id)
+                .put("cost.title", QCost.cost.title)
                 .put("cost.state", QCost.cost.state)
                 .put("cost.contact.id", QCost.cost.contact.id)
                 .put("cost.contact.name", QCost.cost.contact.name)
@@ -98,8 +100,8 @@ public class QCostRepositoryImpl implements QCostRepository {
         if (cost != null) {
             cost.setCategories(
                     Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, companyId)
-                            .leftJoin(QCost.cost.categories).fetchJoin()
-                            .fetchOne())
+                                    .leftJoin(QCost.cost.categories).fetchJoin()
+                                    .fetchOne())
                             .getCategories()
             );
         }
@@ -137,6 +139,19 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .where(QCost.cost.company.id.eq(companyId))
                 .groupBy(QCost.cost.deliveredDate.year())
                 .fetch();
+    }
+
+    @Override
+    public BigDecimal getProjectTotalCostBetweenYears(LocalDate firstYearStart, LocalDate lastYearEnd, Boolean isInternal, Boolean isRepeated, List<Long> categoriesIdInProjectCost, Long companyId) {
+        return this.query.from(QCost.cost)
+                .select(QCost.cost.price.sum())
+                .where(QCost.cost.deliveredDate.gt(firstYearStart))
+                .where(QCost.cost.deliveredDate.lt(lastYearEnd))
+                .where(QCost.cost.isInternal.eq(isInternal))
+                .where(QCost.cost.isRepeated.eq(isRepeated))
+                .join(QCost.cost.categories, QCategory.category)
+                .where(QCategory.category.id.in(categoriesIdInProjectCost))
+                .fetchOne();
     }
 
     private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, Long companyId) {

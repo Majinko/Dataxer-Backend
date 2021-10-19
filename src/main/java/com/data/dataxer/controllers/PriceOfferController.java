@@ -67,4 +67,10 @@ public class PriceOfferController {
     public ResponseEntity<List<PriceOfferDTO>> findAllByProject(@PathVariable Long projectId) {
         return ResponseEntity.ok(priceOfferMapper.priceOffersToPriceOfferDTOsWithoutRelation(this.priceOfferService.findAllByProject(projectId)));
     }
+
+    @GetMapping("/duplicate/{oldPriceOfferId}")
+    public ResponseEntity<PriceOfferDTO> duplicate(@PathVariable Long oldPriceOfferId) {
+        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTO(this.priceOfferService.duplicate(oldPriceOfferId)));
+    }
+
 }

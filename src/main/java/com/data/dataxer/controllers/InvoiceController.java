@@ -108,7 +108,7 @@ public class InvoiceController {
         }
     }
 
-    @RequestMapping(value = "/duplicate/{id}", method = RequestMethod.POST)
+    @GetMapping(value = "/duplicate/{id}")
     public ResponseEntity<InvoiceDTO> duplicate(@PathVariable Long id) {
         return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.duplicate(id)));
     }

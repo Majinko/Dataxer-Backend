@@ -60,6 +60,8 @@ public class QTaskRepositoryImpl implements QTaskRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("task.id", QTask.task.id)
+                .put("task.title", QTask.task.title)
+                .put("task.user.email", QTask.task.user.email)
                 .build();
 
         if (!rqlFilter.equals("")) {

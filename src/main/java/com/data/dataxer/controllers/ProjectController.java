@@ -79,6 +79,26 @@ public class ProjectController {
         return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.all()));
     }
 
+    @GetMapping("/allHasCost")
+    public ResponseEntity<List<ProjectDTO>> allHasCost() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasCost()));
+    }
+
+    @GetMapping("/allHasInvoice")
+    public ResponseEntity<List<ProjectDTO>> allHasInvoice() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasInvoice()));
+    }
+
+    @GetMapping("/allHasPriceOffer")
+    public ResponseEntity<List<ProjectDTO>> allHasPriceOffer() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasPriceOffer()));
+    }
+
+    @GetMapping("/allHasUserTime")
+    public ResponseEntity<List<ProjectDTO>> allHasUserTime() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasUserTime()));
+    }
+
     @GetMapping("/allProjectCategory")
     public ResponseEntity<List<CategoryDTO>> getAllProjectCategories(@RequestParam(value = "projectId") Long projectId) {
         return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(this.projectService.getAllProjectCategories(projectId)));

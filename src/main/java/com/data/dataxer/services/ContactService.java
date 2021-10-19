@@ -1,7 +1,6 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Contact;
-import com.querydsl.core.types.Predicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -23,4 +22,12 @@ public interface ContactService {
     List<Contact> findAll();
 
     List<Contact> findByName(String name);
+
+    List<Contact> allHasCost();
+
+    List<Contact> allHasInvoice();
+
+    List<Contact> allHasPriceOffer();
+
+    List<Contact> allHasProject();
 }

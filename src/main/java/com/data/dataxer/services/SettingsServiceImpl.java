@@ -74,8 +74,7 @@ public class SettingsServiceImpl implements SettingsService{
     }
 
     private String createUploadDirectory(String companyName) {
-        Path fileStorageLocation = Paths.get(this.uploadDirectory + java.io.File.separator + companyName)
-                .toAbsolutePath().normalize();
+        Path fileStorageLocation = Paths.get(this.uploadDirectory + java.io.File.separator + companyName).toAbsolutePath().normalize();
         try {
             Files.createDirectories(fileStorageLocation);
             return fileStorageLocation.toString();

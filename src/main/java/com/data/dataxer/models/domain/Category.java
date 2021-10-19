@@ -34,6 +34,9 @@ public class Category extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private CategoryType categoryType;
 
+    @Column(nullable = true, columnDefinition = "boolean default false")
+    private Boolean isInProjectOverview; // also, category child
+
     private LocalDateTime deletedAt;
 
     @Transient

@@ -1,8 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.models.domain.Contact;
-import com.data.dataxer.models.domain.QContact;
-import com.data.dataxer.models.domain.QProject;
+import com.data.dataxer.models.domain.*;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -14,6 +12,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -94,6 +93,38 @@ public class QContactRepositoryImpl implements QContactRepository {
         return this.query.selectFrom(CONTACT)
                 .where(CONTACT.id.in(contactIds))
                 .where(CONTACT.company.id.in(companyIds))
+                .fetch();
+    }
+
+    @Override
+    public List<Contact> allHasCost(List<Long> companyIds) {
+        return query.selectFrom(QContact.contact)
+                .where(QContact.contact.company.id.in(companyIds))
+                .where(QContact.contact.id.in(JPAExpressions.select(QCost.cost.contact.id).from(QCost.cost).fetchAll()))
+                .fetch();
+    }
+
+    @Override
+    public List<Contact> allHasInvoice(List<Long> companyIds) {
+        return query.selectFrom(QContact.contact)
+                .where(QContact.contact.company.id.in(companyIds))
+                .where(QContact.contact.id.in(JPAExpressions.select(QInvoice.invoice.contact.id).from(QInvoice.invoice).fetchAll()))
+                .fetch();
+    }
+
+    @Override
+    public List<Contact> allHasPriceOffer(List<Long> companyIds) {
+        return query.selectFrom(QContact.contact)
+                .where(QContact.contact.company.id.in(companyIds))
+                .where(QContact.contact.id.in(JPAExpressions.select(QInvoice.invoice.contact.id).from(QInvoice.invoice).fetchAll()))
+                .fetch();
+    }
+
+    @Override
+    public List<Contact> allHasProject(List<Long> companyIds) {
+        return query.selectFrom(QContact.contact)
+                .where(QContact.contact.company.id.in(companyIds))
+                .where(QContact.contact.id.in(JPAExpressions.select(QProject.project.contact.id).from(QProject.project).fetchAll()))
                 .fetch();
     }
 

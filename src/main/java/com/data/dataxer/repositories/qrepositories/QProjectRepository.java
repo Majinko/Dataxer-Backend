@@ -13,4 +13,12 @@ public interface QProjectRepository {
     Project getById(Long id, Long companyId);
 
     List<Project> search(Long companyId, String queryString);
+
+    List<Project> allHasCost(List<Long> companyIds);
+
+    List<Project> allHasInvoice(List<Long> companyIds);
+
+    List<Project> allHasPriceOffer(List<Long> companyIds);
+
+    List<Project> allHasUserTime(String uid, List<Long> companyIds);
 }

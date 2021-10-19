@@ -17,6 +17,7 @@
     <properties>
         <java.version>11</java.version>
         <jjwt.version>0.9.1</jjwt.version>
+        <pdfbox.version>2.0.24</pdfbox.version>
         <org.mapstruct.version>1.4.1.Final</org.mapstruct.version>
         <org.projectlombok.version>1.18.4</org.projectlombok.version>
         <firebase.admin.version>6.10.0</firebase.admin.version>
@@ -76,6 +77,13 @@
             <groupId>org.thymeleaf.extras</groupId>
             <artifactId>thymeleaf-extras-java8time</artifactId>
             <version>3.0.4.RELEASE</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>${pdfbox.version}</version>
         </dependency>
 
         <dependency>

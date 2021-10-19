@@ -17,7 +17,6 @@ import java.util.List;
 @RequestMapping("/api/contact")
 @PreAuthorize("hasPermission(null, 'Contact', 'Contact')")
 public class ContactController {
-
     private final ContactService contactService;
     private final ContactMapper contactMapper;
 
@@ -36,7 +35,7 @@ public class ContactController {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.update(contactMapper.toContact(contactDto))));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<ContactDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.getById(id)));
     }
@@ -61,5 +60,25 @@ public class ContactController {
     @GetMapping("/all")
     public ResponseEntity<List<ContactDTO>> all() {
         return ResponseEntity.ok(contactMapper.toContactDTOs(contactService.findAll()));
+    }
+
+    @GetMapping("/allHasCost")
+    public ResponseEntity<List<ContactDTO>> allHasCost() {
+        return ResponseEntity.ok(contactMapper.toContactDTOs(this.contactService.allHasCost()));
+    }
+
+    @GetMapping("/allHasInvoice")
+    public ResponseEntity<List<ContactDTO>> allHasInvoice() {
+        return ResponseEntity.ok(contactMapper.toContactDTOs(this.contactService.allHasInvoice()));
+    }
+
+    @GetMapping("/allHasPriceOffer")
+    public ResponseEntity<List<ContactDTO>> allHasPriceOffer() {
+        return ResponseEntity.ok(contactMapper.toContactDTOs(this.contactService.allHasPriceOffer()));
+    }
+
+    @GetMapping("/allHasProject")
+    public ResponseEntity<List<ContactDTO>> allHasProject() {
+        return ResponseEntity.ok(contactMapper.toContactDTOs(this.contactService.allHasProject()));
     }
 }

@@ -5,6 +5,7 @@ import com.data.dataxer.models.dto.*;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.ProjectRepository;
+import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
@@ -15,6 +16,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.querydsl.core.Tuple;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -29,24 +31,26 @@ import java.util.*;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
-    private final ProjectRepository projectRepository;
-    private final QProjectRepository qProjectRepository;
-    private final QTimeRepository qTimeRepository;
-    private final CategoryRepository categoryRepository;
-    private final CostRepository costRepository;
-    private final QInvoiceRepository qInvoiceRepository;
+    @Autowired
+    private ProjectRepository projectRepository;
 
-    public ProjectServiceImpl(ProjectRepository projectRepository, QProjectRepository qProjectRepository,
-                              QTimeRepository qTimeRepository, CategoryRepository categoryRepository,
-                              CostRepository costRepository,
-                              QInvoiceRepository qInvoiceRepository) {
-        this.projectRepository = projectRepository;
-        this.qProjectRepository = qProjectRepository;
-        this.qTimeRepository = qTimeRepository;
-        this.categoryRepository = categoryRepository;
-        this.costRepository = costRepository;
-        this.qInvoiceRepository = qInvoiceRepository;
-    }
+    @Autowired
+    private QProjectRepository qProjectRepository;
+
+    @Autowired
+    private QTimeRepository qTimeRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
+
+    @Autowired
+    private CostRepository costRepository;
+
+    @Autowired
+    private QCostRepository qCostRepository;
+
+    @Autowired
+    private QInvoiceRepository qInvoiceRepository;
 
     @Override
     public Project store(Project project) {
@@ -214,7 +218,8 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             Set<String> uniqueUsers = new HashSet<>();
             if (project.getProfitUsers() != null && project.getProfitUsers() != "") {
-                uniqueUsers = new HashSet<>(objectMapper.readValue(project.getProfitUsers(), new TypeReference<List<String>>(){}));
+                uniqueUsers = new HashSet<>(objectMapper.readValue(project.getProfitUsers(), new TypeReference<List<String>>() {
+                }));
             }
             uniqueUsers.add(user.getUid());
             project.setProfitUsers(objectMapper.writeValueAsString(uniqueUsers));
@@ -233,7 +238,8 @@ public class ProjectServiceImpl implements ProjectService {
 
         try {
             if (project.getProfitUsers() != null && project.getProfitUsers() != "") {
-                Set<String> uniqueUsers = new HashSet<>(objectMapper.readValue(project.getProfitUsers(), new TypeReference<List<String>>(){}));
+                Set<String> uniqueUsers = new HashSet<>(objectMapper.readValue(project.getProfitUsers(), new TypeReference<List<String>>() {
+                }));
                 uniqueUsers.remove(user.getUid());
                 project.setProfitUsers(objectMapper.writeValueAsString(uniqueUsers));
                 this.projectRepository.save(project);
@@ -243,6 +249,26 @@ public class ProjectServiceImpl implements ProjectService {
         } catch (IOException e) {
             throw new RuntimeException("JSON parsing failed");
         }
+    }
+
+    @Override
+    public List<Project> allHasCost() {
+        return this.qProjectRepository.allHasCost(SecurityUtils.companyIds());
+    }
+
+    @Override
+    public List<Project> allHasInvoice() {
+        return this.qProjectRepository.allHasInvoice(SecurityUtils.companyIds());
+    }
+
+    @Override
+    public List<Project> allHasPriceOffer() {
+        return this.qProjectRepository.allHasPriceOffer(SecurityUtils.companyIds());
+    }
+
+    @Override
+    public List<Project> allHasUserTime() {
+        return this.qProjectRepository.allHasUserTime(SecurityUtils.uid(), SecurityUtils.companyIds());
     }
 
     private ProjectStatisticDTO prepareProjectStatisticDTO(Long id) {
@@ -317,7 +343,18 @@ public class ProjectServiceImpl implements ProjectService {
         LocalDate firstYearStart = LocalDate.of(firstYear, Month.JANUARY, 1);
         LocalDate lastYearEnd = LocalDate.of(lastYear, Month.DECEMBER, 31);
 
-        return this.costRepository.getProjectTotalCostBetweenYears(firstYearStart, lastYearEnd, Boolean.FALSE, Boolean.FALSE, SecurityUtils.companyId());
+        return this.qCostRepository.getProjectTotalCostBetweenYears(firstYearStart, lastYearEnd, Boolean.FALSE, Boolean.FALSE, this.getCategoriesIdInProjectCost(), SecurityUtils.companyId());
+    }
+
+    private List<Long> getCategoriesIdInProjectCost() {
+        List<Long> categoriesIds = new ArrayList<>();
+        List<Category> categories = this.categoryRepository.findAllByIsInProjectOverviewAndCompanyIdIn(true, SecurityUtils.companyIds());
+
+        categories.forEach(category -> {
+            categoriesIds.addAll(categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyId()));
+        });
+
+        return categoriesIds;
     }
 
     private double convertTimeSecondsToHours(int time) {

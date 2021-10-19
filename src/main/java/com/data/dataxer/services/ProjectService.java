@@ -45,4 +45,12 @@ public interface ProjectService {
     void addProfitUser(Long id, AppUser user);
 
     void removeProfitUser(Long id, AppUser user);
+
+    List<Project> allHasCost();
+
+    List<Project> allHasInvoice();
+
+    List<Project> allHasPriceOffer();
+
+    List<Project> allHasUserTime();
 }

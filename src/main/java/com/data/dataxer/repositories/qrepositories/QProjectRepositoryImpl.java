@@ -1,7 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.models.domain.Project;
-import com.data.dataxer.models.domain.QProject;
+import com.data.dataxer.models.domain.*;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -13,6 +12,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -90,6 +90,44 @@ public class QProjectRepositoryImpl implements QProjectRepository {
         return query.selectFrom(QProject.project)
                 .where(QProject.project.company.id.eq(companyId))
                 .where(QProject.project.title.containsIgnoreCase(queryString))
+                .fetch();
+    }
+
+    @Override
+    public List<Project> allHasCost(List<Long> companyIds) {
+        return query.selectFrom(QProject.project)
+                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.id.in(JPAExpressions.select(QCost.cost.project.id).from(QCost.cost).fetchAll()))
+                .fetch();
+    }
+
+    @Override
+    public List<Project> allHasInvoice(List<Long> companyIds) {
+        return query.selectFrom(QProject.project)
+                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.id.in(JPAExpressions.select(QInvoice.invoice.project.id).from(QInvoice.invoice).fetchAll()))
+                .fetch();
+    }
+
+    @Override
+    public List<Project> allHasPriceOffer(List<Long> companyIds) {
+        return query.selectFrom(QProject.project)
+                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.id.in(JPAExpressions.select(QPriceOffer.priceOffer.project.id).from(QPriceOffer.priceOffer).fetchAll()))
+                .fetch();
+    }
+
+    @Override
+    public List<Project> allHasUserTime(String uid, List<Long> companyIds) {
+        return query.selectFrom(QProject.project)
+                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.id.in(
+                        JPAExpressions
+                                .select(QTime.time1.project.id)
+                                .from(QTime.time1)
+                                .where(QTime.time1.user.uid.eq(uid))
+                                .fetchAll())
+                )
                 .fetch();
     }
 
