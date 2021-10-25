@@ -128,6 +128,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
 
     private JavaMailSenderImpl getMailSender(MailAccounts mailAccounts) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
+
         if (mailAccounts != null) {
             mailSender.setHost(mailAccounts.getHostName());
             mailSender.setPort(mailAccounts.getPort());
@@ -138,8 +139,8 @@ public class MailAccountsServiceImpl implements MailAccountsService {
             mailSender.setPort(Integer.parseInt(environment.getProperty("spring.mail.port")));
             mailSender.setUsername(environment.getProperty("spring.mail.username"));
             mailSender.setPassword(environment.getProperty("spring.mail.password"));
-
         }
+
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
