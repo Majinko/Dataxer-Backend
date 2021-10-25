@@ -153,19 +153,4 @@ public class MailAccountsServiceImpl implements MailAccountsService {
         return mailSender;
     }
 
-    /*private JavaMailSenderImpl getMailSender(String hostName, int port, String userName, String password) {
-        JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(hostName);
-        mailSender.setPort(port);
-        mailSender.setUsername(userName);
-        mailSender.setPassword(password);
-
-        Properties props = mailSender.getJavaMailProperties();
-        props.put("mail.transport.protocol", "smtp");
-        props.put("mail.smtp.auth", "true");
-        props.put("mail.smtp.starttls.enable", "true");
-        props.put("mail.debug", "true");
-
-        return mailSender;
-    }*/
 }
