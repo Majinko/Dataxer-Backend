@@ -42,7 +42,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost update(Cost oldCost) {
-        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyId()).map(cost -> {
+        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyIds()).map(cost -> {
 
             cost.setContact(oldCost.getContact());
             cost.setProject(oldCost.getProject());
@@ -120,7 +120,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost getByIdWithRelation(Long id) {
-        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyId()).orElse(null);
+        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyIds()).orElse(null);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public List<Cost> findAllByProject(Long projectId) {
-        return costRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
+        return costRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds());
     }
 
     @Override

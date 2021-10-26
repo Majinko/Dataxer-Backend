@@ -28,7 +28,6 @@ import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
 @Repository
 public class QContactRepositoryImpl implements QContactRepository {
-
     private final JPAQueryFactory query;
 
     private QContact CONTACT = QContact.contact;
@@ -69,7 +68,7 @@ public class QContactRepositoryImpl implements QContactRepository {
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Contact> contactList = this.query.selectFrom(qContact)
-               // .leftJoin(qContact.projects).fetchJoin()
+                // .leftJoin(qContact.projects).fetchJoin()
                 .where(predicate)
                 .where(qContact.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
@@ -116,7 +115,11 @@ public class QContactRepositoryImpl implements QContactRepository {
     public List<Contact> allHasPriceOffer(List<Long> companyIds) {
         return query.selectFrom(QContact.contact)
                 .where(QContact.contact.company.id.in(companyIds))
-                .where(QContact.contact.id.in(JPAExpressions.select(QInvoice.invoice.contact.id).from(QInvoice.invoice).fetchAll()))
+                .where(
+                        QContact.contact.id.in(JPAExpressions.select(QPriceOffer.priceOffer.contact.id)
+                                .from(QPriceOffer.priceOffer)
+                                .fetchAll())
+                )
                 .fetch();
     }
 

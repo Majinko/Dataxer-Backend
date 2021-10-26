@@ -12,9 +12,9 @@ import java.util.Optional;
 public interface QCostRepository {
     Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
 
-    Optional<Cost> getById(Long id, Long companyId);
+    Optional<Cost> getById(Long id, List<Long> companyIds);
 
-    Optional<Cost> getByIdWithRelation(Long id, Long companyId);
+    Optional<Cost> getByIdWithRelation(Long id, List<Long> companyIds);
 
     List<Cost> getCostsWhereCategoryIdIn(List<Long> categoryIds, Integer year, Long companyId);
 

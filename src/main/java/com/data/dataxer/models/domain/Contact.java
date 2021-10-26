@@ -26,6 +26,9 @@ public class Contact extends BaseEntity {
     @OneToMany(mappedBy = "contact", fetch = FetchType.LAZY)
     private List<Project> projects = new ArrayList<>();
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private Category category;
+
     @NotNull
     private String name;
 

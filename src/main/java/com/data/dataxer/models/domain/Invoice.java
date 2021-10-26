@@ -9,8 +9,6 @@ import org.hibernate.annotations.SQLDelete;
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.HashMap;
-import java.util.Map;
 
 @Entity
 @Setter
@@ -19,6 +17,8 @@ import java.util.Map;
 @SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
 public class Invoice extends DocumentBase {
     private String variableSymbol;
+
+    private String subject;
 
     private String specificSymbol;
 

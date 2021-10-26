@@ -83,15 +83,15 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Optional<Cost> getById(Long id, Long companyId) {
+    public Optional<Cost> getById(Long id, List<Long> companyIds) {
         return Optional.ofNullable(
-                this.constructGetAllByIdAndCompanyId(id, companyId).fetchOne()
+                this.constructGetAllByIdAndCompanyId(id, companyIds).fetchOne()
         );
     }
 
     @Override
-    public Optional<Cost> getByIdWithRelation(Long id, Long companyId) {
-        Cost cost = this.constructGetAllByIdAndCompanyId(id, companyId)
+    public Optional<Cost> getByIdWithRelation(Long id, List<Long> companyIds) {
+        Cost cost = this.constructGetAllByIdAndCompanyId(id, companyIds)
                 .leftJoin(QCost.cost.contact).fetchJoin()
                 .leftJoin(QCost.cost.project).fetchJoin()
                 .leftJoin(QCost.cost.files).fetchJoin()
@@ -99,7 +99,7 @@ public class QCostRepositoryImpl implements QCostRepository {
 
         if (cost != null) {
             cost.setCategories(
-                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, companyId)
+                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, companyIds)
                                     .leftJoin(QCost.cost.categories).fetchJoin()
                                     .fetchOne())
                             .getCategories()
@@ -154,9 +154,9 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .fetchOne();
     }
 
-    private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, Long companyId) {
+    private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, List<Long> companyIds) {
         return query.selectFrom(QCost.cost)
-                .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.company.id.in(companyIds))
                 .where(QCost.cost.id.eq(id));
     }
 

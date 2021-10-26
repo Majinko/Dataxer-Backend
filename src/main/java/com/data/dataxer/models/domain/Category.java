@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.CategoryGroup;
 import com.data.dataxer.models.enums.CategoryType;
 import lombok.Getter;
 import lombok.Setter;
@@ -32,9 +33,12 @@ public class Category extends BaseEntity {
     private Integer position;
 
     @Enumerated(EnumType.STRING)
+    private CategoryGroup categoryGroup;
+
+    @Enumerated(EnumType.STRING)
     private CategoryType categoryType;
 
-    @Column(nullable = true, columnDefinition = "boolean default false")
+    @Column(nullable = true, columnDefinition = "boolean default false") // todo remove in time
     private Boolean isInProjectOverview; // also, category child
 
     private LocalDateTime deletedAt;

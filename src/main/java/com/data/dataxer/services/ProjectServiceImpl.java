@@ -59,7 +59,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project getById(Long id) {
-        return this.qProjectRepository.getById(id, SecurityUtils.companyId());
+        return this.qProjectRepository.getById(id, SecurityUtils.companyIds());
     }
 
     @Override
@@ -69,12 +69,12 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return qProjectRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return qProjectRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override
     public void destroy(Long id) {
-        this.projectRepository.delete(this.qProjectRepository.getById(id, SecurityUtils.companyId()));
+        this.projectRepository.delete(this.qProjectRepository.getById(id, SecurityUtils.companyIds()));
     }
 
     @Override
@@ -84,17 +84,17 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> search(String queryString) {
-        return this.qProjectRepository.search(SecurityUtils.companyId(), queryString);
+        return this.qProjectRepository.search(SecurityUtils.companyIds(), queryString);
     }
 
     @Override
     public List<Category> getAllProjectCategories(Long projectId) {
-        return this.qProjectRepository.getById(projectId, SecurityUtils.companyId()).getCategories();
+        return this.qProjectRepository.getById(projectId, SecurityUtils.companyIds()).getCategories();
     }
 
     @Override
     public List<Category> getAllProjectCategoriesOrderedByPosition(Long projectId) {
-        List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.companyId()).getCategories();
+        List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.companyIds()).getCategories();
         categories.sort(Comparator.comparing(Category::getPosition));
 
         return categories;
@@ -203,9 +203,9 @@ public class ProjectServiceImpl implements ProjectService {
     public EvaluationPreparationDTO evaluationPreparationProjectData(Long id) {
         EvaluationPreparationDTO response = new EvaluationPreparationDTO();
 
-        List<Cost> costs = this.costRepository.findAllByProjectIdAndCompanyId(id, SecurityUtils.companyId());
+ /*       List<Cost> costs = this.costRepository.findAllByProjectIdAndCompanyId(id, SecurityUtils.companyId());
         List<Invoice> invoices = this.qInvoiceRepository.getAllProjectInvoices(id, SecurityUtils.companyId());
-        List<Time> times = this.qTimeRepository.getAllProjectTimesOrdered(id, SecurityUtils.companyId());
+        List<Time> times = this.qTimeRepository.getAllProjectTimesOrdered(id, SecurityUtils.companyId());*/
 
         return response;
     }
@@ -213,7 +213,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void addProfitUser(Long id, AppUser user) {
         ObjectMapper objectMapper = new ObjectMapper();
-        Project project = this.qProjectRepository.getById(id, SecurityUtils.companyId());
+        Project project = this.qProjectRepository.getById(id, SecurityUtils.companyIds());
 
         try {
             Set<String> uniqueUsers = new HashSet<>();
@@ -234,7 +234,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void removeProfitUser(Long id, AppUser user) {
         ObjectMapper objectMapper = new ObjectMapper();
-        Project project = this.qProjectRepository.getById(id, SecurityUtils.companyId());
+        Project project = this.qProjectRepository.getById(id, SecurityUtils.companyIds());
 
         try {
             if (project.getProfitUsers() != null && project.getProfitUsers() != "") {

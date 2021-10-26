@@ -90,7 +90,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     @Override
     public Invoice getById(Long id) {
         return this.qInvoiceRepository
-                .getById(id, SecurityUtils.companyId())
+                .getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
@@ -104,7 +104,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     @Override
     public Invoice getByIdSimple(Long id) {
         return this.qInvoiceRepository
-                .getByIdSimple(id, SecurityUtils.companyId())
+                .getByIdSimple(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
@@ -115,7 +115,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     @Override
     public void makePay(Long id, LocalDate payedDate) {
-        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Invoice not found"));
+        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds()).orElseThrow(() -> new RuntimeException("Invoice not found"));
 
         invoice.setPaymentDate(payedDate);
         this.invoiceRepository.save(invoice);
@@ -151,7 +151,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     @Override
     public List<Invoice> findAllByProject(Long projectId) {
-        return this.invoiceRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
+        return this.invoiceRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds());
     }
 
     @Override
@@ -188,7 +188,8 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
         List<Long> allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(proformaInvoice.getId(), SecurityUtils.companyId())
                 .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
-        List<Invoice> taxDocuments = this.qInvoiceRepository.getAllInvoicesIdInAndType(allRelatedDocumentIds, DocumentType.TAX_DOCUMENT, SecurityUtils.companyId());
+
+        List<Invoice> taxDocuments = this.qInvoiceRepository.getAllInvoicesIdInAndType(allRelatedDocumentIds, DocumentType.TAX_DOCUMENT, SecurityUtils.companyIds());
 
         Invoice summaryInvoice = new Invoice();
 
