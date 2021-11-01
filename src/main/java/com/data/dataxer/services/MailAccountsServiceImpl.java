@@ -8,6 +8,14 @@ import com.data.dataxer.repositories.MailAccountsRepository;
 import com.data.dataxer.repositories.qrepositories.QMailAccountsRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.core.env.Environment;
+import org.hazlewood.connor.bottema.emailaddress.EmailAddressCriteria;
+import org.hazlewood.connor.bottema.emailaddress.EmailAddressValidator;
+import org.simplejavamail.api.email.AttachmentResource;
+import org.simplejavamail.api.email.Email;
+import org.simplejavamail.api.email.Recipient;
+import org.simplejavamail.email.EmailBuilder;
+import org.simplejavamail.mailer.MailerBuilder;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -15,8 +23,12 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.activation.FileDataSource;
+import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
@@ -28,15 +40,17 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     private final ContactService contactService;
     private final MailTemplatesService mailTemplatesService;
     private final Environment environment;
+    private final FileService fileService;
 
     public MailAccountsServiceImpl(MailAccountsRepository mailAccountsRepository, QMailAccountsRepository qMailAccountsRepository,
                                    ContactService contactService, MailTemplatesService mailTemplatesService,
-                                   Environment environment) {
+                                   Environment environment, FileService fileService) {
         this.mailAccountsRepository = mailAccountsRepository;
         this.qMailAccountsRepository = qMailAccountsRepository;
         this.contactService = contactService;
         this.mailTemplatesService = mailTemplatesService;
         this.environment = environment;
+        this.fileService = fileService;
     }
 
     @Override
@@ -124,6 +138,71 @@ public class MailAccountsServiceImpl implements MailAccountsService {
         } catch (MessagingException e) {
             throw new RuntimeException("Sending email failed. Reason: " + e.getMessage());
         }
+    }
+
+    @Override
+    public void sendEmailWithAttachments(String subject, String content, List<Long> recipientIds, Long templateId, List<String> fileNames) {
+        MailAccounts mailAccounts = this.getByCompanyId(SecurityUtils.companyId());
+        if (templateId != null) {
+            MailTemplate mailTemplates = this.mailTemplatesService.getById(templateId);
+            subject = mailTemplates.getEmailSubject();
+            content = mailTemplates.getEmailContent();
+        }
+
+        String host = mailAccounts != null ? mailAccounts.getHostName() : environment.getProperty("spring.mail.host");
+        int port = mailAccounts != null ? mailAccounts.getPort() : Integer.parseInt(environment.getProperty("spring.mail.port"));
+        String username = mailAccounts != null ? mailAccounts.getUserName() : environment.getProperty("spring.mail.username");
+        String password = mailAccounts != null ? mailAccounts.getPassword() : environment.getProperty("spring.mail.password");
+
+        Email email = createEmail(username, subject, content, recipientIds, fileNames);
+
+        MailerBuilder.withSMTPServer(host, port, username, password)
+                .buildMailer()
+                .sendMail(email);
+    }
+
+    private Email createEmail(String from, String subject, String body, List<Long> recipientIds, List<String> fileNames) {
+        return EmailBuilder.startingBlank()
+                .from(from)
+                .to(this.makeRecipients(recipientIds))
+                .withSubject(subject)
+                .withHTMLText(body)
+                .withEmbeddedImageAutoResolutionForFiles(true)
+                .withAttachments(makeAttachments(fileNames))
+                .buildEmail();
+    }
+
+    private List<AttachmentResource> makeAttachments(List<String> fileNames) {
+        List<AttachmentResource> attachments = new ArrayList<>();
+
+        fileNames.forEach(fileName-> {
+
+            try {
+                Resource resource = fileService.loadFileAsResource(fileName);
+                FileDataSource dataSource = new FileDataSource(resource.getFile());
+                AttachmentResource attachment = new AttachmentResource(fileName, dataSource);
+
+                attachments.add(attachment);
+            } catch (IOException exception) {
+                throw new RuntimeException("File is broken");
+            }
+        });
+
+        return attachments;
+    }
+
+    private List<Recipient> makeRecipients(List<Long> recipientIds) {
+        List<Recipient> recipients = new ArrayList<>();
+
+        List<Contact> participants = this.contactService.getContactByIds(recipientIds);
+        participants.forEach(participant-> {
+            if (EmailAddressValidator.isValid(participant.getEmail(), EmailAddressCriteria.RFC_COMPLIANT)) {
+                Recipient recipient = new Recipient(participant.getName(), participant.getEmail(), Message.RecipientType.TO);
+                recipients.add(recipient);
+            }
+        });
+
+        return recipients;
     }
 
     private JavaMailSenderImpl getMailSenderByCompanyId(Long companyId) {
