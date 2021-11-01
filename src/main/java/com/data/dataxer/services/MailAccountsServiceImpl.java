@@ -7,6 +7,7 @@ import com.data.dataxer.models.enums.MailAccountState;
 import com.data.dataxer.repositories.MailAccountsRepository;
 import com.data.dataxer.repositories.qrepositories.QMailAccountsRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import org.springframework.core.env.Environment;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -26,13 +27,16 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     private final QMailAccountsRepository qMailAccountsRepository;
     private final ContactService contactService;
     private final MailTemplatesService mailTemplatesService;
+    private final Environment environment;
 
     public MailAccountsServiceImpl(MailAccountsRepository mailAccountsRepository, QMailAccountsRepository qMailAccountsRepository,
-                                   ContactService contactService, MailTemplatesService mailTemplatesService) {
+                                   ContactService contactService, MailTemplatesService mailTemplatesService,
+                                   Environment environment) {
         this.mailAccountsRepository = mailAccountsRepository;
         this.qMailAccountsRepository = qMailAccountsRepository;
         this.contactService = contactService;
         this.mailTemplatesService = mailTemplatesService;
+        this.environment = environment;
     }
 
     @Override
@@ -72,7 +76,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     public void activate(Long id) {
         MailAccounts mailAccounts = this.getById(id);
         try {
-            this.getMailSender(mailAccounts.getHostName(), mailAccounts.getPort(), mailAccounts.getUserName(), mailAccounts.getPassword())
+            this.getMailSender(mailAccounts)
                     .testConnection();
             mailAccounts.setState(MailAccountState.ACTIVATED);
             this.qMailAccountsRepository.updateByMailAccounts(mailAccounts, SecurityUtils.companyId());
@@ -124,26 +128,37 @@ public class MailAccountsServiceImpl implements MailAccountsService {
 
     private JavaMailSenderImpl getMailSenderByCompanyId(Long companyId) {
         MailAccounts mailAccounts = this.getByCompanyId(companyId);
-        return this.getMailSender(mailAccounts.getHostName(), mailAccounts.getPort(), mailAccounts.getUserName(), mailAccounts.getPassword());
+        return this.getMailSender(mailAccounts);
     }
 
     private MailAccounts getByCompanyId(Long companyId) {
         return this.qMailAccountsRepository.getByCompaniesId(companyId)
-                .orElseThrow(() -> new RuntimeException("Mail account for company not found."));
+                .orElse(null);
     }
 
-    private JavaMailSenderImpl getMailSender(String hostName, int port, String userName, String password) {
+    private JavaMailSenderImpl getMailSender(MailAccounts mailAccounts) {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
-        mailSender.setHost(hostName);
-        mailSender.setPort(port);
-        mailSender.setUsername(userName);
-        mailSender.setPassword(password);
+
+        if (mailAccounts != null) {
+            mailSender.setHost(mailAccounts.getHostName());
+            mailSender.setPort(mailAccounts.getPort());
+            mailSender.setUsername(mailAccounts.getUserName());
+            mailSender.setPassword(mailAccounts.getPassword());
+        } else {
+            mailSender.setHost(environment.getProperty("spring.mail.host"));
+            mailSender.setPort(Integer.parseInt(environment.getProperty("spring.mail.port")));
+            mailSender.setUsername(environment.getProperty("spring.mail.username"));
+            mailSender.setPassword(environment.getProperty("spring.mail.password"));
+        }
 
         Properties props = mailSender.getJavaMailProperties();
         props.put("mail.transport.protocol", "smtp");
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.debug", "true");
+        props.put("mail.smtp.connectiontimeout", "5000");
+        props.put("mail.smtp.timeout", "5000");
+        props.put("mail.smtp.writetimeout", "5000");
 
         return mailSender;
     }
