@@ -12,6 +12,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/mailAccounts")
 @PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
@@ -72,5 +74,11 @@ public class MailAccountsController {
     @PostMapping("/sendEmail")
     public void sendEmail(@RequestBody MailDataDTO mailDataDTO) {
         this.mailAccountsService.sendEmail(mailDataDTO.getSubject(), mailDataDTO.getContent(), mailDataDTO.getEmails());
+    }
+
+    @PostMapping("/sendSimpleEmail")
+    public void sendEmailWithAttachments(@RequestBody MailDataDTO mailDataDTO) {
+        this.mailAccountsService.sendEmailWithAttachments(mailDataDTO.getSubject(), mailDataDTO.getContent(),
+                mailDataDTO.getEmails(), mailDataDTO.getFileNames());
     }
 }

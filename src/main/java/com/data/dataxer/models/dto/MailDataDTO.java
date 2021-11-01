@@ -11,4 +11,5 @@ public class MailDataDTO {
     private String subject;
     private String content;
     private List<String> emails;
+    private List<String> fileNames;
 }
