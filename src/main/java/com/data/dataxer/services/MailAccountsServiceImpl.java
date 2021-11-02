@@ -175,6 +175,10 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     private List<AttachmentResource> makeAttachments(List<String> fileNames) {
         List<AttachmentResource> attachments = new ArrayList<>();
 
+        if (fileNames == null) {
+            return attachments;
+        }
+
         fileNames.forEach(fileName-> {
 
             try {
