@@ -141,8 +141,10 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     }
 
     @Override
-    public void sendEmailWithAttachments(String subject, String content, List<Long> recipientIds, Long templateId, List<String> fileNames) {
-        MailAccounts mailAccounts = this.getByCompanyId(SecurityUtils.companyId());
+    public void sendEmailWithAttachments(String subject, String content, List<Long> recipientIds, Long templateId, List<String> fileNames, Long companyId) {
+        companyId = companyId != null ? companyId : SecurityUtils.companyId();
+
+        MailAccounts mailAccounts = this.getByCompanyId(companyId);
         if (templateId != null) {
             MailTemplate mailTemplates = this.mailTemplatesService.getById(templateId);
             subject = mailTemplates.getEmailSubject();

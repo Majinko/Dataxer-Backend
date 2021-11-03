@@ -23,5 +23,5 @@ public interface MailAccountsService {
 
     void sendEmail(String emailSubject, String emailContent, List<Long> contactIds, Long companyId, Long templateId);
 
-    void sendEmailWithAttachments(String subject, String content, List<Long> recipientIds, Long templateId, List<String> fileNames);
+    void sendEmailWithAttachments(String subject, String content, List<Long> recipientIds, Long templateId, List<String> fileNames, Long companyId);
 }
