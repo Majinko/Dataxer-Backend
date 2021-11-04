@@ -33,6 +33,7 @@ public class Invoice extends DocumentBase {
 
     private LocalDate paymentDate;
 
+    @Override
     public BigDecimal countDiscountTotalPrice() {
         return this.totalPrice.multiply(this.discount.divide(BigDecimal.valueOf(100)));
     }
