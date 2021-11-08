@@ -38,7 +38,7 @@ public interface ProjectService {
 
     String getProjectTimeForThisYear(Long id);
 
-    ProjectManHoursDTO getProjectManHours(Long id);
+    ProjectManHoursDTO getProjectManHours(Long id, List<Long> companyIds);
 
     EvaluationPreparationDTO evaluationPreparationProjectData(Long id);
 

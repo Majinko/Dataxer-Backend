@@ -27,7 +27,7 @@ public interface CostService {
 
     Cost duplicate(Long id);
 
-    List<Cost> findAllByProject(Long projectId);
+    List<Cost> findAllByProject(Long projectId, List<Long> companyIds);
 
     List<Integer> getCostsYears();
 }

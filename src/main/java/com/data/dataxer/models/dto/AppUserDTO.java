@@ -21,4 +21,5 @@ public class AppUserDTO {
     private String country;
 
     private List<RoleDTO> roles = new ArrayList<>();
+    private List<CompanyDTO> companies = new ArrayList<>();
 }

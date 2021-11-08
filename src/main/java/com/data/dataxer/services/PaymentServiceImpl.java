@@ -3,6 +3,7 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.domain.Payment;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.InvoiceRepository;
@@ -88,6 +89,7 @@ public class PaymentServiceImpl implements PaymentService {
     private void setInvoicePayment(Long invoiceId, LocalDate date) {
         Invoice invoice = this.invoiceRepository.findByIdAndCompanyId(invoiceId, SecurityUtils.companyId());
         invoice.setPaymentDate(date);
+        invoice.setState(DocumentState.PAYED);
         invoiceRepository.save(invoice);
     }
 

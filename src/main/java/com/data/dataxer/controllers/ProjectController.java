@@ -133,8 +133,11 @@ public class ProjectController {
     }
 
     @GetMapping("/projectManHours/{id}")
-    public ResponseEntity<ProjectManHoursDTO> getProjectManHours(@PathVariable Long id) {
-        return ResponseEntity.ok(this.projectService.getProjectManHours(id));
+    public ResponseEntity<ProjectManHoursDTO> getProjectManHours(
+            @PathVariable Long id,
+            @RequestParam(value = "companyIds", required = false) List<Long> companyIds
+    ) {
+        return ResponseEntity.ok(this.projectService.getProjectManHours(id, companyIds));
     }
 
     //todo remove

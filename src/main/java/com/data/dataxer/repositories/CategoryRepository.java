@@ -15,7 +15,7 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     Optional<Category> findByIdAndCompanyId(Long id, Long companyId);
 
-    List<Category> findAllByCompanyIdOrderByPositionAsc(Long companyId);
+    List<Category> findAllByCompanyIdInOrderByPositionAsc(List<Long> companyIds);
 
     List<Category> findAllByIdInAndCompanyId(List<Long> ids, Long companyId);
 
@@ -27,9 +27,9 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
     Optional<Category> findCategoryByName(String categoryName, Long companyId);
 
     @Query(
-            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id = ?2 and category.deleted_at is null and category.parent_id = ids.id) SELECT * FROM ids;",
+            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id in ?2 and category.deleted_at is null and category.parent_id = ids.id) SELECT * FROM ids;",
             nativeQuery = true)
-    List<Long> findAllChildIds(Long categoryId, Long companyId);
+    List<Long> findAllChildIds(Long categoryId, List<Long> companyIds);
 
     @Query(
             value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id = ?2 and category.parent_id = ids.id) SELECT * FROM ids where ids.id in (SELECT category_id from time);",

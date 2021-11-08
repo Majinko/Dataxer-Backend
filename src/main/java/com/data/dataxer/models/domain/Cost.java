@@ -32,10 +32,12 @@ public class Cost extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     Contact contact;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     Project project;
 
     @JoinTable(

@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
 
         if (moreData) {
             appUserOverviewDTO.setRoles(roleMapper.rolesToRoleDTOs(user.getRoles()));
-            appUserOverviewDTO.setSalary(salaryMapper.salaryToSalaryDTO(salaryRepository.findByUserUidAndFinishIsNull(user.getUid())));
+            appUserOverviewDTO.setSalary(salaryMapper.salaryToSalaryDTO(salaryRepository.findByUserUidAndFinishIsNullAndCompanyId(user.getUid(), SecurityUtils.companyId())));
         }
 
         return appUserOverviewDTO;
@@ -209,7 +209,6 @@ public class UserServiceImpl implements UserService {
         user.setRoles(roles);
         this.userRepository.save(user);
     }
-
 
     private void addCompanyToUser(Long companyId, AppUser appUser) {
         Company company = this.companyRepository.findByIdWithUsers(companyId);

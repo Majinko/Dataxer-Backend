@@ -98,8 +98,11 @@ public class CostController {
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<CostDTO>> findAllByProject(@PathVariable Long projectId) {
-        return ResponseEntity.ok(costMapper.costsToCostDTOsWithoutRelations(this.costService.findAllByProject(projectId)));
+    public ResponseEntity<List<CostDTO>> findAllByProject(
+            @PathVariable Long projectId,
+            @RequestParam(value = "companyIds", required = false) List<Long> companyIds
+    ) {
+        return ResponseEntity.ok(costMapper.costsToCostDTOsWithoutRelations(this.costService.findAllByProject(projectId, companyIds)));
     }
 
     @GetMapping("/years")

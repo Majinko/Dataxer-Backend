@@ -62,8 +62,8 @@ public class PriceOfferServiceImpl extends DocumentHelperService implements Pric
     }
 
     @Override
-    public List<PriceOffer> findAllByProject(Long projectId) {
-        return this.priceOfferRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
+    public List<PriceOffer> findAllByProject(Long projectId, List<Long> companyIds) {
+        return this.priceOfferRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
     }
 
     @Override

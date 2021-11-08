@@ -13,6 +13,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -45,6 +46,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("invoice.id", QInvoice.invoice.id)
+                .put("invoice.company.id", QInvoice.invoice.company.id)
                 .put("invoice.title", QInvoice.invoice.title)
                 .put("invoice.state", QInvoice.invoice.state)
                 .put("invoice.document_type", QInvoice.invoice.documentType)
@@ -52,6 +54,8 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .put("invoice.contact.name", QInvoice.invoice.contact.name)
                 .put("invoice.project.id", QInvoice.invoice.project.id)
                 .put("invoice.documentType", QInvoice.invoice.documentType)
+                .put("invoice.start", QInvoice.invoice.createdAt)
+                .put("invoice.end", QInvoice.invoice.createdAt)
                 .build();
 
         if (!rqlFilter.equals("")) {
@@ -60,15 +64,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Invoice> invoiceList = this.query.selectFrom(QInvoice.invoice)
-                .leftJoin(QInvoice.invoice.contact).fetchJoin()
-                .leftJoin(QInvoice.invoice.project).fetchJoin()
-                .where(predicate)
-                .where(QInvoice.invoice.company.id.eq(companyId))
-                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        List<Invoice> invoiceList = this.getInvoicePaginates(pageable, rqlFilter, companyId, predicate, orderSpecifierList);
 
         return new PageImpl<>(invoiceList, pageable, getTotalCount(predicate));
     }
@@ -154,5 +150,23 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 invoicePackItems.stream().filter(
                         invoicePackItem -> invoicePackItem.getPack().getId().equals(documentPack.getId())).collect(Collectors.toList())
         ));
+    }
+
+    //todo tieto spolocne metody dat do abstrakntej triedy pre faktury a cenove ponuky
+    private List<Invoice> getInvoicePaginates(Pageable pageable, String rqlFilter, Long companyId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+        JPAQuery<Invoice> invoiceJPAQuery = this.query.selectFrom(QInvoice.invoice)
+                .leftJoin(QInvoice.invoice.contact).fetchJoin()
+                .leftJoin(QInvoice.invoice.project).fetchJoin()
+                .where(predicate)
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        if (!rqlFilter.contains("invoice.company.id")) { // todo make refakt
+            invoiceJPAQuery.where(QInvoice.invoice.company.id.eq(companyId));
+        }
+
+        return invoiceJPAQuery.fetch();
     }
 }

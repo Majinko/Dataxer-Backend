@@ -71,8 +71,11 @@ public class TimeController {
     }
 
     @GetMapping("/allByProject/{projectId}")
-    public ResponseEntity<List<TimeDTO>> allByProject(@PathVariable Long projectId) {
-        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOWithoutRelations(this.timeService.allByProject(projectId)));
+    public ResponseEntity<List<TimeDTO>> allByProject(
+            @PathVariable Long projectId,
+            @RequestParam(value = "companyIds", required = false) List<Long> companyIds
+    ) {
+        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOWithoutRelations(this.timeService.allByProject(projectId, companyIds)));
     }
 
     @GetMapping("/userMonths")

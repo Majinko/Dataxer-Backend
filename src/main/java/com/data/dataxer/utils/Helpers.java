@@ -1,5 +1,7 @@
 package com.data.dataxer.utils;
 
+import com.data.dataxer.securityContextUtils.SecurityUtils;
+
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
@@ -21,7 +23,6 @@ public class Helpers {
         );
     }
 
-
     public static Long getDiffYears(LocalDate first, LocalDate last) {
         if (first != null && last != null) {
             return ChronoUnit.YEARS.between(first, last);
@@ -34,5 +35,14 @@ public class Helpers {
         Calendar cal = Calendar.getInstance(Locale.US);
         cal.setTime(date);
         return cal;
+    }
+
+    public static void checkCompanyIdFromRql(String parseThis) {
+        String[] strings = parseThis.split(".id==");
+        Long companyId = Long.parseLong(strings[strings.length - 1].replaceAll("[^0-9?!\\.]", ""));
+
+        if (!SecurityUtils.companyIds().contains(companyId)) {
+            throw new RuntimeException("ha ha ha");
+        }
     }
 }

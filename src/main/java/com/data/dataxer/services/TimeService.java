@@ -38,5 +38,5 @@ public interface TimeService {
 
     List<Time> allByUser(String userUid);
 
-    List<Time> allByProject(Long projectId);
+    List<Time> allByProject(Long projectId, List<Long> companyIds);
 }

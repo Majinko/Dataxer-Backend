@@ -244,7 +244,7 @@ public class OverviewServiceImpl implements OverviewService {
         List<CategoryMonthsCostsDTO> categoryMonthsCostsDTOS = new ArrayList<>();
 
         categories.forEach(category -> {
-            List<Long> childrenIds = this.categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyId());
+            List<Long> childrenIds = this.categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyIds());
 
             List<Cost> costList = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds, year, SecurityUtils.companyId());
             List<Cost> onlyChildrenCost = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds.stream().filter(childId -> !childId.equals(category.getId())).collect(Collectors.toList()), year, SecurityUtils.companyId());

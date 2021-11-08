@@ -45,23 +45,23 @@ public interface QTimeRepository {
 
     Integer getTotalProjectTimeForYear(Long id, Integer year, Long companyId);
 
-    List<Integer> getProjectYears(Long id, Long companyId);
+    List<Integer> getProjectYears(Long id, List<Long> companyIds);
 
     Tuple getUserProjectCategoryHoursAndPrice(Long projectId, String userUid, List<Long> categoryIds, Long companyId);
 
-    Integer getUserProjectTimeBetweenYears(Integer startYear, Integer endYear, String uid, Long companyId);
+    Integer getUserProjectTimeBetweenYears(Integer startYear, Integer endYear, String uid, List<Long> companyIds);
 
-    List<Tuple> getUserActiveMonths(Integer startYear, Integer endYear, String uid, Long companyId);
+    List<Tuple> getUserActiveMonths(Integer startYear, Integer endYear, String uid, List<Long> companyIds);
 
-    List<Tuple> getProjectAllUsersActiveMonth(Integer startYear, Integer endYear, Long companyId);
+    List<Tuple> getProjectAllUsersActiveMonth(Integer startYear, Integer endYear, List<Long> companyIds);
 
     List<Tuple> getAllProjectUsers(Long id, Long companyId);
 
-    List<Tuple> getProjectUsersTimePriceSums(Long id, Long companyId);
+    List<Tuple> getProjectUsersTimePriceSums(Long id, List<Long> companyIds);
 
     List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> longs, Long companyId);
 
-    List<Time> getAllProjectTimesOrdered(Long projectId, Long companyId);
+    List<Time> getAllProjectTimesOrdered(Long projectId, List<Long> companyIds);
 
     List<Tuple> getAllUserTimesFromDateToDate(LocalDate processFromDate, LocalDate processToDate, Long companyId);
 }

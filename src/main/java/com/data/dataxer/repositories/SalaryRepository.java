@@ -12,9 +12,9 @@ import java.util.Optional;
 public interface SalaryRepository extends JpaRepository<Salary, Long> {
     Page<Salary> findAllByUserId(Pageable pageable, Long userId);
 
-    Salary findByUserUidAndFinishIsNull(String uid);
+    Salary findByUserUidAndFinishIsNullAndCompanyId(String uid, Long companyId);
 
     Optional<Salary> findByIdAndAndCompanyId(Long id, Long companyId);
 
-    List<Salary> findAllByUserUid(String userId, Sort sort);
+    List<Salary> findAllByUserUidAndCompanyId(String userId, Sort sort, Long companyId);
 }

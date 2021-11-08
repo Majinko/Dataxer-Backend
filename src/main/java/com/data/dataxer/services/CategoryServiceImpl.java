@@ -17,7 +17,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> all() {
-        return this.categoryRepository.findAllByCompanyIdOrderByPositionAsc(SecurityUtils.companyId());
+        return this.categoryRepository.findAllByCompanyIdInOrderByPositionAsc(SecurityUtils.companyIds());
     }
 
     @Override

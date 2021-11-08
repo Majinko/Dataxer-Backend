@@ -150,8 +150,8 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     }
 
     @Override
-    public List<Invoice> findAllByProject(Long projectId) {
-        return this.invoiceRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds());
+    public List<Invoice> findAllByProject(Long projectId, List<Long> companyIds) {
+        return this.invoiceRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
     }
 
     @Override

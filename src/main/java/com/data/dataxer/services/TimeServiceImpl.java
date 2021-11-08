@@ -103,8 +103,8 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public List<Time> allByProject(Long projectId) {
-        return this.qTimeRepository.getAllProjectTimesOrdered(projectId, SecurityUtils.companyId());
+    public List<Time> allByProject(Long projectId, List<Long> companyIds) {
+        return this.qTimeRepository.getAllProjectTimesOrdered(projectId, SecurityUtils.companyIds(companyIds));
     }
 
     @Override

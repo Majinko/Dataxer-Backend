@@ -101,7 +101,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost changeState(Long id, DocumentState state) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyId())
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         oldCost.setState(state);
         return this.update(oldCost);
@@ -114,7 +114,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost getById(Long id) {
-        return this.qCostRepository.getById(id, SecurityUtils.companyId())
+        return this.qCostRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
     }
 
@@ -125,7 +125,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost duplicate(Long id) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyId())
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         Cost newCost = new Cost();
         BeanUtils.copyProperties(oldCost, newCost, "id");
@@ -133,8 +133,8 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public List<Cost> findAllByProject(Long projectId) {
-        return costRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds());
+    public List<Cost> findAllByProject(Long projectId, List<Long> companyIds) {
+        return costRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
     }
 
     @Override

@@ -33,12 +33,12 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override
     public List<Salary> getUserSalaries(String uid, Sort sort) {
-        return this.salaryRepository.findAllByUserUid(uid, sort);
+        return this.salaryRepository.findAllByUserUidAndCompanyId(uid, sort, SecurityUtils.companyId());
     }
 
     @Override
     public void store(Salary salary) {
-        Salary lastUserSalary = this.salaryRepository.findByUserUidAndFinishIsNull(salary.getUser().getUid());
+        Salary lastUserSalary = this.salaryRepository.findByUserUidAndFinishIsNullAndCompanyId(salary.getUser().getUid(), SecurityUtils.companyId());
 
         if (lastUserSalary != null) {
             if (salary.getStart().isBefore(lastUserSalary.getStart())) {
