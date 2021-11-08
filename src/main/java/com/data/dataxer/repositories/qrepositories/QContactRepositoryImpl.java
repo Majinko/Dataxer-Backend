@@ -32,7 +32,7 @@ public class QContactRepositoryImpl implements QContactRepository {
 
     private final JPAQueryFactory query;
 
-    private QContact CONTACT = QContact.contact;
+    private final QContact CONTACT = QContact.contact;
 
     public QContactRepositoryImpl(EntityManager entityManager) {
         this.query = new JPAQueryFactory(entityManager);
