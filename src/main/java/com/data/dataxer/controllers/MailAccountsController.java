@@ -73,4 +73,10 @@ public class MailAccountsController {
     public void sendEmail(@RequestBody MailDataDTO mailDataDTO) {
         this.mailAccountsService.sendEmail(mailDataDTO.getSubject(), mailDataDTO.getContent(), mailDataDTO.getEmails());
     }
+
+    @PostMapping("/sendSimpleEmail")
+    public void sendEmailWithAttachments(@RequestBody MailDataDTO mailDataDTO) {
+        this.mailAccountsService.sendEmailWithAttachments(mailDataDTO.getSubject(), mailDataDTO.getContent(),
+                mailDataDTO.getParticipantIds(), mailDataDTO.getTemplateId(), mailDataDTO.getFileNames(), mailDataDTO.getCompanyId());
+    }
 }
