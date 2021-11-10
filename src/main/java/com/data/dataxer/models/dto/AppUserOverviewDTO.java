@@ -10,7 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 public class AppUserOverviewDTO implements Comparable<AppUserOverviewDTO> {
-
     Long id;
     String uid;
     String fullName;
@@ -33,6 +32,4 @@ public class AppUserOverviewDTO implements Comparable<AppUserOverviewDTO> {
 
         return appUserOverviewDTO.getSumTime().compareTo(this.getSumTime());
     }
-
-
 }

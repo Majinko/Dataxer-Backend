@@ -4,7 +4,6 @@ import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -18,7 +17,6 @@ import java.time.LocalDate;
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE payment SET deleted_at = now() WHERE id = ?")
 public class Payment extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

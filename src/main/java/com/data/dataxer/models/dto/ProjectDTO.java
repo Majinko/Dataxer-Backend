@@ -17,9 +17,11 @@ public class ProjectDTO {
     private String title;
     private String number;
     private String description;
+    private String profitUsers;
     private ProjectState state;
     private String address;
     private Float area;
+    private Float projectProfit;
     private LocalDateTime startedAt;
     private LocalDateTime finishedAt;
 

@@ -1,7 +1,7 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.CategoryGroup;
 import com.data.dataxer.models.enums.CategoryType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -18,34 +18,31 @@ import java.util.List;
 @Setter
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE category SET deleted_at = now() WHERE id = ?")
-public class Category extends BaseEntity{
+public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long parentId;
+
     @NotNull
     private String name;
 
-    private Integer lft;
-
-    private Integer rgt;
-
     private Integer depth;
 
-    private Long position;
+    private Integer position;
 
     @Enumerated(EnumType.STRING)
-    CategoryType categoryType;
+    private CategoryGroup categoryGroup;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_id")
-    private Category parent;
+    @Enumerated(EnumType.STRING)
+    private CategoryType categoryType;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "parent", cascade = {CascadeType.ALL}, fetch = FetchType.LAZY)
-    @OrderBy("lft")
-    private List<Category> children = new ArrayList<Category>();
+    @Column(nullable = true, columnDefinition = "boolean default false") // todo remove in time
+    private Boolean isInProjectOverview; // also, category child
 
     private LocalDateTime deletedAt;
+
+    @Transient
+    private List<Category> children = new ArrayList<>();
 }

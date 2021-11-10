@@ -31,8 +31,12 @@ public class Project extends BaseEntity {
     @JoinColumn(name = "uid", referencedColumnName = "uid")
     private AppUser user;
 
+    //json obsahujuci uid userov s profitom
+    @Column(columnDefinition = "TEXT")
+    private String profitUsers;
+
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private List<Category> categories = new ArrayList<>();
 
     private String title;
@@ -47,6 +51,8 @@ public class Project extends BaseEntity {
     private String address;
 
     private Float area;
+
+    private Float projectProfit; // in percent profit for user in percent from project
 
     private LocalDateTime startedAt;
 

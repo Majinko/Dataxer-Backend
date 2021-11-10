@@ -1,7 +1,7 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Cost;
-import com.data.dataxer.models.enums.CostState;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -41,7 +42,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost update(Cost oldCost) {
-        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyId()).map(cost -> {
+        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyIds()).map(cost -> {
 
             cost.setContact(oldCost.getContact());
             cost.setProject(oldCost.getProject());
@@ -99,8 +100,8 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public Cost changeState(Long id, CostState state) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyId())
+    public Cost changeState(Long id, DocumentState state) {
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         oldCost.setState(state);
         return this.update(oldCost);
@@ -113,18 +114,18 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost getById(Long id) {
-        return this.qCostRepository.getById(id, SecurityUtils.companyId())
+        return this.qCostRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
     }
 
     @Override
     public Cost getByIdWithRelation(Long id) {
-        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyId()).orElse(null);
+        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyIds()).orElse(null);
     }
 
     @Override
     public Cost duplicate(Long id) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyId())
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         Cost newCost = new Cost();
         BeanUtils.copyProperties(oldCost, newCost, "id");
@@ -132,8 +133,17 @@ public class CostServiceImpl implements CostService {
     }
 
     @Override
-    public List<Cost> findAllByProject(Long projectId) {
-        return costRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
+    public List<Cost> findAllByProject(Long projectId, List<Long> companyIds) {
+        return costRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
+    }
+
+    @Override
+    public List<Integer> getCostsYears() {
+        List<Integer> years = this.qCostRepository.getCostsYears(SecurityUtils.companyId());
+
+        years.sort(Collections.reverseOrder());
+
+        return years;
     }
 
     private Cost generateNewCostFromRepeated(Cost repeatedCost) {

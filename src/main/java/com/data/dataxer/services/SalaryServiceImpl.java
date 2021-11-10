@@ -33,12 +33,12 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override
     public List<Salary> getUserSalaries(String uid, Sort sort) {
-        return this.salaryRepository.findAllByUserUid(uid, sort);
+        return this.salaryRepository.findAllByUserUidAndCompanyId(uid, sort, SecurityUtils.companyId());
     }
 
     @Override
     public void store(Salary salary) {
-        Salary lastUserSalary = this.salaryRepository.findByUserUidAndFinishIsNull(salary.getUser().getUid());
+        Salary lastUserSalary = this.salaryRepository.findByUserUidAndFinishIsNullAndCompanyId(salary.getUser().getUid(), SecurityUtils.companyId());
 
         if (lastUserSalary != null) {
             if (salary.getStart().isBefore(lastUserSalary.getStart())) {
@@ -63,6 +63,7 @@ public class SalaryServiceImpl implements SalaryService {
     public void update(Salary salary) {
         List<Time> times = this.timeRepository.findAllBySalaryIdAndAndCompanyId(salary.getId(), SecurityUtils.companyId());
 
+        //todo update and time price
         salaryRepository.findByIdAndAndCompanyId(salary.getId(), SecurityUtils.companyId()).map(s -> {
             s.setPrice(salary.getPrice());
             s.setIsActive(salary.getIsActive());

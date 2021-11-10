@@ -48,5 +48,5 @@ public interface InvoiceService {
 
     List<Invoice> findAllByRelatedDocuments(Long documentId);
 
-    List<Invoice> findAllByProject(Long projectId);
+    List<Invoice> findAllByProject(Long projectId, List<Long> companyIds);
 }

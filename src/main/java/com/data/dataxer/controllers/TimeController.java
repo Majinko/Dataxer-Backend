@@ -12,13 +12,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -53,7 +51,7 @@ public class TimeController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
-            @RequestParam(value = "sortExpression", defaultValue = "sort(+time.id)") String sortExpression
+            @RequestParam(value = "sortExpression", defaultValue = "sort(-time.id)") String sortExpression
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
@@ -61,8 +59,8 @@ public class TimeController {
     }
 
     @GetMapping("/allForPeriod")
-    public ResponseEntity<List<TimeDTO>> allForPeriod(@RequestParam(value = "from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from, @RequestParam(value = "to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(from, to)));
+    public ResponseEntity<List<TimeDTO>> allForPeriod(@RequestParam(value = "filters", defaultValue = "") String rqlFilter) {
+        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOList(this.timeService.allForPeriod(rqlFilter)));
     }
 
     @GetMapping("/allByUser")
@@ -70,6 +68,14 @@ public class TimeController {
             @RequestParam(value = "uId") String userUid
     ) {
         return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOListSimple(this.timeService.allByUser(userUid)));
+    }
+
+    @GetMapping("/allByProject/{projectId}")
+    public ResponseEntity<List<TimeDTO>> allByProject(
+            @PathVariable Long projectId,
+            @RequestParam(value = "companyIds", required = false) List<Long> companyIds
+    ) {
+        return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOWithoutRelations(this.timeService.allByProject(projectId, companyIds)));
     }
 
     @GetMapping("/userMonths")

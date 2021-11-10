@@ -12,7 +12,6 @@ import java.util.List;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
-
     private final CompanyRepository companyRepository;
     private final AppUserRepository appUserRepository;
     private final QAppUserRepository qAppUserRepository;
@@ -49,6 +48,8 @@ public class CompanyServiceImpl implements CompanyService {
         return companyRepository.findByIdAndAppUsersIn(oldCompany.getId(), List.of(SecurityUtils.loggedUser())).map(company -> {
 
             company.setName(oldCompany.getName());
+            company.setSignatureUrl(oldCompany.getSignatureUrl());
+            company.setCompanyTaxType(oldCompany.getCompanyTaxType());
             company.setLogoUrl(oldCompany.getLogoUrl());
             company.setLegalForm(oldCompany.getLegalForm());
             company.setStreet(oldCompany.getStreet());

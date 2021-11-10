@@ -19,5 +19,7 @@ public interface PriceOfferService {
 
     void destroy(Long id);
 
-    List<PriceOffer> findAllByProject(Long projectId);
+    List<PriceOffer> findAllByProject(Long projectId, List<Long> comapnyIds);
+
+    PriceOffer duplicate(Long oldPriceOfferId);
 }

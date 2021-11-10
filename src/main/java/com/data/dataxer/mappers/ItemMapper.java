@@ -1,9 +1,7 @@
 package com.data.dataxer.mappers;
 
-import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Item;
 import com.data.dataxer.models.domain.ItemPrice;
-import com.data.dataxer.models.dto.CategoryDTO;
 import com.data.dataxer.models.dto.ItemDTO;
 import com.data.dataxer.models.dto.ItemPriceDTO;
 import org.mapstruct.IterableMapping;
@@ -37,7 +35,4 @@ public interface ItemMapper {
 
     @IterableMapping(qualifiedByName = "itemToItemDTOWithPrice")
     List<ItemDTO> itemsToItemsDTOsWithPrice(List<Item> items);
-
-    @Mapping(target = "parent", ignore = true)
-    CategoryDTO categoryToCategoryDTO(Category category);
 }

@@ -14,5 +14,5 @@ public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
 
     Invoice findByIdAndCompanyId(Long invoiceId, Long companyId);
 
-    List<Invoice> findAllByProjectIdAndCompanyId(Long projectId, Long companyId);
+    List<Invoice> findAllByProjectIdAndCompanyIdIn(Long projectId, List<Long> companyIds);
 }

@@ -42,6 +42,7 @@ public class QPackRepositoryImpl implements QPackRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("pack.id", QPack.pack.id)
+                .put("pack.title", QPack.pack.title)
                 .build();
 
         if (!rqlFilter.equals("")) {

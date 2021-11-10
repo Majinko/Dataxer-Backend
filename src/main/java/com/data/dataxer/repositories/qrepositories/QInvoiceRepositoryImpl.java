@@ -1,10 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
-import com.data.dataxer.models.domain.QDocumentPack;
-import com.data.dataxer.models.domain.QDocumentPackItem;
-import com.data.dataxer.models.domain.QInvoice;
-import com.data.dataxer.models.domain.QItem;
 import com.data.dataxer.models.enums.DocumentType;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -17,6 +13,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -24,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -50,12 +46,16 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("invoice.id", QInvoice.invoice.id)
+                .put("invoice.company.id", QInvoice.invoice.company.id)
                 .put("invoice.title", QInvoice.invoice.title)
+                .put("invoice.state", QInvoice.invoice.state)
                 .put("invoice.document_type", QInvoice.invoice.documentType)
                 .put("invoice.contact.id", QInvoice.invoice.contact.id)
                 .put("invoice.contact.name", QInvoice.invoice.contact.name)
                 .put("invoice.project.id", QInvoice.invoice.project.id)
                 .put("invoice.documentType", QInvoice.invoice.documentType)
+                .put("invoice.start", QInvoice.invoice.createdAt)
+                .put("invoice.end", QInvoice.invoice.createdAt)
                 .build();
 
         if (!rqlFilter.equals("")) {
@@ -64,28 +64,20 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Invoice> invoiceList = this.query.selectFrom(QInvoice.invoice)
-                .leftJoin(QInvoice.invoice.contact).fetchJoin()
-                .leftJoin(QInvoice.invoice.project).fetchJoin()
-                .where(predicate)
-                .where(QInvoice.invoice.company.id.eq(companyId))
-                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
+        List<Invoice> invoiceList = this.getInvoicePaginates(pageable, rqlFilter, companyId, predicate, orderSpecifierList);
 
         return new PageImpl<>(invoiceList, pageable, getTotalCount(predicate));
     }
 
     @Override
-    public Optional<Invoice> getById(Long id, Long companyId) {
+    public Optional<Invoice> getById(Long id, List<Long> companyIds) {
 
         Invoice invoice = query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
                 .where(QInvoice.invoice.id.eq(id))
-                .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.company.id.in(companyIds))
                 .orderBy(QDocumentPack.documentPack.position.asc())
                 .fetchOne();
 
@@ -115,34 +107,25 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Optional<Invoice> getByIdSimple(Long id, Long companyId) {
+    public Optional<Invoice> getByIdSimple(Long id, List<Long> companyIds) {
         QInvoice qInvoice = QInvoice.invoice;
 
         return Optional.ofNullable(query.selectFrom(qInvoice)
                 .where(qInvoice.id.eq(id))
-                .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.company.id.in(companyIds))
                 .fetchOne());
     }
 
     @Override
-    public List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, Long companyId) {
+    public List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, List<Long> companyIds) {
         return this.query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
                 .where(QInvoice.invoice.id.in(ids))
                 .where(QInvoice.invoice.documentType.eq(type))
-                .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.company.id.in(companyIds))
                 .fetch();
-    }
-
-    @Override
-    public BigDecimal getProjectPriceSum(Long id, Long companyId) {
-        return this.query.select(QInvoice.invoice.totalPrice.sum())
-                .from(QInvoice.invoice)
-                .where(QInvoice.invoice.project.id.eq(id))
-                .where(QInvoice.invoice.company.id.eq(companyId))
-                .fetchOne();
     }
 
     private long getTotalCount(Predicate predicate) {
@@ -167,5 +150,23 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 invoicePackItems.stream().filter(
                         invoicePackItem -> invoicePackItem.getPack().getId().equals(documentPack.getId())).collect(Collectors.toList())
         ));
+    }
+
+    //todo tieto spolocne metody dat do abstrakntej triedy pre faktury a cenove ponuky
+    private List<Invoice> getInvoicePaginates(Pageable pageable, String rqlFilter, Long companyId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+        JPAQuery<Invoice> invoiceJPAQuery = this.query.selectFrom(QInvoice.invoice)
+                .leftJoin(QInvoice.invoice.contact).fetchJoin()
+                .leftJoin(QInvoice.invoice.project).fetchJoin()
+                .where(predicate)
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        if (!rqlFilter.contains("invoice.company.id")) { // todo make refakt
+            invoiceJPAQuery.where(QInvoice.invoice.company.id.eq(companyId));
+        }
+
+        return invoiceJPAQuery.fetch();
     }
 }

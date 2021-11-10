@@ -1,20 +1,19 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
-import com.data.dataxer.models.dto.CategoryNestedDTO;
 
 import java.util.List;
 
 public interface CategoryService {
     List<Category> all();
 
-    List<Category> nested();
+    Category storeOrUpdate(Category category);
 
-    Category store(Category category);
-
-    void updateTree(List<Category> categories, Category category);
+    void updateTree(List<Category> categories);
 
     void delete(Long id);
 
-    void recreateTree();
+    List<Category> allByType(String type);
+
+    Category findById(Long id);
 }

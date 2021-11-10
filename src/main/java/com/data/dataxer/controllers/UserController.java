@@ -28,8 +28,7 @@ public class UserController {
     private final SalaryMapper salaryMapper;
     private final RoleMapper roleMapper;
 
-    public UserController(UserService userService, UserMapper userMapper, SalaryService salaryService,
-                          SalaryMapper salaryMapper, RoleMapper roleMapper) {
+    public UserController(UserService userService, UserMapper userMapper, SalaryService salaryService, SalaryMapper salaryMapper, RoleMapper roleMapper) {
         this.userService = userService;
         this.userMapper = userMapper;
         this.salaryService = salaryService;

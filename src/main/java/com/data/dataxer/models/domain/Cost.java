@@ -1,12 +1,14 @@
 package com.data.dataxer.models.domain;
 
 import com.data.dataxer.mappers.HashMapConverter;
-import com.data.dataxer.models.enums.CostState;
 import com.data.dataxer.models.enums.CostType;
 import com.data.dataxer.models.enums.CostsPeriods;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -30,10 +32,12 @@ public class Cost extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "client_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     Contact contact;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
+    @NotFound(action = NotFoundAction.IGNORE)
     Project project;
 
     @JoinTable(
@@ -50,6 +54,7 @@ public class Cost extends BaseEntity {
 
     private String costOrder;
 
+    @NotFound(action = NotFoundAction.IGNORE)
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private List<Category> categories = new ArrayList<>();
 
@@ -65,7 +70,7 @@ public class Cost extends BaseEntity {
     private String note;
 
     @Enumerated(EnumType.STRING)
-    private CostState state;
+    private DocumentState state;
 
     @Enumerated(EnumType.STRING)
     private CostType type;

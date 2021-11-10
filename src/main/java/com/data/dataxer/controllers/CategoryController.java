@@ -6,14 +6,13 @@ import com.data.dataxer.models.dto.CategoryNestedDTO;
 import com.data.dataxer.services.CategoryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/category")
-@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
+@PreAuthorize("hasPermission(null, 'Category', 'Category')")
 public class CategoryController {
     private final CategoryService categoryService;
     private final CategoryMapper categoryMapper;
@@ -28,29 +27,28 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.all()));
     }
 
-    @Transactional
-    @GetMapping("/nested")
-    public ResponseEntity<List<CategoryNestedDTO>> nested() {
-        return ResponseEntity.ok(categoryMapper.toCategoryNestedDTOs(categoryService.nested()));
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryDTO> finById(@PathVariable Long id) {
+        return ResponseEntity.ok(this.categoryMapper.toCategoryDTO(this.categoryService.findById(id)));
     }
 
-    @PostMapping("/store")
+    @GetMapping("/allByType/{type}")
+    public ResponseEntity<List<CategoryDTO>> allByType(@PathVariable String type) {
+        return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.allByType(type)));
+    }
+
+    @PostMapping("/storeOrUpdate")
     public ResponseEntity<CategoryDTO> store(@RequestBody CategoryDTO categoryDTO) {
-        return ResponseEntity.ok(categoryMapper.toCategoryDTO(this.categoryService.store(categoryMapper.toCategory(categoryDTO))));
+        return ResponseEntity.ok(categoryMapper.toCategoryDTO(this.categoryService.storeOrUpdate(categoryMapper.categoryDTOtoCategory(categoryDTO))));
     }
 
     @PostMapping("/updateTree")
     public void updateTree(@RequestBody List<CategoryNestedDTO> categoryDTOS) {
-        categoryService.updateTree(categoryMapper.CategoryNestedDTOsToCategories(categoryDTOS), null);
+        categoryService.updateTree(categoryMapper.categoryNestedDTOsToCategories(categoryDTOS));
     }
 
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         categoryService.delete(id);
-    }
-
-    @GetMapping("/recreateTree")
-    public void recreateTree() {
-        this.categoryService.recreateTree();
     }
 }

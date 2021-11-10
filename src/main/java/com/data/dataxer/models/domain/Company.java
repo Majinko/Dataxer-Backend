@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.CompanyTaxType;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
@@ -34,7 +35,14 @@ public class Company implements Serializable {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private List<AppUser> appUsers = new ArrayList<>();
 
+    @Enumerated(EnumType.STRING)
+    private CompanyTaxType companyTaxType;
+
+    @Column(columnDefinition = "text")
     private String logoUrl;
+
+    @Column(columnDefinition = "text")
+    private String signatureUrl;
 
     private String legalForm;
 

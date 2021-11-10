@@ -68,7 +68,7 @@ public class ItemController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<ItemDTO> getById(@PathVariable long id) {
         return ResponseEntity.ok(itemMapper.itemToItemDto(this.itemService.getById(id)));
     }

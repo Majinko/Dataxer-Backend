@@ -21,15 +21,15 @@ public interface QTimeRepository {
 
     List<Time> getHourOverviewForAllUsers(LocalDate fromDate, LocalDate toDate, Long companyId);
 
-    List<Time> allForPeriod(LocalDate from, LocalDate to, Long userId, Long companyId);
+    List<Time> allForPeriod(String rqlFilter, Long userId, Long companyId);
 
     List<Tuple> getAllUserMonths(Long userId, Long companyId);
 
     List<Project> getAllUserProjects(Long userId, Long companyId);
 
-    List<Tuple> getUserLastProjects(Long userId, Long limit, Long companyId);
+    List<Tuple> getUserLastProjects(Long userId, Long limit, Long offset, Long companyId);
 
-    List<Tuple> getProjectLastCategories(Long projectId, Long limit, Long companyId);
+    List<Category> getProjectLastCategories(Long projectId, Long limit, Long companyId, String uid);
 
     LocalDate getUserFirstLastRecord(Long userId, Long companyId, Boolean last);
 
@@ -37,7 +37,7 @@ public interface QTimeRepository {
 
     Integer sumUserTime(Long userId, Long companyId);
 
-    List<Time> getAllTimeRecords(Long companyId);
+    List<Time> getAllTimeRecordsFromTo(LocalDate from, LocalDate to, Long companyId);
 
     List<Integer> getAllYears(Long companyId);
 
@@ -45,21 +45,23 @@ public interface QTimeRepository {
 
     Integer getTotalProjectTimeForYear(Long id, Integer year, Long companyId);
 
-    List<Integer> getProjectYears(Long id, Long companyId);
+    List<Integer> getProjectYears(Long id, List<Long> companyIds);
 
     Tuple getUserProjectCategoryHoursAndPrice(Long projectId, String userUid, List<Long> categoryIds, Long companyId);
 
-    Integer getUserProjectTimeBetweenYears(Integer startYear, Integer endYear, String uid, Long companyId);
+    Integer getUserProjectTimeBetweenYears(Integer startYear, Integer endYear, String uid, List<Long> companyIds);
 
-    List<Tuple> getUserActiveMonths(Integer startYear, Integer endYear, String uid, Long companyId);
+    List<Tuple> getUserActiveMonths(Integer startYear, Integer endYear, String uid, List<Long> companyIds);
 
-    List<Tuple> getProjectAllUsersActiveMonth(Integer startYear, Integer endYear, Long companyId);
+    List<Tuple> getProjectAllUsersActiveMonth(Integer startYear, Integer endYear, List<Long> companyIds);
 
     List<Tuple> getAllProjectUsers(Long id, Long companyId);
 
-    List<Tuple> getProjectUsersTimePriceSums(Long id, Long companyId);
+    List<Tuple> getProjectUsersTimePriceSums(Long id, List<Long> companyIds);
 
     List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> longs, Long companyId);
 
-    List<Time> getAllProjectTimesOrdered(Long projectId, Long companyId);
+    List<Time> getAllProjectTimesOrdered(Long projectId, List<Long> companyIds);
+
+    List<Tuple> getAllUserTimesFromDateToDate(LocalDate processFromDate, LocalDate processToDate, Long companyId);
 }

@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/settings")
@@ -22,7 +23,7 @@ public class SettingsController {
         this.settingsMapper = settingsMapper;
     }
 
-    @RequestMapping(value =  "/make/{companyId}", method = RequestMethod.POST)
+    @RequestMapping(value = "/make/{companyId}", method = RequestMethod.POST)
     public void makeCompanySettings(@PathVariable Long companyId) {
         this.settingsService.makeSettingsForCompany(companyId);
     }
@@ -34,8 +35,12 @@ public class SettingsController {
 
     @GetMapping("/getByName/{settingName}")
     public ResponseEntity<SettingsDTO> getSettingByName(@PathVariable String settingName) {
-        return ResponseEntity.ok(this.settingsMapper
-                .settingsToSettingsDTO(this.settingsService.getByName(settingName)));
+        return ResponseEntity.ok(this.settingsMapper.settingsToSettingsDTO(this.settingsService.getByName(settingName)));
+    }
+
+    @PostMapping("/store")
+    public void store(@RequestBody Map<String, String> keyValueMap) {
+
     }
 
     @PostMapping("/destroyCompanySettings/{companyId}")

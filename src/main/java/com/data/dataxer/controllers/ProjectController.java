@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.CategoryMapper;
 import com.data.dataxer.mappers.ProjectMapper;
 import com.data.dataxer.mappers.TimeMapper;
+import com.data.dataxer.mappers.UserMapper;
 import com.data.dataxer.models.dto.*;
 import com.data.dataxer.services.ProjectService;
 import org.springframework.data.domain.Page;
@@ -25,12 +26,15 @@ public class ProjectController {
     private final ProjectMapper projectMapper;
     private final CategoryMapper categoryMapper;
     private final TimeMapper timeMapper;
+    private final UserMapper userMapper;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper, TimeMapper timeMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper,
+                             TimeMapper timeMapper, UserMapper userMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.categoryMapper = categoryMapper;
         this.timeMapper = timeMapper;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/store")
@@ -43,14 +47,14 @@ public class ProjectController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
-            @RequestParam(value = "sortExpression", defaultValue = "sort(+project.id)") String sortExpression
+            @RequestParam(value = "sortExpression", defaultValue = "sort(-project.number)") String sortExpression
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
         return ResponseEntity.ok(projectService.paginate(pageable, rqlFilter, sortExpression).map(projectMapper::projectToProjectDTOWithoutCategory));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<ProjectDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.getById(id)));
     }
@@ -73,6 +77,26 @@ public class ProjectController {
     @GetMapping("/all")
     public ResponseEntity<List<ProjectDTO>> all() {
         return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.all()));
+    }
+
+    @GetMapping("/allHasCost")
+    public ResponseEntity<List<ProjectDTO>> allHasCost() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasCost()));
+    }
+
+    @GetMapping("/allHasInvoice")
+    public ResponseEntity<List<ProjectDTO>> allHasInvoice() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasInvoice()));
+    }
+
+    @GetMapping("/allHasPriceOffer")
+    public ResponseEntity<List<ProjectDTO>> allHasPriceOffer() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasPriceOffer()));
+    }
+
+    @GetMapping("/allHasUserTime")
+    public ResponseEntity<List<ProjectDTO>> allHasUserTime() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasUserTime()));
     }
 
     @GetMapping("/allProjectCategory")
@@ -109,12 +133,26 @@ public class ProjectController {
     }
 
     @GetMapping("/projectManHours/{id}")
-    public ResponseEntity<ProjectManHoursDTO> getProjectManHours(@PathVariable Long id) {
-        return ResponseEntity.ok(this.projectService.getProjectManHours(id));
+    public ResponseEntity<ProjectManHoursDTO> getProjectManHours(
+            @PathVariable Long id,
+            @RequestParam(value = "companyIds", required = false) List<Long> companyIds
+    ) {
+        return ResponseEntity.ok(this.projectService.getProjectManHours(id, companyIds));
     }
 
-    @GetMapping("/evaluation/{id}")
-    public ResponseEntity<EvaluationDTO> projectEvaluationProfit(@PathVariable Long id) {
-        return ResponseEntity.ok(this.projectService.projectEvaluationProfit(id));
+    //todo remove
+    @GetMapping("/prepareEvaluation/{id}")
+    public ResponseEntity<EvaluationPreparationDTO> projectEvaluationPreparation(@PathVariable Long id) {
+        return  ResponseEntity.ok(this.projectService.evaluationPreparationProjectData(id));
+    }
+
+    @PostMapping("/addProfitUser/{id}")
+    public void addProfitUser(@PathVariable Long id, @RequestBody AppUserDTO appUserDTO) {
+        this.projectService.addProfitUser(id, this.userMapper.appUserDTOtoAppUser(appUserDTO));
+    }
+
+    @PostMapping("/removeProfitUser/{id}")
+    public void removeProfitUser(@PathVariable Long id, @RequestBody AppUserDTO appUserDTO) {
+        this.projectService.removeProfitUser(id, this.userMapper.appUserDTOtoAppUser(appUserDTO));
     }
 }

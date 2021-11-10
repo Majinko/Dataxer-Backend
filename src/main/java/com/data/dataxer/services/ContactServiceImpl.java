@@ -63,4 +63,24 @@ public class ContactServiceImpl implements ContactService {
                 .findFirst5ByNameContaining(name)
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
     }
+
+    @Override
+    public List<Contact> allHasCost() {
+        return this.qContactRepository.allHasCost(SecurityUtils.companyIds());
+    }
+
+    @Override
+    public List<Contact> allHasInvoice() {
+        return this.qContactRepository.allHasInvoice(SecurityUtils.companyIds());
+    }
+
+    @Override
+    public List<Contact> allHasPriceOffer() {
+        return this.qContactRepository.allHasPriceOffer(SecurityUtils.companyIds());
+    }
+
+    @Override
+    public List<Contact> allHasProject() {
+        return this.qContactRepository.allHasProject(SecurityUtils.companyIds());
+    }
 }

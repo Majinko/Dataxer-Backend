@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class InvoiceServiceImpl implements InvoiceService {
+public class InvoiceServiceImpl extends DocumentHelperService implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
     private final QInvoiceRepository qInvoiceRepository;
     private final QPaymentRepository qPaymentRepository;
@@ -42,7 +42,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     public void store(Invoice invoice) {
         Invoice i = this.invoiceRepository.save(invoice);
 
-        this.setInvoicePackAndItems(i);
+        this.setDocumentPackAndItems(i);
     }
 
     @Override
@@ -71,13 +71,13 @@ public class InvoiceServiceImpl implements InvoiceService {
     public void storeSummaryInvoice(Invoice summaryInvoice, Long taxDocumentId, Long proformaId) {
         Invoice i = this.invoiceRepository.save(summaryInvoice);
 
-        this.setInvoicePackAndItems(i);
+        this.setDocumentPackAndItems(i);
         this.storeAllSummaryInvoiceRelations(taxDocumentId, summaryInvoice.getId(), proformaId);
     }
 
     @Override
     public void update(Invoice invoice) {
-        Invoice invoiceUpdated = this.setInvoicePackAndItems(invoice);
+        Invoice invoiceUpdated = (Invoice) this.setDocumentPackAndItems(invoice);
 
         this.invoiceRepository.save(invoiceUpdated);
     }
@@ -90,7 +90,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public Invoice getById(Long id) {
         return this.qInvoiceRepository
-                .getById(id, SecurityUtils.companyId())
+                .getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
@@ -104,7 +104,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     @Override
     public Invoice getByIdSimple(Long id) {
         return this.qInvoiceRepository
-                .getByIdSimple(id, SecurityUtils.companyId())
+                .getByIdSimple(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
@@ -115,7 +115,7 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     @Override
     public void makePay(Long id, LocalDate payedDate) {
-        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Invoice not found"));
+        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds()).orElseThrow(() -> new RuntimeException("Invoice not found"));
 
         invoice.setPaymentDate(payedDate);
         this.invoiceRepository.save(invoice);
@@ -150,8 +150,8 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public List<Invoice> findAllByProject(Long projectId) {
-        return this.invoiceRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
+    public List<Invoice> findAllByProject(Long projectId, List<Long> companyIds) {
+        return this.invoiceRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
     }
 
     @Override
@@ -161,8 +161,8 @@ public class InvoiceServiceImpl implements InvoiceService {
         Invoice duplicatedInvoice = new Invoice();
         BeanUtils.copyProperties(originalInvoice, duplicatedInvoice, "id", "packs");
         duplicatedInvoice.setPacks(this.duplicateDocumentPacks(originalInvoice.getPacks()));
-        this.setInvoicePackAndItems(duplicatedInvoice);
-        this.invoiceRepository.save(duplicatedInvoice);
+        this.setDocumentPackAndItems(duplicatedInvoice);
+        //this.invoiceRepository.save(duplicatedInvoice);
         return duplicatedInvoice;
     }
 
@@ -188,7 +188,8 @@ public class InvoiceServiceImpl implements InvoiceService {
 
         List<Long> allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(proformaInvoice.getId(), SecurityUtils.companyId())
                 .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
-        List<Invoice> taxDocuments = this.qInvoiceRepository.getAllInvoicesIdInAndType(allRelatedDocumentIds, DocumentType.TAX_DOCUMENT, SecurityUtils.companyId());
+
+        List<Invoice> taxDocuments = this.qInvoiceRepository.getAllInvoicesIdInAndType(allRelatedDocumentIds, DocumentType.TAX_DOCUMENT, SecurityUtils.companyIds());
 
         Invoice summaryInvoice = new Invoice();
 
@@ -203,8 +204,7 @@ public class InvoiceServiceImpl implements InvoiceService {
         HashMap<Integer, DocumentPack> taxesPacks = new HashMap<>();
         for (Invoice taxDocument : taxDocuments) {
             for (DocumentPack documentPack : taxDocument.getPacks()) {
-                DocumentPack responsePack = this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(),
-                        taxDocument.getCreatedDate(), taxDocument.getVariableSymbol());
+                DocumentPack responsePack = this.generateDocumentPackForSummaryInvoice(documentPack, taxDocument.getNumber(), taxDocument.getCreatedDate(), taxDocument.getVariableSymbol());
                 if (taxesPacks.containsKey(documentPack.getTax())) {
                     DocumentPack pack = taxesPacks.get(documentPack.getTax());
                     pack.setPrice(pack.getPrice().add(responsePack.getPrice()));
@@ -389,47 +389,6 @@ public class InvoiceServiceImpl implements InvoiceService {
                 + taxDocumentCreatedDate + ", variabilný symbol " + taxDocumentVariableSymbol;
     }
 
-    private Invoice setInvoicePackAndItems(Invoice invoice) {
-        int packPosition = 0;
-
-        for (DocumentPack documentPack : invoice.getPacks()) {
-            documentPack.setDocument(invoice);
-            documentPack.setType(DocumentType.INVOICE);
-            documentPack.setPosition(packPosition);
-            packPosition++;
-
-            int packItemPosition = 0;
-
-            for (DocumentPackItem packItem : documentPack.getPackItems()) {
-                packItem.setPack(documentPack);
-                packItem.setPosition(packItemPosition);
-
-                packItemPosition++;
-            }
-        }
-
-        return invoice;
-    }
-
-    private List<DocumentPack> duplicateDocumentPacks(List<DocumentPack> originalDocumentPacks) {
-        List<DocumentPack> duplicatedDocumentPacks = new ArrayList<>();
-        for (DocumentPack originalDocumentPack : originalDocumentPacks) {
-            DocumentPack duplicatePack = new DocumentPack();
-            duplicatePack.setPackItems(this.duplicateDocumentPackItems(originalDocumentPack.getPackItems()));
-            duplicatedDocumentPacks.add(duplicatePack);
-        }
-        return duplicatedDocumentPacks;
-    }
-
-    private List<DocumentPackItem> duplicateDocumentPackItems(List<DocumentPackItem> originalPackItems) {
-        List<DocumentPackItem> duplicatedDocumentPackItems = new ArrayList<>();
-        for (DocumentPackItem originalDocumentPackItem : originalPackItems) {
-            DocumentPackItem duplicatedDocumentPackItem = new DocumentPackItem();
-            BeanUtils.copyProperties(originalDocumentPackItem, duplicatedDocumentPackItem, "id", "pack");
-            duplicatedDocumentPackItems.add(duplicatedDocumentPackItem);
-        }
-        return duplicatedDocumentPackItems;
-    }
 
     private BigDecimal getPriceFromTotalPrice(BigDecimal totalPrice, Integer tax) {
         double taxCoefficient = 1.0 + (tax / 100.0);

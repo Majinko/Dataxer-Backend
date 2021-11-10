@@ -1,5 +1,7 @@
 package com.data.dataxer.models.dto;
 
+import com.data.dataxer.models.enums.CategoryGroup;
+import com.data.dataxer.models.enums.CategoryType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -8,10 +10,8 @@ import lombok.Setter;
 @Setter
 public class CategoryDTO {
     private Long id;
+    private Long parentId;
     private String name;
-    private Integer lft;
-    private Integer rgt;
-    private Long position;
-    private Integer depth;
-    private CategoryDTO parent;
+    private CategoryGroup categoryGroup;
+    private CategoryType categoryType;
 }

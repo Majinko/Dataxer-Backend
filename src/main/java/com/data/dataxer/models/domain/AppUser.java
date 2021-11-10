@@ -45,11 +45,18 @@ public class AppUser implements Serializable {
 
     private String country;
 
+    @Column(name = "connected")
+    private Boolean connected = false;
+
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Role> roles = new ArrayList<>();
 
     @OneToOne(fetch = FetchType.LAZY)
     private Company defaultCompany;
+
+    @Transient
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Company> companies = new ArrayList<>();
 
     @Column(updatable = false)
     @CreationTimestamp
@@ -61,4 +68,29 @@ public class AppUser implements Serializable {
 
     @Column
     private LocalDateTime deletedAt;
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        AppUser other = (AppUser) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
+    }
 }

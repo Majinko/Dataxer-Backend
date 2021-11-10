@@ -1,12 +1,10 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.DocumentPack;
-import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.PriceOffer;
-import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.PriceOfferRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class PriceOfferServiceImpl implements PriceOfferService {
+public class PriceOfferServiceImpl extends DocumentHelperService implements PriceOfferService {
     private final PriceOfferRepository priceOfferRepository;
     private final QPriceOfferRepository qPriceOfferRepository;
 
@@ -29,34 +27,12 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     public void store(PriceOffer priceOffer) {
         PriceOffer p = this.priceOfferRepository.save(priceOffer);
 
-        this.setPriceOfferPackAndItems(p);
-    }
-
-    private PriceOffer setPriceOfferPackAndItems(PriceOffer priceOffer) {
-        int packPosition = 0;
-
-        for (DocumentPack documentPack : priceOffer.getPacks()) {
-            documentPack.setDocument(priceOffer);
-            documentPack.setType(DocumentType.PRICE_OFFER);
-            documentPack.setPosition(packPosition);
-            packPosition++;
-
-            int packItemPosition = 0;
-
-            for (DocumentPackItem packItem : documentPack.getPackItems()) {
-                packItem.setPack(documentPack);
-                packItem.setPosition(packItemPosition);
-
-                packItemPosition++;
-            }
-        }
-
-        return priceOffer;
+        this.setDocumentPackAndItems(p);
     }
 
     @Override
     public void update(PriceOffer priceOffer) {
-        PriceOffer p = this.setPriceOfferPackAndItems(priceOffer);
+        PriceOffer p = (PriceOffer) this.setDocumentPackAndItems(priceOffer);
 
         this.priceOfferRepository.save(p);
     }
@@ -86,7 +62,18 @@ public class PriceOfferServiceImpl implements PriceOfferService {
     }
 
     @Override
-    public List<PriceOffer> findAllByProject(Long projectId) {
-        return this.priceOfferRepository.findAllByProjectIdAndCompanyId(projectId, SecurityUtils.companyId());
+    public List<PriceOffer> findAllByProject(Long projectId, List<Long> companyIds) {
+        return this.priceOfferRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
+    }
+
+    @Override
+    public PriceOffer duplicate(Long oldPriceOfferId) {
+        PriceOffer original = this.getById(oldPriceOfferId);
+        PriceOffer duplicate = new PriceOffer();
+        BeanUtils.copyProperties(original, duplicate, "id", "packs");
+        duplicate.setPacks(this.duplicateDocumentPacks(original.getPacks()));
+        this.setDocumentPackAndItems(duplicate);
+
+        return duplicate;
     }
 }

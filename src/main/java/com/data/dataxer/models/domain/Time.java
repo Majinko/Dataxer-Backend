@@ -43,4 +43,6 @@ public class Time extends BaseEntity {
     float km;
 
     private LocalDate dateWork;
+
+
 }

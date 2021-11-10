@@ -108,7 +108,7 @@ public class InvoiceController {
         }
     }
 
-    @RequestMapping(value = "/duplicate/{id}", method = RequestMethod.POST)
+    @GetMapping(value = "/duplicate/{id}")
     public ResponseEntity<InvoiceDTO> duplicate(@PathVariable Long id) {
         return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.duplicate(id)));
     }
@@ -139,7 +139,10 @@ public class InvoiceController {
     }
 
     @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<InvoiceDTO>> findAllByProject(@PathVariable Long projectId) {
-        return ResponseEntity.ok(invoiceMapper.invoicesToInvoicesDTOWithoutRelation(this.invoiceService.findAllByProject(projectId)));
+    public ResponseEntity<List<InvoiceDTO>> findAllByProject(
+            @PathVariable Long projectId,
+            @RequestParam(value = "companyIds", required = false) List<Long> companyIds
+    ) {
+        return ResponseEntity.ok(invoiceMapper.invoicesToInvoicesDTOWithoutRelation(this.invoiceService.findAllByProject(projectId, companyIds)));
     }
 }

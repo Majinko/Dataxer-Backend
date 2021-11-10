@@ -1,8 +1,6 @@
 package com.data.dataxer.mappers;
 
-import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.domain.Cost;
-import com.data.dataxer.models.dto.CategoryDTO;
 import com.data.dataxer.models.dto.CostDTO;
 import org.mapstruct.IterableMapping;
 import org.mapstruct.Mapper;
@@ -34,7 +32,4 @@ public interface CostMapper {
 
     @IterableMapping(qualifiedByName = "cosToCostDTOWithoutRelations")
     List<CostDTO> costsToCostDTOsWithoutRelations(List<Cost> costs);
-
-    @Mapping(target = "parent", ignore = true)
-    CategoryDTO categoryToCategoryDto(Category category);
 }

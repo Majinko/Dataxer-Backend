@@ -29,7 +29,6 @@ import static com.data.dataxer.utils.Helpers.getDiffYears;
 
 @Service
 public class UserServiceImpl implements UserService {
-
     @Autowired
     private FirebaseAuth firebaseAuth;
     @Autowired
@@ -72,6 +71,7 @@ public class UserServiceImpl implements UserService {
         createRequest.setDisplayName(appUser.getFirstName() + " " + appUser.getLastName());
 
         UserRecord userRecord;
+
 
         try {
             userRecord = firebaseAuth.createUser(createRequest);
@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
 
         if (moreData) {
             appUserOverviewDTO.setRoles(roleMapper.rolesToRoleDTOs(user.getRoles()));
-            appUserOverviewDTO.setSalary(salaryMapper.salaryToSalaryDTO(salaryRepository.findByUserUidAndFinishIsNull(user.getUid())));
+            appUserOverviewDTO.setSalary(salaryMapper.salaryToSalaryDTO(salaryRepository.findByUserUidAndFinishIsNullAndCompanyId(user.getUid(), SecurityUtils.companyId())));
         }
 
         return appUserOverviewDTO;
@@ -157,6 +157,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public AppUser connect(String uid) {
+        AppUser appUser = this.getByUid(uid);
+
+        appUser.setConnected(true);
+
+        userRepository.save(appUser);
+
+        return appUser;
+    }
+
+    @Override
+    public AppUser disconnect(String uid) {
+        AppUser appUser = this.getByUid(uid);
+
+        appUser.setConnected(false);
+
+        userRepository.save(appUser);
+
+        return appUser;
+    }
+
+    @Override
     public AppUser getByUid(String uid) {
         return this.userRepository.findByUidAndDefaultCompanyId(uid, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("User not found :)"));
     }
@@ -187,7 +209,6 @@ public class UserServiceImpl implements UserService {
         user.setRoles(roles);
         this.userRepository.save(user);
     }
-
 
     private void addCompanyToUser(Long companyId, AppUser appUser) {
         Company company = this.companyRepository.findByIdWithUsers(companyId);

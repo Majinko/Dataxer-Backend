@@ -12,6 +12,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -47,6 +48,8 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .put("priceOffer.contact.id", QPriceOffer.priceOffer.contact.id)
                 .put("priceOffer.project.id", QPriceOffer.priceOffer.project.id)
                 .put("priceOffer.contact.name", QPriceOffer.priceOffer.contact.name)
+                .put("priceOffer.start", QPriceOffer.priceOffer.createdAt)
+                .put("priceOffer.end", QPriceOffer.priceOffer.createdAt)
                 .build();
 
         if (!rqlFilter.equals("")) {
@@ -56,15 +59,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
 
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<PriceOffer> priceOfferList = query.selectFrom(QPriceOffer.priceOffer)
-                .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
-                .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
-                .where(predicate)
-                .where(QPriceOffer.priceOffer.company.id.eq(companyId))
-                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
-                .limit(pageable.getPageSize())
-                .offset(pageable.getOffset())
-                .fetch();
+        List<PriceOffer> priceOfferList = this.getPriceOfferPaginate(pageable, rqlFilter, companyId, predicate, orderSpecifierList);
 
         return new PageImpl<>(priceOfferList, pageable, getTotalCount(predicate));
     }
@@ -98,13 +93,10 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     private void priceOfferPackSetItems(PriceOffer priceOffer) {
-        QDocumentPackItem qDocumentPackItem = QDocumentPackItem.documentPackItem;
-        QItem qItem = QItem.item;
-
-        List<DocumentPackItem> priceOfferPackItems = query.selectFrom(qDocumentPackItem)
-                .where(qDocumentPackItem.pack.id.in(priceOffer.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
-                .leftJoin(qDocumentPackItem.item, qItem).fetchJoin()
-                .orderBy(qDocumentPackItem.position.asc())
+        List<DocumentPackItem> priceOfferPackItems = query.selectFrom(QDocumentPackItem.documentPackItem)
+                .where(QDocumentPackItem.documentPackItem.pack.id.in(priceOffer.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
+                .leftJoin(QDocumentPackItem.documentPackItem.item, QItem.item).fetchJoin()
+                .orderBy(QDocumentPackItem.documentPackItem.position.asc())
                 .fetch();
 
         // price offer pack set items
@@ -122,4 +114,21 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .fetchCount();
     }
 
+    //todo tieto spolocne metody dat do abstrakntej triedy pre faktury a cenove ponuky
+    private List<PriceOffer> getPriceOfferPaginate(Pageable pageable, String rqlFilter, Long companyId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+        JPAQuery<PriceOffer> priceOfferJPAQuery = this.query.selectFrom(QPriceOffer.priceOffer)
+                .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
+                .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
+                .where(predicate)
+                .where(QPriceOffer.priceOffer.company.id.eq(companyId))
+                .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize());
+
+        if (!rqlFilter.contains("invoice.company.id")) { // todo make refakt
+            priceOfferJPAQuery.where(QPriceOffer.priceOffer.company.id.eq(companyId));
+        }
+
+        return priceOfferJPAQuery.fetch();
+    }
 }

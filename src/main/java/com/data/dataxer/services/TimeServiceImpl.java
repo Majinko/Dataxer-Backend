@@ -78,18 +78,13 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public List<Time> allForPeriod(LocalDate from, LocalDate to) {
-        return this.qTimeRepository.allForPeriod(from, to, SecurityUtils.id(), SecurityUtils.companyId());
+    public List<Time> allForPeriod(String rqlFilter) {
+        return this.qTimeRepository.allForPeriod(rqlFilter, SecurityUtils.id(), SecurityUtils.companyId());
     }
 
     @Override
     public List<Category> lastProjectCategories(Long projectId) {
-        List<Category> categories = new ArrayList<>();
-        List<Tuple> dataTuple = this.qTimeRepository.getProjectLastCategories(projectId, LIMIT, SecurityUtils.companyId());
-
-        dataTuple.forEach(tuple -> categories.add(tuple.get(QTime.time1.category)));
-
-        return categories;
+        return this.qTimeRepository.getProjectLastCategories(projectId, LIMIT, SecurityUtils.companyId(), SecurityUtils.uid());
     }
 
     @Override
@@ -105,6 +100,11 @@ public class TimeServiceImpl implements TimeService {
     @Override
     public List<Time> allByUser(String userUid) {
         return this.timeRepository.findAllByCompanyIdAndUserUid(SecurityUtils.companyId(), userUid);
+    }
+
+    @Override
+    public List<Time> allByProject(Long projectId, List<Long> companyIds) {
+        return this.qTimeRepository.getAllProjectTimesOrdered(projectId, SecurityUtils.companyIds(companyIds));
     }
 
     @Override
@@ -127,8 +127,13 @@ public class TimeServiceImpl implements TimeService {
     @Override
     public List<Project> getLastUserWorkingProjects(Long userId) {
         List<Project> projects = new ArrayList<>();
-        List<Tuple> dataTuple = this.qTimeRepository.getUserLastProjects(SecurityUtils.id(), LIMIT, SecurityUtils.companyId());
-        dataTuple.forEach(data -> projects.add(data.get(QTime.time1.project)));
+        List<Tuple> dataTuple = this.qTimeRepository.getUserLastProjects(SecurityUtils.id(), LIMIT, 0L, SecurityUtils.companyId());
+
+        dataTuple.forEach(data -> {
+            if (!projects.contains(data.get(QTime.time1.project))) {
+                projects.add(data.get(QTime.time1.project));
+            }
+        });
 
         return projects;
     }

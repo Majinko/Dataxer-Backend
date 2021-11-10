@@ -5,14 +5,13 @@ import com.data.dataxer.models.dto.CompanyDTO;
 import com.data.dataxer.services.CompanyService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/company")
-@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
+@PreAuthorize("hasPermission(null, 'Company', 'Company')")
 public class CompanyController {
     private final CompanyService companyService;
     private final CompanyMapper companyMapper;
@@ -22,7 +21,6 @@ public class CompanyController {
         this.companyMapper = companyMapper;
     }
 
-    @Transactional
     @GetMapping("/{id}")
     public ResponseEntity<CompanyDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(companyMapper.toCompanyWithBillingInfoDTO(this.companyService.findById(id)));
