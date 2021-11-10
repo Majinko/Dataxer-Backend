@@ -140,8 +140,7 @@ public class ProjectServiceImpl implements ProjectService {
                 : this.categoryRepository.findAllByParentIdAndCompanyId(categoryParentId, SecurityUtils.companyId());
     }
 
-    private void prepareProjectTimePriceOverviewDTO(Tuple userData, UserTimePriceOverviewDTO projectTimePriceOverviewDTO, BigDecimal projectTotalCost,
-                                                    Integer firstYear, Integer lastYear) {
+    private void prepareProjectTimePriceOverviewDTO(Tuple userData, UserTimePriceOverviewDTO projectTimePriceOverviewDTO, BigDecimal projectTotalCost, Integer firstYear, Integer lastYear) {
         BigDecimal costToHour = this.getUserCostToHour(firstYear, lastYear, userData.get(QTime.time1.user.uid), projectTotalCost);
 
         projectTimePriceOverviewDTO.setName(StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName)));

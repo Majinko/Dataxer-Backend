@@ -71,7 +71,8 @@ public class MailAccountsController {
 
     @PostMapping("/sendEmail")
     public void sendEmail(@RequestBody MailDataDTO mailDataDTO) {
-        this.mailAccountsService.sendEmail(mailDataDTO.getSubject(), mailDataDTO.getContent(), mailDataDTO.getEmails());
+        // todo 3 parameter bol mailDataDTO.getEmails()
+        this.mailAccountsService.sendEmail(mailDataDTO.getSubject(), mailDataDTO.getContent(), null);
     }
 
     @PostMapping("/sendSimpleEmail")

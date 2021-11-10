@@ -1,13 +1,13 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.MailAccounts;
+import com.data.dataxer.models.domain.MailTemplate;
 import com.data.dataxer.models.enums.MailAccountState;
 import com.data.dataxer.repositories.MailAccountsRepository;
 import com.data.dataxer.repositories.qrepositories.QMailAccountsRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.core.env.Environment;
-<<<<<<< HEAD
-=======
 import org.hazlewood.connor.bottema.emailaddress.EmailAddressCriteria;
 import org.hazlewood.connor.bottema.emailaddress.EmailAddressValidator;
 import org.simplejavamail.api.email.AttachmentResource;
@@ -16,7 +16,6 @@ import org.simplejavamail.api.email.Recipient;
 import org.simplejavamail.email.EmailBuilder;
 import org.simplejavamail.mailer.MailerBuilder;
 import org.springframework.core.io.Resource;
->>>>>>> fd607e9a34fe0b835983eb89f14a40abe0874fbf
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -35,34 +34,22 @@ import java.util.Properties;
 
 @Service
 public class MailAccountsServiceImpl implements MailAccountsService {
-
-    /*@Autowired
-    private Environment env;*/
-
     private final MailAccountsRepository mailAccountsRepository;
     private final QMailAccountsRepository qMailAccountsRepository;
     private final Environment environment;
     private final ContactService contactService;
     private final MailTemplatesService mailTemplatesService;
-    private final Environment environment;
     private final FileService fileService;
 
     public MailAccountsServiceImpl(MailAccountsRepository mailAccountsRepository, QMailAccountsRepository qMailAccountsRepository,
-<<<<<<< HEAD
-                                   ContactService contactService, MailTemplatesService mailTemplatesService, Environment environment) {
-=======
                                    ContactService contactService, MailTemplatesService mailTemplatesService,
                                    Environment environment, FileService fileService) {
->>>>>>> fd607e9a34fe0b835983eb89f14a40abe0874fbf
         this.mailAccountsRepository = mailAccountsRepository;
         this.qMailAccountsRepository = qMailAccountsRepository;
         this.contactService = contactService;
         this.mailTemplatesService = mailTemplatesService;
         this.environment = environment;
-<<<<<<< HEAD
-=======
         this.fileService = fileService;
->>>>>>> fd607e9a34fe0b835983eb89f14a40abe0874fbf
     }
 
     @Override
@@ -203,6 +190,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
         List<Recipient> recipients = new ArrayList<>();
 
         List<Contact> participants = this.contactService.getContactByIds(recipientIds);
+
         participants.forEach(participant-> {
             if (EmailAddressValidator.isValid(participant.getEmail(), EmailAddressCriteria.RFC_COMPLIANT)) {
                 Recipient recipient = new Recipient(participant.getName(), participant.getEmail(), Message.RecipientType.TO);

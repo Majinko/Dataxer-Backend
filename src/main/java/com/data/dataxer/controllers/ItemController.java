@@ -48,9 +48,7 @@ public class ItemController {
     }
 
     @PostMapping("/store")
-    public void store(
-            @RequestBody UploadContextDTO<ItemDTO> uploadContext
-    ) {
+    public void store(@RequestBody UploadContextDTO<ItemDTO> uploadContext) {
         ItemDTO item = itemMapper.itemToItemDto(this.itemService.store(itemMapper.toItem(uploadContext.getObject()), itemPriceMapper.toItemPrice(uploadContext.getObject().getItemPrice())));
 
         if (uploadContext.getObject().getPreview() != null) {
@@ -63,7 +61,7 @@ public class ItemController {
         ItemDTO item = itemMapper.itemToItemDto(this.itemService.update(itemMapper.toItem(itemDTO), itemPriceMapper.toItemPrice(itemDTO.getItemPrice())));
 
         if (itemDTO.getPreview() != null) {
-            this.storageService.destroy(item.getId(), "item"); // destroy old item if exist new
+            this.storageService.destroy(item.getId(), "item"); // destroy old item image if exist new
             this.storageService.store(storageMapper.storageFileDTOtoStorage(itemDTO.getPreview()), item.getId(), "item");
         }
     }
