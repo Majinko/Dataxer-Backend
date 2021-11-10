@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QItemRepository {
-
     Item getById(long id,  Long companyId);
 
     Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String q, Long companyId);

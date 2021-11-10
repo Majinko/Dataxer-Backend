@@ -27,10 +27,11 @@ public class ItemDTO {
     String series;
     String color;
     String material;
+    String previewUrl;
 
     ContactDTO supplier;
     ItemPriceDTO itemPrice;
-    StorageFileDTO preview;
 
+    private List<StorageFileDTO> files = new ArrayList<>();
     private List<CategoryDTO> categories = new ArrayList<>();
 }

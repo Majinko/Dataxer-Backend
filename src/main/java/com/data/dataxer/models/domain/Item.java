@@ -40,11 +40,11 @@ public class Item extends BaseEntity {
             foreignKey = @javax.persistence.ForeignKey(name = "none")
     )
     @OneToMany(fetch = FetchType.LAZY)
-    @Where(clause="file_able_type='item'")
-    private List<Storage> storage = new ArrayList<>();
+    @Where(clause = "file_able_type='item'")
+    private List<Storage> files = new ArrayList<>();
 
+    String previewUrl;
     String title;
-
     String type;
 
     @Column(columnDefinition = "text")

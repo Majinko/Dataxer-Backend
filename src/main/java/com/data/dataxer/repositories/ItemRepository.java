@@ -16,6 +16,6 @@ public interface ItemRepository extends CrudRepository<Item, Long> {
     @Query("SELECT DISTINCT i, s FROM Item i LEFT JOIN  Storage s ON s.fileAbleId = i.id WHERE i.company.id IN ?1")
     List<Item> findAllByCompanyIdIn(List<Long> companyIds);
 
-    @Query("select DISTINCT i from Item i left join fetch i.storage where i.company.id in ?1")
+    @Query("select DISTINCT i from Item i left join fetch i.files where i.company.id in ?1")
     List<Item> findAllItemWithStorage(Pageable pageable, List<Long> companyIds);
 }

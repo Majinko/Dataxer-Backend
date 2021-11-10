@@ -45,11 +45,18 @@ public class QItemRepositoryImpl implements QItemRepository {
                 .fetchOne();
 
         if (item != null) {
+            item.setFiles(
+                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, companyId)
+                                    .leftJoin(QItem.item.files, QStorage.storage).fetchJoin()
+                                    .fetchOne())
+                            .getFiles()
+            );
+
             item.setCategories(
                     Objects.requireNonNull(
-                            this.constructGetAllByIdAndCompanyId(id, companyId)
-                                    .leftJoin(QItem.item.categories, QCategory.category).fetchJoin()
-                                    .fetchOne())
+                                    this.constructGetAllByIdAndCompanyId(id, companyId)
+                                            .leftJoin(QItem.item.categories, QCategory.category).fetchJoin()
+                                            .fetchOne())
                             .getCategories()
             );
         }
@@ -99,7 +106,7 @@ public class QItemRepositoryImpl implements QItemRepository {
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Item> itemList = this.query.selectFrom(qItem)
-                .leftJoin(QItem.item.itemPrices).fetchJoin()
+                .join(QItem.item.itemPrices).fetchJoin()
                 .where(predicate)
                 .where(qItem.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))

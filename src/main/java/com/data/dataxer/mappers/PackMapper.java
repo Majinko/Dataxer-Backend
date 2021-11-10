@@ -36,6 +36,7 @@ public interface PackMapper {
     )
     @Mapping(target = "item.categories", ignore = true)
     @Mapping(target = "item.supplier", ignore = true)
+    @Mapping(target = "item.files", ignore = true)
     PackItemDTO packItemToPackItemDTO(PackItem packItem);
 
     @IterableMapping(qualifiedByName = "packToPackDTOSimple")

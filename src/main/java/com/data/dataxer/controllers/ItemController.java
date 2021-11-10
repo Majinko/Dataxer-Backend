@@ -51,18 +51,21 @@ public class ItemController {
     public void store(@RequestBody UploadContextDTO<ItemDTO> uploadContext) {
         ItemDTO item = itemMapper.itemToItemDto(this.itemService.store(itemMapper.toItem(uploadContext.getObject()), itemPriceMapper.toItemPrice(uploadContext.getObject().getItemPrice())));
 
-        if (uploadContext.getObject().getPreview() != null) {
-            this.storageService.store(storageMapper.storageFileDTOtoStorage(uploadContext.getObject().getPreview()), item.getId(), "item");
+        if (!uploadContext.getFiles().isEmpty()) {
+            uploadContext.getFiles().forEach(file -> {
+                this.storageService.store(storageMapper.storageFileDTOtoStorage(file), item.getId(), "item");
+            });
         }
     }
 
     @PostMapping("/update")
-    public void update(@RequestBody ItemDTO itemDTO) {
-        ItemDTO item = itemMapper.itemToItemDto(this.itemService.update(itemMapper.toItem(itemDTO), itemPriceMapper.toItemPrice(itemDTO.getItemPrice())));
+    public void update(@RequestBody UploadContextDTO<ItemDTO> uploadContext) {
+        ItemDTO item = itemMapper.itemToItemDto(this.itemService.update(itemMapper.toItem(uploadContext.getObject()), itemPriceMapper.toItemPrice(uploadContext.getObject().getItemPrice())));
 
-        if (itemDTO.getPreview() != null) {
-            this.storageService.destroy(item.getId(), "item"); // destroy old item image if exist new
-            this.storageService.store(storageMapper.storageFileDTOtoStorage(itemDTO.getPreview()), item.getId(), "item");
+        if (!uploadContext.getFiles().isEmpty()) {
+            uploadContext.getFiles().forEach(file -> {
+                this.storageService.store(storageMapper.storageFileDTOtoStorage(file), item.getId(), "item");
+            });
         }
     }
 

@@ -30,6 +30,7 @@ public interface ItemMapper {
     @Mapping(target = "itemPrice", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "supplier", ignore = true)
+    @Mapping(target = "files", ignore = true)
     ItemDTO itemToItemDtoSimple(Item item);
 
 
