@@ -15,6 +15,8 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     Optional<Category> findByIdAndCompanyId(Long id, Long companyId);
 
+    Optional<Category> findByIdAndCompanyIdIn(Long id, List<Long> companies);
+
     List<Category> findAllByCompanyIdInOrderByPositionAsc(List<Long> companyIds);
 
     List<Category> findAllByIdInAndCompanyId(List<Long> ids, Long companyId);

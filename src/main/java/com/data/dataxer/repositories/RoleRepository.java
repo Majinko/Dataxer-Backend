@@ -9,8 +9,8 @@ import java.util.Optional;
 import java.util.Set;
 
 public interface RoleRepository extends CrudRepository<Role, Long> {
-    @Query("SELECT DISTINCT r from  Role r join fetch r.privileges where r.company.id = ?1 ")
-    List<Role> findAllByCompanyId(Long companyId);
+    @Query("SELECT DISTINCT r from  Role r join fetch r.privileges where r.company.id in ?1 ")
+    List<Role> findAllByCompanyIdIn(List<Long> companyIds);
 
     @Query("SELECT r from  Role r join fetch r.privileges where r.company.id = ?1")
     Set<Role> findAllByCompanyIdSet(Long companyId);

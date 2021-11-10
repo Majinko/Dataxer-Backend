@@ -27,14 +27,19 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.all()));
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<CategoryDTO> finById(@PathVariable Long id) {
+        return ResponseEntity.ok(this.categoryMapper.toCategoryDTO(this.categoryService.findById(id)));
+    }
+
     @GetMapping("/allByType/{type}")
     public ResponseEntity<List<CategoryDTO>> allByType(@PathVariable String type) {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.allByType(type)));
     }
 
-    @PostMapping("/store")
+    @PostMapping("/storeOrUpdate")
     public ResponseEntity<CategoryDTO> store(@RequestBody CategoryDTO categoryDTO) {
-        return ResponseEntity.ok(categoryMapper.toCategoryDTO(this.categoryService.store(categoryMapper.categoryDTOtoCategory(categoryDTO))));
+        return ResponseEntity.ok(categoryMapper.toCategoryDTO(this.categoryService.storeOrUpdate(categoryMapper.categoryDTOtoCategory(categoryDTO))));
     }
 
     @PostMapping("/updateTree")

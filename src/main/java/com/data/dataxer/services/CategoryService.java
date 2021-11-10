@@ -7,11 +7,13 @@ import java.util.List;
 public interface CategoryService {
     List<Category> all();
 
-    Category store(Category category);
+    Category storeOrUpdate(Category category);
 
     void updateTree(List<Category> categories);
 
     void delete(Long id);
 
     List<Category> allByType(String type);
+
+    Category findById(Long id);
 }
