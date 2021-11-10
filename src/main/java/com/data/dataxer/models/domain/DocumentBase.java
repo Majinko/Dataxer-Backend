@@ -23,7 +23,7 @@ import java.util.Map;
 @DiscriminatorValue("DOCUMENT")
 @Table(name = "DOCUMENT_BASE")
 @Where(clause = "deleted_at is null")
-public class DocumentBase extends BaseEntity {
+public abstract class DocumentBase extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     protected Long id;
@@ -69,6 +69,10 @@ public class DocumentBase extends BaseEntity {
     protected LocalDate dueDate;
 
     protected LocalDateTime deletedAt;
+
+    public abstract BigDecimal countDiscountTotalPrice();
+
+    public abstract BigDecimal countTaxPrice(BigDecimal price, Integer tax);
 }
 
 

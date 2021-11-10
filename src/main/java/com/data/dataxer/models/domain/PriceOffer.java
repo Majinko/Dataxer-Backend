@@ -6,6 +6,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Setter
@@ -15,4 +16,13 @@ import javax.persistence.*;
 @SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
 public class PriceOffer extends DocumentBase {
 
+    @Override
+    public BigDecimal countDiscountTotalPrice() {
+        return BigDecimal.ZERO;
+    }
+
+    @Override
+    public BigDecimal countTaxPrice(BigDecimal price, Integer tax) {
+        return BigDecimal.ZERO;
+    }
 }

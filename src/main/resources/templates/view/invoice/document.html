@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8"/>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <title th:text="${invoice.title}"></title>
+    <title th:text="${document.title}"></title>
     <link rel="stylesheet" type="text/css" href="css/style.css"/>
 </head>
 
@@ -29,32 +29,33 @@
 
         </div>
         <div class="col-md-5 float-right">
-            <h1 style="margin-bottom: 0;"><span class="h1" th:text="'Faktúra ' + ${invoice.getNumber()}"></span></h1>
+            <h1 style="margin-bottom: 0;"><span class="h1" th:text="${type == 'I'} ? 'Faktúra ' + ${document.getNumber()} : 'Cenová ponuka ' + ${document.getNumber()}"></span></h1>
 
-            <div class="fields-box-text fields-box-only-text" th:with="contact=${invoice.getContact()}">
+            <div class="fields-box-text fields-box-only-text" th:with="contact=${document.getContact()}">
                 <p>
-                    <span th:text="${invoice.getCreatedDate() != null } ? 'Dátum vystavenia: ' + ${#temporals.format(invoice.createdDate, 'dd.MM.yyyy')} : 'Dátum vystavenia: '"></span>
+                    <span th:text="${document.getCreatedDate() != null } ? 'Dátum vystavenia: ' + ${#temporals.format(document.createdDate, 'dd.MM.yyyy')} : 'Dátum vystavenia: '"></span>
                     <br></br>
-                    <span th:text="${invoice.getDeliveredDate() != null} ? 'Dátum dodania: ' + ${#temporals.format(invoice.getDeliveredDate(), 'dd.MM.yyyy')} : 'Dátum dodania: '"></span>
+                    <span th:if="${type == 'I'}" th:text="${document.getDeliveredDate() != null} ? 'Dátum dodania: ' + ${#temporals.format(document.getDeliveredDate(), 'dd.MM.yyyy')} : 'Dátum dodania: '"></span>
+                    <span th:if="${type == 'P'}" th:text="${document.getDueDate() != null} ? 'Platné do: ' + ${#temporals.format(document.getDueDate(), 'dd.MM.yyyy')} : 'Platné do: '"></span>
                     <br></br>
                 </p>
 
                 <p style="font-weight: bold; margin-top: 20px;" th:text="'Odberateľ:'"></p>
                 <p>
-                    <span th:text="${ contact != null } ? ${invoice.contact.getName()} : ''"></span><br></br>
-                    <span th:text="${ contact != null } ? ${invoice.contact.getStreet()} : ''"></span><br></br>
-                    <span th:text="${ contact != null } ? ${invoice.contact.getPostalCode()} + ' ' + ${invoice.contact.getCity()} : ''"></span><br></br>
-                    <span th:text="${ contact != null } ? ${invoice.contact.getCountry()} : ''"></span><br></br>
-                    <span th:text="${ contact != null } ? (${invoice.contact.getCin()} ? 'IČO: ' + ${invoice.contact.getCin()} : '') : ''"></span><br></br>
-                    <span th:text="${ contact != null } ? (${invoice.contact.getTin()} ? 'DIČ: ' + ${invoice.contact.getTin()} : '') : ''"></span><br></br>
-                    <span th:text="${ contact != null } ? (${invoice.contact.getVatin()} ? 'IČ DPH: ' + ${invoice.contact.getVatin()} : '') : ''"></span><br></br>
+                    <span th:text="${ contact != null } ? ${document.contact.getName()} : ''"></span><br></br>
+                    <span th:text="${ contact != null } ? ${document.contact.getStreet()} : ''"></span><br></br>
+                    <span th:text="${ contact != null } ? ${document.contact.getPostalCode()} + ' ' + ${document.contact.getCity()} : ''"></span><br></br>
+                    <span th:text="${ contact != null } ? ${document.contact.getCountry()} : ''"></span><br></br>
+                    <span th:text="${ contact != null } ? (${document.contact.getCin()} ? 'IČO: ' + ${document.contact.getCin()} : '') : ''"></span><br></br>
+                    <span th:text="${ contact != null } ? (${document.contact.getTin()} ? 'DIČ: ' + ${document.contact.getTin()} : '') : ''"></span><br></br>
+                    <span th:text="${ contact != null } ? (${document.contact.getVatin()} ? 'IČ DPH: ' + ${document.contact.getVatin()} : '') : ''"></span><br></br>
                 </p>
             </div>
         </div>
         <div class="clear"></div>
     </header>
 
-    <h2 style="font-size: 15px; font-weight: bold; display: block; margin-top: 22px" th:text="${invoice.getTitle() ?: ''}"></h2>
+    <h2 style="font-size: 15px; font-weight: bold; display: block; margin-top: 22px" th:text="${document.getTitle() ?: ''}"></h2>
 
     <div style="margin-top: 10px" class="table-scroll">
         <table cellspacing="0" class="table-data table-invoice-items table-invoice-summary">
@@ -69,7 +70,7 @@
                     <th class="nowrap text-right" th:text="'Celkom s DPH'"></th>
                 </tr>
             </thead>
-            <th:block th:each="pack: ${invoice.getPacks()}">
+            <th:block th:each="pack: ${document.getPacks()}">
                 <tbody>
                     <tr class="bold set">
                         <td class="text-left white-space-normal" th:text="${pack.getTitle()}"></td>
@@ -108,27 +109,27 @@
     <div class="footer-wrap" style="padding-top: 13px;">
         <div class="row">
             <div class="col-md-6">
-                <p style="padding-top: 0; margin-top: 0; font-size: 8px;" th:text="${invoice.getHeaderComment()} ?: ''"></p>
+                <p style="padding-top: 0; margin-top: 0; font-size: 8px;" th:text="${headerComment} ?: ''"></p>
             </div>
             <div class="col-md-12" style="width: 100%" th:with="taxesAndValues=${taxes}">
                 <table class="table-invoice-items table-invoice-summary" style="margin-top: -3px;">
                     <tfoot class="text-right">
-                    <tr th:if="${invoice.getDiscount() > 0}" >
+                    <tr th:if="${document.getDiscount() > 0}" >
                         <td colspan="5" class="text-right" th:text="'Suma pred zľavou: '"></td>
                         <td class="text-right thin">
-                            <span class="open-sans" th:text="${#numbers.formatDecimal(invoice.getPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            <span class="open-sans" th:text="${#numbers.formatDecimal(document.getPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
                     </tr>
-                    <tr th:if="${invoice.getDiscount() > 0}" >
-                        <td colspan="5" class="text-right" th:text="'Zľava ' + ${invoice.getDiscount()} + '%'"></td>
+                    <tr th:if="${document.getDiscount() > 0}" >
+                        <td colspan="5" class="text-right" th:text="'Zľava ' + ${document.getDiscount()} + '%'"></td>
                         <td class="text-right thin">
-                            <span class="open-sans" th:text="${#numbers.formatDecimal(invoice.countDiscountTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            <span class="open-sans" th:text="${#numbers.formatDecimal(document.countDiscountTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
                     </tr>
                     <tr>
-                        <td colspan="5" class="text-right" th:text="'Celkom bez DPH: '"></td>
+                        <td colspan="5" class="text-right" th:if="${type == 'P'}" th:text="'Celkom bez DPH: '"></td>
                         <td class="text-right thin">
-                            <span class="open-sans" th:text="${#numbers.formatDecimal(invoice.getPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            <span class="open-sans" th:if="${type == 'P'}" th:text="${#numbers.formatDecimal(document.getPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
                     </tr>
 
@@ -144,7 +145,7 @@
                             <td colspan="5" class="text-right" th:text="'DPH ' + ${key} + ' %'"></td>
 
                             <td class="text-right thin">
-                                <span class="open-sans" th:text="${#numbers.formatDecimal(invoice.countTaxPrice(taxesAndValues.get(key), key), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(document.countTaxPrice(taxesAndValues.get(key), key), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                             </td>
                         </tr>
                     </th:block>
@@ -153,7 +154,7 @@
                         <td colspan="5" class="text-right" style="font-weight: bold; font-size: 16px; line-height: 1.21em"
                             th:text="'Celkom s DPH: '"></td>
                         <td class="text-right thin" style="line-height: 1.21em">
-                            <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:text="${#numbers.formatDecimal(invoice.getTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
                     </tr>
                     </tfoot>
@@ -165,7 +166,7 @@
             <p style="font-weight: bold;" th:text="'Informácie k úhrade:'"></p>
         </div>
 
-        <div class="four_box_wrapper invoice-summary" th:style="'background: url(' + @{images/table.jpg} + ') no-repeat; height: 60px; padding: 10px 15px 15px 15px; margin-top: 10px; display: block; vertical-align: middle;'">
+        <div class="four_box_wrapper invoice-summary" th:if="${type == 'I'}" th:style="'background: url(' + @{images/table.jpg} + ') no-repeat; height: 60px; padding: 10px 15px 15px 15px; margin-top: 10px; display: block; vertical-align: middle;'">
             <div class="text_box box1">
                 <p style="margin-top: 7px">
                     <span style="display:inline-block; font-size: 9px; white-space: nowrap" th:text="'IBAN: '"></span>
@@ -178,7 +179,7 @@
                 <p style="width: 102px; margin-left: 65px; margin-top: 7px">
                     <span style="font-size: 8px;" th:text="'Variabilný symbol:'"></span>
                     <br></br>
-                    <span style="font-size: 10px; font-weight: bold; white-space: nowrap"  th:text="${invoice.getVariableSymbol()}"></span>
+                    <span style="font-size: 10px; font-weight: bold; white-space: nowrap" th:text="${variableSymbol}"></span>
                 </p>
             </div>
 
@@ -186,7 +187,7 @@
                 <p style="width: 102px; margin-left: 75px; margin-top: 7px" >
                     <span style="font-size: 8px" th:text="'Dátum splatnosti:'"></span>
                     <br></br>
-                    <span style="font-size: 10px; font-weight: bold;" th:text="${#temporals.format(invoice.getDueDate(), 'dd.MM.yyyy')}"></span>
+                    <span style="font-size: 10px; font-weight: bold;" th:text="${#temporals.format(document.getDueDate(), 'dd.MM.yyyy')}"></span>
                 </p>
             </div>
 
@@ -194,19 +195,19 @@
                 <p style="width: 102px; margin-left: 80px; margin-top: 7px;">
                     <span style="font-size: 8px" th:text="'Suma na úhradu:'"></span>
                     <br></br>
-                    <span style="font-weight: bold; font-size: 10px;" th:text="${invoice.getTotalPrice() != null and invoice.getTotalPrice() &gt; 0} ? ${#numbers.formatDecimal(invoice.getTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : '0,00 &euro;'"></span>
+                    <span style="font-weight: bold; font-size: 10px;" th:text="${document.getTotalPrice() != null and document.getTotalPrice() &gt; 0} ? ${#numbers.formatDecimal(document.getTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : '0,00 &euro;'"></span>
                 </p>
             </div>
         </div>
 
         <p>
-            <span style="font-weight: bold;" th:text="${invoice.paymentMethod != null } ? 'Spôsob platby: ' + ${invoice.paymentMethod.getName()} : 'Spôsob platby: '"></span>
+            <span style="font-weight: bold;" th:if="${type == 'I'}" th:text="${paymentMethod != null } ? 'Spôsob platby: ' + ${paymentMethod.getName()} : 'Spôsob platby: '"></span>
         </p>
 
-        <div th:if="${invoice.getNote() != null || invoice.getNote() != ''}">
+        <div th:if="${document.getNote() != null || document.getNote() != ''}">
             <p style="font-weight: bold" th:text="'Poznámka:'"></p>
             <br></br>
-            <p style="text-align: justify; margin-top: -20px" class="small-font" th:text="${invoice.getNote()}"></p>
+            <p style="text-align: justify; margin-top: -20px" class="small-font" th:text="${document.getNote()}"></p>
         </div>
 
         <div class="row" style="margin-top: 50px;">

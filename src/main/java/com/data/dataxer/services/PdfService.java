@@ -1,6 +1,9 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.DocumentBase;
 import com.data.dataxer.models.domain.Invoice;
+import com.data.dataxer.models.domain.PriceOffer;
+import com.data.dataxer.models.enums.DocumentType;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
@@ -29,15 +32,22 @@ public class PdfService {
         this.templateEngine.addDialect(new Java8TimeDialect());
     }
 
-    public File generatePdf(Invoice invoice) throws IOException, DocumentException {
-        Context context = getContext(invoice);
+    public File generatePdf(DocumentBase document) throws IOException, DocumentException {
+        Context context;
+        if (document instanceof Invoice) {
+            context = getInvoiceContext((Invoice) document);
+        } else if (document instanceof PriceOffer) {
+            context = getPriceOfferContext((PriceOffer) document);
+        } else {
+            throw new RuntimeException("Wrong document type");
+        }
         String html = loadAndFillTemplate(context);
 
-        return renderPdf(html, invoice);
+        return renderPdf(html, document);
     }
 
-    private File renderPdf(String html, Invoice invoice) throws IOException, DocumentException {
-        File file = File.createTempFile(invoice.getTitle(), ".pdf");
+    private File renderPdf(String html, DocumentBase document) throws IOException, DocumentException {
+        File file = File.createTempFile(document.getTitle(), ".pdf");
         OutputStream outputStream = new FileOutputStream(file);
         ITextRenderer renderer = new ITextRenderer(20f * 4f / 3f, 20);
 
@@ -53,13 +63,34 @@ public class PdfService {
         return file;
     }
 
-    private Context getContext(Invoice invoice) {
+    private Context getInvoiceContext(Invoice invoice) {
+        Context context = getBasicContext(invoice);
+
+        context.setVariable("headerComment", invoice.getHeaderComment());
+        context.setVariable("paymentMethod", invoice.getPaymentMethod());
+        context.setVariable("variableSymbol", invoice.getVariableSymbol());
+        context.setVariable("type", "I");
+        context.setVariable("document", invoice);
+
+        return context;
+    }
+
+    private Context getPriceOfferContext(PriceOffer priceOffer) {
+        Context context = getBasicContext(priceOffer);
+
+        context.setVariable("headerComment", "");
+        context.setVariable("type", "P");
+        context.setVariable("document", priceOffer);
+
+        return context;
+    }
+
+    private Context getBasicContext(DocumentBase document) {
         Context context = new Context();
 
-        context.setVariable("firm", invoice.getDocumentData().get("firm"));
-        context.setVariable("bankAccount", invoice.getDocumentData().get("bankAccount"));
-        context.setVariable("taxes", invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(invoice.getPacks())));
-        context.setVariable("invoice", invoice);
+        context.setVariable("firm", document.getDocumentData().get("firm"));
+        context.setVariable("bankAccount", document.getDocumentData().get("bankAccount"));
+        context.setVariable("taxes", invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks())));
         context.setVariable("createdName", "Janko Hrasko");
         context.setVariable("createdPhone", "0905123456");
         context.setVariable("createdWeb", "www.example.com");
@@ -69,6 +100,6 @@ public class PdfService {
     }
 
     private String loadAndFillTemplate(Context context) {
-        return templateEngine.process("view/invoice/invoice_template", context);
+        return templateEngine.process("view/invoice/document", context);
     }
 }
