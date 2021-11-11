@@ -3,7 +3,6 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.DocumentBase;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.domain.PriceOffer;
-import com.data.dataxer.models.enums.DocumentType;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
@@ -24,28 +23,35 @@ public class PdfService {
 
     private final SpringTemplateEngine templateEngine;
     private final InvoiceService invoiceService;
+    private final PriceOfferService priceOfferService;
 
-    public PdfService(SpringTemplateEngine templateEngine, InvoiceService invoiceService) {
+    public PdfService(SpringTemplateEngine templateEngine, InvoiceService invoiceService,
+                      PriceOfferService priceOfferService) {
         this.templateEngine = templateEngine;
         this.invoiceService = invoiceService;
+        this.priceOfferService = priceOfferService;
 
         this.templateEngine.addDialect(new Java8TimeDialect());
     }
 
-    public File generatePdf(DocumentBase document) throws IOException, DocumentException {
+    public File generatePdf(Long id) throws IOException, DocumentException {
+        String html;
         Context context;
 
-        if (document instanceof Invoice) {
-            context = getInvoiceContext((Invoice) document);
-        } else if (document instanceof PriceOffer) {
-            context = getPriceOfferContext((PriceOffer) document);
-        } else {
-            throw new RuntimeException("Wrong document type");
+        try {
+            System.out.println("Loading invoice");
+            Invoice  invoice = this.invoiceService.getById(id);
+            context = getInvoiceContext(invoice);
+            html = loadAndFillTemplate(context);
+            System.out.println("Finishing");
+            return renderPdf(html, invoice);
+        } catch (RuntimeException ex) {
+            System.out.println("Loading priceoffer");
+            PriceOffer priceOffer = this.priceOfferService.getById(id);
+            context = getPriceOfferContext(priceOffer);
+            html = loadAndFillTemplate(context);
+            return renderPdf(html, priceOffer);
         }
-
-        String html = loadAndFillTemplate(context);
-
-        return renderPdf(html, document);
     }
 
     private File renderPdf(String html, DocumentBase document) throws IOException, DocumentException {
@@ -71,6 +77,7 @@ public class PdfService {
         context.setVariable("headerComment", invoice.getHeaderComment());
         context.setVariable("paymentMethod", invoice.getPaymentMethod());
         context.setVariable("variableSymbol", invoice.getVariableSymbol());
+        context.setVariable("subject", invoice.getSubject());
         context.setVariable("type", "I");
         context.setVariable("document", invoice);
 
@@ -93,6 +100,7 @@ public class PdfService {
         context.setVariable("firm", document.getDocumentData().get("firm"));
         context.setVariable("bankAccount", document.getDocumentData().get("bankAccount"));
         context.setVariable("taxes", invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks())));
+        context.setVariable("subject", "");
         context.setVariable("createdName", "Janko Hrasko");
         context.setVariable("createdPhone", "0905123456");
         context.setVariable("createdWeb", "www.example.com");

@@ -4,7 +4,6 @@ import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.enums.CategoryType;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
-import jdk.swing.interop.LightweightContentWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

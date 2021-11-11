@@ -42,20 +42,20 @@
 
                 <p style="font-weight: bold; margin-top: 20px;" th:text="'Odberateľ:'"></p>
                 <p>
-                    <span th:text="${contact != null } ? ${invoice.contact.getName()} : ''"></span><br></br>
-                    <span th:text="${contact != null } ? ${invoice.contact.getStreet()} : ''"></span><br></br>
-                    <span th:text="${contact != null } ? ${invoice.contact.getPostalCode()} + ' ' + ${invoice.contact.getCity()} : ''"></span><br></br>
-                    <span th:text="${contact != null } ? ${invoice.contact.getCountry()} : ''"></span><br></br>
-                    <span th:text="${contact != null } ? (${invoice.contact.getCin()} ? 'IČO: ' + ${invoice.contact.getCin()} : '') : ''"></span><br></br>
-                    <span th:text="${contact != null } ? (${invoice.contact.getTin()} ? 'DIČ: ' + ${invoice.contact.getTin()} : '') : ''"></span><br></br>
-                    <span th:text="${contact != null } ? (${invoice.contact.getVatin()} ? 'IČ DPH: ' + ${invoice.contact.getVatin()} : '') : ''"></span><br></br>
+                    <span th:text="${contact != null } ? ${document.contact.getName()} : ''"></span><br></br>
+                    <span th:text="${contact != null } ? ${document.contact.getStreet()} : ''"></span><br></br>
+                    <span th:text="${contact != null } ? ${document.contact.getPostalCode()} + ' ' + ${document.contact.getCity()} : ''"></span><br></br>
+                    <span th:text="${contact != null } ? ${document.contact.getCountry()} : ''"></span><br></br>
+                    <span th:text="${contact != null } ? (${document.contact.getCin()} ? 'IČO: ' + ${document.contact.getCin()} : '') : ''"></span><br></br>
+                    <span th:text="${contact != null } ? (${document.contact.getTin()} ? 'DIČ: ' + ${document.contact.getTin()} : '') : ''"></span><br></br>
+                    <span th:text="${contact != null } ? (${document.contact.getVatin()} ? 'IČ DPH: ' + ${document.contact.getVatin()} : '') : ''"></span><br></br>
                 </p>
             </div>
         </div>
         <div class="clear"></div>
     </header>
 
-    <h2 style="font-size: 15px; font-weight: bold; display: block; margin-top: 22px" th:text="${invoice.getSubject() != '' ? invoice.getSubject() : (invoice.getTitle() != '' ? invoice.getTitle() : '')}"></h2>
+    <h2 style="font-size: 15px; font-weight: bold; display: block; margin-top: 22px" th:text="${subject != '' ? subject : (document.getTitle() != '' ? document.getTitle() : '')}"></h2>
 
     <div style="margin-top: 10px" class="table-scroll">
         <table cellspacing="0" class="table-data table-invoice-items table-invoice-summary">
@@ -150,21 +150,21 @@
                         </tr>
                     </th:block>
 
-                    <tr th:if="${!invoice.getDocumentType().getName().equals('tax_document')}">
+                    <tr th:if="${!document.getDocumentType().getName().equals('tax_document')}">
                         <td colspan="5" class="text-right" style="font-weight: bold; font-size: 16px; line-height: 1.21em" th:text="'Celkom s DPH: '"></td>
                         <td class="text-right thin" style="line-height: 1.21em">
                             <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
                     </tr>
 
-                    <tr th:if="${invoice.getDocumentType().getName().equals('tax_document')}">
+                    <tr th:if="${document.getDocumentType().getName().equals('tax_document')}">
                         <td colspan="5" class="text-right" th:text="'Celkom s DPH: '"></td>
                         <td class="text-right thin">
-                            <span class="open-sans" th:text="${#numbers.formatDecimal(invoice.getTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            <span class="open-sans" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
                     </tr>
 
-                    <tr th:if="${invoice.getDocumentType().getName().equals('tax_document')}">
+                    <tr th:if="${document.getDocumentType().getName().equals('tax_document')}">
                         <td colspan="5" class="text-right" style="font-weight: bold; font-size: 16px; line-height: 1.21em" th:text="'Suma na úhradu: '"></td>
                         <td class="text-right thin" style="line-height: 1.21em">
                             <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:text="'0,00 &euro;'"></span>
@@ -208,13 +208,13 @@
                 <p style="width: 102px; margin-left: 80px; margin-top: 7px;">
                     <span style="font-size: 8px" th:text="'Suma na úhradu:'"></span>
                     <br></br>
-                    <span style="font-weight: bold; font-size: 10px;" th:text="${invoice.getTotalPrice() != null and !invoice.getDocumentType().getName().equals('tax_document') and invoice.getTotalPrice() &gt; 0} ? ${#numbers.formatDecimal(invoice.getTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : '0,00 &euro;'"></span>
+                    <span style="font-weight: bold; font-size: 10px;" th:text="${document.getTotalPrice() != null and !document.getDocumentType().getName().equals('tax_document') and document.getTotalPrice() &gt; 0} ? ${#numbers.formatDecimal(document.getTotalPrice(), 0, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : '0,00 &euro;'"></span>
                 </p>
             </div>
         </div>
 
-        <p th:if="${invoice.paymentMethod != null }">
-            <div th:switch="${invoice.paymentMethod.getName()}">
+        <p th:if="${paymentMethod != null }">
+            <div th:switch="${paymentMethod.getName()}">
                 <span th:case="'bank_payment'" style="font-weight: bold;" th:text="'Spôsob platby: '"></span><span th:text="'Bankový prevod'"></span>
             </div>
         </p>
