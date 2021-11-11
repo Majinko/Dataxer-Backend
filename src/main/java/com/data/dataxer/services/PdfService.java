@@ -34,6 +34,7 @@ public class PdfService {
 
     public File generatePdf(DocumentBase document) throws IOException, DocumentException {
         Context context;
+
         if (document instanceof Invoice) {
             context = getInvoiceContext((Invoice) document);
         } else if (document instanceof PriceOffer) {
@@ -41,6 +42,7 @@ public class PdfService {
         } else {
             throw new RuntimeException("Wrong document type");
         }
+
         String html = loadAndFillTemplate(context);
 
         return renderPdf(html, document);

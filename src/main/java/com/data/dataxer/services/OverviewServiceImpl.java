@@ -159,6 +159,7 @@ public class OverviewServiceImpl implements OverviewService {
     public String executeUsersYearsHours(String params, Company company) {
         LocalDate processFromDate = null;
         LocalDate processToDate;
+
         if (params != null) {
             processFromDate = LocalDate.parse(params).plusDays(1);
             processToDate = LocalDate.parse(params).plusDays(1);

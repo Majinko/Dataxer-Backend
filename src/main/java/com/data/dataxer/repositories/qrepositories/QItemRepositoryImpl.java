@@ -88,8 +88,6 @@ public class QItemRepositoryImpl implements QItemRepository {
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
 
-        QItem qItem = QItem.item;
-
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("item.id", QItem.item.id)
                 .put("item.title", QItem.item.title)
@@ -104,10 +102,10 @@ public class QItemRepositoryImpl implements QItemRepository {
         }
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Item> itemList = this.query.selectFrom(qItem)
-                .join(QItem.item.itemPrices).fetchJoin()
+        List<Item> itemList = this.query.selectFrom(QItem.item)
+                .leftJoin(QItem.item.itemPrices).fetchJoin()
                 .where(predicate)
-                .where(qItem.company.id.eq(companyId))
+                .where(QItem.item.company.id.eq(companyId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

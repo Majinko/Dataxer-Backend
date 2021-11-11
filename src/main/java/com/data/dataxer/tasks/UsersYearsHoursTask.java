@@ -11,7 +11,6 @@ import java.util.List;
 
 @Component
 public class UsersYearsHoursTask {
-
     private final OverviewService overviewService;
     private final BackGroundTaskRepository backGroundTaskRepository;
 
@@ -23,6 +22,7 @@ public class UsersYearsHoursTask {
     @Scheduled(cron = "0 0 0 * * *")
     void execute() {
         List<BackGroundTask> tasks = this.backGroundTaskRepository.findBackGroundTaskByNameAndCompanyId(UsersYearsHoursTask.class.getName());
+
         tasks.forEach(task -> {
             task.setParams(this.overviewService.executeUsersYearsHours(task.getParams(), task.getCompany()));
             task.setLastExecution(LocalDate.now());
