@@ -7,7 +7,6 @@ import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.services.DocumentNumberGeneratorService;
 import com.data.dataxer.services.InvoiceService;
 import com.data.dataxer.services.PdfService;
-import com.lowagie.text.DocumentException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -15,11 +14,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -89,23 +83,6 @@ public class InvoiceController {
     @GetMapping("/{id}")
     public ResponseEntity<InvoiceDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.getById(id)));
-    }
-
-    @GetMapping("/pdf/{id}")
-    public void pdf(@PathVariable Long id, HttpServletResponse response) {
-        try {
-            Path file = Paths.get(pdfService.generatePdf(this.invoiceService.getById(id)).getAbsolutePath());
-
-            if (Files.exists(file)) {
-                response.setContentType("application/pdf");
-                response.addHeader("Content-Disposition", "inline; filename=" + file.getFileName());
-                Files.copy(file, response.getOutputStream());
-                response.getOutputStream().flush();
-            }
-
-        } catch (DocumentException | IOException ex) {
-            ex.printStackTrace();
-        }
     }
 
     @GetMapping(value = "/duplicate/{id}")
