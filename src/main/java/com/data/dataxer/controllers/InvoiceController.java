@@ -94,7 +94,7 @@ public class InvoiceController {
     @GetMapping("/pdf/{id}")
     public void pdf(@PathVariable Long id, HttpServletResponse response) {
         try {
-            Path file = Paths.get(pdfService.generatePdf(this.invoiceService.getById(id)).getAbsolutePath());
+            Path file = Paths.get(pdfService.generatePdf(id).getAbsolutePath());
 
             if (Files.exists(file)) {
                 response.setContentType("application/pdf");
