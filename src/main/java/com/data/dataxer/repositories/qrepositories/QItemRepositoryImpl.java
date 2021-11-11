@@ -95,7 +95,6 @@ public class QItemRepositoryImpl implements QItemRepository {
                 .put("item.title", QItem.item.title)
                 .put("item.code", QItem.item.code)
                 .put("item.manufacturer", QItem.item.manufacturer)
-                .put("item.contact.id", QItem.item.supplier.id)
                 .put("item.contact.name", QItem.item.supplier.name)
                 .build();
 
