@@ -34,19 +34,16 @@ public class PdfService {
         this.templateEngine.addDialect(new Java8TimeDialect());
     }
 
-    public File generatePdf(Long id) throws IOException, DocumentException {
+    public File generatePdf(Long id, String documentType) throws IOException, DocumentException {
         String html;
         Context context;
 
-        try {
-            System.out.println("Loading invoice");
+        if (documentType == null) {
             Invoice  invoice = this.invoiceService.getById(id);
             context = getInvoiceContext(invoice);
             html = loadAndFillTemplate(context);
-            System.out.println("Finishing");
             return renderPdf(html, invoice);
-        } catch (RuntimeException ex) {
-            System.out.println("Loading priceoffer");
+        } else {
             PriceOffer priceOffer = this.priceOfferService.getById(id);
             context = getPriceOfferContext(priceOffer);
             html = loadAndFillTemplate(context);
