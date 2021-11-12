@@ -19,7 +19,7 @@ import java.nio.file.Paths;
 
 @Controller
 @RequestMapping("/api/pdf")
-@PreAuthorize("hasPermission(null, 'Pdf', 'Pdf')")
+@PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class PdfController {
     private final PdfService pdfService;
     private final InvoiceService invoiceService;
@@ -36,7 +36,7 @@ public class PdfController {
         return modelAndView;
     }
 
-    @RequestMapping(value = "/download-pdf/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/downloadPdf/{id}", method = RequestMethod.GET)
     public void downloadPDFResource(@PathVariable Long id, HttpServletResponse response) {
         try {
             Path file = Paths.get(pdfService.generatePdf(id).getAbsolutePath());
