@@ -182,6 +182,17 @@
             <version>6.6.1</version>
         </dependency>
 
+        <dependency>
+            <groupId>io.github.perplexhub</groupId>
+            <artifactId>rsql-querydsl-spring-boot-starter</artifactId>
+            <version>5.0.19</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.perplexhub</groupId>
+            <artifactId>rsql-jpa-spring-boot-starter</artifactId>
+            <version>5.0.19</version>
+        </dependency>
+
     </dependencies>
 
     <build>
