@@ -213,8 +213,8 @@
             </div>
         </div>
 
-        <p th:if="${paymentMethod != null }">
-            <div th:switch="${paymentMethod.getName()}">
+        <p>
+            <div th:if="${paymentMethod != null }" th:switch="${paymentMethod.getName()}">
                 <span th:case="'bank_payment'" style="font-weight: bold;" th:text="'Spôsob platby: '"></span><span th:text="'Bankový prevod'"></span>
             </div>
         </p>
