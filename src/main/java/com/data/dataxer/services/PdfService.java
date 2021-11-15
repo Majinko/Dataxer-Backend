@@ -38,7 +38,7 @@ public class PdfService {
         String html;
         Context context;
 
-        if (documentType == null) {
+        if (documentType == null || "".equals(documentType)) {
             Invoice  invoice = this.invoiceService.getById(id);
             context = getInvoiceContext(invoice);
             html = loadAndFillTemplate(context);
@@ -97,11 +97,8 @@ public class PdfService {
         context.setVariable("firm", document.getDocumentData().get("firm"));
         context.setVariable("bankAccount", document.getDocumentData().get("bankAccount"));
         context.setVariable("taxes", invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks())));
-        context.setVariable("subject", "");
-        context.setVariable("createdName", "Janko Hrasko");
-        context.setVariable("createdPhone", "0905123456");
-        context.setVariable("createdWeb", "www.example.com");
-        context.setVariable("createdEmail", "janko.hrasko@example.com");
+        context.setVariable("user", document.getDocumentData().get("user"));
+        context.setVariable("createdWeb", "");
 
         return context;
     }
