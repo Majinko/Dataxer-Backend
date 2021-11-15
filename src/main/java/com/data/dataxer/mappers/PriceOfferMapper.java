@@ -17,6 +17,7 @@ public interface PriceOfferMapper {
 
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "project.contact", ignore = true)
+    @Mapping(target = "item.files", ignore = true)
     PriceOfferDTO priceOfferToPriceOfferDTO(PriceOffer priceOffer);
 
     @Mapping(target = "packs", ignore = true)

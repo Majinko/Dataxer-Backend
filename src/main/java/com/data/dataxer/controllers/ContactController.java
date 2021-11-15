@@ -30,7 +30,7 @@ public class ContactController {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.store(contactMapper.toContact(contactDto))));
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<ContactDTO> update(@RequestBody ContactDTO contactDto) {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.update(contactMapper.toContact(contactDto))));
     }

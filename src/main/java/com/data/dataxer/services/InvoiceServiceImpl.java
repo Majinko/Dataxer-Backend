@@ -175,6 +175,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
                 "id", "packs", "title", "note", "number", "state", "discount", "price",
                 "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
                 "paymentMethod", "invoiceType");
+
         taxDocument.setCreatedDate(LocalDate.now());
         taxDocument.setDocumentType(DocumentType.TAX_DOCUMENT);
         taxDocument.setPacks(this.setTaxDocumentsPacks(proformaInvoice));
@@ -276,6 +277,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         taxDocumentPack.setPrice(getPriceFromTotalPrice(totalPrice, tax));
         taxDocumentPack.setTotalPrice(totalPrice);
         taxDocumentPack.setTitle("Daňový doklad k prijatej platbe");
+        taxDocumentPack.setShowItems(true);
 
         taxDocumentPack.setPackItems(List.of(generateDocumentPackItemForTaxDocument(proformaInvoice, tax, totalPrice)));
 
