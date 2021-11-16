@@ -1,9 +1,11 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
-import com.github.vineey.rql.filter.parser.DefaultFilterParser;
-import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
-import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
+import com.data.dataxer.models.domain.QCategory;
+import com.data.dataxer.models.domain.QContact;
+import com.data.dataxer.models.domain.QItem;
+import com.data.dataxer.models.domain.QItemPrice;
+import com.data.dataxer.models.domain.QStorage;
 import com.github.vineey.rql.querydsl.sort.OrderSpecifierList;
 import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
 import com.github.vineey.rql.sort.parser.DefaultSortParser;
@@ -14,18 +16,14 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.github.perplexhub.rsql.RSQLQueryDslSupport;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-
-import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
+import java.util.*;
 
 @Repository
 public class QItemRepositoryImpl implements QItemRepository {
@@ -84,25 +82,11 @@ public class QItemRepositoryImpl implements QItemRepository {
 
     @Override
     public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
-        DefaultSortParser sortParser = new DefaultSortParser();
-        DefaultFilterParser filterParser = new DefaultFilterParser();
-        Predicate predicate = new BooleanBuilder();
-
-        Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
-                .put("item.id", QItem.item.id)
-                .put("item.title", QItem.item.title)
-                .put("item.code", QItem.item.code)
-                .put("item.manufacturer", QItem.item.manufacturer)
-                .put("item.contact.name", QItem.item.supplier.name)
-                .build();
-
-        if (!rqlFilter.equals("")) {
-            predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
-                    .setMapping(pathMapping)));
-        }
-        OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
+        Predicate predicate = buildPredicate(rqlFilter);
+        OrderSpecifierList orderSpecifierList = buildSort(sortExpression);
 
         List<Item> itemList = this.query.selectFrom(QItem.item)
+                //.leftJoin(QItem.item.supplier)
                 .leftJoin(QItem.item.itemPrices).fetchJoin()
                 .where(predicate)
                 .where(QItem.item.company.id.eq(companyId))
@@ -112,6 +96,37 @@ public class QItemRepositoryImpl implements QItemRepository {
                 .fetch();
 
         return new PageImpl<>(itemList, pageable, getTotalCount(predicate));
+    }
+
+    private Predicate buildPredicate(String rsqlFilter) {
+        Predicate predicate = new BooleanBuilder();
+
+        if (rsqlFilter.equals("")) {
+            return predicate;
+        }
+
+        Map<String, String> filterPathMapping = new HashMap<>();
+        filterPathMapping.put("id", "id");
+        filterPathMapping.put("title", "title");
+        filterPathMapping.put("code", "code");
+        filterPathMapping.put("manufacturer", "manufacturer");
+        filterPathMapping.put("contactName", "supplier.name");
+
+        return RSQLQueryDslSupport.toPredicate(rsqlFilter, QItem.item, filterPathMapping);
+    }
+
+    private OrderSpecifierList buildSort(String sortExpression) {
+        DefaultSortParser sortParser = new DefaultSortParser();
+
+        Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
+                .put("item.id", QItem.item.id)
+                .put("item.title", QItem.item.title)
+                .put("item.code", QItem.item.code)
+                .put("item.manufacturer", QItem.item.manufacturer)
+                .put("item.contact.name", QItem.item.supplier.name)
+                .build();
+
+        return sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
     }
 
     private long getTotalCount(Predicate predicate) {
