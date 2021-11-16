@@ -86,6 +86,7 @@ public class QItemRepositoryImpl implements QItemRepository {
         OrderSpecifierList orderSpecifierList = buildSort(sortExpression);
 
         List<Item> itemList = this.query.selectFrom(QItem.item)
+                //.leftJoin(QItem.item.supplier)
                 .leftJoin(QItem.item.itemPrices).fetchJoin()
                 .where(predicate)
                 .where(QItem.item.company.id.eq(companyId))
@@ -105,11 +106,11 @@ public class QItemRepositoryImpl implements QItemRepository {
         }
 
         Map<String, String> filterPathMapping = new HashMap<>();
-        filterPathMapping.put("item.id", "item.id");
-        filterPathMapping.put("item.title", "item.title");
-        filterPathMapping.put("item.code", "item.code");
-        filterPathMapping.put("item.manufacturer", "item.manufacturer");
-        filterPathMapping.put("item.contact.name", "item.contact.name");
+        filterPathMapping.put("id", "id");
+        filterPathMapping.put("title", "title");
+        filterPathMapping.put("code", "code");
+        filterPathMapping.put("manufacturer", "manufacturer");
+        filterPathMapping.put("contactName", "supplier.name");
 
         return RSQLQueryDslSupport.toPredicate(rsqlFilter, QItem.item, filterPathMapping);
     }
