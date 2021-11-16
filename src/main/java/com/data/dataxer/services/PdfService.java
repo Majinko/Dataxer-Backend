@@ -34,19 +34,16 @@ public class PdfService {
         this.templateEngine.addDialect(new Java8TimeDialect());
     }
 
-    public File generatePdf(Long id) throws IOException, DocumentException {
+    public File generatePdf(Long id, String documentType) throws IOException, DocumentException {
         String html;
         Context context;
 
-        try {
-            System.out.println("Loading invoice");
+        if (documentType == null || "".equals(documentType)) {
             Invoice  invoice = this.invoiceService.getById(id);
             context = getInvoiceContext(invoice);
             html = loadAndFillTemplate(context);
-            System.out.println("Finishing");
             return renderPdf(html, invoice);
-        } catch (RuntimeException ex) {
-            System.out.println("Loading priceoffer");
+        } else {
             PriceOffer priceOffer = this.priceOfferService.getById(id);
             context = getPriceOfferContext(priceOffer);
             html = loadAndFillTemplate(context);
@@ -100,11 +97,8 @@ public class PdfService {
         context.setVariable("firm", document.getDocumentData().get("firm"));
         context.setVariable("bankAccount", document.getDocumentData().get("bankAccount"));
         context.setVariable("taxes", invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks())));
-        context.setVariable("subject", "");
-        context.setVariable("createdName", "Janko Hrasko");
-        context.setVariable("createdPhone", "0905123456");
-        context.setVariable("createdWeb", "www.example.com");
-        context.setVariable("createdEmail", "janko.hrasko@example.com");
+        context.setVariable("user", document.getDocumentData().get("user"));
+        context.setVariable("createdWeb", "");
 
         return context;
     }

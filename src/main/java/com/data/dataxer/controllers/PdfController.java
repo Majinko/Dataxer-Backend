@@ -5,10 +5,7 @@ import com.data.dataxer.services.PdfService;
 import com.lowagie.text.DocumentException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
@@ -37,9 +34,11 @@ public class PdfController {
     }
 
     @RequestMapping(value = "/downloadPdf/{id}", method = RequestMethod.GET)
-    public void downloadPDFResource(@PathVariable Long id, HttpServletResponse response) {
+    public void downloadPDFResource(@PathVariable Long id,
+                                    @RequestParam(value = "docType", defaultValue = "") String documentType,
+                                    HttpServletResponse response) {
         try {
-            Path file = Paths.get(pdfService.generatePdf(id).getAbsolutePath());
+            Path file = Paths.get(pdfService.generatePdf(id, documentType).getAbsolutePath());
 
             if (Files.exists(file)) {
                 response.setContentType("application/pdf");
