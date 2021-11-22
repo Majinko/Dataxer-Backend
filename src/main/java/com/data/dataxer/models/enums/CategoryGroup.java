@@ -3,7 +3,8 @@ package com.data.dataxer.models.enums;
 public enum CategoryGroup {
     COMPANY("company"),
     SALARY("salary"),
-    PROJECT("project");
+    PROJECT("project"),
+    TYPE_PROJECT("type_project");
 
     public final String categoryGroup;
 
