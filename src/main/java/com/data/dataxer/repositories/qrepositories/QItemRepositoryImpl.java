@@ -106,6 +106,7 @@ public class QItemRepositoryImpl implements QItemRepository {
         }
 
         Map<String, String> filterPathMapping = new HashMap<>();
+
         filterPathMapping.put("id", "id");
         filterPathMapping.put("title", "title");
         filterPathMapping.put("code", "code");

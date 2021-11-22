@@ -125,7 +125,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
 
-        if (!rqlFilter.contains("invoice.company.id")) { // todo make refakt
+        if (!rqlFilter.contains("priceOffer.company.id")) { // todo make refakt
             priceOfferJPAQuery.where(QPriceOffer.priceOffer.company.id.eq(companyId));
         }
 

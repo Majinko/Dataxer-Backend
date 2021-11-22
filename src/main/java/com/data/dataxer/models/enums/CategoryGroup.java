@@ -4,7 +4,8 @@ public enum CategoryGroup {
     COMPANY("company"),
     SALARY("salary"),
     PROJECT("project"),
-    TYPE_PROJECT("type_project");
+    TYPE_PROJECT("type_project"),
+    CONTACT("contact");
 
     public final String categoryGroup;
 

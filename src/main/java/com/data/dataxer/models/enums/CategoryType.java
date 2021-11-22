@@ -18,8 +18,10 @@ public enum CategoryType {
     SALARY_FOR_PROJECT("salary_for_project"), // Mzdy zákazky
 
     // TYPE_PROJECT
-    TYPE_PROJECT_CATEGORY_SUBCATEGORY_SEARCH("type_project_category_subcategory_search"); // Vytvorte si kategórie a podkategórie zákazok
+    TYPE_PROJECT_CATEGORY_SUBCATEGORY_SEARCH("type_project_category_subcategory_search"), // Vytvorte si kategórie a podkategórie zákazok
 
+    // CONTACT
+    TYPE_CONTACT("type_contact"); // Kontakty sa automaticky zaradia podla toho, ci od nich mame naklad (vtedy budú automaticky v dodavateloch), ked im budeme fakturovat, budu automaticky v klientoch. Niektori mozu byt v oboch. Ale mali byt sme tam mat moznost pridat dalsie kategorie kontaktov, kde si ulozim kontakty na veci, ktore su napriklad statne institucie a podobne.
 
     public final String categoryType;
 
