@@ -107,11 +107,11 @@ public class QItemRepositoryImpl implements QItemRepository {
 
         Map<String, String> filterPathMapping = new HashMap<>();
 
-        filterPathMapping.put("id", "id");
-        filterPathMapping.put("title", "title");
-        filterPathMapping.put("code", "code");
-        filterPathMapping.put("manufacturer", "manufacturer");
-        filterPathMapping.put("contactName", "supplier.name");
+        filterPathMapping.put("item.id", "id");
+        filterPathMapping.put("item.title", "title");
+        filterPathMapping.put("item.code", "code");
+        filterPathMapping.put("item.manufacturer", "manufacturer");
+        filterPathMapping.put("item.contact.name", "supplier.name");
 
         return RSQLQueryDslSupport.toPredicate(rsqlFilter, QItem.item, filterPathMapping);
     }
