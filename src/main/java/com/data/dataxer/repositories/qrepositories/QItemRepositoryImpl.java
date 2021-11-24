@@ -86,7 +86,7 @@ public class QItemRepositoryImpl implements QItemRepository {
         OrderSpecifierList orderSpecifierList = buildSort(sortExpression);
 
         List<Item> itemList = this.query.selectFrom(QItem.item)
-                //.leftJoin(QItem.item.supplier)
+                .leftJoin(QItem.item.supplier)
                 .leftJoin(QItem.item.itemPrices).fetchJoin()
                 .where(predicate)
                 .where(QItem.item.company.id.eq(companyId))
