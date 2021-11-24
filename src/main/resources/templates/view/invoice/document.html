@@ -176,7 +176,7 @@
         </div>
 
         <div class="row" style="margin-top: 50px; margin-bottom: 0;">
-            <p style="font-weight: bold;" th:text="'Informácie k úhrade:'"></p>
+            <p style="font-weight: bold;" th:if="${type == 'I'}" th:text="'Informácie k úhrade:'"></p>
         </div>
 
         <div class="four_box_wrapper invoice-summary" th:if="${type == 'I'}" th:style="'background: url(' + @{images/table.jpg} + ') no-repeat; height: 60px; padding: 10px 15px 15px 15px; margin-top: 10px; display: block; vertical-align: middle;'">
