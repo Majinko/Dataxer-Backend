@@ -54,6 +54,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> allByTypes(List<String> types) {
+        List<CategoryType> categoryTypes = new ArrayList<>();
+
+        types.forEach(c -> {
+            categoryTypes.add(CategoryType.valueOf(c));
+        });
+
+        return this.categoryRepository.findAllByCategoryTypeInAndCompanyIdIn(categoryTypes, SecurityUtils.companyIds());
+    }
+
+    @Override
     public Category findById(Long id) {
         return this.categoryRepository
                 .findByIdAndCompanyIdIn(id, SecurityUtils.companyIds())

@@ -38,8 +38,8 @@ public class PdfService {
         String html;
         Context context;
 
-        if (documentType == null || "".equals(documentType)) {
-            Invoice  invoice = this.invoiceService.getById(id);
+        if (documentType.equals("invoice")) {
+            Invoice invoice = this.invoiceService.getById(id);
             context = getInvoiceContext(invoice);
             html = loadAndFillTemplate(context);
             return renderPdf(html, invoice);

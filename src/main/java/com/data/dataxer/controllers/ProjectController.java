@@ -28,8 +28,7 @@ public class ProjectController {
     private final TimeMapper timeMapper;
     private final UserMapper userMapper;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper,
-                             TimeMapper timeMapper, UserMapper userMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper, TimeMapper timeMapper, UserMapper userMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.categoryMapper = categoryMapper;

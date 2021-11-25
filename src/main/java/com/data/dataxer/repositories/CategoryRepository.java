@@ -25,6 +25,8 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     List<Category> findAllByIsInProjectOverviewAndCompanyIdIn(Boolean isInProjectOverview, List<Long> companyIds);
 
+    List<Category> findAllByCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);
+
     @Query("SELECT c FROM Category c WHERE c.name = ?1 AND c.company.id = ?2")
     Optional<Category> findCategoryByName(String categoryName, Long companyId);
 

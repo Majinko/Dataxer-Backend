@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -35,6 +36,13 @@ public class CategoryController {
     @GetMapping("/allByType/{type}")
     public ResponseEntity<List<CategoryDTO>> allByType(@PathVariable String type) {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.allByType(type)));
+    }
+
+    @GetMapping("/allByTypes")
+    public ResponseEntity<List<CategoryDTO>> allByTypes(
+            @RequestParam(value = "types") String types
+    ) {
+        return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.allByTypes(Arrays.asList(types.split(",")))));
     }
 
     @PostMapping("/storeOrUpdate")
