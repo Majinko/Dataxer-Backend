@@ -1,5 +1,9 @@
 package com.data.dataxer.models.enums;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public enum CategoryType {
     // FIRM
     STUFF_SERVICE_FOR_COMPANY("stuff_service_for_company"), // Tovar / služna pre chod firmy
@@ -28,4 +32,25 @@ public enum CategoryType {
     CategoryType(String categoryType) {
         this.categoryType = categoryType;
     }
+
+    public static List<CategoryType> getManHoursTypes() {
+        return new ArrayList<>(
+                Arrays.asList(
+                        STUFF_SERVICE_FOR_COMPANY,
+                        TIME_FOR_COMPANY,
+                        STUFF_SERVICE_IN_OPERATING_COST_COMPANY,
+                        TIME_NO_CAPITAL_IN_PROJECT,
+                        TIME_AFTER_PROJECT_END
+                )
+        );
     }
+
+    public static List<CategoryType> getTimeTypes() {
+        return new ArrayList<>(
+                Arrays.asList(
+                        TIME_CAPITAL_IN_PROJECT,
+                        TIME_FOR_COMPANY
+                )
+        );
+    }
+}
