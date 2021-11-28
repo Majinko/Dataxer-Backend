@@ -5,6 +5,7 @@ import com.data.dataxer.models.dto.EvaluationPreparationDTO;
 import com.data.dataxer.models.dto.ProjectManHoursDTO;
 import com.data.dataxer.models.dto.ProjectTimePriceOverviewCategoryDTO;
 import com.data.dataxer.models.dto.UserTimePriceOverviewDTO;
+import com.data.dataxer.models.enums.CategoryType;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.ProjectRepository;
@@ -311,15 +312,19 @@ public class ProjectServiceImpl implements ProjectService {
         return this.qCostRepository.getProjectTotalCostBetweenYears(firstYearStart, lastYearEnd, Boolean.FALSE, Boolean.FALSE, this.getCategoriesIdInProjectCost(), SecurityUtils.companyIds(companyIds));
     }
 
+    /*
+    * tu je to miesto kde loadnut kategorie podla noveho standardu
+    * */
     private List<Long> getCategoriesIdInProjectCost() {
-        List<Long> categoriesIds = new ArrayList<>();
-        List<Category> categories = this.categoryRepository.findAllByIsInProjectOverviewAndCompanyIdIn(true, SecurityUtils.companyIds());
+        //List<Long> categoriesIds = new ArrayList<>();
+        return this.categoryRepository.getAllIdsByTypesAndItsChildren(CategoryType.getManHoursTypes(), SecurityUtils.companyIds());
+        /*List<Category> categories = this.categoryRepository.findAllByIsInProjectOverviewAndCompanyIdIn(true, SecurityUtils.companyIds());
 
         categories.forEach(category -> {
             categoriesIds.addAll(categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyIds()));
         });
 
-        return categoriesIds;
+        return categoriesIds;*/
     }
 
     private double convertTimeSecondsToHours(int time) {
