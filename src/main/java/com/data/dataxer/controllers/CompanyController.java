@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/company")
-@PreAuthorize("hasPermission(null, 'Company', 'Company')")
 public class CompanyController {
     private final CompanyService companyService;
     private final CompanyMapper companyMapper;
@@ -22,21 +21,25 @@ public class CompanyController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasPermission(null, 'Company', 'Company')")
     public ResponseEntity<CompanyDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(companyMapper.toCompanyWithBillingInfoDTO(this.companyService.findById(id)));
     }
 
     @GetMapping("/all")
+    @PreAuthorize("hasPermission(null, 'Company', 'Company')")
     public ResponseEntity<List<CompanyDTO>> all() {
         return ResponseEntity.ok(companyMapper.toCompaniesDTO(this.companyService.findAll()));
     }
 
     @PostMapping("/store")
+    @PreAuthorize("hasPermission(null, 'Company', 'Company')")
     public ResponseEntity<CompanyDTO> store(@RequestBody CompanyDTO companyDTO) {
         return ResponseEntity.ok(companyMapper.toCompanyDTO(this.companyService.store(companyMapper.toCompanyWithBillingInfo(companyDTO))));
     }
 
     @PostMapping("/update")
+    @PreAuthorize("hasPermission(null, 'Company', 'Company')")
     public ResponseEntity<CompanyDTO> update(@RequestBody CompanyDTO companyDTO) {
         return ResponseEntity.ok(companyMapper.toCompanyWithBillingInfoDTO(this.companyService.update(companyMapper.toCompany(companyDTO))));
     }
@@ -47,6 +50,7 @@ public class CompanyController {
     }
 
     @GetMapping("/destroy/{id}")
+    @PreAuthorize("hasPermission(null, 'Company', 'Company')")
     public void destroy(@PathVariable Long id) {
         this.companyService.destroy(id);
     }

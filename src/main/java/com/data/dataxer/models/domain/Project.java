@@ -25,6 +25,7 @@ public class Project extends BaseEntity {
 
     @JoinColumn(name = "client_id")
     @ManyToOne(fetch = FetchType.LAZY)
+    @NotFound(action = NotFoundAction.IGNORE)
     private Contact contact;
 
     @OneToOne

@@ -36,11 +36,6 @@ public class ProjectController {
         this.userMapper = userMapper;
     }
 
-    @PostMapping("/store")
-    public ResponseEntity<ProjectDTO> store(@RequestBody ProjectDTO projectDTO) {
-        return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.store(projectMapper.projectDTOtoProject(projectDTO))));
-    }
-
     @GetMapping("/paginate")
     public ResponseEntity<Page<ProjectDTO>> paginate(
             @RequestParam(value = "page", defaultValue = "0") int page,
@@ -71,6 +66,12 @@ public class ProjectController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.projectService.destroy(id);
+    }
+
+
+    @PostMapping("/store")
+    public ResponseEntity<ProjectDTO> store(@RequestBody ProjectDTO projectDTO) {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.store(projectMapper.projectDTOtoProject(projectDTO))));
     }
 
     @GetMapping("/all")

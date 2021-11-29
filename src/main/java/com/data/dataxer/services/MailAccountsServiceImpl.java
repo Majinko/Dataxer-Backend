@@ -134,6 +134,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
         companyId = companyId != null ? companyId : SecurityUtils.companyId();
 
         MailAccounts mailAccounts = this.getByCompanyId(companyId);
+
         if (templateId != null) {
             MailTemplate mailTemplates = this.mailTemplatesService.getById(templateId);
             subject = mailTemplates.getEmailSubject();

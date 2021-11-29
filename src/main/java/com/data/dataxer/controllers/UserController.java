@@ -81,7 +81,7 @@ public class UserController {
     public void store(@RequestBody AppUserInitDTO appUserInitDTO) {
         this.salaryService.initUserStoreSalary(
                 salaryMapper.salaryDTOtoSalary(appUserInitDTO.getSalary()),
-                userMapper.appUserDTOtoAppUser(userMapper.appUserToAppUserDTO(userService.store(userMapper.appUserDTOtoAppUser(appUserInitDTO.getUser()))))
+                userMapper.appUserDTOtoAppUserWithRoles(userMapper.appUserToAppUserDTO(userService.store(userMapper.appUserDTOtoAppUserWithRoles(appUserInitDTO.getUser()))))
         );
     }
 

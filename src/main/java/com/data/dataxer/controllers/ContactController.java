@@ -35,6 +35,11 @@ public class ContactController {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.update(contactMapper.toContact(contactDto))));
     }
 
+    @GetMapping("/destroy/{id}")
+    public void destroy(@PathVariable Long id) {
+        contactService.destroy(id);
+    }
+
     @GetMapping("/getById/{id}")
     public ResponseEntity<ContactDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.getById(id)));
@@ -50,11 +55,6 @@ public class ContactController {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
         return ResponseEntity.ok(contactService.paginate(pageable, rqlFilter, sortExpression).map(contactMapper::toContactDto));
-    }
-
-    @GetMapping("/destroy/{id}")
-    public void destroy(@PathVariable Long id) {
-        contactService.destroy(id);
     }
 
     @GetMapping("/all")

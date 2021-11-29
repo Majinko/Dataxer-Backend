@@ -53,17 +53,21 @@ public class UserServiceImpl implements UserService {
     // todo create camunda process
     @Override
     public AppUser store(AppUser appUser) {
-        appUser.setUid(this.createFirebaseUser(appUser));
+        UserRecord userRecord = this.createFirebaseUser(appUser);
+
+        appUser.setUid(userRecord.getUid());
         appUser.setDefaultCompany(SecurityUtils.defaultCompany());
 
         AppUser savedUser = this.userRepository.save(appUser);
 
         this.addCompanyToUser(SecurityUtils.companyId(), savedUser);
 
+        // todo send email to user
+
         return savedUser;
     }
 
-    private String createFirebaseUser(AppUser appUser) {
+    private UserRecord createFirebaseUser(AppUser appUser) {
         UserRecord.CreateRequest createRequest = new UserRecord.CreateRequest();
 
         createRequest.setEmail(appUser.getEmail());
@@ -72,10 +76,9 @@ public class UserServiceImpl implements UserService {
 
         UserRecord userRecord;
 
-
         try {
             userRecord = firebaseAuth.createUser(createRequest);
-            return userRecord.getUid();
+            return userRecord;
         } catch (FirebaseAuthException e) {
             if ("email-already-exists".equals(e.getErrorCode())) {
                 throw new RuntimeException("User with email " + appUser.getEmail() + ", is already registered");

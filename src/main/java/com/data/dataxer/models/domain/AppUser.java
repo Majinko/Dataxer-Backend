@@ -48,11 +48,11 @@ public class AppUser implements Serializable {
     @Column(name = "connected")
     private Boolean connected = false;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<Role> roles = new ArrayList<>();
-
     @OneToOne(fetch = FetchType.LAZY)
     private Company defaultCompany;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<Role> roles = new ArrayList<>();
 
     @Transient
     @ManyToMany(fetch = FetchType.LAZY)
