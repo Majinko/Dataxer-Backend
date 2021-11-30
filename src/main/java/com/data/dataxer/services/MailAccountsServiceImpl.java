@@ -3,6 +3,7 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.MailAccounts;
 import com.data.dataxer.models.domain.MailTemplate;
+import com.data.dataxer.models.dto.EmailMessage;
 import com.data.dataxer.models.enums.MailAccountState;
 import com.data.dataxer.repositories.MailAccountsRepository;
 import com.data.dataxer.repositories.qrepositories.QMailAccountsRepository;
@@ -130,6 +131,27 @@ public class MailAccountsServiceImpl implements MailAccountsService {
     }
 
     @Override
+    public void sendEmail(EmailMessage emailMessage, List<String> emails) {
+        try {
+            JavaMailSenderImpl mailSender = this.getMailSenderByCompanyId(SecurityUtils.companyId());
+
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
+
+            helper.setFrom(mailSender.getUsername());
+            helper.setSubject(emailMessage.getSubject());
+            helper.setText(emailMessage.getBody(), true);
+
+            for (String email : emails) {
+                helper.setTo(email);
+                mailSender.send(mimeMessage);
+            }
+        } catch (MessagingException e) {
+            throw new RuntimeException("Sending email failed. Reason: " + e.getMessage());
+        }
+    }
+
+    @Override
     public void sendEmailWithAttachments(String subject, String content, List<Long> recipientIds, Long templateId, List<String> fileNames, Long companyId) {
         companyId = companyId != null ? companyId : SecurityUtils.companyId();
 
@@ -171,7 +193,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
             return attachments;
         }
 
-        fileNames.forEach(fileName-> {
+        fileNames.forEach(fileName -> {
 
             try {
                 Resource resource = fileService.loadFileAsResource(fileName);
@@ -192,7 +214,7 @@ public class MailAccountsServiceImpl implements MailAccountsService {
 
         List<Contact> participants = this.contactService.getContactByIds(recipientIds);
 
-        participants.forEach(participant-> {
+        participants.forEach(participant -> {
             if (EmailAddressValidator.isValid(participant.getEmail(), EmailAddressCriteria.RFC_COMPLIANT)) {
                 Recipient recipient = new Recipient(participant.getName(), participant.getEmail(), Message.RecipientType.TO);
                 recipients.add(recipient);

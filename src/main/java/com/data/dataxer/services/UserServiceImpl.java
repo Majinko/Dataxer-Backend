@@ -11,6 +11,7 @@ import com.data.dataxer.repositories.SalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.security.model.Role;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.data.dataxer.utils.EmailUtils;
 import com.data.dataxer.utils.StringUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,6 +46,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private RoleMapper roleMapper;
 
+    @Autowired
+    MailAccountsServiceImpl mailAccountsService;
+
 
     @Override
     public AppUser loggedUser() {
@@ -53,25 +58,30 @@ public class UserServiceImpl implements UserService {
     // todo create camunda process
     @Override
     public AppUser store(AppUser appUser) {
-        UserRecord userRecord = this.createFirebaseUser(appUser);
+        AppUser user = this.userRepository.findUserByEmail(appUser.getEmail()).orElse(this.storeUserAndSendRegistrationEmail(appUser));
+
+        this.addCompanyToUser(SecurityUtils.companyId(), user);
+
+        return user;
+    }
+
+    private AppUser storeUserAndSendRegistrationEmail(AppUser appUser) {
+        String pass = StringUtils.generateRandomTextPassword();
+        UserRecord userRecord = this.createFirebaseUser(appUser, pass);
 
         appUser.setUid(userRecord.getUid());
         appUser.setDefaultCompany(SecurityUtils.defaultCompany());
 
-        AppUser savedUser = this.userRepository.save(appUser);
+        this.mailAccountsService.sendEmail(EmailUtils.newUser(appUser.getEmail(), pass), List.of(appUser.getEmail()));
 
-        this.addCompanyToUser(SecurityUtils.companyId(), savedUser);
-
-        // todo send email to user
-
-        return savedUser;
+        return this.userRepository.save(appUser);
     }
 
-    private UserRecord createFirebaseUser(AppUser appUser) {
+    private UserRecord createFirebaseUser(AppUser appUser, String password) {
         UserRecord.CreateRequest createRequest = new UserRecord.CreateRequest();
 
         createRequest.setEmail(appUser.getEmail());
-        createRequest.setPassword(StringUtils.generateRandomTextPassword());
+        createRequest.setPassword(password);
         createRequest.setDisplayName(appUser.getFirstName() + " " + appUser.getLastName());
 
         UserRecord userRecord;

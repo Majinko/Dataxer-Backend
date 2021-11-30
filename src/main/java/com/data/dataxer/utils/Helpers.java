@@ -38,7 +38,7 @@ public class Helpers {
     }
 
     public static void checkCompanyIdFromRql(String parseThis) {
-        String[] strings = parseThis.split(".id==");
+        String[] strings = parseThis.split(".company.id==");
         Long companyId = Long.parseLong(strings[strings.length - 1].replaceAll("[^0-9?!\\.]", ""));
 
         if (!SecurityUtils.companyIds().contains(companyId)) {

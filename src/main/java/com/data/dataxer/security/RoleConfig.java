@@ -1,38 +1,40 @@
 package com.data.dataxer.security;
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.PrivilegeRepository;
 import com.data.dataxer.repositories.RoleRepository;
 import com.data.dataxer.security.model.Privilege;
 import com.data.dataxer.security.model.Role;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Component
 public class RoleConfig {
-
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
 
-    private final RoleRepository roleRepository;
-    private final PrivilegeRepository privilegeRepository;
+    @Autowired
+    private RoleRepository roleRepository;
 
-    public RoleConfig(RoleRepository roleRepository, PrivilegeRepository privilegeRepository) {
-        this.roleRepository = roleRepository;
-        this.privilegeRepository = privilegeRepository;
-    }
+    @Autowired
+    private PrivilegeRepository privilegeRepository;
 
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @PostConstruct
     public void init() {
-        List<Privilege> privileges = this.initializePrivileges();
+        List<Privilege> adminPrivileges = this.initAdminPrivileges();
 
-        initializeRole(ROLE_ADMIN, privileges);
+        initializeRole(ROLE_ADMIN, adminPrivileges);
     }
 
-    private List<Privilege> initializePrivileges() {
+    private List<Privilege> initAdminPrivileges() {
         List<String> privileges = new ArrayList<>();
         List<Privilege> response = new ArrayList<>();
 
@@ -48,6 +50,7 @@ public class RoleConfig {
         privileges.add(Task.class.getSimpleName());
         privileges.add(Time.class.getSimpleName());
         privileges.add(Category.class.getSimpleName());
+        privileges.add("Overview");
 
         List<String> existedPrivileges = this.privilegeRepository.findAllPrivileges();
         privileges.removeAll(existedPrivileges);
@@ -67,6 +70,7 @@ public class RoleConfig {
             newRole = new Role();
             newRole.setName(role);
             newRole.setPrivileges(privileges);
+            newRole.setCompany(this.companyRepository.findById(1L).orElse(null));
             this.roleRepository.save(newRole);
         }
     }
