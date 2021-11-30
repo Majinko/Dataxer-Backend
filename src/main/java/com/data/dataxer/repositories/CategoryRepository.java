@@ -25,17 +25,13 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     List<Category> findAllByIsInProjectOverviewAndCompanyIdIn(Boolean isInProjectOverview, List<Long> companyIds);
 
-<<<<<<< HEAD
     List<Category> findAllByCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);
-=======
-    @Query(
-            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where categoryType IN ?1 UNION ALL SELECT category.id from ids, category where category.company_id in ?2 and category.deleted_at is null and category.parent_id = ids.id) SELECT * FROM ids;",
-            nativeQuery = true)
-    List<Long> getAllIdsByTypesAndItsChildren(List<CategoryType> types, List<Long> companyId);
+
+    @Query("select c.id from Category c where c.categoryType in ?1 and c.company.id in ?2")
+    List<Long> findAllIdsCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);
 
     @Query("SELECT c FROM Category c WHERE c.categoryType IN ?1 AND c.company.id = ?2")
     Optional<List<Long>> getAllIdsByTypes(List<CategoryType> types, Long companyId);
->>>>>>> c0516e3012a24865e79efed49e8f2c75ae526b29
 
     @Query("SELECT c FROM Category c WHERE c.name = ?1 AND c.company.id = ?2")
     Optional<Category> findCategoryByName(String categoryName, Long companyId);

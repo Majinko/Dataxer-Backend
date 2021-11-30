@@ -179,7 +179,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         if (!projectYears.isEmpty()) {
             List<UserTimePriceOverviewDTO> projectTimePriceOverviewDTOList = new ArrayList<>();
-            BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
+            BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1)); // todo k nakladom pridat aj casy ktore suvisia s chodom firmy teda niesu ziskove
             List<Tuple> userTimesPriceSums = this.qTimeRepository.getProjectUsersTimePriceSums(id, SecurityUtils.companyIds(companyIds));
 
             userTimesPriceSums.forEach(tuple -> {
@@ -203,13 +203,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public EvaluationPreparationDTO evaluationPreparationProjectData(Long id) {
-        EvaluationPreparationDTO response = new EvaluationPreparationDTO();
-
- /*       List<Cost> costs = this.costRepository.findAllByProjectIdAndCompanyId(id, SecurityUtils.companyId());
-        List<Invoice> invoices = this.qInvoiceRepository.getAllProjectInvoices(id, SecurityUtils.companyId());
-        List<Time> times = this.qTimeRepository.getAllProjectTimesOrdered(id, SecurityUtils.companyId());*/
-
-        return response;
+        return new EvaluationPreparationDTO();
     }
 
     @Override
@@ -312,19 +306,11 @@ public class ProjectServiceImpl implements ProjectService {
         return this.qCostRepository.getProjectTotalCostBetweenYears(firstYearStart, lastYearEnd, Boolean.FALSE, Boolean.FALSE, this.getCategoriesIdInProjectCost(), SecurityUtils.companyIds(companyIds));
     }
 
-    /*
-    * tu je to miesto kde loadnut kategorie podla noveho standardu
-    * */
+    /**
+     * Get categories ids
+     */
     private List<Long> getCategoriesIdInProjectCost() {
-        //List<Long> categoriesIds = new ArrayList<>();
-        return this.categoryRepository.getAllIdsByTypesAndItsChildren(CategoryType.getManHoursTypes(), SecurityUtils.companyIds());
-        /*List<Category> categories = this.categoryRepository.findAllByIsInProjectOverviewAndCompanyIdIn(true, SecurityUtils.companyIds());
-
-        categories.forEach(category -> {
-            categoriesIds.addAll(categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyIds()));
-        });
-
-        return categoriesIds;*/
+        return this.categoryRepository.findAllIdsCategoryTypeInAndCompanyIdIn(CategoryType.getManHoursTypes(), SecurityUtils.companyIds());
     }
 
     private double convertTimeSecondsToHours(int time) {
