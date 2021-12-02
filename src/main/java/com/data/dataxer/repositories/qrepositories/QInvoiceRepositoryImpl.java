@@ -54,8 +54,8 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .put("invoice.contact.name", QInvoice.invoice.contact.name)
                 .put("invoice.project.id", QInvoice.invoice.project.id)
                 .put("invoice.documentType", QInvoice.invoice.documentType)
-                .put("invoice.start", QInvoice.invoice.createdAt)
-                .put("invoice.end", QInvoice.invoice.createdAt)
+                .put("invoice.start", QInvoice.invoice.createdDate)
+                .put("invoice.end", QInvoice.invoice.createdDate)
                 .build();
 
         if (!rqlFilter.equals("")) {

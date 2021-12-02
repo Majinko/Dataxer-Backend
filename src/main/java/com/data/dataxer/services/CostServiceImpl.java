@@ -43,7 +43,6 @@ public class CostServiceImpl implements CostService {
     @Override
     public Cost update(Cost oldCost) {
         return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyIds()).map(cost -> {
-
             cost.setContact(oldCost.getContact());
             cost.setProject(oldCost.getProject());
             cost.setTitle(oldCost.getTitle());

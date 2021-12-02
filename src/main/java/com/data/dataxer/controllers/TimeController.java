@@ -37,8 +37,8 @@ public class TimeController {
     }
 
     @PostMapping("/store")
-    public ResponseEntity<TimeDTO> store(@RequestBody @Valid TimeDTO timeDTO) {
-        return ResponseEntity.ok(this.timeMapper.timeToTimeDTO(this.timeService.store(this.timeMapper.timeDTOToTime(timeDTO))));
+    public void store(@RequestBody @Valid TimeDTO timeDTO) {
+        this.timeService.store(this.timeMapper.timeDTOToTime(timeDTO));
     }
 
     @PostMapping("/update")

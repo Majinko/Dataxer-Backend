@@ -57,8 +57,8 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .put("cost.contact.id", QCost.cost.contact.id)
                 .put("cost.contact.name", QCost.cost.contact.name)
                 .put("cost.project.id", QCost.cost.project.id)
-                .put("cost.start", QCost.cost.createdAt)
-                .put("cost.end", QCost.cost.createdAt)
+                .put("cost.start", QCost.cost.createdDate)
+                .put("cost.end", QCost.cost.createdDate)
                 .build();
 
         if (!rqlFilter.equals("")) {

@@ -1,6 +1,7 @@
 package com.data.dataxer.repositories;
 
 import com.data.dataxer.models.domain.Category;
+import com.data.dataxer.models.enums.CategoryGroup;
 import com.data.dataxer.models.enums.CategoryType;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -21,11 +22,15 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     List<Category> findAllByIdInAndCompanyId(List<Long> ids, Long companyId);
 
+    List<Category> findAllByIdInAndCompanyIdIn(List<Long> ids, List<Long> companyIds);
+
     List<Category> findAllByParentIdAndCompanyId(Long parentId, Long companyId);
 
     List<Category> findAllByIsInProjectOverviewAndCompanyIdIn(Boolean isInProjectOverview, List<Long> companyIds);
 
     List<Category> findAllByCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);
+
+    List<Category> findAllByCategoryGroupAndCompanyIdInAndParentIdIsNull(CategoryGroup categoryGroup, List<Long> companyIds);
 
     @Query("select c.id from Category c where c.categoryType in ?1 and c.company.id in ?2")
     List<Long> findAllIdsCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);

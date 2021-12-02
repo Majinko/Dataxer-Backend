@@ -49,8 +49,8 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .put("priceOffer.contact.id", QPriceOffer.priceOffer.contact.id)
                 .put("priceOffer.project.id", QPriceOffer.priceOffer.project.id)
                 .put("priceOffer.contact.name", QPriceOffer.priceOffer.contact.name)
-                .put("priceOffer.start", QPriceOffer.priceOffer.createdAt)
-                .put("priceOffer.end", QPriceOffer.priceOffer.createdAt)
+                .put("priceOffer.start", QPriceOffer.priceOffer.createdDate)
+                .put("priceOffer.end", QPriceOffer.priceOffer.createdDate)
                 .build();
 
         if (!rqlFilter.equals("")) {

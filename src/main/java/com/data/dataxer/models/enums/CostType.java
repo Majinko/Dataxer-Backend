@@ -6,6 +6,7 @@ public enum CostType {
     INTERNAL("internal"),
     CONTRIBUTION("contribution"),
     RECEIVED_CREDIT_NOTE("received_credit_note"),
+    NONDEDUCTIBLE("nondeductible"),
     OTHER("other");
 
     private String name;

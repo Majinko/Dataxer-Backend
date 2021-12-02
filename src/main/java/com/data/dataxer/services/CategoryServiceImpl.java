@@ -1,6 +1,7 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Category;
+import com.data.dataxer.models.enums.CategoryGroup;
 import com.data.dataxer.models.enums.CategoryType;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -8,12 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CategoryServiceImpl implements CategoryService {
-    private List<Category> categories = new ArrayList<>();
-
     @Autowired
     private CategoryRepository categoryRepository;
 
@@ -34,9 +35,11 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void updateTree(List<Category> categories) {
-        this.prepareTree(categories, null);
+        List<Category> updateCategories = new ArrayList<>();
 
-        this.categoryRepository.saveAll(this.categories);
+        this.prepareTree(categories, null, updateCategories);
+
+        this.categoryRepository.saveAll(updateCategories);
     }
 
     @Override
@@ -57,8 +60,8 @@ public class CategoryServiceImpl implements CategoryService {
     public List<Category> allByTypes(List<String> types) {
         List<CategoryType> categoryTypes = new ArrayList<>();
 
-        types.forEach(c -> {
-            categoryTypes.add(CategoryType.valueOf(c));
+        types.forEach(cType -> {
+            categoryTypes.add(CategoryType.valueOf(cType));
         });
 
         return this.categoryRepository.findAllByCategoryTypeInAndCompanyIdIn(categoryTypes, SecurityUtils.companyIds());
@@ -69,6 +72,18 @@ public class CategoryServiceImpl implements CategoryService {
         return this.categoryRepository
                 .findByIdAndCompanyIdIn(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("category not found"));
+    }
+
+    @Override
+    public List<Category> allByGroupFromParent(String group) {
+        Set<Long> categoriesId = new HashSet<>();
+
+        // todo make better query in foreach is bad idea
+        this.categoryRepository // fill categoriesId
+                .findAllByCategoryGroupAndCompanyIdInAndParentIdIsNull(CategoryGroup.valueOf(group), SecurityUtils.companyIds())
+                .forEach(c -> categoriesId.addAll(this.categoryRepository.findAllChildIds(c.getId(), SecurityUtils.companyIds())));
+
+        return this.categoryRepository.findAllByIdInAndCompanyIdIn(new ArrayList<>(categoriesId), SecurityUtils.companyIds());
     }
 
     // private methods
@@ -83,14 +98,14 @@ public class CategoryServiceImpl implements CategoryService {
         }).orElse(null);
     }
 
-    private void prepareTree(List<Category> categories, Long parentId) {
+    private void prepareTree(List<Category> categories, Long parentId, List<Category> updateCategories) {
         categories.forEach(c -> {
             c.setParentId(parentId);
 
-            this.categories.add(c);
+            updateCategories.add(c);
 
             if (c.getChildren() != null) {
-                this.prepareTree(c.getChildren(), c.getId());
+                this.prepareTree(c.getChildren(), c.getId(), updateCategories);
             }
         });
     }

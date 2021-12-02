@@ -33,6 +33,11 @@ public class CategoryController {
         return ResponseEntity.ok(this.categoryMapper.toCategoryDTO(this.categoryService.findById(id)));
     }
 
+    @GetMapping("/allByGroupFromParent/{group}")
+    public ResponseEntity<List<CategoryDTO>> allByGroupFromParent(@PathVariable String group) {
+        return ResponseEntity.ok(this.categoryMapper.toCategoryDTOs(categoryService.allByGroupFromParent(group)));
+    }
+
     @GetMapping("/allByType/{type}")
     public ResponseEntity<List<CategoryDTO>> allByType(@PathVariable String type) {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.allByType(type)));

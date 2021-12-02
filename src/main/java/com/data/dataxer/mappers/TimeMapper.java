@@ -11,6 +11,7 @@ import java.util.List;
 
 @Mapper
 public interface TimeMapper {
+    @Mapping(target = "user.roles", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     Time timeDTOToTime(TimeDTO timeDTO);
 

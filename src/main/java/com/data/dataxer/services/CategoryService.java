@@ -18,4 +18,6 @@ public interface CategoryService {
     List<Category> allByTypes(List<String> types);
 
     Category findById(Long id);
+
+    List<Category> allByGroupFromParent(String group);
 }
