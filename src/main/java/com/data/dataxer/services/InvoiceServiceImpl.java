@@ -335,7 +335,15 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         List<DocumentPackItem> documentPackItems = new ArrayList<>();
 
         packs.forEach(pack -> {
-            documentPackItems.addAll(pack.getPackItems());
+            if (pack.getCustomPrice()) {
+                DocumentPackItem tmpItem = new DocumentPackItem();
+                tmpItem.setTax(pack.getTax());
+                tmpItem.setPrice(pack.getPrice());
+                tmpItem.setTotalPrice(pack.getTotalPrice());
+                documentPackItems.add(tmpItem);
+            } else {
+                documentPackItems.addAll(pack.getPackItems());
+            }
         });
 
         return documentPackItems;
