@@ -1,12 +1,15 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Cost;
+import com.data.dataxer.models.domain.Payment;
 import com.data.dataxer.models.enums.DocumentState;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.MandatoryValidator;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -17,14 +20,14 @@ import java.util.List;
 
 @Service
 public class CostServiceImpl implements CostService {
+    @Autowired
+    private CostRepository costRepository;
 
-    private final CostRepository costRepository;
-    private final QCostRepository qCostRepository;
+    @Autowired
+    private QCostRepository qCostRepository;
 
-    public CostServiceImpl(CostRepository costRepository, QCostRepository qCostRepository) {
-        this.costRepository = costRepository;
-        this.qCostRepository = qCostRepository;
-    }
+    @Autowired
+    private PaymentService paymentService;
 
     @Override
     public Cost store(Cost cost) {
@@ -37,7 +40,14 @@ public class CostServiceImpl implements CostService {
             cost.setNextRepeatedCost(this.getNextRepeat(cost));
             this.costRepository.save(fromRepeatedCost);
         }
-        return this.costRepository.save(cost);
+
+        Cost newCost = this.costRepository.save(cost);
+
+        if (newCost.getPaymentDate() != null) {
+            this.storeCostPayment(newCost); // todo tpm odstranit ked sa opravia platby pri nakladoch
+        }
+
+        return newCost;
     }
 
     @Override
@@ -181,5 +191,17 @@ public class CostServiceImpl implements CostService {
             return nextRepeatedCost;
         }
         return LocalDate.now();
+    }
+
+    private void storeCostPayment(Cost cost) {
+        Payment payment = new Payment();
+
+        payment.setPaymentMethod(cost.getPaymentMethod());
+        payment.setDocumentId(cost.getId());
+        payment.setPayedValue(cost.getPrice());
+        payment.setDocumentType(DocumentType.COST);
+        payment.setPayedDate(cost.getPaymentDate());
+
+        this.paymentService.store(payment);
     }
 }

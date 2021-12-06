@@ -21,13 +21,11 @@ import java.util.List;
 @RequestMapping("/api/invoice")
 @PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class InvoiceController {
-    private final PdfService pdfService;
     private final InvoiceService invoiceService;
     private final InvoiceMapper invoiceMapper;
     private final DocumentNumberGeneratorService documentNumberGeneratorService;
 
-    public InvoiceController(PdfService pdfService, InvoiceService invoiceService, InvoiceMapper invoiceMapper, DocumentNumberGeneratorService documentNumberGeneratorService) {
-        this.pdfService = pdfService;
+    public InvoiceController(InvoiceService invoiceService, InvoiceMapper invoiceMapper, DocumentNumberGeneratorService documentNumberGeneratorService) {
         this.invoiceService = invoiceService;
         this.invoiceMapper = invoiceMapper;
         this.documentNumberGeneratorService = documentNumberGeneratorService;
@@ -73,7 +71,7 @@ public class InvoiceController {
             @RequestParam(value = "page", defaultValue = "0") int page,
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
-            @RequestParam(value = "sortExpression", defaultValue = "sort(-invoice.start)") String sortExpression
+            @RequestParam(value = "sortExpression", defaultValue = "sort(-invoice.id)") String sortExpression
     ) {
         Pageable pageable = PageRequest.of(page, size);
 

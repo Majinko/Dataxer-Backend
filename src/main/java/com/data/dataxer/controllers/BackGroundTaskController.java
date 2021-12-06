@@ -19,5 +19,4 @@ public class BackGroundTaskController {
     public void scheduleUYH() {
         this.backGroundTaskService.scheduleUsersYearsHoursTask();
     }
-
 }

@@ -39,7 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (this.documentIsPayed(payment)) {
             if (payment.getDocumentType().equals(DocumentType.COST)) {
-                this.setCostPayment(payment.getDocumentId(), payment.getPayedDate());
+                this.setCostPayment(payment.getDocumentId(), payment.getPayedDate()); // todo spravit ako ma faktura
             } else {
                 this.setInvoicePayment(payment.getDocumentId(), payment.getPayedDate());
             }

@@ -51,6 +51,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
                 .put("project.id", QProject.project.id)
                 .put("project.title", QProject.project.title)
                 .put("project.number", QProject.project.number)
+                .put("project.address", QProject.project.address)
                 .put("project.contact.id", QProject.project.contact.id)
                 .put("project.contact.name", QProject.project.contact.name)
                 .build();

@@ -26,8 +26,6 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     List<Category> findAllByParentIdAndCompanyId(Long parentId, Long companyId);
 
-    List<Category> findAllByIsInProjectOverviewAndCompanyIdIn(Boolean isInProjectOverview, List<Long> companyIds);
-
     List<Category> findAllByCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);
 
     List<Category> findAllByCategoryGroupAndCompanyIdInAndParentIdIsNull(CategoryGroup categoryGroup, List<Long> companyIds);
