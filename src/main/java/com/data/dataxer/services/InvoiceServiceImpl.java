@@ -7,6 +7,7 @@ import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.data.dataxer.utils.Helpers;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -390,7 +391,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     private String generateSummaryInvoicePackTitle(String taxDocumentNumber, LocalDate taxDocumentCreatedDate, String taxDocumentVariableSymbol) {
         return "Daňový doklad k prijatej platbe " + taxDocumentNumber + ", zo dňa "
-                + taxDocumentCreatedDate + ", variabilný symbol " + taxDocumentVariableSymbol;
+                + taxDocumentCreatedDate + ", VS " + taxDocumentVariableSymbol;
     }
 
 

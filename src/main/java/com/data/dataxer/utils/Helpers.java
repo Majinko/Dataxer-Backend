@@ -2,6 +2,7 @@ package com.data.dataxer.utils;
 
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Calendar;
@@ -44,5 +45,11 @@ public class Helpers {
         if (!SecurityUtils.companyIds().contains(companyId)) {
             throw new RuntimeException("ha ha ha");
         }
+    }
+
+    public static String getDateFormat(LocalDate date) {
+        SimpleDateFormat DateFor = new SimpleDateFormat("dd.MM.yyyy");
+
+        return DateFor.format(date);
     }
 }
