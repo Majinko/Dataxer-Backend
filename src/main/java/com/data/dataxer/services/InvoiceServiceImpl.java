@@ -346,10 +346,12 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         HashMap<Integer, BigDecimal> mappedTaxedValues = new HashMap<>();
         for (DocumentPackItem documentPackItem : documentPackItems) {
             if (mappedTaxedValues.containsKey(documentPackItem.getTax())) {
-                BigDecimal newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(documentPackItem.getTotalPrice());
+                BigDecimal newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
+                        documentPackItem.getTotalPrice() != null ? documentPackItem.getTotalPrice() : BigDecimal.ZERO);
                 mappedTaxedValues.replace(documentPackItem.getTax(), newValue);
             } else {
-                mappedTaxedValues.put(documentPackItem.getTax(), documentPackItem.getTotalPrice());
+                mappedTaxedValues.put(documentPackItem.getTax(),
+                        documentPackItem.getTotalPrice() != null ? documentPackItem.getTotalPrice() : BigDecimal.ZERO);
             }
         }
         return mappedTaxedValues;
