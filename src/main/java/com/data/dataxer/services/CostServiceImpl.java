@@ -43,7 +43,7 @@ public class CostServiceImpl implements CostService {
 
         Cost newCost = this.costRepository.save(cost);
 
-        if (newCost.getPaymentDate() != null) {
+        if (newCost.getState() == DocumentState.PAYED) {
             this.storeCostPayment(newCost); // todo tpm odstranit ked sa opravia platby pri nakladoch
         }
 

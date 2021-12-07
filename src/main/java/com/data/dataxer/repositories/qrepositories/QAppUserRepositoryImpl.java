@@ -1,17 +1,20 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.AppUser;
+import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.domain.QAppUser;
 import com.data.dataxer.models.domain.QCompany;
 import com.data.dataxer.security.model.Privilege;
 import com.data.dataxer.security.model.QPrivilege;
 import com.data.dataxer.security.model.QRole;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class QAppUserRepositoryImpl implements QAppUserRepository {
@@ -61,6 +64,30 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
         );
     }
 
+    @Override
+    public List<AppUser> getUsersByCompany(Pageable pageable, String qString, List<Long> companyIds) {
+        Set<Long> userIds = new HashSet<>();
+
+        List<Company> companies = this.query
+                .selectFrom(QCompany.company)
+                .where(QCompany.company.id.in(companyIds))
+                .leftJoin(QCompany.company.appUsers).fetchJoin()
+                .distinct()
+                .fetch();
+
+        companies.forEach(c -> {
+            userIds.addAll(c.getAppUsers().stream().map(AppUser::getId).collect(Collectors.toList()));
+        });
+
+        return this.query
+                .selectFrom(QAppUser.appUser)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .where(search(qString))
+                .where(QAppUser.appUser.id.in(userIds))
+                .fetch();
+    }
+
     private void appUserSetRolePrivileges(AppUser appUser) {
         appUser.getRoles().forEach(role -> {
             List<Privilege> privileges = this.query.selectFrom(QPrivilege.privilege)
@@ -68,5 +95,23 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
                     .fetch();
             role.setPrivileges(privileges);
         });
+    }
+
+    private Long getTotalCount(String qString) {
+        return this.query
+                .selectFrom(QAppUser.appUser)
+                .where(search(qString))
+                .fetchCount();
+    }
+
+    private BooleanBuilder search(String queryString) {
+        BooleanBuilder where = new BooleanBuilder();
+
+        if (queryString != null)
+            where
+                    .or(QAppUser.appUser.firstName.containsIgnoreCase(queryString))
+                    .or(QAppUser.appUser.email.containsIgnoreCase(queryString));
+
+        return where;
     }
 }

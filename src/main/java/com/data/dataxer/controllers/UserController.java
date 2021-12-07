@@ -59,11 +59,12 @@ public class UserController {
     @GetMapping("/overview")
     public ResponseEntity<Page<AppUserOverviewDTO>> overview(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "15") int size
+            @RequestParam(value = "size", defaultValue = "15") int size,
+            @RequestParam(value = "qString", required = false) String qString
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.userService.overview(pageable));
+        return ResponseEntity.ok(this.userService.overview(pageable, qString));
     }
 
     // todo move to other controller

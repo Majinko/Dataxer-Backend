@@ -27,7 +27,7 @@ public interface UserService {
 
     void assignRoles(String uid, List<Role> roleDTOStoRoles);
 
-    Page<AppUserOverviewDTO> overview(Pageable pageable);
+    Page<AppUserOverviewDTO> overview(Pageable pageable, String qString);
 
     AppUser userWithRoles(String uid);
 

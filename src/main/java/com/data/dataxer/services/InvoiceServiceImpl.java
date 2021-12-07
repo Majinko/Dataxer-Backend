@@ -212,10 +212,10 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
                     DocumentPack pack = taxesPacks.get(documentPack.getTax());
                     pack.setPrice(pack.getPrice().add(responsePack.getPrice()));
                     pack.setTotalPrice(pack.getTotalPrice().add(responsePack.getTotalPrice()));
-                    pack.setShowItems(true);
                     List<DocumentPackItem> items = new ArrayList<>(pack.getPackItems());
                     items.addAll(new ArrayList<>(responsePack.getPackItems()));
                     pack.setPackItems(items);
+                    pack.setShowItems(true);
                     taxesPacks.replace(documentPack.getTax(), pack);
                 } else {
                     taxesPacks.put(documentPack.getTax(), responsePack);
@@ -295,6 +295,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         summaryInvoicePack.setTax(taxDocumentPack.getTax());
         summaryInvoicePack.setPrice(taxDocumentPack.getPrice().negate());
         summaryInvoicePack.setTotalPrice(taxDocumentPack.getTotalPrice().negate());
+        summaryInvoicePack.setShowItems(true);
 
         summaryInvoicePack.setPackItems(List.of(generateDocumentPackItemForSummaryInvoice(taxDocumentPack, taxDocumentNumber,
                 taxDocumentCreated, taxDocumentVariableSymbol)));

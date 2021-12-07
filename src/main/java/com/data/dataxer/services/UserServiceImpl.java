@@ -8,6 +8,7 @@ import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.repositories.AppUserRepository;
 import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.SalaryRepository;
+import com.data.dataxer.repositories.qrepositories.QAppUserRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.security.model.Role;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -35,6 +36,8 @@ public class UserServiceImpl implements UserService {
     private FirebaseAuth firebaseAuth;
     @Autowired
     private AppUserRepository userRepository;
+    @Autowired
+    private QAppUserRepository qAppUserRepository;
     @Autowired
     private QTimeRepository qTimeRepository;
     @Autowired
@@ -104,9 +107,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Page<AppUserOverviewDTO> overview(Pageable pageable) {
-        List<AppUser> appUsers = this.userRepository.findAllByDefaultCompanyIdOrderByIdAsc(pageable, SecurityUtils.companyId());
+    public Page<AppUserOverviewDTO> overview(Pageable pageable, String qString) {
         List<AppUserOverviewDTO> appUserOverviewDTOS = new ArrayList<>();
+        List<AppUser> appUsers = this.qAppUserRepository.getUsersByCompany(pageable, qString, SecurityUtils.companyIds());
 
         appUsers.forEach(user -> {
             appUserOverviewDTOS.add(fillAppUserOverview(user, false));
