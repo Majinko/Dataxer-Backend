@@ -86,17 +86,17 @@
                         <tr>
                             <td class="text-left white-space-normal" style="white-space: nowrap" th:text="${packItem.getTitle()} ?: ''"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getQty()} ?: ''"></td>
-                            <td class="text-center" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
+                            <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getItem() != null ? packItem.getItem().getUnit() : ''}"></td>
-                            <td class="text-center" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
+                            <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
                             <td class="text-right" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getPrice() != null} ? ${#numbers.formatDecimal(packItem.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
-                            <td class="text-right" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
+                            <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
                             <td class="text-center" style="white-space: nowrap" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getTax() != null} ? ${packItem.getTax()} + ' %' : ''"></td>
-                            <td class="text-center" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
+                            <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
                             <td class="text-right" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null} ? ${#numbers.formatDecimal(packItem.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
-                            <td class="text-right" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
+                            <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
                             <td class="text-right" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null and packItem.getDiscount() != null} ? ${#numbers.formatDecimal(packItem.countQuantityTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
-                            <td class="text-right" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
+                            <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
                         </tr>
 
                         <tr th:if="${packItem.getDiscount() != null and packItem.getDiscount() &gt; 0}">
@@ -156,17 +156,27 @@
                         </tr>
                     </th:block>
 
+                    <th:block th:if="${document.getDocumentType().getName().equals('summary_invoice')}" th:each="key: ${payedValue.keySet()}">
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'Uhradená záloha DPH ' + ${key} + ' %'"></td>
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(payedValue.get(key), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'Výška uhradenej zálohy DPH ' + ${key} + ' %'"></td>
+
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(payedTaxValue.get(key), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+                    </th:block>
+
                     <tr th:if="${!document.getDocumentType().getName().equals('tax_document')}">
                         <td colspan="5" class="text-right" style="font-weight: bold; font-size: 16px; line-height: 1.21em" th:text="'Celkom s DPH: '"></td>
                         <td class="text-right thin" style="line-height: 1.21em">
                             <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
-                        </td>
-                    </tr>
-
-                    <tr th:if="${document.getDocumentType().getName().equals('tax_document')}">
-                        <td colspan="5" class="text-right" th:text="'Celkom s DPH: '"></td>
-                        <td class="text-right thin">
-                            <span class="open-sans" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
                     </tr>
 
