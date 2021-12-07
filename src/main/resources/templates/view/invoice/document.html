@@ -235,10 +235,10 @@
             </div>
         </p>
 
-        <div th:if="${document.getNote() != null || document.getNote() != ''}">
-            <p style="font-weight: bold" th:text="'Poznámka:'"></p>
+        <div class="note">
+            <p style="font-weight: bold" th:if="${document.getNote() != null || document.getNote() != ''}" th:text="'Poznámka:'"></p>
             <br></br>
-            <p style="text-align: justify; margin-top: -20px" class="small-font" th:text="${document.getNote()}"></p>
+            <p style="text-align: justify; margin-top: -20px" class="small-font" th:if="${document.getNote() != null || document.getNote() != ''}" th:text="${document.getNote()}"></p>
         </div>
 
         <div class="row" style="margin-top: 50px;">
