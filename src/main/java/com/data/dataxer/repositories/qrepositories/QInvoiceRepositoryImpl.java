@@ -118,7 +118,8 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
     @Override
     public List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, List<Long> companyIds) {
-        return this.query.selectFrom(QInvoice.invoice)
+        return this.query.selectDistinct(QInvoice.invoice)
+                .from(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
