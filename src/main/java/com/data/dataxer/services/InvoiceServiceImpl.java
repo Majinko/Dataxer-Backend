@@ -335,7 +335,15 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         List<DocumentPackItem> documentPackItems = new ArrayList<>();
 
         packs.forEach(pack -> {
-            documentPackItems.addAll(pack.getPackItems());
+            if (pack.getCustomPrice() != null && pack.getCustomPrice()) {
+                DocumentPackItem tmpItem = new DocumentPackItem();
+                tmpItem.setTax(pack.getTax());
+                tmpItem.setPrice(pack.getPrice());
+                tmpItem.setTotalPrice(pack.getTotalPrice());
+                documentPackItems.add(tmpItem);
+            } else {
+                documentPackItems.addAll(pack.getPackItems());
+            }
         });
 
         return documentPackItems;
@@ -346,13 +354,47 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         HashMap<Integer, BigDecimal> mappedTaxedValues = new HashMap<>();
         for (DocumentPackItem documentPackItem : documentPackItems) {
             if (mappedTaxedValues.containsKey(documentPackItem.getTax())) {
-                BigDecimal newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(documentPackItem.getTotalPrice());
+                BigDecimal newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
+                        documentPackItem.getTotalPrice() != null ? documentPackItem.getTotalPrice() : BigDecimal.ZERO);
                 mappedTaxedValues.replace(documentPackItem.getTax(), newValue);
             } else {
-                mappedTaxedValues.put(documentPackItem.getTax(), documentPackItem.getTotalPrice());
+                mappedTaxedValues.put(documentPackItem.getTax(),
+                        documentPackItem.getTotalPrice() != null ? documentPackItem.getTotalPrice() : BigDecimal.ZERO);
             }
         }
         return mappedTaxedValues;
+    }
+
+    @Override
+    public HashMap<Integer, BigDecimal> getPayedTaxesValuesMap(List<DocumentPack> packs) {
+        HashMap<Integer, BigDecimal> mappedPayedTaxedValues = new HashMap<>();
+        for (DocumentPack pack : packs) {
+            if (pack.getTotalPrice().compareTo(BigDecimal.ZERO) == -1) {
+                if (mappedPayedTaxedValues.containsKey(pack.getTax())) {
+                    BigDecimal newValue = mappedPayedTaxedValues.get(pack.getTax()).add(pack.getTotalPrice());
+                    mappedPayedTaxedValues.replace(pack.getTax(), newValue);
+                } else {
+                    mappedPayedTaxedValues.put(pack.getTax(), pack.getTotalPrice());
+                }
+            }
+        }
+        return mappedPayedTaxedValues;
+    }
+
+    @Override
+    public HashMap<Integer, BigDecimal> getTaxPayedTaxesValuesMap(List<DocumentPack> packs) {
+        HashMap<Integer, BigDecimal> mappedPayedTaxedValues = new HashMap<>();
+        for (DocumentPack pack : packs) {
+            if (pack.getTotalPrice().compareTo(BigDecimal.ZERO) == -1) {
+                if (mappedPayedTaxedValues.containsKey(pack.getTax())) {
+                    BigDecimal newValue = mappedPayedTaxedValues.get(pack.getTax()).add(pack.getTotalPrice().subtract(pack.getPrice()));
+                    mappedPayedTaxedValues.replace(pack.getTax(), newValue);
+                } else {
+                    mappedPayedTaxedValues.put(pack.getTax(), pack.getTotalPrice().subtract(pack.getPrice()));
+                }
+            }
+        }
+        return mappedPayedTaxedValues;
     }
 
     private BigDecimal getPaymentsValue(Long proformaInvoiceId) {

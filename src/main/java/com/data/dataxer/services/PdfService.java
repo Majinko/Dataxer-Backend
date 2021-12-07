@@ -77,6 +77,8 @@ public class PdfService {
         context.setVariable("subject", invoice.getSubject());
         context.setVariable("type", "I");
         context.setVariable("document", invoice);
+        context.setVariable("payedValue", invoiceService.getPayedTaxesValuesMap(invoice.getPacks()));
+        context.setVariable("payedTaxValue", invoiceService.getTaxPayedTaxesValuesMap(invoice.getPacks()));
 
         return context;
     }
