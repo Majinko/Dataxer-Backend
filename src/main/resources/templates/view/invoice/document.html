@@ -156,7 +156,7 @@
                         </tr>
                     </th:block>
 
-                    <th:block th:if="${document.getDocumentType().getName().equals('summary_invoice')}" th:each="key: ${payedValue.keySet()}">
+                    <th:block th:if="${document.getDocumentType() != null && document.getDocumentType().getName().equals('summary_invoice')}" th:each="key: ${payedValue.keySet()}">
                         <tr>
                             <td colspan="5" class="text-right" th:text="'Uhradená záloha DPH ' + ${key} + ' %'"></td>
                             <td class="text-right thin">
@@ -173,14 +173,14 @@
                         </tr>
                     </th:block>
 
-                    <tr th:if="${!document.getDocumentType().getName().equals('tax_document')}">
+                    <tr th:if="${document.getDocumentType() != null && !document.getDocumentType().getName().equals('tax_document')}">
                         <td colspan="5" class="text-right" style="font-weight: bold; font-size: 16px; line-height: 1.21em" th:text="'Celkom s DPH: '"></td>
                         <td class="text-right thin" style="line-height: 1.21em">
                             <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
                     </tr>
 
-                    <tr th:if="${document.getDocumentType().getName().equals('tax_document')}">
+                    <tr th:if="${document.getDocumentType() != null && document.getDocumentType().getName().equals('tax_document')}">
                         <td colspan="5" class="text-right" style="font-weight: bold; font-size: 16px; line-height: 1.21em" th:text="'Suma na úhradu: '"></td>
                         <td class="text-right thin" style="line-height: 1.21em">
                             <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:text="'0,00 &euro;'"></span>
