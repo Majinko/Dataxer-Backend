@@ -41,7 +41,7 @@ public class Invoice extends DocumentBase {
 
     public BigDecimal countTaxPrice(BigDecimal totalPrice, Integer tax) {
         return totalPrice.subtract(
-                totalPrice.divide(new BigDecimal(1.0 + (tax.doubleValue()/100)).setScale(2, RoundingMode.HALF_UP))
-        );
+                totalPrice.divide(new BigDecimal(1.0 + (tax.doubleValue()/100)).setScale(2, RoundingMode.HALF_UP), 2, RoundingMode.HALF_UP)
+        ).setScale(2, RoundingMode.HALF_UP);
     }
 }
