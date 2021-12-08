@@ -16,6 +16,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
+import java.util.HashMap;
 
 @Service
 public class PdfService {
@@ -89,6 +91,7 @@ public class PdfService {
         context.setVariable("headerComment", "");
         context.setVariable("type", "P");
         context.setVariable("document", priceOffer);
+        context.setVariable("payedValue", new HashMap<Integer, BigDecimal>());
 
         return context;
     }
