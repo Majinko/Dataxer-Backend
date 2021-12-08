@@ -65,6 +65,7 @@ public class QCostRepositoryImpl implements QCostRepository {
             predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
                     .setMapping(pathMapping)));
         }
+
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Long> costIds = this.returnCostsIdsForPaginate(pageable, rqlFilter, companyId, predicate, orderSpecifierList);
@@ -74,6 +75,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .leftJoin(qCost.project).fetchJoin()
                 .join(QCost.cost.categories, QCategory.category).fetchJoin()
                 .where(qCost.id.in(costIds))
+                .orderBy(QCost.cost.id.desc())
                 .fetch();
 
 
@@ -177,9 +179,6 @@ public class QCostRepositoryImpl implements QCostRepository {
         if (!rqlFilter.contains("cost.company.id")) {
             costJPAQuery.where(QCost.cost.company.id.eq(companyId));
         } // todo somethnig can hack, only change company id in header query params manual alebo nejaku grupu pre usera
-        else {
-            //Helpers.checkCompanyIdFromRql(rqlFilter); //todo only hot fix make somthing group for user app account
-        }
 
         return costJPAQuery.select(QCost.cost.id).fetch();
     }

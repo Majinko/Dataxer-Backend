@@ -75,7 +75,7 @@ public class CostController {
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
             @RequestParam(value = "sortExpression", defaultValue = "sort(-cost.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Pageable pageable = PageRequest.of(page, size);
 
         return ResponseEntity.ok(this.costService.paginate(pageable, rqlFilter, sortExpression).map(this.costMapper::costToCostDTOPaginate));
     }

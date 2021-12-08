@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/storage")
-@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
 public class StorageController {
     @Autowired
     StorageService storageService;
