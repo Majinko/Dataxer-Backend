@@ -85,21 +85,21 @@
                     <th:block  th:if="${pack.getShowItems()}" th:each="packItem, inDex: ${pack.getPackItems()}">
                         <tr>
                             <td class="text-left white-space-normal" style="white-space: nowrap" th:text="${packItem.getTitle()} ?: ''"></td>
-                            <td class="text-center" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getQty()} ?: ''"></td>
+                            <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getQty()}"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
-                            <td class="text-center" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getItem() != null ? packItem.getItem().getUnit() : ''}"></td>
-                            <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getItem() == null}" th:text="''"></td>
-                            <td class="text-right" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getPrice() != null} ? ${#numbers.formatDecimal(packItem.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
+                            <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getItem() != null ? packItem.getItem().getUnit() : ''}"></td>
+                            <td class="text-center" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
+                            <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getPrice() != null} ? ${#numbers.formatDecimal(packItem.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
                             <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getPrice() == null}" th:text="''"></td>
-                            <td class="text-center" style="white-space: nowrap" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getTax() != null} ? ${packItem.getTax()} + ' %' : ''"></td>
+                            <td class="text-center" style="white-space: nowrap" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTax() != null} ? ${packItem.getTax()} + ' %' : ''"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getTax() == null}" th:text="''"></td>
-                            <td class="text-right" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null} ? ${#numbers.formatDecimal(packItem.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
+                            <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null} ? ${#numbers.formatDecimal(packItem.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
                             <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getTotalPrice() == null}" th:text="''"></td>
-                            <td class="text-right" th:if="${pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null and packItem.getDiscount() != null} ? ${#numbers.formatDecimal(packItem.countQuantityTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
+                            <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null and packItem.getDiscount() != null} ? ${#numbers.formatDecimal(packItem.countQuantityTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
                             <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getTotalPrice() == null}" th:text="''"></td>
                         </tr>
 
-                        <tr th:if="${packItem.getDiscount() != null and packItem.getDiscount() &gt; 0}">
+                        <tr th:if="${packItem.getDiscount() != null and packItem.getDiscount() &gt; 0.00}">
                             <td class="text-left white-space-nowrap" colspan="3" th:text="'Zľava ' + ${packItem.getDiscount()} + ' %'"></td>
                             <td class="text-right nowrap" th:text="${#numbers.formatDecimal(packItem.countPriceDiscount(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
                             <td></td>
