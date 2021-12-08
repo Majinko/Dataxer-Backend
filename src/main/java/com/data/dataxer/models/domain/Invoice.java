@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLDelete;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 
 @Entity
@@ -38,7 +39,9 @@ public class Invoice extends DocumentBase {
         return this.totalPrice.multiply(this.discount.divide(BigDecimal.valueOf(100)));
     }
 
-    public BigDecimal countTaxPrice(BigDecimal price, Integer tax) {
-        return price.multiply(new BigDecimal(tax.floatValue() / 100));
+    public BigDecimal countTaxPrice(BigDecimal totalPrice, Integer tax) {
+        return totalPrice.subtract(
+                totalPrice.divide(new BigDecimal(1.0 + (tax.doubleValue()/100)).setScale(2, RoundingMode.HALF_UP))
+        );
     }
 }
