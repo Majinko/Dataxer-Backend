@@ -56,7 +56,7 @@ public class PdfService {
     private File renderPdf(String html, DocumentBase document) throws IOException, DocumentException {
         File file = File.createTempFile(document.getTitle(), ".pdf");
         OutputStream outputStream = new FileOutputStream(file);
-        ITextRenderer renderer = new ITextRenderer(20f * 4f / 3f, 20);
+        ITextRenderer renderer = new ITextRenderer();
 
         renderer.getFontResolver().addFont("/fonts/OpenSans.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
         renderer.getFontResolver().addFont("/fonts/DejaVuSans.ttf", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
@@ -104,6 +104,7 @@ public class PdfService {
         context.setVariable("taxes", invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks())));
         context.setVariable("user", document.getDocumentData().get("user"));
         context.setVariable("createdWeb", "");
+        context.setVariable("note", document.getNote() != null ? document.getNote().strip() : "");
 
         return context;
     }
