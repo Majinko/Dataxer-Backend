@@ -5,6 +5,7 @@ import com.data.dataxer.models.domain.Salary;
 import com.data.dataxer.models.domain.Time;
 import com.data.dataxer.repositories.SalaryRepository;
 import com.data.dataxer.repositories.TimeRepository;
+import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -56,6 +57,11 @@ public class SalaryServiceImpl implements SalaryService {
     @Override
     public Salary getById(Long id) {
         return this.salaryRepository.findByIdAndAndCompanyId(id, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Salary not found :("));
+    }
+
+    @Override
+    public Salary getActiveSalary(String uid) {
+        return this.salaryRepository.findByUserUidAndFinishIsNullAndCompanyId(uid, SecurityUtils.companyId());
     }
 
     @Override

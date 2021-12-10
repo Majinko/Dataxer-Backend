@@ -19,7 +19,7 @@ public class QSalaryRepositoryImpl implements QSalaryRepository {
     }
 
     @Override
-    public Salary getPriceFromSalaryByUserFinishIsNull(AppUser user, Long companyId) {
+    public Salary getActiveSalary(AppUser user, Long companyId) {
         return this.query.select(QSalary.salary)
                 .from(QSalary.salary)
                 .where(QSalary.salary.user.eq(user))

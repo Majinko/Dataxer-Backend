@@ -15,5 +15,7 @@ public interface SalaryService {
 
     Salary getById(Long id);
 
+    Salary getActiveSalary(String uid);
+
     void update(Salary salaryDTOtoSalary);
 }

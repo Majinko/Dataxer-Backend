@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.dto.MonthAndYearDTO;
+import com.data.dataxer.models.enums.SalaryType;
 import com.data.dataxer.repositories.TimeRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
@@ -45,11 +46,16 @@ public class TimeServiceImpl implements TimeService {
     }
 
     private void addDataToTime(Time time) {
-        Salary salary = this.qSalaryRepository.getPriceFromSalaryByUserFinishIsNull(SecurityUtils.loggedUser(), SecurityUtils.companyId());
+        Salary salary = this.qSalaryRepository.getActiveSalary(SecurityUtils.loggedUser(), SecurityUtils.companyId());
 
         time.setSalary(salary);
         time.setUser(SecurityUtils.loggedUser());
-        time.setPrice(BigDecimal.valueOf((float) time.getTime() / 60 / 60).multiply(salary.getPrice())); // calc total price by time store
+
+        if (salary.getSalaryType().equals(SalaryType.FLAT)) {
+            time.setPrice(null);
+        } else {
+            time.setPrice(BigDecimal.valueOf((float) time.getTime() / 60 / 60).multiply(salary.getPrice())); // calc total price by time store
+        }
     }
 
     @Override
@@ -130,9 +136,7 @@ public class TimeServiceImpl implements TimeService {
         List<Tuple> dataTuple = this.qTimeRepository.getUserLastProjects(SecurityUtils.id(), LIMIT, 0L, SecurityUtils.companyId());
 
         dataTuple.forEach(data -> {
-            if (!projects.contains(data.get(QTime.time1.project))) {
-                projects.add(data.get(QTime.time1.project));
-            }
+            projects.add(data.get(QTime.time1.project));
         });
 
         return projects;
