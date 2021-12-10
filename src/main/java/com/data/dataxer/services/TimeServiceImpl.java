@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.dto.MonthAndYearDTO;
 import com.data.dataxer.models.enums.SalaryType;
 import com.data.dataxer.repositories.TimeRepository;
+import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
@@ -24,11 +25,14 @@ public class TimeServiceImpl implements TimeService {
     private final TimeRepository timeRepository;
     private final QTimeRepository qTimeRepository;
     private final QSalaryRepository qSalaryRepository;
+    private final QProjectRepository qProjectRepository;
 
-    public TimeServiceImpl(TimeRepository timeRepository, QTimeRepository qTimeRepository, QSalaryRepository qSalaryRepository) {
+    public TimeServiceImpl(TimeRepository timeRepository, QTimeRepository qTimeRepository,
+                           QSalaryRepository qSalaryRepository, QProjectRepository qProjectRepository) {
         this.timeRepository = timeRepository;
         this.qTimeRepository = qTimeRepository;
         this.qSalaryRepository = qSalaryRepository;
+        this.qProjectRepository = qProjectRepository;
     }
 
     @Override
@@ -132,13 +136,8 @@ public class TimeServiceImpl implements TimeService {
 
     @Override
     public List<Project> getLastUserWorkingProjects(Long userId) {
-        List<Project> projects = new ArrayList<>();
-        List<Tuple> dataTuple = this.qTimeRepository.getUserLastProjects(SecurityUtils.id(), LIMIT, 0L, SecurityUtils.companyId());
+        List<Long> projectIds = this.timeRepository.loadLastUserProject(SecurityUtils.uid(), LIMIT, SecurityUtils.companyId());
 
-        dataTuple.forEach(data -> {
-            projects.add(data.get(QTime.time1.project));
-        });
-
-        return projects;
+        return this.qProjectRepository.getAllByIds(projectIds, SecurityUtils.companyIds());
     }
 }

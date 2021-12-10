@@ -132,6 +132,14 @@ public class QProjectRepositoryImpl implements QProjectRepository {
                 .fetch();
     }
 
+    @Override
+    public List<Project> getAllByIds(List<Long> ids, List<Long> companyIds) {
+        return this.query.selectFrom(QProject.project)
+                .where(QProject.project.id.in(ids))
+                .where(QProject.project.company.id.in(companyIds))
+                .fetch();
+    }
+
 
     private long getTotalCount(Predicate predicate) {
         QProject qProject = QProject.project;

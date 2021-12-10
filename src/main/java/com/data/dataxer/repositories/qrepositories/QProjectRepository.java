@@ -21,4 +21,6 @@ public interface QProjectRepository {
     List<Project> allHasPriceOffer(List<Long> companyIds);
 
     List<Project> allHasUserTime(String uid, List<Long> companyIds);
+
+    List<Project> getAllByIds(List<Long> ids, List<Long> companyIds);
 }
