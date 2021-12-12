@@ -18,7 +18,6 @@ import java.util.List;
 
 @Service
 public class SettingsServiceImpl implements SettingsService{
-
     @Value("${file.upload-dir}")
     private String uploadDirectory;
 
