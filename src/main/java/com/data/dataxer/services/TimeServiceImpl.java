@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -138,6 +139,8 @@ public class TimeServiceImpl implements TimeService {
     public List<Project> getLastUserWorkingProjects(Long userId) {
         List<Long> projectIds = this.timeRepository.loadLastUserProject(SecurityUtils.uid(), LIMIT, SecurityUtils.companyId());
 
-        return this.qProjectRepository.getAllByIds(projectIds, SecurityUtils.companyIds());
+        List<Project> projects = this.qProjectRepository.getAllByIds(projectIds, SecurityUtils.companyIds());
+        projects.sort(Comparator.comparing(project -> projectIds.indexOf(project.getId())));
+        return projects;
     }
 }
