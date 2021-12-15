@@ -28,6 +28,8 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     List<Category> findAllByCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);
 
+    List<Category> findAllByCategoryGroupInAndCompanyIdIn(List<CategoryGroup> categoryGroups, List<Long> companyIds);
+
     List<Category> findAllByCategoryGroupAndCompanyIdInAndParentIdIsNull(CategoryGroup categoryGroup, List<Long> companyIds);
 
     @Query("select c.id from Category c where c.categoryType in ?1 and c.company.id in ?2")

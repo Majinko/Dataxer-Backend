@@ -55,7 +55,7 @@ public class Cost extends BaseEntity {
     private String costOrder;
 
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Category> categories = new ArrayList<>();
 
     protected String number;

@@ -179,6 +179,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.user.uid.eq(uid))
+                .orderBy(QTime.time1.id.asc())
                 .limit(limit)
                 .fetch();
     }
@@ -389,7 +390,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Time> getAllProjectTimesOrdered(Long projectId,  List<Long> companyIds) {
+    public List<Time> getAllProjectTimesOrdered(Long projectId, List<Long> companyIds) {
         return this.query.selectFrom(QTime.time1)
                 .where(QTime.time1.project.id.eq(projectId))
                 .where(QTime.time1.company.id.in(companyIds))

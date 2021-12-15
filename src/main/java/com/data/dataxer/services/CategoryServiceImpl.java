@@ -68,6 +68,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> allByGroups(List<String> groups) {
+        List<CategoryGroup> categoryGroups = new ArrayList<>();
+
+        groups.forEach(group -> {
+            categoryGroups.add(CategoryGroup.valueOf(group));
+        });
+
+        return this.categoryRepository.findAllByCategoryGroupInAndCompanyIdIn(categoryGroups, SecurityUtils.companyIds());
+    }
+
+    @Override
     public Category findById(Long id) {
         return this.categoryRepository
                 .findByIdAndCompanyIdIn(id, SecurityUtils.companyIds())
@@ -85,6 +96,7 @@ public class CategoryServiceImpl implements CategoryService {
 
         return this.categoryRepository.findAllByIdInAndCompanyIdIn(new ArrayList<>(categoriesId), SecurityUtils.companyIds());
     }
+
 
     // private methods
     private Category updateCategory(Category category) {

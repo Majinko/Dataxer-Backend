@@ -158,11 +158,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUser userWithRoles(String uid) {
-        AppUser appUser = this.userRepository.findByUidAndDefaultCompanyIdWithRoles(uid, SecurityUtils.companyId());
+        AppUser appUser = this.userRepository.findByUid(uid);
 
-        appUser.getRoles().forEach(r -> {
-            r.setPrivileges(null);
-        });
+        if (!appUser.getRoles().isEmpty()) {
+            appUser.getRoles().forEach(r -> {
+                r.setPrivileges(null);
+            });
+        }
 
         return appUser;
     }
