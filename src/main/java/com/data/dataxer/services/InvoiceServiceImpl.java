@@ -6,8 +6,8 @@ import com.data.dataxer.repositories.DocumentRelationsRepository;
 import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
+import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
-import com.data.dataxer.utils.Helpers;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,15 +27,19 @@ import java.util.stream.Collectors;
 @Service
 public class InvoiceServiceImpl extends DocumentHelperService implements InvoiceService {
     private final InvoiceRepository invoiceRepository;
+    private final QPriceOfferRepository qPriceOfferRepository;
     private final QInvoiceRepository qInvoiceRepository;
     private final QPaymentRepository qPaymentRepository;
     private final DocumentRelationsRepository documentRelationsRepository;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, QInvoiceRepository qInvoiceRepository, QPaymentRepository qPaymentRepository, DocumentRelationsRepository documentRelationsRepository) {
+    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, QInvoiceRepository qInvoiceRepository,
+                              QPaymentRepository qPaymentRepository, DocumentRelationsRepository documentRelationsRepository,
+                              QPriceOfferRepository qPriceOfferRepository) {
         this.invoiceRepository = invoiceRepository;
         this.qInvoiceRepository = qInvoiceRepository;
         this.qPaymentRepository = qPaymentRepository;
         this.documentRelationsRepository = documentRelationsRepository;
+        this.qPriceOfferRepository = qPriceOfferRepository;
     }
 
     @Override
@@ -153,6 +157,30 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     @Override
     public List<Invoice> findAllByProject(Long projectId, List<Long> companyIds) {
         return this.invoiceRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
+    }
+
+    @Override
+    public Invoice generateFromPriceOfferByType(Long id, DocumentType type) {
+        PriceOffer priceOffer = this.qPriceOfferRepository.getById(id, SecurityUtils.companyId())
+                .orElseThrow(() -> new RuntimeException("Price offer not found"));
+
+        Invoice invoice = new Invoice();
+        BeanUtils.copyProperties(priceOffer, invoice, "id", "title", "note", "number", "state",
+                "createdDate", "createdAt", "updatedAt");
+        switch (type) {
+            case PROFORMA:
+                invoice.setDocumentType(DocumentType.PROFORMA);
+                break;
+            case SUMMARY_INVOICE:
+                invoice.setDocumentType(DocumentType.SUMMARY_INVOICE);
+                break;
+            case INVOICE:
+            default:
+                invoice.setDocumentType(DocumentType.INVOICE);
+                break;
+        }
+
+        return invoice;
     }
 
     @Override

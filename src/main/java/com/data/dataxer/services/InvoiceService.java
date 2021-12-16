@@ -3,6 +3,7 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
+import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -53,4 +54,6 @@ public interface InvoiceService {
     List<Invoice> findAllByRelatedDocuments(Long documentId);
 
     List<Invoice> findAllByProject(Long projectId, List<Long> companyIds);
+
+    Invoice generateFromPriceOfferByType(Long id, DocumentType type);
 }

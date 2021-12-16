@@ -120,4 +120,19 @@ public class InvoiceController {
     ) {
         return ResponseEntity.ok(invoiceMapper.invoicesToInvoicesDTOWithoutRelation(this.invoiceService.findAllByProject(projectId, companyIds)));
     }
+
+    @GetMapping("/priceOffer-to-proforma/{id}")
+    public ResponseEntity<InvoiceDTO> generateProformaFromPriceOffer(@PathVariable Long id) {
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateFromPriceOfferByType(id, DocumentType.PROFORMA)));
+    }
+
+    @GetMapping("/priceOffer-to-summary/{id}")
+    public ResponseEntity<InvoiceDTO> generateSummaryInvoiceFromPriceOffer(@PathVariable Long id) {
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateFromPriceOfferByType(id, DocumentType.SUMMARY_INVOICE)));
+    }
+
+    @GetMapping("/priceOffer-to-invoice/{id}")
+    public ResponseEntity<InvoiceDTO> generateInvoiceFromPriceOffer(@PathVariable Long id) {
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateFromPriceOfferByType(id, DocumentType.INVOICE)));
+    }
 }
