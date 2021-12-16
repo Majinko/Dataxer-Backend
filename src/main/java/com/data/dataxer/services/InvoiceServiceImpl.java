@@ -437,7 +437,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     private String generateSummaryInvoicePackTitle(String taxDocumentNumber, LocalDate taxDocumentCreatedDate, String taxDocumentVariableSymbol) {
         return "Daňový doklad k prijatej platbe " + taxDocumentNumber + ", zo dňa "
-                + taxDocumentCreatedDate + ", VS " + taxDocumentVariableSymbol;
+                + taxDocumentCreatedDate.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + ", VS " + taxDocumentVariableSymbol;
     }
 
 

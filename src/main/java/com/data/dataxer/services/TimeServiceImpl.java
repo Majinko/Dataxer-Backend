@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -97,16 +98,6 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public List<Category> lastProjectCategories(Long projectId) {
-        return this.categoryRepository.findAllByIdInAndCompanyId(
-                timeRepository.loadLastUserCategories(projectId, SecurityUtils.uid(), SecurityUtils.companyId(), LIMIT),
-                SecurityUtils.companyId()
-        );
-
-        //return this.qTimeRepository.getProjectLastCategories(projectId, LIMIT, SecurityUtils.companyId(), SecurityUtils.uid());
-    }
-
-    @Override
     public Time getLastUserTime() {
         return this.timeRepository.findFirstByUserIdAndCompanyIdAndDateWorkOrderByIdDesc(SecurityUtils.id(), SecurityUtils.companyId(), LocalDate.now());
     }
@@ -144,9 +135,24 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
+    public List<Category> lastProjectCategories(Long projectId) {
+        List<Long> categoryIds = timeRepository.loadLastUserCategories(projectId, SecurityUtils.uid(), SecurityUtils.companyId(), LIMIT);
+
+        List<Category> categories = this.categoryRepository.findAllByIdInAndCompanyId(categoryIds, SecurityUtils.companyId());
+
+        categories.sort(Comparator.comparing(category -> categoryIds.indexOf(category.getId())));
+
+        return categories;
+    }
+
+    @Override
     public List<Project> getLastUserWorkingProjects(Long userId) {
         List<Long> projectIds = this.timeRepository.loadLastUserProject(SecurityUtils.uid(), LIMIT, SecurityUtils.companyId());
 
-        return this.qProjectRepository.getAllByIds(projectIds, SecurityUtils.companyIds());
+        List<Project> projects = this.qProjectRepository.getAllByIds(projectIds, SecurityUtils.companyIds());
+
+        projects.sort(Comparator.comparing(project -> projectIds.indexOf(project.getId())));
+
+        return projects;
     }
 }

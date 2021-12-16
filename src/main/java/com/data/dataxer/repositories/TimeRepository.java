@@ -15,16 +15,14 @@ public interface TimeRepository extends JpaRepository<Time, Long> {
 
     List<Time> findAllBySalaryIdAndAndCompanyId(Long salaryId, Long companyId);
 
-    List<Time> findAllByCompanyId(Long companyId);
-
     @Query("select t from Time t left join fetch t.category where t.company.id = ?1 and t.user.uid = ?2")
     List<Time> findAllByCompanyIdAndUserUid(Long companyId, String userId);
 
     @Query(value = "SELECT t.project_id FROM " +
-            "(SELECT DISTINCT ON (project_id) project_id, id, time_to " +
+            "(SELECT DISTINCT ON (project_id) project_id, id " +
             "FROM time " +
             "WHERE uid = ?1 AND company_id = ?3 " +
-            "ORDER BY project_id, id, time_to DESC) t " +
+            "ORDER BY project_id, id DESC) t " +
             "ORDER BY t.id DESC LIMIT ?2", nativeQuery = true)
     List<Long> loadLastUserProject(String uid, Long limit, Long companyId);
 

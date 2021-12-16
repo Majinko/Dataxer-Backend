@@ -17,7 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/payment")
-@PreAuthorize("hasPermission(null, 'Document', 'Document')")
+//@PreAuthorize("hasPermission(null, 'Document', 'Document')") todo nezabudnut dorobit logiku aby isli vsetky dokladay aj naklady
 public class PaymentController {
 
     private final PaymentService paymentService;

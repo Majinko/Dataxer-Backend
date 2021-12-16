@@ -26,6 +26,8 @@ public interface ProjectService {
 
     List<Project> all();
 
+    List<Project> allByClient(Long clientId);
+
     List<Project> search(String queryString);
 
     List<Category> getAllProjectCategories(Long projectId);

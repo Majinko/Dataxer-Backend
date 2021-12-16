@@ -3,6 +3,7 @@ package com.data.dataxer.repositories.qrepositories;
 import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.QCategory;
 import com.data.dataxer.models.domain.QCost;
+import com.data.dataxer.models.domain.QInvoice;
 import com.data.dataxer.utils.Helpers;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -57,6 +58,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .put("cost.contact.id", QCost.cost.contact.id)
                 .put("cost.contact.name", QCost.cost.contact.name)
                 .put("cost.project.id", QCost.cost.project.id)
+                .put("cost.documentType", QCost.cost.type)
                 .put("cost.start", QCost.cost.createdDate)
                 .put("cost.end", QCost.cost.createdDate)
                 .build();

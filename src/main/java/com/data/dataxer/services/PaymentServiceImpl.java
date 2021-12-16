@@ -15,8 +15,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
+
+import static java.math.BigDecimal.ROUND_HALF_EVEN;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -39,7 +43,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (this.documentIsPayed(payment)) {
             if (payment.getDocumentType().equals(DocumentType.COST)) {
-                this.setCostPayment(payment.getDocumentId(), payment.getPayedDate()); // todo spravit ako ma faktura
+                this.setCostPayment(payment.getDocumentId(), payment.getPayedDate(), DocumentState.PAYED); // todo spravit ako ma faktura
             } else {
                 this.setInvoicePayment(payment.getDocumentId(), payment.getPayedDate());
             }
@@ -71,7 +75,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         if (this.documentIsPayed(payment)) {
             if (payment.getDocumentType().equals(DocumentType.COST)) {
-                this.setCostPayment(payment.getDocumentId(), null);
+                this.setCostPayment(payment.getDocumentId(), null, DocumentState.UNPAID);
             } else {
                 this.setInvoicePayment(payment.getDocumentId(), null);
             }
@@ -80,9 +84,11 @@ public class PaymentServiceImpl implements PaymentService {
         this.paymentRepository.delete(payment);
     }
 
-    private void setCostPayment(Long costId, LocalDate date) {
+    private void setCostPayment(Long costId, LocalDate date, DocumentState documentState) {
         Cost cost = this.costRepository.findByIdAndCompanyId(costId, SecurityUtils.companyId());
         cost.setPaymentDate(date);
+        cost.setState(documentState);
+
         costRepository.save(cost);
     }
 
@@ -98,7 +104,7 @@ public class PaymentServiceImpl implements PaymentService {
         BigDecimal documentTotalPrice = this.qPaymentRepository.getDocumentTotalPrice(documentId, documentType);
         BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(documentId);
 
-        return documentTotalPrice.subtract(payedTotalPrice);
+        return documentTotalPrice.subtract(payedTotalPrice).setScale(2, RoundingMode.HALF_UP);
     }
 
     @Override
