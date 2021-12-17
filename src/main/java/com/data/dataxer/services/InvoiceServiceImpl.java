@@ -167,6 +167,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         Invoice invoice = new Invoice();
         BeanUtils.copyProperties(priceOffer, invoice, "id", "title", "note", "number", "state",
                 "createdDate", "createdAt", "updatedAt");
+
         switch (type) {
             case PROFORMA:
                 invoice.setDocumentType(DocumentType.PROFORMA);
