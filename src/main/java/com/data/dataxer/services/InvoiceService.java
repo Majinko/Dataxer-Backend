@@ -47,7 +47,7 @@ public interface InvoiceService {
     List<DocumentPackItem> getInvoiceItems(List<DocumentPack> packs);
     //parameter je id danoveho dokladu
 
-    Invoice generateSummaryInvoice(Long taxDocumentId);
+    Invoice generateSummaryInvoice(Long documentId, String documentType);
 
     Invoice changeTypeAndSave(Long id, String type, String number);
 
@@ -55,5 +55,5 @@ public interface InvoiceService {
 
     List<Invoice> findAllByProject(Long projectId, List<Long> companyIds);
 
-    Invoice generateFromPriceOfferByType(Long id, DocumentType type);
+    Invoice getInvoicesFromPriceOffer(Long id, String type);
 }

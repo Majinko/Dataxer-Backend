@@ -160,24 +160,22 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     }
 
     @Override
-    public Invoice generateFromPriceOfferByType(Long id, DocumentType type) {
+    public Invoice getInvoicesFromPriceOffer(Long id, String type) {
+        DocumentType documentType = DocumentType.getTypeByName(type);
         PriceOffer priceOffer = this.qPriceOfferRepository.getById(id, SecurityUtils.companyId())
                 .orElseThrow(() -> new RuntimeException("Price offer not found"));
-
         Invoice invoice = new Invoice();
         BeanUtils.copyProperties(priceOffer, invoice, "id", "title", "note", "number", "state",
-                "createdDate", "createdAt", "updatedAt");
-        switch (type) {
+                "createdDate", "createdAt", "updatedAt", "price", "totalPrice", "deliveredDate", "dueDate");
+
+        switch(documentType) {
             case PROFORMA:
                 invoice.setDocumentType(DocumentType.PROFORMA);
-                break;
             case SUMMARY_INVOICE:
                 invoice.setDocumentType(DocumentType.SUMMARY_INVOICE);
-                break;
             case INVOICE:
             default:
                 invoice.setDocumentType(DocumentType.INVOICE);
-                break;
         }
 
         return invoice;
@@ -213,24 +211,49 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     }
 
     @Override
-    public Invoice generateSummaryInvoice(Long taxDocumentId) {
-        Invoice proformaInvoice = this.getOriginalProformaInvoiceFromTaxDocument(taxDocumentId);
+    public Invoice generateSummaryInvoice(Long documentId, String type) {
+        List<Long> allRelatedDocumentIds;
+        Invoice summaryInvoice = new Invoice();
+        List<DocumentPack> summaryInvoicePacks;
 
-        List<Long> allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(proformaInvoice.getId(), SecurityUtils.companyId())
-                .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
+        switch (type) {
+            case "priceOffer":
+                PriceOffer priceOffer = this.qPriceOfferRepository.getById(documentId, SecurityUtils.companyId())
+                        .orElseThrow(() -> new RuntimeException("Price offer not found"));
+                allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(priceOffer.getId(), SecurityUtils.companyId())
+                        .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
+                BeanUtils.copyProperties(priceOffer, summaryInvoice,
+                        "id", "packs", "title", "note", "number", "state", "discount", "price",
+                        "totalPrice", "documentData", "createdDate", "createdAt", "updatedAt");
+                summaryInvoicePacks = new ArrayList<>(priceOffer.getPacks());
+                break;
+            case "invoice":
+                Invoice invoice = this.qInvoiceRepository.getById(documentId, SecurityUtils.companyIds()).orElseThrow(
+                        () -> new RuntimeException("Invoice not found"));
+                allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(invoice.getId(), SecurityUtils.companyId())
+                        .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
+                BeanUtils.copyProperties(invoice, summaryInvoice,
+                        "id", "packs", "title", "note", "number", "state", "discount", "price",
+                        "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
+                        "paymentMethod", "invoiceType", "createdAt", "updatedAt");
+                summaryInvoicePacks = new ArrayList<>(invoice.getPacks());
+                break;
+            case "taxDocument":
+            default:
+                Invoice proformaInvoice = this.getOriginalProformaInvoiceFromTaxDocument(documentId);
+                allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(proformaInvoice.getId(), SecurityUtils.companyId())
+                        .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
+                BeanUtils.copyProperties(proformaInvoice, summaryInvoice,
+                        "id", "packs", "title", "note", "number", "state", "discount", "price",
+                        "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
+                        "paymentMethod", "invoiceType", "createdAt", "updatedAt");
+                summaryInvoicePacks = new ArrayList<>(proformaInvoice.getPacks());
+                break;
+        }
 
         List<Invoice> taxDocuments = this.qInvoiceRepository.getAllInvoicesIdInAndType(allRelatedDocumentIds, DocumentType.TAX_DOCUMENT, SecurityUtils.companyIds());
 
-        Invoice summaryInvoice = new Invoice();
-
-        BeanUtils.copyProperties(proformaInvoice, summaryInvoice,
-                "id", "packs", "title", "note", "number", "state", "discount", "price",
-                "totalPrice", "documentData", "createdDate", "variableSymbol", "headerComment",
-                "paymentMethod", "invoiceType", "createdAt", "updatedAt");
-
         summaryInvoice.setDocumentType(DocumentType.SUMMARY_INVOICE);
-
-        List<DocumentPack> summaryInvoicePacks = new ArrayList<>(proformaInvoice.getPacks());
 
         HashMap<Integer, DocumentPack> taxesPacks = new HashMap<>();
         for (Invoice taxDocument : taxDocuments) {
