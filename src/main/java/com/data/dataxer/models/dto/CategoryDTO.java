@@ -12,6 +12,7 @@ public class CategoryDTO {
     private Long id;
     private Long parentId;
     private String name;
+    private Integer position;
     private CategoryGroup categoryGroup;
     private CategoryType categoryType;
 }

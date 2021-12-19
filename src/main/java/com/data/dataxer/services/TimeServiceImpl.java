@@ -3,12 +3,14 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.dto.MonthAndYearDTO;
 import com.data.dataxer.models.enums.SalaryType;
+import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.TimeRepository;
 import com.data.dataxer.repositories.qrepositories.QProjectRepository;
 import com.data.dataxer.repositories.qrepositories.QSalaryRepository;
 import com.data.dataxer.repositories.qrepositories.QTimeRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.querydsl.core.Tuple;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,18 +25,20 @@ import java.util.List;
 public class TimeServiceImpl implements TimeService {
     private final Long LIMIT = 5L;
 
-    private final TimeRepository timeRepository;
-    private final QTimeRepository qTimeRepository;
-    private final QSalaryRepository qSalaryRepository;
-    private final QProjectRepository qProjectRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
-    public TimeServiceImpl(TimeRepository timeRepository, QTimeRepository qTimeRepository,
-                           QSalaryRepository qSalaryRepository, QProjectRepository qProjectRepository) {
-        this.timeRepository = timeRepository;
-        this.qTimeRepository = qTimeRepository;
-        this.qSalaryRepository = qSalaryRepository;
-        this.qProjectRepository = qProjectRepository;
-    }
+    @Autowired
+    private TimeRepository timeRepository;
+
+    @Autowired
+    private QTimeRepository qTimeRepository;
+
+    @Autowired
+    private QSalaryRepository qSalaryRepository;
+
+    @Autowired
+    private QProjectRepository qProjectRepository;
 
     @Override
     public Time store(Time time) {
@@ -94,11 +98,6 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
-    public List<Category> lastProjectCategories(Long projectId) {
-        return this.qTimeRepository.getProjectLastCategories(projectId, LIMIT, SecurityUtils.companyId(), SecurityUtils.uid());
-    }
-
-    @Override
     public Time getLastUserTime() {
         return this.timeRepository.findFirstByUserIdAndCompanyIdAndDateWorkOrderByIdDesc(SecurityUtils.id(), SecurityUtils.companyId(), LocalDate.now());
     }
@@ -136,11 +135,24 @@ public class TimeServiceImpl implements TimeService {
     }
 
     @Override
+    public List<Category> lastProjectCategories(Long projectId) {
+        List<Long> categoryIds = timeRepository.loadLastUserCategories(projectId, SecurityUtils.uid(), SecurityUtils.companyId(), LIMIT);
+
+        List<Category> categories = this.categoryRepository.findAllByIdInAndCompanyId(categoryIds, SecurityUtils.companyId());
+
+        categories.sort(Comparator.comparing(category -> categoryIds.indexOf(category.getId())));
+
+        return categories;
+    }
+
+    @Override
     public List<Project> getLastUserWorkingProjects(Long userId) {
         List<Long> projectIds = this.timeRepository.loadLastUserProject(SecurityUtils.uid(), LIMIT, SecurityUtils.companyId());
 
         List<Project> projects = this.qProjectRepository.getAllByIds(projectIds, SecurityUtils.companyIds());
+
         projects.sort(Comparator.comparing(project -> projectIds.indexOf(project.getId())));
+
         return projects;
     }
 }

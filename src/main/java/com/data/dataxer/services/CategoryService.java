@@ -20,4 +20,6 @@ public interface CategoryService {
     Category findById(Long id);
 
     List<Category> allByGroupFromParent(String group);
+
+    List<Category> allByGroups(List<String> asList);
 }

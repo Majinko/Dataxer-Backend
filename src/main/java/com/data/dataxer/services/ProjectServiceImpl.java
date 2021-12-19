@@ -86,12 +86,21 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public List<Project> allByClient(Long clientId) {
+        return this.projectRepository.findAllByContactIdAndCompanyIdIn(clientId, SecurityUtils.companyIds());
+    }
+
+    @Override
     public List<Project> search(String queryString) {
         return this.qProjectRepository.search(SecurityUtils.companyIds(), queryString);
     }
 
     @Override
     public List<Category> getAllProjectCategories(Long projectId) {
+        List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.companyIds()).getCategories();
+
+        categories.sort(Comparator.comparing(Category::getPosition));
+
         return this.qProjectRepository.getById(projectId, SecurityUtils.companyIds()).getCategories();
     }
 

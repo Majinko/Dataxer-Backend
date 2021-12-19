@@ -8,7 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DocumentNumberGeneratorDTO {
-
     private Long id;
     private String title;
     private String format;

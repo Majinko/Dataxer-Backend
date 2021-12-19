@@ -11,14 +11,15 @@ import java.util.Optional;
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findUserByEmail(String email);
 
-    Optional<AppUser> findByUid(String uid);
-
     Optional<AppUser> findByIdAndUid(Long id, String uid);
 
     Optional<AppUser> findByUidAndDefaultCompanyId(String uid, Long companyId);
 
     @Query("SELECT u FROM AppUser u left join fetch u.roles where u.uid = ?1 and u.defaultCompany.id = ?2")
     AppUser findByUidAndDefaultCompanyIdWithRoles(String uid, Long companyId);
+
+    @Query("SELECT u FROM AppUser u left join fetch u.roles where u.uid = ?1")
+    AppUser findByUid(String uid); // todo add company
 
     List<AppUser> findAllByDefaultCompanyId(Long companyId);
 

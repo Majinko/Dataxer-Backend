@@ -1,6 +1,7 @@
 package com.data.dataxer.models.dto;
 
 import com.data.dataxer.models.domain.Contact;
+import com.data.dataxer.models.enums.CategoryGroup;
 import com.data.dataxer.models.enums.ProjectState;
 import lombok.Getter;
 import lombok.Setter;

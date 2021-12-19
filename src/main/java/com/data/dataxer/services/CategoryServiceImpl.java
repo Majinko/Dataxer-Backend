@@ -68,6 +68,17 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
+    public List<Category> allByGroups(List<String> groups) {
+        List<CategoryGroup> categoryGroups = new ArrayList<>();
+
+        groups.forEach(group -> {
+            categoryGroups.add(CategoryGroup.valueOf(group));
+        });
+
+        return this.categoryRepository.findAllByCategoryGroupInAndCompanyIdInOrderByPosition(categoryGroups, SecurityUtils.companyIds());
+    }
+
+    @Override
     public Category findById(Long id) {
         return this.categoryRepository
                 .findByIdAndCompanyIdIn(id, SecurityUtils.companyIds())
@@ -80,11 +91,12 @@ public class CategoryServiceImpl implements CategoryService {
 
         // todo make better query in foreach is bad idea
         this.categoryRepository // fill categoriesId
-                .findAllByCategoryGroupAndCompanyIdInAndParentIdIsNull(CategoryGroup.valueOf(group), SecurityUtils.companyIds())
+                .findAllByCategoryGroupAndCompanyIdInAndParentIdIsNullOrderByPosition(CategoryGroup.valueOf(group), SecurityUtils.companyIds())
                 .forEach(c -> categoriesId.addAll(this.categoryRepository.findAllChildIds(c.getId(), SecurityUtils.companyIds())));
 
-        return this.categoryRepository.findAllByIdInAndCompanyIdIn(new ArrayList<>(categoriesId), SecurityUtils.companyIds());
+        return this.categoryRepository.findAllByIdInAndCompanyIdInOrderByPosition(new ArrayList<>(categoriesId), SecurityUtils.companyIds());
     }
+
 
     // private methods
     private Category updateCategory(Category category) {

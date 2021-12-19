@@ -50,6 +50,13 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.allByTypes(Arrays.asList(types.split(",")))));
     }
 
+    @GetMapping("/allByGroups")
+    public ResponseEntity<List<CategoryDTO>> allByGroups(
+            @RequestParam(value = "groups") String groups
+    ) {
+        return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.allByGroups(Arrays.asList(groups.split(",")))));
+    }
+
     @PostMapping("/storeOrUpdate")
     public ResponseEntity<CategoryDTO> store(@RequestBody CategoryDTO categoryDTO) {
         return ResponseEntity.ok(categoryMapper.toCategoryDTO(this.categoryService.storeOrUpdate(categoryMapper.categoryDTOtoCategory(categoryDTO))));

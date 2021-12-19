@@ -79,6 +79,13 @@ public class ProjectController {
         return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.all()));
     }
 
+    @GetMapping("/allByClient")
+    public ResponseEntity<List<ProjectDTO>> allByClient(
+            @RequestParam(value = "clientId") Long clientId
+    ) {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allByClient(clientId)));
+    }
+
     @GetMapping("/allHasCost")
     public ResponseEntity<List<ProjectDTO>> allHasCost() {
         return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasCost()));
