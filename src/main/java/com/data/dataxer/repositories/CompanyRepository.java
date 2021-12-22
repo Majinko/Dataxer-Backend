@@ -13,6 +13,8 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
 
     Optional<Company> findByIdAndAppUsersIn(Long companyId, List<AppUser> appUsers);
 
+    Optional<Company> findByCin(String cin);
+
     @Query("SELECT c FROM Company c left join fetch c.appUsers where c.id = ?1")
     Company findByIdWithUsers(Long id);
 

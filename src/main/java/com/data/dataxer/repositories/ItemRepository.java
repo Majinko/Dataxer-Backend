@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemRepository extends CrudRepository<Item, Long> {
-    Optional<Item> findByIdAndCompanyId(Long id, Long companyId);
+    Optional<Item> findByIdAndCompanyIdIn(Long id, List<Long> companyIds);
 
     Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String title, List<Long> companyIds);
 

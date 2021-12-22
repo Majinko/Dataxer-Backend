@@ -43,7 +43,7 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -70,7 +70,7 @@ public class QCostRepositoryImpl implements QCostRepository {
 
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Long> costIds = this.returnCostsIdsForPaginate(pageable, rqlFilter, companyId, predicate, orderSpecifierList);
+        List<Long> costIds = this.returnCostsIdsForPaginate(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
 
         List<Cost> costList = this.query.selectFrom(qCost)
                 .leftJoin(qCost.contact).fetchJoin()
@@ -171,7 +171,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .fetchCount();
     }
 
-    private List<Long> returnCostsIdsForPaginate(Pageable pageable, String rqlFilter, Long companyId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+    private List<Long> returnCostsIdsForPaginate(Pageable pageable, String rqlFilter, List<Long> companyIds, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<Cost> costJPAQuery = this.query.selectFrom(QCost.cost)
                 .where(predicate)
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
@@ -179,7 +179,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .limit(pageable.getPageSize());
 
         if (!rqlFilter.contains("cost.company.id")) {
-            costJPAQuery.where(QCost.cost.company.id.eq(companyId));
+            costJPAQuery.where(QCost.cost.company.id.in(companyIds));
         } // todo somethnig can hack, only change company id in header query params manual alebo nejaku grupu pre usera
 
         return costJPAQuery.select(QCost.cost.id).fetch();

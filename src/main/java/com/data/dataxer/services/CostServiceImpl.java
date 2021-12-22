@@ -90,7 +90,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qCostRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return this.qCostRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override

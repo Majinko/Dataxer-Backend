@@ -21,7 +21,7 @@
                     <span th:text="${firm.get('country')}"></span><br></br>
                 </p>
                 <p>
-                    <span th:if="${firm.get('cint') != null}" th:text="'IČO:  ' + ${firm.get('cint')}"></span><br></br>
+                    <span th:if="${firm.get('cin') != null}" th:text="'IČO:  ' + ${firm.get('cin')}"></span><br></br>
                     <span th:if="${firm.get('tin') != null}" th:text="'DIČ:  ' + ${firm.get('tin')}"></span><br></br>
                     <span th:if="${firm.get('vatin') != null}" th:text="'IČ DPH:  ' + ${firm.get('vatin')}"></span>
                 </p>
@@ -87,7 +87,7 @@
                             <td class="text-left white-space-normal" style="white-space: nowrap" th:text="${packItem.getTitle()} ?: ''"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getQty()}"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
-                            <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getItem() != null ? packItem.getItem().getUnit() : ''}"></td>
+                            <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getUnit()}"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
                             <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getPrice() != null} ? ${#numbers.formatDecimal(packItem.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
                             <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getPrice() == null}" th:text="''"></td>

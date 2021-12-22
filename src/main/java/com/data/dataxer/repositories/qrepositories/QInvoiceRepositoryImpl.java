@@ -38,7 +38,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
 
@@ -64,7 +64,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Invoice> invoiceList = this.getInvoicePaginates(pageable, rqlFilter, companyId, predicate, orderSpecifierList);
+        List<Invoice> invoiceList = this.getInvoicePaginates(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
 
         return new PageImpl<>(invoiceList, pageable, getTotalCount(predicate));
     }
@@ -154,18 +154,18 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     //todo tieto spolocne metody dat do abstrakntej triedy pre faktury a cenove ponuky
-    private List<Invoice> getInvoicePaginates(Pageable pageable, String rqlFilter, Long companyId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+    private List<Invoice> getInvoicePaginates(Pageable pageable, String rqlFilter, List<Long> companyIds, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<Invoice> invoiceJPAQuery = this.query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .where(predicate)
-                .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
 
         if (!rqlFilter.contains("invoice.company.id")) { // todo make refakt
-            invoiceJPAQuery.where(QInvoice.invoice.company.id.eq(companyId));
+            invoiceJPAQuery.where(QInvoice.invoice.company.id.in(companyIds));
         }
 
         return invoiceJPAQuery.fetch();

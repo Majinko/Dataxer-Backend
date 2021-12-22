@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
@@ -26,6 +27,9 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     @Transactional
     public Company store(Company company) {
+        this.checkCanCreateCompany(company);
+
+
         company.setAppUsers(List.of(SecurityUtils.loggedUser()));
 
         return this.companyRepository.save(company);
@@ -82,5 +86,13 @@ public class CompanyServiceImpl implements CompanyService {
         }
 
         this.companyRepository.delete(c);
+    }
+
+    private void checkCanCreateCompany(Company company) {
+        Optional<Company> c = this.companyRepository.findByCin(company.getCin());
+
+        if (c.isPresent()) {
+            throw new RuntimeException("company with cin " + company.getCin() + " exist");
+        }
     }
 }

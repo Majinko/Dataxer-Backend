@@ -102,7 +102,7 @@ public class StorageServiceImpl implements StorageService {
         HashMap<String, String> fileData = new HashMap<String, String>();
 
         String name = generateFileName(file.getFileName());
-        String path = SecurityUtils.defaultCompany().getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", " ") + "/" + type + '/' + name;
+        String path = SecurityUtils.defaultCompany().getCin().toLowerCase().replaceAll("[^a-zA-Z0-9]", " ") + "/" + type + '/' + name;
 
         Blob blob = bucket.create(path, file.getContent(), file.getContentType());
 

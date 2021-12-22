@@ -33,7 +33,7 @@ public class QPackRepositoryImpl implements QPackRepository {
     }
 
     @Override
-    public Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -53,7 +53,7 @@ public class QPackRepositoryImpl implements QPackRepository {
 
         List<Pack> packList = this.query.selectFrom(qPack)
                 .where(predicate)
-                .where(qPack.company.id.eq(companyId))
+                .where(qPack.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -63,9 +63,9 @@ public class QPackRepositoryImpl implements QPackRepository {
     }
 
     @Override
-    public Pack getById(Long id, Long companyId) {
+    public Pack getById(Long id, List<Long> companyIds) {
         return query.selectFrom(QPack.pack)
-                .where(QPack.pack.company.id.eq(companyId))
+                .where(QPack.pack.company.id.in(companyIds))
                 .where(QPack.pack.id.eq(id))
                 .leftJoin(QPack.pack.packItems, QPackItem.packItem).orderBy(QPackItem.packItem.position.desc()).fetchJoin()
                 .leftJoin(QPackItem.packItem.item, QItem.item).fetchJoin()
@@ -74,11 +74,11 @@ public class QPackRepositoryImpl implements QPackRepository {
     }
 
     @Override
-    public List<Pack> search(String q, Long companyId) {
+    public List<Pack> search(String q, List<Long> companyIds) {
         QPack qPack = QPack.pack;
 
         return query.selectFrom(qPack)
-                .where(qPack.company.id.eq(companyId))
+                .where(qPack.company.id.in(companyIds))
                 .where(qPack.title.containsIgnoreCase(q))
                 .fetch();
     }

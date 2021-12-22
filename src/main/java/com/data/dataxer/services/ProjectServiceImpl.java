@@ -99,7 +99,7 @@ public class ProjectServiceImpl implements ProjectService {
     public List<Category> getAllProjectCategories(Long projectId) {
         List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.companyIds()).getCategories();
 
-        categories.sort(Comparator.comparing(Category::getPosition));
+        categories.sort(Comparator.comparing(category -> category.getPosition() != null ? category.getPosition() : 0));
 
         return this.qProjectRepository.getById(projectId, SecurityUtils.companyIds()).getCategories();
     }

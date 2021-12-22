@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QInvoiceRepository {
-    Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
+    Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
 
     Optional<Invoice> getById(Long id, List<Long> companyIds);
 

@@ -98,7 +98,6 @@ public class PdfService {
 
     private Context getBasicContext(DocumentBase document) {
         Context context = new Context();
-
         context.setVariable("firm", document.getDocumentData().get("firm"));
         context.setVariable("bankAccount", document.getDocumentData().get("bankAccount"));
         context.setVariable("taxes", invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks())));

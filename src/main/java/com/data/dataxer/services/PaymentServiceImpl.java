@@ -10,6 +10,7 @@ import com.data.dataxer.repositories.InvoiceRepository;
 import com.data.dataxer.repositories.PaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,18 +25,17 @@ import static java.math.BigDecimal.ROUND_HALF_EVEN;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
+    @Autowired
+    private PaymentRepository paymentRepository;
 
-    private final PaymentRepository paymentRepository;
-    private final QPaymentRepository qPaymentRepository;
-    private final InvoiceRepository invoiceRepository;
-    private final CostRepository costRepository;
+    @Autowired
+    private QPaymentRepository qPaymentRepository;
 
-    public PaymentServiceImpl(PaymentRepository paymentRepository, QPaymentRepository qPaymentRepository, InvoiceRepository invoiceRepository, CostRepository costRepository) {
-        this.paymentRepository = paymentRepository;
-        this.qPaymentRepository = qPaymentRepository;
-        this.invoiceRepository = invoiceRepository;
-        this.costRepository = costRepository;
-    }
+    @Autowired
+    private InvoiceRepository invoiceRepository;
+
+    @Autowired
+    private CostRepository costRepository;
 
     @Override
     public Payment store(Payment payment) {
@@ -45,7 +45,7 @@ public class PaymentServiceImpl implements PaymentService {
             if (payment.getDocumentType().equals(DocumentType.COST)) {
                 this.setCostPayment(payment.getDocumentId(), payment.getPayedDate(), DocumentState.PAYED); // todo spravit ako ma faktura
             } else {
-                this.setInvoicePayment(payment.getDocumentId(), payment.getPayedDate());
+                this.setInvoicePayment(payment.getDocumentId(), payment.getPayedDate(), DocumentState.PAYED);
             }
         }
 
@@ -59,13 +59,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override
     public Payment getById(Long id) {
         return this.qPaymentRepository
-                .getById(id, SecurityUtils.companyId())
+                .getById(id, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
     }
 
@@ -77,7 +77,7 @@ public class PaymentServiceImpl implements PaymentService {
             if (payment.getDocumentType().equals(DocumentType.COST)) {
                 this.setCostPayment(payment.getDocumentId(), null, DocumentState.UNPAID);
             } else {
-                this.setInvoicePayment(payment.getDocumentId(), null);
+                this.setInvoicePayment(payment.getDocumentId(), null, DocumentState.UNPAID);
             }
         }
 
@@ -85,17 +85,18 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void setCostPayment(Long costId, LocalDate date, DocumentState documentState) {
-        Cost cost = this.costRepository.findByIdAndCompanyId(costId, SecurityUtils.companyId());
+        Cost cost = this.costRepository.findByIdAndCompanyIdIn(costId, SecurityUtils.companyIds());
         cost.setPaymentDate(date);
         cost.setState(documentState);
 
         costRepository.save(cost);
     }
 
-    private void setInvoicePayment(Long invoiceId, LocalDate date) {
-        Invoice invoice = this.invoiceRepository.findByIdAndCompanyId(invoiceId, SecurityUtils.companyId());
+    private void setInvoicePayment(Long invoiceId, LocalDate date, DocumentState documentState) {
+        Invoice invoice = this.invoiceRepository.findByIdAndCompanyIdIn(invoiceId, SecurityUtils.companyIds());
         invoice.setPaymentDate(date);
-        invoice.setState(DocumentState.PAYED);
+        invoice.setState(documentState);
+
         invoiceRepository.save(invoice);
     }
 

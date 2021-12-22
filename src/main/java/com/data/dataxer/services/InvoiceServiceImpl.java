@@ -1,6 +1,7 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.DocumentRelationsRepository;
 import com.data.dataxer.repositories.InvoiceRepository;
@@ -9,6 +10,7 @@ import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,21 +28,20 @@ import java.util.stream.Collectors;
 
 @Service
 public class InvoiceServiceImpl extends DocumentHelperService implements InvoiceService {
-    private final InvoiceRepository invoiceRepository;
-    private final QPriceOfferRepository qPriceOfferRepository;
-    private final QInvoiceRepository qInvoiceRepository;
-    private final QPaymentRepository qPaymentRepository;
-    private final DocumentRelationsRepository documentRelationsRepository;
+    @Autowired
+    private InvoiceRepository invoiceRepository;
 
-    public InvoiceServiceImpl(InvoiceRepository invoiceRepository, QInvoiceRepository qInvoiceRepository,
-                              QPaymentRepository qPaymentRepository, DocumentRelationsRepository documentRelationsRepository,
-                              QPriceOfferRepository qPriceOfferRepository) {
-        this.invoiceRepository = invoiceRepository;
-        this.qInvoiceRepository = qInvoiceRepository;
-        this.qPaymentRepository = qPaymentRepository;
-        this.documentRelationsRepository = documentRelationsRepository;
-        this.qPriceOfferRepository = qPriceOfferRepository;
-    }
+    @Autowired
+    private QPriceOfferRepository qPriceOfferRepository;
+
+    @Autowired
+    private QInvoiceRepository qInvoiceRepository;
+
+    @Autowired
+    private QPaymentRepository qPaymentRepository;
+
+    @Autowired
+    private DocumentRelationsRepository documentRelationsRepository;
 
     @Override
     @Transactional
@@ -62,7 +63,15 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         });
 
         if (invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT) || invoice.getDocumentType().equals(DocumentType.SUMMARY_INVOICE)) {
-            invoice.setPaymentDate(LocalDate.now());
+            if (invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT)) {
+                invoice.setState(DocumentState.PAYED);
+                invoice.setPaymentDate(LocalDate.now());
+            } else if (invoice.getDocumentType().equals(DocumentType.SUMMARY_INVOICE)) {
+                if (invoice.getTotalPrice().compareTo(BigDecimal.ZERO) == 0) {
+                    invoice.setState(DocumentState.PAYED);
+                    invoice.setPaymentDate(LocalDate.now());
+                }
+            }
         }
 
         this.store(invoice);
@@ -84,12 +93,30 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     public void update(Invoice invoice) {
         Invoice invoiceUpdated = (Invoice) this.setDocumentPackAndItems(invoice);
 
+        if (!invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT)) {
+            this.checkInvoicePayment(invoice);
+        }
+
         this.invoiceRepository.save(invoiceUpdated);
+    }
+
+    private void checkInvoicePayment(Invoice invoice) {
+        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(invoice.getId());
+
+        boolean isPayed = invoice.getTotalPrice().subtract(payedTotalPrice).setScale(2, RoundingMode.HALF_UP).compareTo(BigDecimal.ZERO) == 0;
+
+        if (!isPayed) {
+            invoice.setPaymentDate(null);
+            invoice.setState(DocumentState.UNPAID);
+        } else {
+            invoice.setState(DocumentState.PAYED);
+            invoice.setPaymentDate(LocalDate.now());
+        }
     }
 
     @Override
     public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qInvoiceRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return this.qInvoiceRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override
@@ -168,7 +195,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         BeanUtils.copyProperties(priceOffer, invoice, "id", "title", "note", "number", "state",
                 "createdDate", "createdAt", "updatedAt", "price", "totalPrice", "deliveredDate", "dueDate");
 
-        switch(documentType) {
+        switch (documentType) {
             case PROFORMA:
                 invoice.setDocumentType(DocumentType.PROFORMA);
             case SUMMARY_INVOICE:
@@ -454,7 +481,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     private BigDecimal getPaymentsValue(Long proformaInvoiceId) {
         BigDecimal paymentsValue = BigDecimal.ZERO;
-        List<Payment> payments = this.qPaymentRepository.getPaymentsByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyId());
+        List<Payment> payments = this.qPaymentRepository.getPaymentsByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
 
         for (Payment payment : payments) {
             paymentsValue = paymentsValue.add(payment.getPayedValue());
@@ -477,7 +504,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     }
 
     private LocalDate getNewestPaymentPayedDate(Long proformaInvoiceId) {
-        Payment payment = this.qPaymentRepository.getNewestByDocumentId(proformaInvoiceId, SecurityUtils.companyId())
+        Payment payment = this.qPaymentRepository.getNewestByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
                 .orElseThrow(() -> new RuntimeException("No payment usable for tax document"));
         return payment.getPayedDate();
     }

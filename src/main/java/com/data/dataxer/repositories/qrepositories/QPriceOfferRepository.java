@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QPriceOfferRepository {
-    Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
+    Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyId);
 
     Optional<PriceOffer> getById(Long id, Long companyId);
 

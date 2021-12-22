@@ -34,9 +34,9 @@ public class QItemRepositoryImpl implements QItemRepository {
     }
 
     @Override
-    public Item getById(long id, Long companyId) {
-        Item item = this.constructGetAllByIdAndCompanyId(id, companyId)
-                .where(QItem.item.company.id.eq(companyId))
+    public Item getById(long id, List<Long> companyIds) {
+        Item item = this.constructGetAllByIdAndCompanyId(id, companyIds)
+                .where(QItem.item.company.id.in(companyIds))
                 .where(QItem.item.id.eq(id))
                 .leftJoin(QItem.item.itemPrices, QItemPrice.itemPrice).fetchJoin()
                 .leftJoin(QItem.item.supplier, QContact.contact).fetchJoin()
@@ -44,7 +44,7 @@ public class QItemRepositoryImpl implements QItemRepository {
 
         if (item != null) {
             item.setFiles(
-                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, companyId)
+                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, companyIds)
                                     .leftJoin(QItem.item.files, QStorage.storage).fetchJoin()
                                     .fetchOne())
                             .getFiles()
@@ -52,7 +52,7 @@ public class QItemRepositoryImpl implements QItemRepository {
 
             item.setCategories(
                     Objects.requireNonNull(
-                                    this.constructGetAllByIdAndCompanyId(id, companyId)
+                                    this.constructGetAllByIdAndCompanyId(id, companyIds)
                                             .leftJoin(QItem.item.categories, QCategory.category).fetchJoin()
                                             .fetchOne())
                             .getCategories()
@@ -62,26 +62,26 @@ public class QItemRepositoryImpl implements QItemRepository {
         return item;
     }
 
-    private JPAQuery<Item> constructGetAllByIdAndCompanyId(Long id, Long companyId) {
+    private JPAQuery<Item> constructGetAllByIdAndCompanyId(Long id, List<Long> companyIds) {
         return query.selectFrom(QItem.item)
-                .where(QItem.item.company.id.eq(companyId))
+                .where(QItem.item.company.id.in(companyIds))
                 .where(QItem.item.id.eq(id));
     }
 
     @Override
-    public Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String q, Long companyId) {
+    public Optional<List<Item>> findAllByTitleContainsAndCompanyIdIn(String q, List<Long> companyIds) {
         QItem qItem = QItem.item;
 
         return Optional.ofNullable(query
                 .selectFrom(qItem)
-                .where(qItem.company.id.eq(companyId))
+                .where(qItem.company.id.in(companyIds))
                 .where(qItem.title.containsIgnoreCase(q))
                 .leftJoin(qItem.itemPrices).fetchJoin()
                 .fetch());
     }
 
     @Override
-    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
         Predicate predicate = buildPredicate(rqlFilter);
         OrderSpecifierList orderSpecifierList = buildSort(sortExpression);
 
@@ -89,7 +89,7 @@ public class QItemRepositoryImpl implements QItemRepository {
                 .leftJoin(QItem.item.supplier)
                 .leftJoin(QItem.item.itemPrices).fetchJoin()
                 .where(predicate)
-                .where(QItem.item.company.id.eq(companyId))
+                .where(QItem.item.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

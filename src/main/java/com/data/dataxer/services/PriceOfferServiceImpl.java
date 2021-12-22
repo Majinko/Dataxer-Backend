@@ -39,7 +39,7 @@ public class PriceOfferServiceImpl extends DocumentHelperService implements Pric
 
     @Override
     public Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qPriceOfferRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return this.qPriceOfferRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
     }
 
     @Override

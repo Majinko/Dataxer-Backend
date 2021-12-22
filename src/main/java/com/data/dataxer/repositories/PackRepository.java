@@ -11,7 +11,7 @@ import java.util.Set;
 
 @Repository
 public interface PackRepository extends CrudRepository<Pack, Long> {
-    Optional<Pack> findByIdAndCompanyId(Long id, Long companyId);
+    Optional<Pack> findByIdAndCompanyIdIn(Long id, List<Long> companyIds);
 
     @Query("select p from Pack p where p.id = ?1")
     Pack findById(Long id, List<Long> companyIds);
