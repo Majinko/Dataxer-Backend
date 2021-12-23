@@ -23,7 +23,6 @@ import java.util.List;
 @RequestMapping("/api/time")
 @PreAuthorize("hasPermission(null, 'Time', 'Time')")
 public class TimeController {
-
     private final TimeService timeService;
     private final TimeMapper timeMapper;
     private final ProjectMapper projectMapper;

@@ -27,7 +27,7 @@ public class RoleConfig {
     @Autowired
     private CompanyRepository companyRepository;
 
-    @PostConstruct
+    //@PostConstruct
     public void init() {
         List<Privilege> adminPrivileges = this.initAdminPrivileges();
 
