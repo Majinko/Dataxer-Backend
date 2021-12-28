@@ -3,7 +3,6 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.DocumentPack;
 import com.data.dataxer.models.domain.DocumentPackItem;
 import com.data.dataxer.models.domain.Invoice;
-import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -40,7 +39,9 @@ public interface InvoiceService {
 
     HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems);
 
-    HashMap<Integer, BigDecimal> getPayedTaxesValuesMap(List<DocumentPack> packs);
+    HashMap<Integer, BigDecimal> getInvoicePayedTaxesValuesMap(List<DocumentPack> packs);
+
+    BigDecimal getTaxDocumentPayedValue(List<DocumentPack> packs);
 
     HashMap<Integer, BigDecimal> getTaxPayedTaxesValuesMap(List<DocumentPack> packs);
 
