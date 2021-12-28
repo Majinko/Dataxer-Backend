@@ -428,6 +428,9 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         return documentPackItems;
     }
 
+    /**
+     * Spocita pre jednotlive dane zaklad dane (price)
+     */
     @Override
     public HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems) {
         HashMap<Integer, BigDecimal> mappedTaxedValues = new HashMap<>();
@@ -435,20 +438,20 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         for (DocumentPackItem documentPackItem : documentPackItems) {
             if (mappedTaxedValues.containsKey(documentPackItem.getTax())) {
                 BigDecimal newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
-                        documentPackItem.getTotalPrice() != null && documentPackItem.getTotalPrice().compareTo(BigDecimal.ZERO) != -1
-                                ? documentPackItem.getTotalPrice() : BigDecimal.ZERO);
+                        documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                                ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty())).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
                 mappedTaxedValues.replace(documentPackItem.getTax(), newValue);
             } else {
                 mappedTaxedValues.put(documentPackItem.getTax(),
-                        documentPackItem.getTotalPrice() != null && documentPackItem.getTotalPrice().compareTo(BigDecimal.ZERO) != -1
-                                ? documentPackItem.getTotalPrice() : BigDecimal.ZERO);
+                        documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                                ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty())).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
             }
         }
         return mappedTaxedValues;
     }
 
     @Override
-    public HashMap<Integer, BigDecimal> getPayedTaxesValuesMap(List<DocumentPack> packs) {
+    public HashMap<Integer, BigDecimal> getInvoicePayedTaxesValuesMap(List<DocumentPack> packs) {
         HashMap<Integer, BigDecimal> mappedPayedTaxedValues = new HashMap<>();
         for (DocumentPack pack : packs) {
             if (pack.getTotalPrice().compareTo(BigDecimal.ZERO) == -1) {
@@ -461,6 +464,15 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
             }
         }
         return mappedPayedTaxedValues;
+    }
+
+    @Override
+    public BigDecimal getTaxDocumentPayedValue(List<DocumentPack> packs) {
+        BigDecimal result = BigDecimal.ZERO;
+        for (DocumentPack pack : packs) {
+            result = result.add(pack.getTotalPrice());
+        }
+        return result;
     }
 
     @Override
