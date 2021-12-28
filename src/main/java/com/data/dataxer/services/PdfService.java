@@ -5,6 +5,7 @@ import com.data.dataxer.models.domain.DocumentBase;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.domain.PriceOffer;
 import com.data.dataxer.models.enums.CompanyTaxType;
+import com.data.dataxer.models.enums.DocumentType;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
@@ -86,8 +87,12 @@ public class PdfService {
         context.setVariable("subject", invoice.getSubject());
         context.setVariable("type", "I");
         context.setVariable("document", invoice);
-        context.setVariable("payedValue", invoiceService.getPayedTaxesValuesMap(invoice.getPacks()));
+        context.setVariable("payedValue", invoiceService.getInvoicePayedTaxesValuesMap(invoice.getPacks()));
         context.setVariable("payedTaxValue", invoiceService.getTaxPayedTaxesValuesMap(invoice.getPacks()));
+
+        if (invoice.getDocumentType() == DocumentType.TAX_DOCUMENT) {
+            context.setVariable("taxDocPayed", invoiceService.getTaxDocumentPayedValue(invoice.getPacks()));
+        }
 
         return context;
     }

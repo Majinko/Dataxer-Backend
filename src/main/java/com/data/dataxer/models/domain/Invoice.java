@@ -39,9 +39,13 @@ public class Invoice extends DocumentBase {
         return this.totalPrice.multiply(this.discount.divide(BigDecimal.valueOf(100)));
     }
 
-    public BigDecimal countTaxPrice(BigDecimal totalPrice, Integer tax) {
-        return totalPrice.subtract(
-                totalPrice.divide(new BigDecimal(1.0 + (tax.doubleValue()/100)).setScale(2, RoundingMode.HALF_UP), 2, RoundingMode.HALF_UP)
-        ).setScale(2, RoundingMode.HALF_UP);
+    /**
+     * Vrati sumu s DPH na zaklade ceny bez DPH a dane
+     * @param price
+     * @param tax
+     * @return
+     */
+    public BigDecimal countTaxPrice(BigDecimal price, Integer tax) {
+        return price.multiply(new BigDecimal (tax.doubleValue()/100)).setScale(2, RoundingMode.HALF_UP);
     }
 }

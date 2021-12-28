@@ -85,7 +85,7 @@
                     <th:block  th:if="${pack.getShowItems()}" th:each="packItem, inDex: ${pack.getPackItems()}">
                         <tr>
                             <td class="text-left white-space-normal" style="white-space: nowrap" th:text="${packItem.getTitle()} ?: ''"></td>
-                            <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getQty()}"></td>
+                            <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${#numbers.formatDecimal(packItem.getQty(), 1, 'WHITESPACE', 0, 'COMMA')}"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getUnit()}"></td>
                             <td class="text-center" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
@@ -127,7 +127,7 @@
                         </td>
                     </tr>
                     <tr th:if="${document.getDiscount() > 0}" >
-                        <td colspan="5" class="text-right" th:text="'Zľava ' + ${document.getDiscount()} + '%'"></td>
+                        <td colspan="5" class="text-right" th:text="'Zľava ' + ${#numbers.formatDecimal(document.getDiscount(), 1, 'WHITESPACE', 0, 'COMMA')} + '%'"></td>
                         <td class="text-right thin">
                             <span class="open-sans" th:text="${#numbers.formatDecimal(document.countDiscountTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
@@ -173,10 +173,26 @@
                         </tr>
                     </th:block>
 
+                    <th:block th:if="${document.getDocumentType() != null && document.getDocumentType().getName().equals('tax_document')}">
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'Celková suma: '"></td>
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'Uhradená záloha: '"></td>
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(taxDocPayed, 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+                    </th:block>
+
                     <tr th:if="${document.getDocumentType() != null && !document.getDocumentType().getName().equals('tax_document')}">
                         <td colspan="5" class="text-right" style="font-weight: bold; font-size: 16px; line-height: 1.21em" th:text="'Celkom s DPH: '"></td>
                         <td class="text-right thin" style="line-height: 1.21em">
-                            <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:if="${document.getDiscount() <= 0 || document.getDiscount() == null}" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:if="${document.getDiscount() > 0}" th:text="${#numbers.formatDecimal(document.getTotalPrice()-document.countDiscountTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                         </td>
                     </tr>
 
@@ -186,6 +202,7 @@
                             <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:text="'0,00 &euro;'"></span>
                         </td>
                     </tr>
+
                     </tfoot>
                 </table>
             </div>
@@ -195,7 +212,7 @@
             <p style="font-weight: bold;" th:if="${type == 'I'}" th:text="'Informácie k úhrade:'"></p>
         </div>
 
-        <div class="four_box_wrapper invoice-summary" th:if="${type == 'I'}" th:style="'background: url(' + @{images/table.jpg} + ') no-repeat; height: 65px; padding: 10px 15px 15px 15px; margin-top: 10px; display: block; vertical-align: middle;'">
+        <div class="four_box_wrapper invoice-summary" th:if="${type == 'I'}" th:style="'background: url(' + @{images/table.jpg} + ') no-repeat; height: 70px; padding: 10px 15px 15px 15px; margin-top: 10px; display: block; vertical-align: middle;'">
             <div class="text_box box1">
                 <p style="margin-top: 7px">
                     <span style="display:inline-block; font-size: 9px; white-space: nowrap" th:text="'IBAN: '"></span>
@@ -224,7 +241,8 @@
                 <p style="width: 102px; margin-left: 80px; margin-top: 7px;">
                     <span style="font-size: 8px" th:text="'Suma na úhradu:'"></span>
                     <br></br>
-                    <span style="font-weight: bold; font-size: 10px;" th:text="${document.getTotalPrice() != null and !document.getDocumentType().getName().equals('tax_document') and document.getTotalPrice() &gt; 0} ? ${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : '0,00 &euro;'"></span>
+                    <span style="font-weight: bold; font-size: 10px;" th:if="${document.getDiscount() <= 0 || document.getDiscount() == null}" th:text="${document.getTotalPrice() != null and !document.getDocumentType().getName().equals('tax_document') and document.getTotalPrice() &gt; 0} ? ${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : '0,00 &euro;'"></span>
+                    <span style="font-weight: bold; font-size: 10px;" th:if="${document.getDiscount() > 0}" th:text="${document.getTotalPrice() != null and !document.getDocumentType().getName().equals('tax_document') and document.getTotalPrice() &gt; 0} ? ${#numbers.formatDecimal(document.getTotalPrice()-document.countDiscountTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : '0,00 &euro;'"></span>
                 </p>
             </div>
         </div>
