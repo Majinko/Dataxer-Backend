@@ -20,7 +20,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class PdfService {
@@ -110,11 +114,16 @@ public class PdfService {
 
     private Context getBasicContext(DocumentBase document) {
         Company company = this.companyService.findById(document.getCompany().getId());
+        HashMap<Integer, BigDecimal> taxesValuesMap = invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks()));
+
+        if (document.getDiscount().compareTo(BigDecimal.ZERO) == 1) {
+            taxesValuesMap = sortHashmapAndSubtractDiscount(taxesValuesMap, document.getDiscount());
+        }
 
         Context context = new Context();
         context.setVariable("firm", document.getDocumentData().get("firm"));
         context.setVariable("bankAccount", document.getDocumentData().get("bankAccount"));
-        context.setVariable("taxes", invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks())));
+        context.setVariable("taxes", taxesValuesMap);
         context.setVariable("user", document.getDocumentData().get("user"));
         context.setVariable("createdWeb", "");
         context.setVariable("note", document.getNote() != null ? document.getNote().strip() : "");
@@ -132,5 +141,24 @@ public class PdfService {
             default:
                 return templateEngine.process("view/invoice/document", context);
         }
+    }
+
+    private HashMap<Integer, BigDecimal> sortHashmapAndSubtractDiscount(HashMap<Integer, BigDecimal> originalMap, BigDecimal discount) {
+        HashMap<Integer, BigDecimal> sorted = new HashMap<>();
+
+        List<Integer> keys = new ArrayList<>(originalMap.keySet());
+        Collections.sort(keys);
+        Collections.reverse(keys);
+
+        keys.forEach(key -> {
+            if (discount.compareTo(BigDecimal.ZERO) == 1) {
+                sorted.put(key, originalMap.get(key).subtract(originalMap.get(key).multiply(discount.divide(new BigDecimal(100), 2, RoundingMode.HALF_UP))
+                                .setScale(2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP));
+            } else {
+                sorted.put(key, originalMap.get(key));
+            }
+        });
+
+        return sorted;
     }
 }
