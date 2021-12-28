@@ -1,8 +1,10 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.domain.DocumentBase;
 import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.domain.PriceOffer;
+import com.data.dataxer.models.enums.CompanyTaxType;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
@@ -26,12 +28,14 @@ public class PdfService {
     private final SpringTemplateEngine templateEngine;
     private final InvoiceService invoiceService;
     private final PriceOfferService priceOfferService;
+    private final CompanyService companyService;
 
     public PdfService(SpringTemplateEngine templateEngine, InvoiceService invoiceService,
-                      PriceOfferService priceOfferService) {
+                      PriceOfferService priceOfferService, CompanyService companyService) {
         this.templateEngine = templateEngine;
         this.invoiceService = invoiceService;
         this.priceOfferService = priceOfferService;
+        this.companyService = companyService;
 
         this.templateEngine.addDialect(new Java8TimeDialect());
     }
@@ -39,16 +43,19 @@ public class PdfService {
     public File generatePdf(Long id, String documentType) throws IOException, DocumentException {
         String html;
         Context context;
+        Company company;
 
         if (documentType.equals("invoice")) {
             Invoice invoice = this.invoiceService.getById(id);
+            company = this.companyService.findById(invoice.getCompany().getId());
             context = getInvoiceContext(invoice);
-            html = loadAndFillTemplate(context);
+            html = loadAndFillTemplate(context, company.getCompanyTaxType());
             return renderPdf(html, invoice);
         } else {
             PriceOffer priceOffer = this.priceOfferService.getById(id);
+            company = this.companyService.findById(priceOffer.getCompany().getId());
             context = getPriceOfferContext(priceOffer);
-            html = loadAndFillTemplate(context);
+            html = loadAndFillTemplate(context, company.getCompanyTaxType());
             return renderPdf(html, priceOffer);
         }
     }
@@ -97,6 +104,8 @@ public class PdfService {
     }
 
     private Context getBasicContext(DocumentBase document) {
+        Company company = this.companyService.findById(document.getCompany().getId());
+
         Context context = new Context();
         context.setVariable("firm", document.getDocumentData().get("firm"));
         context.setVariable("bankAccount", document.getDocumentData().get("bankAccount"));
@@ -104,11 +113,19 @@ public class PdfService {
         context.setVariable("user", document.getDocumentData().get("user"));
         context.setVariable("createdWeb", "");
         context.setVariable("note", document.getNote() != null ? document.getNote().strip() : "");
+        context.setVariable("logo_url", company.getLogoUrl());
+        context.setVariable("signature_url", company.getSignatureUrl());
 
         return context;
     }
 
-    private String loadAndFillTemplate(Context context) {
-        return templateEngine.process("view/invoice/document", context);
+    private String loadAndFillTemplate(Context context, CompanyTaxType type) {
+        switch(type) {
+            case NO_TAX_PAYER:
+                return templateEngine.process("view/invoice/document_not_taxPayer", context);
+            case TAX_PAYER:
+            default:
+                return templateEngine.process("view/invoice/document", context);
+        }
     }
 }
