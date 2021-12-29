@@ -46,6 +46,7 @@
                     <span th:text="${contact != null } ? ${document.contact.getStreet()} : ''"></span><br></br>
                     <span th:text="${contact != null } ? ${document.contact.getPostalCode()} + ' ' + ${document.contact.getCity()} : ''"></span><br></br>
                     <span th:text="${contact != null } ? ${document.contact.getCountry()} : ''"></span><br></br>
+                    <br></br>
                     <span th:text="${contact != null } ? (${document.contact.getCin()} ? 'IČO: ' + ${document.contact.getCin()} : '') : ''"></span><br></br>
                     <span th:text="${contact != null } ? (${document.contact.getTin()} ? 'DIČ: ' + ${document.contact.getTin()} : '') : ''"></span><br></br>
                     <span th:text="${contact != null } ? (${document.contact.getVatin()} ? 'IČ DPH: ' + ${document.contact.getVatin()} : '') : ''"></span><br></br>
@@ -169,6 +170,21 @@
 
                             <td class="text-right thin">
                                 <span class="open-sans" th:text="${#numbers.formatDecimal(payedTaxValue.get(key), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'Celkom bez DPH: '"></td>
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(document.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'DPH: '"></td>
+
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(document.getTotalPrice()-document.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
                             </td>
                         </tr>
                     </th:block>

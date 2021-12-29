@@ -454,12 +454,12 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     public HashMap<Integer, BigDecimal> getInvoicePayedTaxesValuesMap(List<DocumentPack> packs) {
         HashMap<Integer, BigDecimal> mappedPayedTaxedValues = new HashMap<>();
         for (DocumentPack pack : packs) {
-            if (pack.getTotalPrice().compareTo(BigDecimal.ZERO) == -1) {
+            if (pack.getPrice().compareTo(BigDecimal.ZERO) == -1) {
                 if (mappedPayedTaxedValues.containsKey(pack.getTax())) {
-                    BigDecimal newValue = mappedPayedTaxedValues.get(pack.getTax()).add(pack.getTotalPrice());
+                    BigDecimal newValue = mappedPayedTaxedValues.get(pack.getTax()).add(pack.getPrice());
                     mappedPayedTaxedValues.replace(pack.getTax(), newValue);
                 } else {
-                    mappedPayedTaxedValues.put(pack.getTax(), pack.getTotalPrice());
+                    mappedPayedTaxedValues.put(pack.getTax(), pack.getPrice());
                 }
             }
         }
