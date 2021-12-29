@@ -81,6 +81,11 @@ table td, table th {
     float: left;
 }
 
+.col-md-5 {
+    width: 50%;
+    float: right;
+}
+
 ul, ol, p {
     padding-bottom: 10px;
 }
