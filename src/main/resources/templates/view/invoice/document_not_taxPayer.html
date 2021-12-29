@@ -87,7 +87,7 @@
                         <td class="text-center" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
                         <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null} ? ${#numbers.formatDecimal(packItem.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
                         <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getTotalPrice() == null}" th:text="''"></td>
-                        <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null and packItem.getDiscount() != null} ? ${#numbers.formatDecimal(packItem.countQuantityTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
+                        <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null and packItem.getDiscount() != null} ? ${#numbers.formatDecimal(packItem.countItemPriceWithTax(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
                         <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getTotalPrice() == null}" th:text="''"></td>
                     </tr>
 

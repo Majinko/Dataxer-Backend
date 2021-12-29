@@ -437,14 +437,31 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
         for (DocumentPackItem documentPackItem : documentPackItems) {
             if (mappedTaxedValues.containsKey(documentPackItem.getTax())) {
-                BigDecimal newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
-                        documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
-                                ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty())).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                //ak ma item zlavu tak ju odpocitame
+                BigDecimal newValue;
+                if (documentPackItem.getDiscount() != null && documentPackItem.getDiscount().compareTo(BigDecimal.ZERO) == 1) {
+                    newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
+                            documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                                    ? documentPackItem.getPrice().add(documentPackItem.countPriceDiscount())
+                                    .multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1)).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                } else {
+                    newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
+                            documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                                    ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1))
+                                    .setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                }
                 mappedTaxedValues.replace(documentPackItem.getTax(), newValue);
             } else {
-                mappedTaxedValues.put(documentPackItem.getTax(),
-                        documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
-                                ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty())).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                BigDecimal price;
+                if (documentPackItem.getDiscount() != null && documentPackItem.getDiscount().compareTo(BigDecimal.ZERO) == 1) {
+                    price = documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                            ? documentPackItem.getPrice().add(documentPackItem.countPriceDiscount()).multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1))
+                            .setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+                } else {
+                    price = documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                            ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1)).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+                }
+                mappedTaxedValues.put(documentPackItem.getTax(), price);
             }
         }
         return mappedTaxedValues;

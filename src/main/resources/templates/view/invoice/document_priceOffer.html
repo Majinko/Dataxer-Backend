@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="sk">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title th:text="${document.getTitle()}"></title>
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+</head>
+
+<body>
+<section>
+    <header>
+        <div class="col-md-6 float-left">
+            <img height="60" th:src="${logo_url}" alt="Logo"/>
+            <div >
+                <p style="font-weight: bold; margin-top: 41px" th:text="'Dodávateľ:' "></p>
+                <p>
+                    <span th:text="${firm.get('name')}"></span><br></br>
+                    <span th:text="${firm.get('street')}"></span><br></br>
+                    <span th:text="${firm.get('postalCode')} + ' '+ ${firm.get('city')}"></span><br></br>
+                    <span th:text="${firm.get('country')}"></span><br></br>
+                </p>
+                <br></br>
+                <p>
+                    <span th:if="${firm.get('cin') != null}" th:text="'IČO:  ' + ${firm.get('cin')}"></span><br></br>
+                    <span th:if="${firm.get('tin') != null}" th:text="'DIČ:  ' + ${firm.get('tin')}"></span><br></br>
+                    <span th:if="${firm.get('vatin') != null}" th:text="'IČ DPH:  ' + ${firm.get('vatin')}"></span>
+                </p>
+            </div>
+        </div>
+        <div class="col-md-5 float-right">
+            <h1 style="margin-bottom: 0; margin-right: auto"><span class="h1" th:text="${document.getTitle() != null && document.getTitle() != ''}
+                ? ${document.getTitle()} : 'Cenová ponuka ' + ${document.getNumber()}"></span></h1>
+
+            <div class="fields-box-text fields-box-only-text" th:with="contact=${document.getContact()}">
+                <p>
+                    <span th:text="${document.getCreatedDate() != null } ? 'Dátum vystavenia: ' + ${#temporals.format(document.createdDate, 'dd.MM.yyyy')} : 'Dátum vystavenia: '"></span>
+                    <br></br>
+                    <span th:text="${document.getDueDate() != null} ? 'Platné do: ' + ${#temporals.format(document.getDueDate(), 'dd.MM.yyyy')} : 'Platné do: '"></span>
+                    <br></br>
+                </p>
+
+                <p style="font-weight: bold; margin-top: 20px;" th:text="'Odberateľ:'"></p>
+                <p>
+                    <span th:text="${contact != null } ? ${document.contact.getName()} : ''"></span><br></br>
+                    <span th:text="${contact != null } ? ${document.contact.getStreet()} : ''"></span><br></br>
+                    <span th:text="${contact != null } ? ${document.contact.getPostalCode()} + ' ' + ${document.contact.getCity()} : ''"></span><br></br>
+                    <span th:text="${contact != null } ? ${document.contact.getCountry()} : ''"></span><br></br>
+                </p>
+                <br></br>
+                <p>
+                    <span th:text="${contact != null } ? (${document.contact.getCin()} ? 'IČO: ' + ${document.contact.getCin()} : '') : ''"></span><br></br>
+                    <span th:text="${contact != null } ? (${document.contact.getTin()} ? 'DIČ: ' + ${document.contact.getTin()} : '') : ''"></span><br></br>
+                    <span th:text="${contact != null } ? (${document.contact.getVatin()} ? 'IČ DPH: ' + ${document.contact.getVatin()} : '') : ''"></span><br></br>
+                </p>
+            </div>
+        </div>
+        <div class="clear"></div>
+    </header>
+
+    <h2 style="font-size: 15px; font-weight: bold; display: block; margin-top: 22px" th:text="${projectName != null && projectName != '' ? projectName : ''}"></h2>
+
+    <div style="margin-top: 10px" class="table-scroll">
+        <table cellspacing="0" class="table-data table-invoice-items table-invoice-summary">
+            <thead>
+            <tr>
+                <th class="text-left white-space-nowrap" th:text="'Názov položky'"></th>
+                <th class="text-center" th:text="'Počet'"></th>
+                <th class="text-center" th:text="'MJ'"></th>
+                <th class="text-right white-space-nowrap"  th:utext="'Jedn. cena' + '<br></br>' + 'bez DPH'"></th>
+                <th class="text-center" th:text="'Dph %'"></th>
+                <th class="text-right white-space-nowrap" th:utext="'Jedn. cena' + '<br></br>' + 's DPH'"></th>
+                <th class="nowrap text-right" th:text="'Celkom s DPH'"></th>
+            </tr>
+            </thead>
+            <th:block th:each="pack: ${document.getPacks()}">
+                <tbody>
+                <tr class="bold set">
+                    <td class="text-left white-space-normal" th:text="${pack.getTitle()}"></td>
+                    <td class="text-center"></td>
+                    <td class="text-center"></td>
+                    <td class="text-right" th:text="${#numbers.formatDecimal(pack.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
+                    <td class="text-center white-space-nowrap" th:text="${pack.getTax() != null} ? ${pack.getTax()} + ' %' : ''"></td>
+                    <td class="text-right" th:text="${#numbers.formatDecimal(pack.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
+                    <td class="text-right" th:text="${#numbers.formatDecimal(pack.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
+                </tr>
+
+                <th:block  th:if="${pack.getShowItems()}" th:each="packItem, inDex: ${pack.getPackItems()}">
+                    <tr>
+                        <td class="text-left white-space-normal" style="white-space: nowrap" th:text="${packItem.getTitle()} ?: ''"></td>
+                        <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${#numbers.formatDecimal(packItem.getQty(), 1, 'WHITESPACE', 0, 'COMMA')}"></td>
+                        <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
+                        <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getUnit()}"></td>
+                        <td class="text-center" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
+                        <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getPrice() != null} ? ${#numbers.formatDecimal(packItem.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
+                        <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getPrice() == null}" th:text="''"></td>
+                        <td class="text-center" style="white-space: nowrap" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTax() != null} ? ${packItem.getTax()} + ' %' : ''"></td>
+                        <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getTax() == null}" th:text="''"></td>
+                        <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getPrice() != null} ? ${#numbers.formatDecimal(packItem.countItemPriceWithTax(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
+                        <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getTotalPrice() == null}" th:text="''"></td>
+                        <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null and packItem.getDiscount() != null} ? ${#numbers.formatDecimal(packItem.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
+                        <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getTotalPrice() == null}" th:text="''"></td>
+                    </tr>
+
+                    <tr th:if="${packItem.getDiscount() != null and packItem.getDiscount() &gt; 0.00}">
+                        <td class="text-left white-space-nowrap" colspan="3" th:text="'Zľava ' + ${#numbers.formatDecimal(packItem.getDiscount(), 1, 'WHITESPACE', 0, 'COMMA')} + ' %'"></td>
+                        <td class="text-right nowrap" th:text="${#numbers.formatDecimal(packItem.countPriceDiscount(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
+                        <td></td>
+                        <td class="text-right nowrap" th:text="${#numbers.formatDecimal(packItem.countTotalPriceDiscount(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
+                        <td class="text-right nowrap" th:text="${#numbers.formatDecimal(packItem.countQuantityTotalPriceDiscount(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
+                    </tr>
+                </th:block>
+                </tbody>
+            </th:block>
+        </table>
+    </div>
+
+    <div class="footer-wrap" style="padding-top: 13px;">
+        <div class="row">
+            <div class="col-md-12" style="width: 100%" th:with="taxesAndValues=${taxes}">
+                <table class="table-invoice-items table-invoice-summary" style="margin-top: -3px;">
+                    <tfoot class="text-right">
+                    <th:block th:if="${document.getDiscount() != null && document.getDiscount() > 0}">
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'Suma pred zľavou: '"></td>
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'Zľava ' + ${#numbers.formatDecimal(document.getDiscount(), 1, 'WHITESPACE', 0, 'COMMA')} + '%'"></td>
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="'-' + ${#numbers.formatDecimal(document.countDiscountTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+                    </th:block>
+
+                    <tr>
+                        <td colspan="5" class="text-right" th:text="'Celkom bez DPH: '"></td>
+                        <td class="text-right thin">
+                            <span class="open-sans" th:if="${document.getDiscount() == null || document.getDiscount() <= 0}" th:text="${#numbers.formatDecimal(document.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            <span class="open-sans" th:if="${document.getDiscount() != null && document.getDiscount() > 0}" th:text="${#numbers.formatDecimal(document.getPrice()-(document.getPrice()*(document.getDiscount()/100)), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                        </td>
+                    </tr>
+
+                    <th:block th:each="key: ${taxesAndValues.keySet()}">
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'Základ pre DPH ' + ${key} + ' %'"></td>
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(taxesAndValues.get(key), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="5" class="text-right" th:text="'DPH ' + ${key} + ' %'"></td>
+
+                            <td class="text-right thin">
+                                <span class="open-sans" th:text="${#numbers.formatDecimal(document.countTaxPrice(taxesAndValues.get(key), key), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            </td>
+                        </tr>
+                    </th:block>
+
+
+                    <tr>
+                        <td colspan="5" class="text-right" style="font-weight: bold; font-size: 16px; line-height: 1.21em" th:text="'Celkom s DPH: '"></td>
+                        <td class="text-right thin" style="line-height: 1.21em">
+                            <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:if="${document.getDiscount() <= 0 || document.getDiscount() == null}" th:text="${#numbers.formatDecimal(document.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                            <span class="open-sans" style="font-weight: bold; font-size: 16px;" th:if="${document.getDiscount() > 0}" th:text="${#numbers.formatDecimal(document.getTotalPrice()-document.countDiscountTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></span>
+                        </td>
+                    </tr>
+
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+
+        <th:block th:if="${note != null && note != ''}">
+            <div class="note">
+                <p style="font-weight: bold" th:text="'Poznámka:'"></p>
+                <br></br>
+                <p style="text-align: justify; margin-top: -20px" class="small-font" th:text="${document.getNote()}"></p>
+            </div>
+        </th:block>
+
+        <div class="row" style="margin-top: 50px;">
+            <img height="50" style="float: right;" alt="Signature" th:src="${signature_url}"/>
+        </div>
+
+        <div class="row" style="text-align: center; margin-top: 23px; bottom: 0px; margin-bottom: 2px">
+            <p style="font-size: 7px; margin-bottom: 0; padding-bottom: 0;" th:text="'Vystavil:' + ${user.get('name') != null && user.get('name') != '' ? user.get('name') : user.get('displayName')} + '&nbsp;|&nbsp;' + ${user.get('phone')} + '&nbsp;|&nbsp;' + ${createdWeb} + '&nbsp;|&nbsp;' + ${user.get('email')}"></p>
+            <p style="font-size: 7px;" th:text="'Vygenerované cez dataxer.com'"></p>
+        </div>
+    </div>
+</section>
+</body>
+</html>
