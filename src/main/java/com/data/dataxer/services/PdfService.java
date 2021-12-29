@@ -6,6 +6,7 @@ import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.domain.PriceOffer;
 import com.data.dataxer.models.enums.CompanyTaxType;
 import com.data.dataxer.models.enums.DocumentType;
+import com.data.dataxer.utils.Helpers;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
@@ -108,7 +109,7 @@ public class PdfService {
     private Context getBasicContext(DocumentBase document) {
         Company company = this.companyService.findById(document.getCompany().getId());
         HashMap<Integer, BigDecimal> taxesValuesMap = invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks()));
-        LinkedHashMap<Integer, BigDecimal> sortedTaxesValuesMap = sortHashmapAndSubtractDiscount(taxesValuesMap, document.getDiscount());
+        LinkedHashMap<Integer, BigDecimal> sortedTaxesValuesMap = Helpers.sortHashmapAndSubtractDiscount(taxesValuesMap, document.getDiscount());
 
         Context context = new Context();
         context.setVariable("firm", document.getDocumentData().get("firm"));
@@ -133,21 +134,4 @@ public class PdfService {
         }
     }
 
-    private LinkedHashMap<Integer, BigDecimal> sortHashmapAndSubtractDiscount(HashMap<Integer, BigDecimal> originalMap, BigDecimal discount) {
-        LinkedHashMap<Integer, BigDecimal> sorted = new LinkedHashMap<>();
-
-        List<Integer> keys = new ArrayList<>(originalMap.keySet());
-        Collections.reverse(keys);
-
-        keys.forEach(key -> {
-            if (discount != null && discount.compareTo(BigDecimal.ZERO) == 1) {
-                sorted.put(key, originalMap.get(key).subtract(originalMap.get(key).multiply(discount.divide(new BigDecimal(100), 2, RoundingMode.HALF_UP))
-                                .setScale(2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP));
-            } else {
-                sorted.put(key, originalMap.get(key));
-            }
-        });
-
-        return sorted;
-    }
 }
