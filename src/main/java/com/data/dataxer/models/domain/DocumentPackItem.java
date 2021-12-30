@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity
 @Getter
@@ -55,16 +56,17 @@ public class DocumentPackItem extends BaseEntity {
         this.totalPrice = packItem.getTotalPrice();
     }
 
-    public BigDecimal countQuantityTotalPrice() {
-        return this.totalPrice.multiply(BigDecimal.valueOf(this.qty));
+    //zlava zmenit pre invoice template
+    public BigDecimal countItemPriceWithTax() {
+        return price.add(price.multiply(new BigDecimal((double) tax/100)).setScale(2, RoundingMode.HALF_UP));
     }
 
     public BigDecimal countPriceDiscount() {
-        return this.price.multiply(this.discount.divide(BigDecimal.valueOf(100)));
+        return this.price.multiply(this.discount.divide(BigDecimal.valueOf(100))).multiply(new BigDecimal(-1));
     }
 
     public BigDecimal countTotalPriceDiscount() {
-        return this.totalPrice.multiply(this.discount.divide(BigDecimal.valueOf(100)));
+        return countItemPriceWithTax().multiply(this.discount.divide(BigDecimal.valueOf(100))).multiply(new BigDecimal(-1));
     }
 
     public BigDecimal countQuantityTotalPriceDiscount() {

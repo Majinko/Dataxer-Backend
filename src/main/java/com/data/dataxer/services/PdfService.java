@@ -6,6 +6,7 @@ import com.data.dataxer.models.domain.Invoice;
 import com.data.dataxer.models.domain.PriceOffer;
 import com.data.dataxer.models.enums.CompanyTaxType;
 import com.data.dataxer.models.enums.DocumentType;
+import com.data.dataxer.utils.Helpers;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.pdf.BaseFont;
 import org.springframework.core.io.ClassPathResource;
@@ -21,10 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class PdfService {
@@ -58,9 +56,8 @@ public class PdfService {
             return renderPdf(html, invoice);
         } else {
             PriceOffer priceOffer = this.priceOfferService.getById(id);
-            company = this.companyService.findById(priceOffer.getCompany().getId());
             context = getPriceOfferContext(priceOffer);
-            html = loadAndFillTemplate(context, company.getCompanyTaxType());
+            html = templateEngine.process("view/invoice/document_priceOffer", context);
             return renderPdf(html, priceOffer);
         }
     }
@@ -89,7 +86,6 @@ public class PdfService {
         context.setVariable("paymentMethod", invoice.getPaymentMethod());
         context.setVariable("variableSymbol", invoice.getVariableSymbol());
         context.setVariable("subject", invoice.getSubject());
-        context.setVariable("type", "I");
         context.setVariable("document", invoice);
         context.setVariable("payedValue", invoiceService.getInvoicePayedTaxesValuesMap(invoice.getPacks()));
         context.setVariable("payedTaxValue", invoiceService.getTaxPayedTaxesValuesMap(invoice.getPacks()));
@@ -104,10 +100,8 @@ public class PdfService {
     private Context getPriceOfferContext(PriceOffer priceOffer) {
         Context context = getBasicContext(priceOffer);
 
-        context.setVariable("headerComment", "");
-        context.setVariable("type", "P");
         context.setVariable("document", priceOffer);
-        context.setVariable("payedValue", new HashMap<Integer, BigDecimal>());
+        context.setVariable("projectName", priceOffer.getProject() != null ? priceOffer.getProject().getTitle() : "");
 
         return context;
     }
@@ -115,15 +109,12 @@ public class PdfService {
     private Context getBasicContext(DocumentBase document) {
         Company company = this.companyService.findById(document.getCompany().getId());
         HashMap<Integer, BigDecimal> taxesValuesMap = invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks()));
-
-        if (document.getDiscount().compareTo(BigDecimal.ZERO) == 1) {
-            taxesValuesMap = sortHashmapAndSubtractDiscount(taxesValuesMap, document.getDiscount());
-        }
+        LinkedHashMap<Integer, BigDecimal> sortedTaxesValuesMap = Helpers.sortHashmapAndSubtractDiscount(taxesValuesMap, document.getDiscount());
 
         Context context = new Context();
         context.setVariable("firm", document.getDocumentData().get("firm"));
         context.setVariable("bankAccount", document.getDocumentData().get("bankAccount"));
-        context.setVariable("taxes", taxesValuesMap);
+        context.setVariable("taxes", sortedTaxesValuesMap);
         context.setVariable("user", document.getDocumentData().get("user"));
         context.setVariable("createdWeb", "");
         context.setVariable("note", document.getNote() != null ? document.getNote().strip() : "");
@@ -143,22 +134,4 @@ public class PdfService {
         }
     }
 
-    private HashMap<Integer, BigDecimal> sortHashmapAndSubtractDiscount(HashMap<Integer, BigDecimal> originalMap, BigDecimal discount) {
-        HashMap<Integer, BigDecimal> sorted = new HashMap<>();
-
-        List<Integer> keys = new ArrayList<>(originalMap.keySet());
-        Collections.sort(keys);
-        Collections.reverse(keys);
-
-        keys.forEach(key -> {
-            if (discount.compareTo(BigDecimal.ZERO) == 1) {
-                sorted.put(key, originalMap.get(key).subtract(originalMap.get(key).multiply(discount.divide(new BigDecimal(100), 2, RoundingMode.HALF_UP))
-                                .setScale(2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP));
-            } else {
-                sorted.put(key, originalMap.get(key));
-            }
-        });
-
-        return sorted;
-    }
 }

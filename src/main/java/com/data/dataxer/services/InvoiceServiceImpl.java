@@ -9,6 +9,7 @@ import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
 import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import com.data.dataxer.utils.Helpers;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -20,10 +21,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -329,14 +327,12 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
         //storing keys desc****************
         HashMap<Integer, BigDecimal> valuesForTaxes = getTaxesValuesMap(this.getInvoiceItems(proformaInvoice.getPacks()));
-        ArrayList<Integer> sortedKeys = new ArrayList<>(valuesForTaxes.keySet());
-        Collections.sort(sortedKeys);
-        Collections.reverse(sortedKeys);
-        //*********************************
+        //zoradene zaklady pre dph so zlavou (suma je bez dph)
+        LinkedHashMap<Integer, BigDecimal> sortedValuesForTaxesWithDiscount = Helpers.sortHashmapAndSubtractDiscount(valuesForTaxes, proformaInvoice.getDiscount());
 
-        for (Integer keyTax : sortedKeys) {
-            if (payments.compareTo(BigDecimal.ZERO) > 0 && valuesForTaxes.get(keyTax).compareTo(payed) > 0) {
-                BigDecimal totalPrice = payments.compareTo(valuesForTaxes.get(keyTax)) > 0 ? valuesForTaxes.get(keyTax) : payments;
+        for (Integer keyTax : sortedValuesForTaxesWithDiscount.keySet()) {
+            if (payments.compareTo(BigDecimal.ZERO) > 0 && sortedValuesForTaxesWithDiscount.get(keyTax).compareTo(payed) > 0) {
+                BigDecimal totalPrice = payments.compareTo(sortedValuesForTaxesWithDiscount.get(keyTax)) > 0 ? sortedValuesForTaxesWithDiscount.get(keyTax) : payments;
                 if (payed.compareTo(BigDecimal.ZERO) > 0) {
                     totalPrice = totalPrice.subtract(payed);
                 }
@@ -344,23 +340,23 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
                 documentPacks.add(generateDocumentPackForTaxDocument(proformaInvoice, keyTax, totalPrice));
             }
 
-            payed = payed.subtract(valuesForTaxes.get(keyTax));
-            payments = payments.subtract(valuesForTaxes.get(keyTax));
+            payed = payed.subtract(sortedValuesForTaxesWithDiscount.get(keyTax));
+            payments = payments.subtract(sortedValuesForTaxesWithDiscount.get(keyTax));
         }
 
         return documentPacks;
     }
 
-    private DocumentPack generateDocumentPackForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal totalPrice) {
+    private DocumentPack generateDocumentPackForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal price) {
         DocumentPack taxDocumentPack = new DocumentPack();
 
         taxDocumentPack.setTax(tax);
-        taxDocumentPack.setPrice(getPriceFromTotalPrice(totalPrice, tax));
-        taxDocumentPack.setTotalPrice(totalPrice);
+        taxDocumentPack.setPrice(price);
+        taxDocumentPack.setTotalPrice(price.multiply(new BigDecimal(1.0 + ((double)tax/100))).setScale(2, RoundingMode.HALF_UP));
         taxDocumentPack.setTitle("Daňový doklad k prijatej platbe");
         taxDocumentPack.setShowItems(true);
 
-        taxDocumentPack.setPackItems(List.of(generateDocumentPackItemForTaxDocument(proformaInvoice, tax, totalPrice)));
+        taxDocumentPack.setPackItems(List.of(generateDocumentPackItemForTaxDocument(proformaInvoice, tax, price)));
 
         return taxDocumentPack;
     }
@@ -381,15 +377,15 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         return summaryInvoicePack;
     }
 
-    private DocumentPackItem generateDocumentPackItemForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal totalPrice) {
+    private DocumentPackItem generateDocumentPackItemForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal price) {
         DocumentPackItem documentPackItem = new DocumentPackItem();
 
         documentPackItem.setTitle(this.generateTaxDocumentPackTitle(getNewestPaymentPayedDate(proformaInvoice.getId()), proformaInvoice));
         documentPackItem.setQty(1f);
         documentPackItem.setDiscount(BigDecimal.valueOf(0));
         documentPackItem.setTax(tax);
-        documentPackItem.setPrice(getPriceFromTotalPrice(totalPrice, tax));
-        documentPackItem.setTotalPrice(totalPrice);
+        documentPackItem.setPrice(price);
+        documentPackItem.setTotalPrice(price.multiply(new BigDecimal(1.0 + ((double)tax/100))).setScale(2, RoundingMode.HALF_UP));
 
         return documentPackItem;
     }
@@ -437,14 +433,31 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
         for (DocumentPackItem documentPackItem : documentPackItems) {
             if (mappedTaxedValues.containsKey(documentPackItem.getTax())) {
-                BigDecimal newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
-                        documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
-                                ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty())).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                //ak ma item zlavu tak ju odpocitame
+                BigDecimal newValue;
+                if (documentPackItem.getDiscount() != null && documentPackItem.getDiscount().compareTo(BigDecimal.ZERO) == 1) {
+                    newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
+                            documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                                    ? documentPackItem.getPrice().add(documentPackItem.countPriceDiscount())
+                                    .multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1)).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                } else {
+                    newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
+                            documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                                    ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1))
+                                    .setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                }
                 mappedTaxedValues.replace(documentPackItem.getTax(), newValue);
             } else {
-                mappedTaxedValues.put(documentPackItem.getTax(),
-                        documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
-                                ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty())).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                BigDecimal price;
+                if (documentPackItem.getDiscount() != null && documentPackItem.getDiscount().compareTo(BigDecimal.ZERO) == 1) {
+                    price = documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                            ? documentPackItem.getPrice().add(documentPackItem.countPriceDiscount()).multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1))
+                            .setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+                } else {
+                    price = documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                            ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1)).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
+                }
+                mappedTaxedValues.put(documentPackItem.getTax(), price);
             }
         }
         return mappedTaxedValues;
@@ -454,12 +467,12 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     public HashMap<Integer, BigDecimal> getInvoicePayedTaxesValuesMap(List<DocumentPack> packs) {
         HashMap<Integer, BigDecimal> mappedPayedTaxedValues = new HashMap<>();
         for (DocumentPack pack : packs) {
-            if (pack.getTotalPrice().compareTo(BigDecimal.ZERO) == -1) {
+            if (pack.getPrice().compareTo(BigDecimal.ZERO) == -1) {
                 if (mappedPayedTaxedValues.containsKey(pack.getTax())) {
-                    BigDecimal newValue = mappedPayedTaxedValues.get(pack.getTax()).add(pack.getTotalPrice());
+                    BigDecimal newValue = mappedPayedTaxedValues.get(pack.getTax()).add(pack.getPrice());
                     mappedPayedTaxedValues.replace(pack.getTax(), newValue);
                 } else {
-                    mappedPayedTaxedValues.put(pack.getTax(), pack.getTotalPrice());
+                    mappedPayedTaxedValues.put(pack.getTax(), pack.getPrice());
                 }
             }
         }

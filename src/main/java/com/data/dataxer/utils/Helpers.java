@@ -3,13 +3,12 @@ package com.data.dataxer.utils;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -53,5 +52,24 @@ public class Helpers {
         SimpleDateFormat DateFor = new SimpleDateFormat("dd.MM.yyyy");
 
         return DateFor.format(date);
+    }
+
+    public static LinkedHashMap<Integer, BigDecimal> sortHashmapAndSubtractDiscount(HashMap<Integer, BigDecimal> originalMap, BigDecimal discount) {
+        LinkedHashMap<Integer, BigDecimal> sorted = new LinkedHashMap<>();
+
+        List<Integer> keys = new ArrayList<>(originalMap.keySet());
+        Collections.sort(keys);
+        Collections.reverse(keys);
+
+        keys.forEach(key -> {
+            if (discount != null && discount.compareTo(BigDecimal.ZERO) == 1) {
+                sorted.put(key, originalMap.get(key).subtract(originalMap.get(key).multiply(discount.divide(new BigDecimal(100), 2, RoundingMode.HALF_UP))
+                        .setScale(2, RoundingMode.HALF_UP)).setScale(2, RoundingMode.HALF_UP));
+            } else {
+                sorted.put(key, originalMap.get(key));
+            }
+        });
+
+        return sorted;
     }
 }
