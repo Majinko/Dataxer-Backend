@@ -212,7 +212,8 @@
 
                     </th:block>
 
-                    <th:block th:if="${document.getDocumentType() != null && document.getDocumentType().getName().equals('summary_invoice')}">
+                    <th:block
+                            th:if="${document.getDocumentType() != null && document.getDocumentType().getName().equals('summary_invoice')}">
                         <tr>
                             <td colspan="5" class="text-right" th:text="'Celkom bez DPH: '"></td>
                             <td class="text-right thin">
@@ -231,7 +232,9 @@
                         </tr>
 
                         <tr>
-                            <td colspan="5" class="text-right" th:text="'Celkom s DPH: '"></td>
+                            <td colspan="5" class="text-right"
+                                style="font-weight: bold; font-size: 16px; line-height: 1.21em"
+                                th:text="'Celkom s DPH: '"></td>
 
                             <td class="text-right thin">
                                 <span class="open-sans" style="font-weight: bold; font-size: 16px;"
