@@ -85,11 +85,10 @@ public class PdfService {
         context.setVariable("headerComment", invoice.getHeaderComment());
         context.setVariable("paymentMethod", invoice.getPaymentMethod());
         context.setVariable("variableSymbol", invoice.getVariableSymbol());
-        context.setVariable("subject", invoice.getSubject());
+        context.setVariable("subject", invoice.getSubject() == null ? (invoice.getProject() != null ? invoice.getProject().getTitle() : "") : "");
         context.setVariable("document", invoice);
         context.setVariable("payedValue", invoiceService.getInvoicePayedTaxesValuesMap(invoice.getPacks()));
         context.setVariable("payedTaxValue", invoiceService.getTaxPayedTaxesValuesMap(invoice.getPacks()));
-        context.setVariable("projectName", invoice.getProject() != null ? invoice.getProject().getTitle() : "");
 
         if (invoice.getDocumentType() == DocumentType.TAX_DOCUMENT) {
             context.setVariable("taxDocPayed", invoiceService.getTaxDocumentPayedValue(invoice.getPacks()));
@@ -113,6 +112,7 @@ public class PdfService {
         LinkedHashMap<Integer, BigDecimal> sortedTaxesValuesMap = Helpers.sortHashmapAndSubtractDiscount(taxesValuesMap, document.getDiscount());
 
         Context context = new Context();
+
         context.setVariable("firm", document.getDocumentData().get("firm"));
         context.setVariable("bankAccount", document.getDocumentData().get("bankAccount"));
         context.setVariable("taxes", sortedTaxesValuesMap);
