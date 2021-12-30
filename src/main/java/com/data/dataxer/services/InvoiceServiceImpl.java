@@ -229,6 +229,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
                 "paymentMethod", "invoiceType");
 
         taxDocument.setCreatedDate(LocalDate.now());
+        taxDocument.setDeliveredDate(getNewestPaymentPayedDate(proformaInvoiceId));
         taxDocument.setDocumentType(DocumentType.TAX_DOCUMENT);
         taxDocument.setPacks(this.setTaxDocumentsPacks(proformaInvoice));
 
