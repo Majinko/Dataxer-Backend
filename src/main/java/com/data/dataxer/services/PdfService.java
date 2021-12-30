@@ -85,7 +85,7 @@ public class PdfService {
         context.setVariable("headerComment", invoice.getHeaderComment());
         context.setVariable("paymentMethod", invoice.getPaymentMethod());
         context.setVariable("variableSymbol", invoice.getVariableSymbol());
-        context.setVariable("subject", invoice.getSubject() == null ? (invoice.getProject() != null ? invoice.getProject().getTitle() : "") : "");
+        context.setVariable("subject", invoice.getSubject() == null || Objects.equals(invoice.getSubject(), "") ? (invoice.getProject() != null ? invoice.getProject().getTitle() : "") : invoice.getSubject());
         context.setVariable("document", invoice);
         context.setVariable("payedValue", invoiceService.getInvoicePayedTaxesValuesMap(invoice.getPacks()));
         context.setVariable("payedTaxValue", invoiceService.getTaxPayedTaxesValuesMap(invoice.getPacks()));
@@ -101,7 +101,7 @@ public class PdfService {
         Context context = getBasicContext(priceOffer);
 
         context.setVariable("document", priceOffer);
-        context.setVariable("projectName", priceOffer.getProject() != null ? priceOffer.getProject().getTitle() : "");
+        context.setVariable("subject", priceOffer.getSubject() == null || Objects.equals(priceOffer.getSubject(), "") ? (priceOffer.getProject() != null ? priceOffer.getProject().getTitle() : "") : priceOffer.getSubject());
 
         return context;
     }

@@ -60,9 +60,6 @@
 
     <h2 style="font-size: 15px; font-weight: bold; display: block; margin-top: 22px"
         th:if="${subject != null && subject != ''}" th:text="${subject}"></h2>
-    <h2 style="font-size: 15px; font-weight: bold; display: block; margin-top: 22px"
-        th:if="${(subject == null || subject == '') && projectName != null}"
-        th:text="${projectName != ''} ? ${projectName} : ''"></h2>
 
     <div style="margin-top: 10px" class="table-scroll">
         <table cellspacing="0" class="table-data table-invoice-items table-invoice-summary">

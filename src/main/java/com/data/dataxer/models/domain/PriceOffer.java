@@ -16,6 +16,7 @@ import java.math.RoundingMode;
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
 public class PriceOffer extends DocumentBase {
+    private String subject;
 
     @Override
     public BigDecimal countDiscountTotalPrice() {

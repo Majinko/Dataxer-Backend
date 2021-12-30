@@ -14,6 +14,7 @@ import java.util.*;
 public class PriceOfferDTO {
     private Long id;
     private String title;
+    private String subject;
     private String number;
     private DocumentState state;
     private String note;

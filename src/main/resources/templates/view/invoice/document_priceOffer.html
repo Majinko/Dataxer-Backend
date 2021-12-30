@@ -59,7 +59,7 @@
     </header>
 
     <h2 style="font-size: 15px; font-weight: bold; display: block; margin-top: 22px"
-        th:text="${projectName != null && projectName != '' ? projectName : ''}"></h2>
+        th:if="${subject != null && subject != ''}" th:text="${subject}"></h2>
 
     <div style="margin-top: 10px" class="table-scroll">
         <table cellspacing="0" class="table-data table-invoice-items table-invoice-summary">
