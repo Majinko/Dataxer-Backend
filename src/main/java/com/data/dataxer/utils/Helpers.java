@@ -58,6 +58,7 @@ public class Helpers {
         LinkedHashMap<Integer, BigDecimal> sorted = new LinkedHashMap<>();
 
         List<Integer> keys = new ArrayList<>(originalMap.keySet());
+        Collections.sort(keys);
         Collections.reverse(keys);
 
         keys.forEach(key -> {
