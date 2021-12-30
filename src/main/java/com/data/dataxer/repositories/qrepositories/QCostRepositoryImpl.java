@@ -78,6 +78,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .join(QCost.cost.categories, QCategory.category).fetchJoin()
                 .where(qCost.id.in(costIds))
                 .orderBy(QCost.cost.id.desc())
+                .distinct()
                 .fetch();
 
 

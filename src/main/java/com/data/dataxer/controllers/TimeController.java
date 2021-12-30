@@ -52,7 +52,7 @@ public class TimeController {
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
             @RequestParam(value = "sortExpression", defaultValue = "sort(-time.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("date_work")));
 
         return ResponseEntity.ok(this.timeService.paginate(pageable, rqlFilter, sortExpression).map(this.timeMapper::timeToTimeDTO));
     }
