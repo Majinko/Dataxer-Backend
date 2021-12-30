@@ -19,8 +19,6 @@ import java.time.LocalDate;
 public class Invoice extends DocumentBase {
     private String variableSymbol;
 
-    private String subject;
-
     private String specificSymbol;
 
     @Enumerated(EnumType.STRING)

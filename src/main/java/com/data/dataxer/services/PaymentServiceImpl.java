@@ -114,6 +114,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private boolean documentIsPayed(Payment payment) {
-        return this.getRestToPay(payment.getDocumentId(), payment.getDocumentType()).compareTo(BigDecimal.ZERO) == 0;
+        return this.getRestToPay(payment.getDocumentId(), payment.getDocumentType()).compareTo(BigDecimal.ZERO) <= 0;
     }
 }

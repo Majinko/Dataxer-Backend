@@ -41,6 +41,8 @@ public abstract class DocumentBase extends BaseEntity {
 
     protected String title;
 
+    protected String subject;
+
     protected String number;
 
     @Enumerated(EnumType.STRING)
