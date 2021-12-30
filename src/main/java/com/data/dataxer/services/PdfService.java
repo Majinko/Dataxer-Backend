@@ -89,6 +89,7 @@ public class PdfService {
         context.setVariable("document", invoice);
         context.setVariable("payedValue", invoiceService.getInvoicePayedTaxesValuesMap(invoice.getPacks()));
         context.setVariable("payedTaxValue", invoiceService.getTaxPayedTaxesValuesMap(invoice.getPacks()));
+        context.setVariable("projectName", invoice.getProject() != null ? invoice.getProject().getTitle() : "");
 
         if (invoice.getDocumentType() == DocumentType.TAX_DOCUMENT) {
             context.setVariable("taxDocPayed", invoiceService.getTaxDocumentPayedValue(invoice.getPacks()));
