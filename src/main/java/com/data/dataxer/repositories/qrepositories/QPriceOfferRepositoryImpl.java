@@ -15,11 +15,12 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
+import com.data.dataxer.models.page.CustomPageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -61,7 +62,14 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
 
         List<PriceOffer> priceOfferList = this.getPriceOfferPaginate(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
 
-        return new PageImpl<>(priceOfferList, pageable, getTotalCount(predicate));
+        return new CustomPageImpl<>(priceOfferList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
+    }
+
+    private BigDecimal getTotalPrice(Predicate predicate) {
+        return this.query.select(QPriceOffer.priceOffer.priceAfterDiscount.sum())
+                .from(QPriceOffer.priceOffer)
+                .where(predicate)
+                .fetchOne();
     }
 
     @Override

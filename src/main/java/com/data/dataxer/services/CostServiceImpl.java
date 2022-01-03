@@ -2,6 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.Payment;
+import org.springframework.data.domain.Page;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.CostRepository;
@@ -11,7 +12,6 @@ import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.MandatoryValidator;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 

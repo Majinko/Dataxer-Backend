@@ -3,9 +3,8 @@ package com.data.dataxer.repositories.qrepositories;
 import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.QCategory;
 import com.data.dataxer.models.domain.QCost;
-import com.data.dataxer.models.domain.QInvoice;
-import com.data.dataxer.models.dto.CustomPageImplDTO;
-import com.data.dataxer.utils.Helpers;
+import org.springframework.data.domain.Page;
+import com.data.dataxer.models.page.CustomPageImpl;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -19,8 +18,6 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -82,8 +79,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .distinct()
                 .fetch();
 
-
-        return new CustomPageImplDTO<>(costList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
+        return new CustomPageImpl<Cost>(costList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
     }
 
     @Override
@@ -173,13 +169,12 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .fetchCount();
     }
 
-    private long getTotalPrice(Predicate predicate) {
-        QCost qCost = QCost.cost;
-
-        return this.query.select(qCost.price)
-                .from(qCost)
+    private BigDecimal getTotalPrice(Predicate predicate) {
+        return this.query
+                .select(QCost.cost.price.sum())
+                .from(QCost.cost)
                 .where(predicate)
-                .fetchCount();
+                .fetchOne();
     }
 
     private List<Long> returnCostsIdsForPaginate(Pageable pageable, String rqlFilter, List<Long> companyIds, Predicate predicate, OrderSpecifierList orderSpecifierList) {

@@ -17,6 +17,7 @@ public interface InvoiceMapper {
 
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "project.contact", ignore = true)
+    @Mapping(target = "payments", ignore = true)
     InvoiceDTO invoiceToInvoiceDTO(Invoice invoice);
 
     @Mapping(target = "packs", ignore = true)
@@ -27,6 +28,7 @@ public interface InvoiceMapper {
     @Mapping(target = "packs", ignore = true)
     @Mapping(target = "contact", ignore = true)
     @Mapping(target = "project", ignore = true)
+    @Mapping(target = "payments", ignore = true)
     @Named(value = "invoiceToInvoiceDtoWithoutRelation")
     InvoiceDTO invoiceToInvoiceDtoWithoutRelation(Invoice invoice);
 

@@ -4,12 +4,16 @@ import com.data.dataxer.models.enums.DeliveryMethod;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -31,6 +35,16 @@ public class Invoice extends DocumentBase {
     private String headerComment;
 
     private LocalDate paymentDate;
+
+    @JoinTable(
+            name = "payment",
+            joinColumns = @JoinColumn(name = "documentId"),
+            inverseJoinColumns = @JoinColumn(name = "id"),
+            foreignKey = @javax.persistence.ForeignKey(name = "none")
+    )
+    @OneToMany(fetch = FetchType.LAZY)
+    @Where(clause="document_type='INVOICE'")
+    private List<Payment> payments = new ArrayList<>();
 
     @Override
     public BigDecimal countDiscountTotalPrice() {

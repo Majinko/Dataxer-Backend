@@ -5,6 +5,7 @@ import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -59,6 +60,9 @@ public abstract class DocumentBase extends BaseEntity {
     protected BigDecimal price;
 
     protected BigDecimal totalPrice;
+
+    @Formula("price - (price * (discount / 100))")
+    private BigDecimal priceAfterDiscount;
 
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)

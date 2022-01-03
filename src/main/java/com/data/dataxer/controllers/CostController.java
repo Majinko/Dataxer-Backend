@@ -3,6 +3,7 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.CostMapper;
 import com.data.dataxer.mappers.StorageMapper;
 import com.data.dataxer.models.dto.CostDTO;
+import com.data.dataxer.models.page.CustomPageDTO;
 import com.data.dataxer.models.dto.UploadContextDTO;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.services.CostService;
@@ -11,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +34,6 @@ public class CostController {
     @Autowired
     private StorageMapper storageMapper;
 
-
     @PostMapping("/store")
     public ResponseEntity<CostDTO> store(@RequestBody UploadContextDTO<CostDTO> uploadContext) {
         CostDTO cost = this.costMapper.costToCostDTO(this.costService.store(this.costMapper.costDTOToCost(uploadContext.getObject())));
@@ -48,12 +47,10 @@ public class CostController {
         return ResponseEntity.ok(cost);
     }
 
-
     @GetMapping("/getById/{id}")
     public ResponseEntity<CostDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.getByIdWithRelation(id)));
     }
-
 
     @PostMapping("/update")
     public ResponseEntity<CostDTO> update(@RequestBody UploadContextDTO<CostDTO> uploadContext) {

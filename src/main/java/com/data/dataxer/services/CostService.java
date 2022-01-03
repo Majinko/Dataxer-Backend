@@ -1,8 +1,8 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Cost;
-import com.data.dataxer.models.enums.DocumentState;
 import org.springframework.data.domain.Page;
+import com.data.dataxer.models.enums.DocumentState;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

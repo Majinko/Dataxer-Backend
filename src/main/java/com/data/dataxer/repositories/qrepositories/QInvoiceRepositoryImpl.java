@@ -3,7 +3,7 @@ package com.data.dataxer.repositories.qrepositories;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QInvoice;
 import com.data.dataxer.models.domain.QItem;
-import com.data.dataxer.models.dto.CustomPageImplDTO;
+import com.data.dataxer.models.page.CustomPageImpl;
 import com.data.dataxer.models.enums.DocumentType;
 import com.github.vineey.rql.querydsl.sort.OrderSpecifierList;
 import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +44,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         List<Invoice> invoiceList = this.getInvoicePaginates(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
 
-        return new CustomPageImplDTO<>(invoiceList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
+        return new CustomPageImpl<>(invoiceList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
     }
 
     @Override
@@ -113,13 +114,11 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .fetchCount();
     }
 
-    private long getTotalPrice(Predicate predicate) {
-        QInvoice qInvoice = QInvoice.invoice;
-
-        return this.query.select(qInvoice.price)
-                .from(qInvoice)
+    private BigDecimal getTotalPrice(Predicate predicate) {
+        return this.query.select(QInvoice.invoice.priceAfterDiscount.sum())
+                .from(QInvoice.invoice)
                 .where(predicate)
-                .fetchCount();
+                .fetchOne();
     }
 
     private void invoicePackSetItems(Invoice invoice) {
@@ -142,6 +141,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         JPAQuery<Invoice> invoiceJPAQuery = this.query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
+                .leftJoin(QInvoice.invoice.payments).fetchJoin()
                 .where(predicate)
                 .where(QInvoice.invoice.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
