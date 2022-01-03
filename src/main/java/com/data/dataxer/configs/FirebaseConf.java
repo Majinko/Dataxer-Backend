@@ -12,7 +12,6 @@ import java.io.IOException;
 
 @Configuration
 public class FirebaseConf {
-
     @Bean
     public FirebaseAuth firebaseAuth() throws IOException {
         ClassPathResource classPathResource = new ClassPathResource("dataxer-dev-firebase.json");

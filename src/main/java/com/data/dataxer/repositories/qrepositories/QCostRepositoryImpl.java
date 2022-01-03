@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.QCategory;
 import com.data.dataxer.models.domain.QCost;
 import com.data.dataxer.models.domain.QInvoice;
+import com.data.dataxer.models.dto.CustomPageImplDTO;
 import com.data.dataxer.utils.Helpers;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -82,7 +83,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .fetch();
 
 
-        return new PageImpl<>(costList, pageable, getTotalCount(predicate));
+        return new CustomPageImplDTO<>(costList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
     }
 
     @Override
@@ -168,6 +169,15 @@ public class QCostRepositoryImpl implements QCostRepository {
         QCost qCost = QCost.cost;
 
         return this.query.selectFrom(qCost)
+                .where(predicate)
+                .fetchCount();
+    }
+
+    private long getTotalPrice(Predicate predicate) {
+        QCost qCost = QCost.cost;
+
+        return this.query.select(qCost.price)
+                .from(qCost)
                 .where(predicate)
                 .fetchCount();
     }

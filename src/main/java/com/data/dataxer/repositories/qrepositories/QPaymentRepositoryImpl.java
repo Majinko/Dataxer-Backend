@@ -123,11 +123,12 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
         List<Payment> payments = this.query
                 .selectFrom(qPayment)
-                .where(qPayment.documentId.eq(documentId))
+                .where(qPayment.documentId.eq(documentId)) // todo pridat aj typ dokumentu lebo sa moze stat ze budu mat rovnake id naklad a faktura
                 .orderBy(qPayment.id.desc())
                 .fetch();
 
         BigDecimal payedTotalPrice = BigDecimal.valueOf(0);
+
         for (Payment payment : payments) {
             payedTotalPrice = payedTotalPrice.add(payment.getPayedValue());
         }

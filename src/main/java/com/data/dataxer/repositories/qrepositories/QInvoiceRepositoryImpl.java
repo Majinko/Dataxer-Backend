@@ -3,6 +3,7 @@ package com.data.dataxer.repositories.qrepositories;
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QInvoice;
 import com.data.dataxer.models.domain.QItem;
+import com.data.dataxer.models.dto.CustomPageImplDTO;
 import com.data.dataxer.models.enums.DocumentType;
 import com.github.vineey.rql.querydsl.sort.OrderSpecifierList;
 import com.github.vineey.rql.querydsl.sort.QuerydslSortContext;
@@ -16,7 +17,6 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.github.perplexhub.rsql.RSQLQueryDslSupport;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -43,12 +43,11 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
 
         List<Invoice> invoiceList = this.getInvoicePaginates(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
 
-        return new PageImpl<>(invoiceList, pageable, getTotalCount(predicate));
+        return new CustomPageImplDTO<>(invoiceList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
     }
 
     @Override
     public Optional<Invoice> getById(Long id, List<Long> companyIds) {
-
         Invoice invoice = query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
@@ -114,6 +113,15 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .fetchCount();
     }
 
+    private long getTotalPrice(Predicate predicate) {
+        QInvoice qInvoice = QInvoice.invoice;
+
+        return this.query.select(qInvoice.price)
+                .from(qInvoice)
+                .where(predicate)
+                .fetchCount();
+    }
+
     private void invoicePackSetItems(Invoice invoice) {
         QDocumentPackItem qDocumentPackItem = QDocumentPackItem.documentPackItem;
         QItem qItem = QItem.item;
@@ -130,7 +138,6 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         ));
     }
 
-    //todo tieto spolocne metody dat do abstrakntej triedy pre faktury a cenove ponuky
     private List<Invoice> getInvoicePaginates(Pageable pageable, String rqlFilter, List<Long> companyIds, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<Invoice> invoiceJPAQuery = this.query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()

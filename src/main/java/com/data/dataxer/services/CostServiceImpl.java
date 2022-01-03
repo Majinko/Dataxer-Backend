@@ -6,6 +6,7 @@ import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
+import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.MandatoryValidator;
 import org.springframework.beans.BeanUtils;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +31,9 @@ public class CostServiceImpl implements CostService {
 
     @Autowired
     private PaymentService paymentService;
+
+    @Autowired
+    private QPaymentRepository qPaymentRepository;
 
     @Override
     public Cost store(Cost cost) {
@@ -52,6 +58,8 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost update(Cost oldCost) {
+        this.checkCostPayment(oldCost);
+
         return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyIds()).map(cost -> {
             cost.setContact(oldCost.getContact());
             cost.setProject(oldCost.getProject());
@@ -86,6 +94,20 @@ public class CostServiceImpl implements CostService {
 
             return cost;
         }).orElse(null);
+    }
+
+    private void checkCostPayment(Cost cost) {
+        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(cost.getId());
+
+        boolean isPayed = cost.getTotalPrice().subtract(payedTotalPrice).setScale(2, RoundingMode.HALF_UP).compareTo(BigDecimal.ZERO) == 0;
+
+        if (!isPayed) {
+            cost.setPaymentDate(null);
+            cost.setState(DocumentState.UNPAID);
+        } else {
+            cost.setState(DocumentState.PAYED);
+            cost.setPaymentDate(LocalDate.now());
+        }
     }
 
     @Override
