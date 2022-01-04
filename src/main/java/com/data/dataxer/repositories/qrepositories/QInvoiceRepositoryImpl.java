@@ -30,7 +30,6 @@ import java.util.stream.Collectors;
 
 @Repository
 public class QInvoiceRepositoryImpl implements QInvoiceRepository {
-
     private final JPAQueryFactory query;
 
     public QInvoiceRepositoryImpl(EntityManager entityManager) {
@@ -42,9 +41,17 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         Predicate predicate = buildPredicate(rqlFilter);
         OrderSpecifierList orderSpecifierList = buildSort(sortExpression);
 
-        List<Invoice> invoiceList = this.getInvoicePaginates(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
+        List<Long> invoiceIds = this.getInvoiceIdsPaginate(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
 
-        return new CustomPageImpl<>(invoiceList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
+        List<Invoice> invoices = this.query.selectFrom(QInvoice.invoice)
+                .leftJoin(QInvoice.invoice.contact).fetchJoin()
+                .leftJoin(QInvoice.invoice.project).fetchJoin()
+                .leftJoin(QInvoice.invoice.payments).fetchJoin()
+                .where(QInvoice.invoice.id.in(invoiceIds))
+                .distinct()
+                .fetch();
+
+        return new CustomPageImpl<>(invoices, pageable, getTotalCount(predicate), getTotalPrice(predicate));
     }
 
     @Override
@@ -137,11 +144,8 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         ));
     }
 
-    private List<Invoice> getInvoicePaginates(Pageable pageable, String rqlFilter, List<Long> companyIds, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+    private List<Long> getInvoiceIdsPaginate(Pageable pageable, String rqlFilter, List<Long> companyIds, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<Invoice> invoiceJPAQuery = this.query.selectFrom(QInvoice.invoice)
-                .leftJoin(QInvoice.invoice.contact).fetchJoin()
-                .leftJoin(QInvoice.invoice.project).fetchJoin()
-                .leftJoin(QInvoice.invoice.payments).fetchJoin()
                 .where(predicate)
                 .where(QInvoice.invoice.company.id.in(companyIds))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
@@ -152,8 +156,9 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
             invoiceJPAQuery.where(QInvoice.invoice.company.id.in(companyIds));
         }
 
-        return invoiceJPAQuery.fetch();
+        return invoiceJPAQuery.select(QInvoice.invoice.id).fetch();
     }
+
 
     private Predicate buildPredicate(String rqlFilter) {
         Predicate predicate = new BooleanBuilder();

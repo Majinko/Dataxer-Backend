@@ -1,13 +1,11 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.models.domain.AppUser;
-import com.data.dataxer.models.domain.Company;
-import com.data.dataxer.models.domain.QAppUser;
-import com.data.dataxer.models.domain.QCompany;
+import com.data.dataxer.models.domain.*;
 import com.data.dataxer.security.model.Privilege;
 import com.data.dataxer.security.model.QPrivilege;
 import com.data.dataxer.security.model.QRole;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -71,7 +69,7 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
         List<Company> companies = this.query
                 .selectFrom(QCompany.company)
                 .where(QCompany.company.id.in(companyIds))
-                .leftJoin(QCompany.company.appUsers).fetchJoin()
+                .leftJoin(QCompany.company.appUsers, QAppUser.appUser).fetchJoin()
                 .distinct()
                 .fetch();
 
@@ -85,6 +83,13 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
                 .limit(pageable.getPageSize())
                 .where(search(qString))
                 .where(QAppUser.appUser.id.in(userIds))
+          /*      .where(QAppUser.appUser.uid.in(
+                        JPAExpressions
+                                .select(QTime.time1.user.uid)
+                                .where(QTime.time1.dateWork.goe())
+                                .orderBy(QTime.time1.timeFrom.desc())
+                                .fetchAll()
+                ))*/
                 .fetch();
     }
 

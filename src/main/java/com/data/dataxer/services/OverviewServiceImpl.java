@@ -280,6 +280,7 @@ public class OverviewServiceImpl implements OverviewService {
                 userYearOverviewDTO.setFirstName(key.getFirstName());
                 userYearOverviewDTO.setLastName(key.getLastName());
                 userYearOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
+                userYearOverviewDTO.setPhotoUrl(key.getPhotoUrl());
                 userYearOverviewDTO.setYearHours(this.generateUserHoursStringFromMinutes(preparedData.get(key)));
                 response.add(userYearOverviewDTO);
             }
@@ -298,9 +299,11 @@ public class OverviewServiceImpl implements OverviewService {
         userTimeData.keySet().iterator().forEachRemaining(key -> {
             if (userSalaryHashMap.get(key.getId()) != null) {
                 UserHourOverviewDTO userHourOverviewDTO = new UserHourOverviewDTO();
+
                 userHourOverviewDTO.setFirstName(key.getFirstName());
                 userHourOverviewDTO.setLastName(key.getLastName());
                 userHourOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
+                userHourOverviewDTO.setPhotoUrl(key.getPhotoUrl());
                 userHourOverviewDTO.setUserTimePrices(userDayTotalPrice.get(key));
                 userHourOverviewDTO.setSalaryType(userSalaryHashMap.get(key.getId()).getSalaryType());
                 userHourOverviewDTO.setActiveHourPrice(userSalaryHashMap.get(key.getId()).getPrice());

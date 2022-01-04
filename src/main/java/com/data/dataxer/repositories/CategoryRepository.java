@@ -14,8 +14,6 @@ import java.util.Optional;
 public interface CategoryRepository extends CrudRepository<Category, Long> {
     Optional<List<Category>> findByParentIdIsNullAndCompanyId(Long companyId);
 
-    Optional<Category> findByIdAndCompanyId(Long id, Long companyId);
-
     Optional<Category> findByIdAndCompanyIdIn(Long id, List<Long> companies);
 
     List<Category> findAllByCompanyIdInOrderByPositionAsc(List<Long> companyIds);
@@ -34,9 +32,6 @@ public interface CategoryRepository extends CrudRepository<Category, Long> {
 
     @Query("select c.id from Category c where c.categoryType in ?1 and c.company.id in ?2")
     List<Long> findAllIdsCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);
-
-    @Query("SELECT c FROM Category c WHERE c.categoryType IN ?1 AND c.company.id = ?2")
-    Optional<List<Long>> getAllIdsByTypes(List<CategoryType> types, Long companyId);
 
     @Query("SELECT c FROM Category c WHERE c.name = ?1 AND c.company.id = ?2")
     Optional<Category> findCategoryByName(String categoryName, Long companyId);

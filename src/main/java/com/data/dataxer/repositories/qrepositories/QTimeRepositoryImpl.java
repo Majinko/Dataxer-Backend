@@ -128,7 +128,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.company.id.eq(companyId))
                 .where(QTime.time1.user.id.eq(userId))
                 .where(predicate)
-                .orderBy(QTime.time1.dateWork.desc())
+                .orderBy(QTime.time1.timeFrom.desc())
                 .fetch();
     }
 
@@ -142,6 +142,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .groupBy(QTime.time1.dateWork.month())
                 .orderBy(QTime.time1.dateWork.year().desc())
                 .orderBy(QTime.time1.dateWork.month().desc())
+                .orderBy(QTime.time1.timeTo.desc())
                 .fetch();
     }
 
@@ -317,7 +318,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
 
     @Override
     public List<Tuple> getProjectUsersTimePriceSums(Long id, List<Long> companyIds) {
-        return this.query.select(QTime.time1.time.sum(), QTime.time1.price.sum(), QTime.time1.user.uid, QTime.time1.user.firstName, QTime.time1.user.lastName)
+        return this.query.select(QTime.time1.time.sum(), QTime.time1.price.sum(), QTime.time1.user.uid, QTime.time1.user.firstName, QTime.time1.user.lastName, QTime.time1.user.photoUrl)
                 .from(QTime.time1)
                 .where(QTime.time1.project.id.eq(id))
                 .where(QTime.time1.company.id.in(companyIds))
@@ -325,13 +326,21 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .groupBy(QTime.time1.user.uid)
                 .groupBy(QTime.time1.user.firstName)
                 .groupBy(QTime.time1.user.lastName)
+                .groupBy(QTime.time1.user.photoUrl)
                 .fetch();
     }
 
     @Override
     public List<Tuple> getAllProjectUserCategoryData(Long id, List<Long> categoryIds, Long companyId) {
-        return this.query.select(QTime.time1.user.uid, QTime.time1.user.firstName, QTime.time1.user.lastName,
-                        QTime.time1.time.sum(), QTime.time1.price.sum())
+        return this.query
+                .select(
+                        QTime.time1.user.uid,
+                        QTime.time1.user.firstName,
+                        QTime.time1.user.lastName,
+                        QTime.time1.user.photoUrl,
+                        QTime.time1.time.sum(),
+                        QTime.time1.price.sum()
+                )
                 .from(QTime.time1)
                 .leftJoin(QTime.time1.user)
                 .where(QTime.time1.project.id.eq(id))
@@ -341,6 +350,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .groupBy(QTime.time1.user.uid)
                 .groupBy(QTime.time1.user.firstName)
                 .groupBy(QTime.time1.user.lastName)
+                .groupBy(QTime.time1.user.photoUrl)
                 .fetch();
     }
 

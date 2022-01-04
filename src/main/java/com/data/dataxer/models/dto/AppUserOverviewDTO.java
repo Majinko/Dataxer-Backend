@@ -13,6 +13,7 @@ public class AppUserOverviewDTO implements Comparable<AppUserOverviewDTO> {
     Long id;
     String uid;
     String fullName;
+    String photoUrl;
     LocalDate startWork;
     Long years;
     Long projectCount;

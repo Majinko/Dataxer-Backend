@@ -46,14 +46,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
-    private CostRepository costRepository;
 
     @Autowired
     private QCostRepository qCostRepository;
-
-    @Autowired
-    private QInvoiceRepository qInvoiceRepository;
 
     @Override
     public Project store(Project project) {
@@ -154,6 +149,7 @@ public class ProjectServiceImpl implements ProjectService {
         BigDecimal costToHour = this.getUserCostToHour(firstYear, lastYear, userData.get(QTime.time1.user.uid), projectTotalCost);
 
         projectTimePriceOverviewDTO.setName(StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName)));
+        projectTimePriceOverviewDTO.setPhotoUrl(userData.get(QTime.time1.user.photoUrl));
         projectTimePriceOverviewDTO.setHours(userData.get(QTime.time1.time.sum()));
 
         projectTimePriceOverviewDTO.setPriceNetto(userData.get(QTime.time1.price.sum()));

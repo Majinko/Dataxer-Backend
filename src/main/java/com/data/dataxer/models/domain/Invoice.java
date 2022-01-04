@@ -4,11 +4,11 @@ import com.data.dataxer.models.enums.DeliveryMethod;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Formula;
-import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -44,6 +44,7 @@ public class Invoice extends DocumentBase {
     )
     @OneToMany(fetch = FetchType.LAZY)
     @Where(clause="document_type='INVOICE'")
+    @NotFound(action = NotFoundAction.IGNORE)
     private List<Payment> payments = new ArrayList<>();
 
     @Override

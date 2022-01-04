@@ -126,6 +126,7 @@ public class UserServiceImpl implements UserService {
         appUserOverviewDTO.setId(user.getId());
         appUserOverviewDTO.setUid(user.getUid());
         appUserOverviewDTO.setFullName(user.getFirstName() + ' ' + user.getLastName());
+        appUserOverviewDTO.setPhotoUrl(user.getPhotoUrl());
         appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), false));
         appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), true)));
         appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.companyId()));
@@ -145,6 +146,7 @@ public class UserServiceImpl implements UserService {
 
             user.setFirstName(appUser.getFirstName());
             user.setLastName(appUser.getLastName());
+            user.setPhotoUrl(appUser.getPhotoUrl());
             user.setPhone(appUser.getPhone());
             user.setStreet(appUser.getStreet());
             user.setCity(appUser.getCity());

@@ -32,6 +32,9 @@ public class AppUser implements Serializable {
 
     private String lastName;
 
+    @Column(columnDefinition = "text")
+    private String photoUrl;
+
     @Column(unique = true, nullable = false, updatable = false, length = 50)
     private String email;
 

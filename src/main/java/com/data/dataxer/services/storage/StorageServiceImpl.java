@@ -104,7 +104,7 @@ public class StorageServiceImpl implements StorageService {
         String name = generateFileName(file.getFileName());
         String path = SecurityUtils.defaultCompany().getCin().toLowerCase().replaceAll("[^a-zA-Z0-9]", " ") + "/" + type + '/' + name;
 
-        Blob blob = bucket.create(path, file.getContent(), file.getContentType());
+        bucket.create(path, file.getContent(), file.getContentType());
 
         fileData.put("name", name);
         fileData.put("path", path);

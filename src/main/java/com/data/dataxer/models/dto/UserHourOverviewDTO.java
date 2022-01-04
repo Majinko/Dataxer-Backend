@@ -17,6 +17,8 @@ public class UserHourOverviewDTO {
 
     private String fullName;
 
+    private String photoUrl;
+
     private SalaryType salaryType;
 
     private BigDecimal activeHourPrice;
