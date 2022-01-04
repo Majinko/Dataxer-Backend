@@ -33,21 +33,21 @@ public class InvoiceController {
 
     @PostMapping("/store")
     public void store(@RequestBody InvoiceDTO invoiceDTO) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType(), true);
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType());
 
         this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
     }
 
     @PostMapping("/store/{oldInvoiceId}")
     public void store(@RequestBody InvoiceDTO invoiceDTO, @PathVariable Long oldInvoiceId) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType().equals(DocumentType.PROFORMA) ? DocumentType.PROFORMA : DocumentType.INVOICE, true);
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType().equals(DocumentType.PROFORMA) ? DocumentType.PROFORMA : DocumentType.INVOICE);
 
         this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), oldInvoiceId);
     }
 
     @RequestMapping(value = "/storeSummaryInvoice", method = RequestMethod.POST)
     public void storeTaxDocument(@RequestParam(value = "id1") Long taxDocumentId, @RequestParam(value = "id2") Long proformaId, @RequestBody InvoiceDTO invoiceDTO) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.INVOICE, true);
+        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.INVOICE);
 
         this.invoiceService.storeSummaryInvoice(this.invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), taxDocumentId, proformaId);
     }

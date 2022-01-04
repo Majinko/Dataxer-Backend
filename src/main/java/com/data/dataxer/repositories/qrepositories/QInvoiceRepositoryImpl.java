@@ -113,6 +113,16 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .fetch();
     }
 
+    @Override
+    public Invoice getLastInvoice(DocumentType type, Long companyId) {
+        return this.query.selectFrom(QInvoice.invoice)
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.documentType.eq(type))
+                .orderBy(QInvoice.invoice.id.desc())
+                .limit(1l)
+                .fetchOne();
+    }
+
     private long getTotalCount(Predicate predicate) {
         QInvoice qInvoice = QInvoice.invoice;
 

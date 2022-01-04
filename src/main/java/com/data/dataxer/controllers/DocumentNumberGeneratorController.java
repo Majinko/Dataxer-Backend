@@ -57,43 +57,12 @@ public class DocumentNumberGeneratorController {
     public ResponseEntity<String> generateNextNumberByDocumentType(
             @PathVariable DocumentType documentType
     ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, false));
-    }
-
-    @GetMapping("/generateAndSaveNextByType/{documentType}")
-    public ResponseEntity<String> generateAndSaveNextNumberByDocumentType(
-            @PathVariable DocumentType documentType
-    ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, true));
-    }
-
-    @GetMapping("/generateNextById/{id}")
-    public ResponseEntity<String> generateNextNumberByDocumentId(
-            @PathVariable Long id
-    ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentId(id, false));
-    }
-
-    @GetMapping("/generateAndSaveNextById/{id}")
-    public ResponseEntity<String> generateAndSaveNextNumberByDocumentId(
-            @PathVariable Long id
-    ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentId(id, true));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType));
     }
 
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.documentNumberGeneratorService.destroy(id);
-    }
-
-    @GetMapping("/resetGenerationByType/{documentType}")
-    public void resetGenerationByType(@PathVariable DocumentType documentType) {
-        this.documentNumberGeneratorService.resetGenerationByType(documentType);
-    }
-
-    @GetMapping("/resetGenerationById/{id}")
-    public void resetGenerationById(@PathVariable Long id) {
-        this.documentNumberGeneratorService.resetGenerationById(id);
     }
 
     private DocumentNumberGeneratorDTO convertToDocumentNumberGeneratorDTO(DocumentNumberGenerator documentNumberGenerator) {

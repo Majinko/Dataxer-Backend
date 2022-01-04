@@ -26,8 +26,6 @@ public class DocumentNumberGenerator extends BaseEntity {
 
     private Boolean isDefault;
 
-    private String lastNumber;
-
     public DocumentNumberGenerator() {}
 
     public DocumentNumberGenerator(
@@ -35,13 +33,11 @@ public class DocumentNumberGenerator extends BaseEntity {
             String format,
             DocumentType type,
             Periods period,
-            boolean isDefault,
-            String lastNumber) {
+            boolean isDefault) {
         this.title = title;
         this.format = format;
         this.type = type;
         this.period = period;
         this.isDefault = isDefault;
-        this.lastNumber = lastNumber;
     }
 }
