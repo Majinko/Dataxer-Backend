@@ -1,12 +1,17 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
+import com.data.dataxer.models.domain.Invoice;
+import com.data.dataxer.models.domain.PriceOffer;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.models.enums.Periods;
 import com.data.dataxer.repositories.DocumentNumberGeneratorRepository;
+import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.repositories.qrepositories.QDocumentNumberGeneratorRepository;
+import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
+import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
-import com.data.dataxer.utils.DefaultInvoiceNumberGenerator;
 import com.data.dataxer.utils.FormatValidator;
 import com.data.dataxer.utils.StringUtils;
 import org.springframework.data.domain.Page;
@@ -14,17 +19,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGeneratorService {
 
     private final DocumentNumberGeneratorRepository documentNumberGeneratorRepository;
     private final QDocumentNumberGeneratorRepository qDocumentNumberGeneratorRepository;
+    private final QInvoiceRepository qInvoiceRepository;
+    private final QCostRepository qCostRepository;
+    private final QPriceOfferRepository qPriceOfferRepository;
 
-    public DocumentNumberGeneratorServiceImpl(DocumentNumberGeneratorRepository documentNumberGeneratorRepository, QDocumentNumberGeneratorRepository qDocumentNumberGeneratorRepository) {
+    public DocumentNumberGeneratorServiceImpl(DocumentNumberGeneratorRepository documentNumberGeneratorRepository, QDocumentNumberGeneratorRepository qDocumentNumberGeneratorRepository,
+                                              QInvoiceRepository qInvoiceRepository, QCostRepository qCostRepository, QPriceOfferRepository qPriceOfferRepository) {
         this.documentNumberGeneratorRepository = documentNumberGeneratorRepository;
         this.qDocumentNumberGeneratorRepository = qDocumentNumberGeneratorRepository;
+        this.qInvoiceRepository = qInvoiceRepository;
+        this.qCostRepository = qCostRepository;
+        this.qPriceOfferRepository = qPriceOfferRepository;
     }
 
     @Override
@@ -34,7 +46,6 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             this.handleIfDefaultAlreadyExist(documentNumberGenerator, false);
         }
 
-        documentNumberGenerator.setLastNumber("0");
         this.documentNumberGeneratorRepository.save(documentNumberGenerator);
     }
 
@@ -45,9 +56,6 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         if (documentNumberGenerator.getIsDefault()) {
             this.handleIfDefaultAlreadyExist(documentNumberGenerator, true);
         }
-        Optional<DocumentNumberGenerator> oldDocumentNumberGenerator = this.qDocumentNumberGeneratorRepository.getById(documentNumberGenerator.getId(), SecurityUtils.companyId());
-
-        oldDocumentNumberGenerator.ifPresent(numberGenerator -> documentNumberGenerator.setLastNumber(numberGenerator.getLastNumber()));
 
         return this.documentNumberGeneratorRepository.save(documentNumberGenerator);
     }
@@ -77,61 +85,31 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated) {
+    public String generateNextNumberByDocumentType(DocumentType documentType) {
         DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.companyId());
 
         if (documentNumberGenerator == null) {
             documentNumberGenerator = this.documentNumberGeneratorRepository.save(this.returnDefault(documentType));
         }
 
-        return this.generateNextDocumentNumber(documentNumberGenerator, storeGenerated);
+        return this.generateNextDocumentNumber(documentNumberGenerator, documentType);
     }
 
     @Override
     public String generateNextNumberByDocumentTypeFromString(String type) {
-        return this.generateNextNumberByDocumentType(DocumentType.valueOf(type), true);
+        return this.generateNextNumberByDocumentType(DocumentType.valueOf(type));
     }
 
     private DocumentNumberGenerator returnDefault(DocumentType type) {
-        return new DocumentNumberGenerator("Default number generator", "YYYYNNNNNN", type, Periods.YEAR, true, "000000");
-    }
-
-    @Override
-    public String generateNextNumberByDocumentId(Long id, boolean storeGenerated) {
-        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository
-                .getById(id, SecurityUtils.companyId())
-                .orElseThrow(() -> new RuntimeException("Generator not found"));
-        return this.generateNextDocumentNumber(documentNumberGenerator, storeGenerated);
+        return new DocumentNumberGenerator("Default number generator", "YYYYNNNNNN", type, Periods.YEAR, true);
     }
 
     @Override
     public String getNextNumber(DocumentNumberGenerator documentNumberGenerator) {
-        return this.generateNextDocumentNumber(documentNumberGenerator, false);
+        return this.generateNextDocumentNumber(documentNumberGenerator, documentNumberGenerator.getType());
     }
 
-    @Override
-    public void resetGenerationByType(DocumentType documentType) {
-        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.companyId());
-        if (documentNumberGenerator != null) {
-            documentNumberGenerator.setLastNumber("0");
-            this.documentNumberGeneratorRepository.save(documentNumberGenerator);
-        }
-    }
-
-    @Override
-    public void resetGenerationById(Long id) {
-        Optional<DocumentNumberGenerator> documentNumberGeneratorOptional = this.qDocumentNumberGeneratorRepository
-                .getByIdSimple(id, SecurityUtils.companyId());
-        if (documentNumberGeneratorOptional.isPresent()) {
-            DocumentNumberGenerator documentNumberGenerator = documentNumberGeneratorOptional.get();
-            documentNumberGenerator.setLastNumber("0");
-            this.documentNumberGeneratorRepository.save(documentNumberGenerator);
-        } else {
-            throw new RuntimeException("Number generator with id {" + id + "} not found");
-        }
-    }
-
-    private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator, boolean storeGenerated) {
+    private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type) {
         LocalDate currentDate = LocalDate.now();
         String generatedNumber = this.replaceYear(documentNumberGenerator.getFormat(), currentDate);
         generatedNumber = this.replaceMonth(generatedNumber, currentDate);
@@ -139,26 +117,50 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         generatedNumber = this.replaceHalfYear(generatedNumber, currentDate);
         generatedNumber = this.replaceDay(generatedNumber, currentDate);
 
-        return this.replaceNumber(generatedNumber, getAndStoreNextNumber(documentNumberGenerator, storeGenerated));
+        return this.replaceNumber(generatedNumber, getNextNumber(documentNumberGenerator, type, currentDate));
     }
 
-    private String getAndStoreNextNumber(DocumentNumberGenerator documentNumberGenerator, boolean storeGenerated) {
-        boolean generatorChanged = false;
-        String nextNumber = this.getNextNumber(documentNumberGenerator.getFormat(), documentNumberGenerator.getLastNumber());
-
-        if (storeGenerated) {
-            documentNumberGenerator.setLastNumber(nextNumber);
-            generatorChanged = true;
+    private String getNextNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type, LocalDate currentDate) {
+        String lastNumber = "0";
+        switch(type) {
+            case INVOICE:
+            case PROFORMA:
+            case SUMMARY_INVOICE:
+            case TAX_DOCUMENT:
+                Invoice invoice = this.qInvoiceRepository.getLastInvoice(type, documentNumberGenerator.getCompany().getId());
+                if (invoice != null) {
+                    lastNumber = invoice.getNumber();
+                }
+                break;
+            case COST:
+                Cost cost = this.qCostRepository.getLastCost(documentNumberGenerator.getCompany().getId());
+                if (cost != null) {
+                    lastNumber = cost.getNumber();
+                }
+                break;
+            case PRICE_OFFER:
+            default:
+                PriceOffer priceOffer = this.qPriceOfferRepository.getLastPriceOffer(documentNumberGenerator.getCompany().getId());
+                if (priceOffer != null) {
+                    lastNumber = priceOffer.getNumber();
+                }
+                break;
         }
+        String nextNumber = this.getNextNumber(documentNumberGenerator.getFormat(), lastNumber, currentDate);
+
         if (nextNumber.length() > StringUtils.countCharacters(documentNumberGenerator.getFormat(), 'N')) {
             documentNumberGenerator.setFormat(this.extendFormat(documentNumberGenerator.getFormat()));
-            generatorChanged = true;
-        }
-        if (generatorChanged) {
             this.documentNumberGeneratorRepository.save(documentNumberGenerator);
         }
 
         return nextNumber;
+    }
+
+    private String parseNumber(String format, String lastNumber) {
+        int countOfNumber = StringUtils.countCharacters(format, 'N');
+        int firstPosition = format.indexOf('N');
+
+        return lastNumber.substring(firstPosition, firstPosition + countOfNumber);
     }
 
     private String extendFormat(String shorterFormat) {
@@ -203,18 +205,42 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return generatedNumber.replace(forReplace, monthForReplace);
     }
 
-    private String getNextNumber(String generatedNumber, String lastNumber) {
-        int countOfNumber = StringUtils.countCharacters(generatedNumber, 'N');
+    private String getNextNumber(String format, String lastNumber, LocalDate currentDate) {
+        int countOfNumber = StringUtils.countCharacters(format, 'N');
 
         if (countOfNumber == 0) {
             return "";
         }
 
-        String nextNumber = String.valueOf((Integer.valueOf(lastNumber).intValue() + 1));
+        if (hasResetNumber(format, lastNumber, currentDate)) {
+            lastNumber = "0";
+        } else {
+            lastNumber = parseNumber(format, lastNumber);
+        }
+
+        String nextNumber = String.valueOf((Integer.parseInt(lastNumber) + 1));
         for (int i = nextNumber.length(); i < countOfNumber; i++) {
             nextNumber = "0" + nextNumber;
         }
         return nextNumber;
+    }
+
+    private boolean hasResetNumber(String format, String lastNumber, LocalDate currentDate) {
+        int positionOfYear = format.indexOf('Y');
+        int countOfYear = StringUtils.countCharacters(format, 'Y');
+
+        //format neobsahuje rok alebo este nie je ziadne cislo a teda je uz resetovane
+        if (positionOfYear == -1 || lastNumber.equals("0")) {
+            return true;
+        }
+
+        String lastNumberYear = lastNumber.substring(positionOfYear, positionOfYear + countOfYear);
+
+        if (countOfYear == 2) {
+            return !lastNumberYear.equals(String.valueOf(currentDate.getYear()).substring(2));
+        } else {
+            return !lastNumberYear.equals(String.valueOf(currentDate.getYear()));
+        }
     }
 
     private String replaceNumber(String generatedNumber, String newNumber) {

@@ -158,6 +158,15 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .fetchOne();
     }
 
+    @Override
+    public Cost getLastCost(Long companyId) {
+        return this.query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
+                .orderBy(QCost.cost.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
     private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, List<Long> companyIds) {
         return query.selectFrom(QCost.cost)
                 .where(QCost.cost.company.id.in(companyIds))

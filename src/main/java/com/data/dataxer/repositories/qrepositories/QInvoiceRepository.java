@@ -18,4 +18,6 @@ public interface QInvoiceRepository {
     Optional<Invoice> getByIdSimple(Long id, List<Long> companyIds);
 
     List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, List<Long> companyIds);
+
+    Invoice getLastInvoice(DocumentType type, Long companyId);
 }

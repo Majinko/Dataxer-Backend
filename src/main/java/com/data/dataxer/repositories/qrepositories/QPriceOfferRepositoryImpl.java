@@ -1,6 +1,8 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QPriceOffer;
+import com.data.dataxer.models.enums.DocumentType;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -90,6 +92,15 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .where(qPriceOffer.id.eq(id))
                 .where(qPriceOffer.company.id.eq(companyId))
                 .fetchOne());
+    }
+
+    @Override
+    public PriceOffer getLastPriceOffer(Long companyId) {
+        return this.query.selectFrom(QPriceOffer.priceOffer)
+                .where(QPriceOffer.priceOffer.company.id.eq(companyId))
+                .orderBy(QPriceOffer.priceOffer.id.desc())
+                .limit(1L)
+                .fetchOne();
     }
 
     private void priceOfferPackSetItems(PriceOffer priceOffer) {

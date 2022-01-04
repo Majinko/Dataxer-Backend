@@ -19,15 +19,10 @@ public interface DocumentNumberGeneratorService {
 
     void destroy(Long id);
 
-    String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated);
+    String generateNextNumberByDocumentType(DocumentType documentType);
 
     String generateNextNumberByDocumentTypeFromString(String type);
 
     String getNextNumber(DocumentNumberGenerator documentNumberGenerator);
 
-    void resetGenerationByType(DocumentType documentType);
-
-    void resetGenerationById(Long id);
-
-    String generateNextNumberByDocumentId(Long id, boolean storeGenerated);
 }
