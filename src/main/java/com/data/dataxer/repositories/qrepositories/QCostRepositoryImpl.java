@@ -79,7 +79,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .distinct()
                 .fetch();
 
-        return new CustomPageImpl<Cost>(costList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
+        return new CustomPageImpl<Cost>(costList, pageable, getTotalCount(predicate, companyIds), getTotalPrice(predicate, companyIds));
     }
 
     @Override
@@ -170,19 +170,21 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .where(QCost.cost.id.eq(id));
     }
 
-    private long getTotalCount(Predicate predicate) {
+    private long getTotalCount(Predicate predicate, List<Long> companyIds) {
         QCost qCost = QCost.cost;
 
         return this.query.selectFrom(qCost)
                 .where(predicate)
+                .where(QCost.cost.company.id.in(companyIds))
                 .fetchCount();
     }
 
-    private BigDecimal getTotalPrice(Predicate predicate) {
+    private BigDecimal getTotalPrice(Predicate predicate, List<Long> companyIds) {
         return this.query
                 .select(QCost.cost.price.sum())
                 .from(QCost.cost)
                 .where(predicate)
+                .where(QCost.cost.company.id.in(companyIds))
                 .fetchOne();
     }
 

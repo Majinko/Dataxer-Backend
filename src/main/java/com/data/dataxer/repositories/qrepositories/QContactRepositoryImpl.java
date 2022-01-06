@@ -76,7 +76,7 @@ public class QContactRepositoryImpl implements QContactRepository {
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        return new PageImpl<>(contactList, pageable, getTotalCount(predicate));
+        return new PageImpl<>(contactList, pageable, getTotalCount(predicate, companyIds));
     }
 
     @Override
@@ -131,11 +131,12 @@ public class QContactRepositoryImpl implements QContactRepository {
                 .fetch();
     }
 
-    private long getTotalCount(Predicate predicate) {
+    private long getTotalCount(Predicate predicate, List<Long> companyIds) {
         QContact qContact = QContact.contact;
 
         return this.query.selectFrom(qContact)
                 .where(predicate)
+                .where(QContact.contact.company.id.in(companyIds))
                 .fetchCount();
     }
 }

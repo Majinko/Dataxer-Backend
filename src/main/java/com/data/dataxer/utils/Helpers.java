@@ -7,6 +7,7 @@ import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collector;
@@ -71,5 +72,9 @@ public class Helpers {
         });
 
         return sorted;
+    }
+
+    public static LocalDate getLastDate(int minusMonth){
+       return LocalDate.now().minusMonths(minusMonth);
     }
 }

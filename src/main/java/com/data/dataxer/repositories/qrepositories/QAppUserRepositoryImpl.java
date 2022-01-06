@@ -4,8 +4,11 @@ import com.data.dataxer.models.domain.*;
 import com.data.dataxer.security.model.Privilege;
 import com.data.dataxer.security.model.QPrivilege;
 import com.data.dataxer.security.model.QRole;
+import com.data.dataxer.utils.Helpers;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -83,14 +86,17 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
                 .limit(pageable.getPageSize())
                 .where(search(qString))
                 .where(QAppUser.appUser.id.in(userIds))
-          /*      .where(QAppUser.appUser.uid.in(
-                        JPAExpressions
-                                .select(QTime.time1.user.uid)
-                                .where(QTime.time1.dateWork.goe())
-                                .orderBy(QTime.time1.timeFrom.desc())
-                                .fetchAll()
-                ))*/
+                //.where(QAppUser.appUser.uid.in(this.queryForGetActiveUser()))
                 .fetch();
+    }
+
+    private JPQLQuery<String> queryForGetActiveUser() {
+        return JPAExpressions
+                .select(QTime.time1.user.uid)
+                .from(QTime.time1)
+                .where(QTime.time1.dateWork.goe(Helpers.getLastDate(2)))
+                .orderBy(QTime.time1.timeFrom.desc())
+                .fetchAll();
     }
 
     private void appUserSetRolePrivileges(AppUser appUser) {

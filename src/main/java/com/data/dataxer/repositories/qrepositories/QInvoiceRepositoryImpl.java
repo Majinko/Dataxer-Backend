@@ -51,7 +51,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .distinct()
                 .fetch();
 
-        return new CustomPageImpl<>(invoices, pageable, getTotalCount(predicate), getTotalPrice(predicate));
+        return new CustomPageImpl<>(invoices, pageable, getTotalCount(predicate, companyIds), getTotalPrice(predicate, companyIds));
     }
 
     @Override
@@ -123,18 +123,20 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .fetchOne();
     }
 
-    private long getTotalCount(Predicate predicate) {
+    private long getTotalCount(Predicate predicate, List<Long> companyIds) {
         QInvoice qInvoice = QInvoice.invoice;
 
         return this.query.selectFrom(qInvoice)
                 .where(predicate)
+                .where(QInvoice.invoice.company.id.in(companyIds))
                 .fetchCount();
     }
 
-    private BigDecimal getTotalPrice(Predicate predicate) {
+    private BigDecimal getTotalPrice(Predicate predicate, List<Long> companyIds) {
         return this.query.select(QInvoice.invoice.priceAfterDiscount.sum())
                 .from(QInvoice.invoice)
                 .where(predicate)
+                .where(QInvoice.invoice.company.id.in(companyIds))
                 .fetchOne();
     }
 

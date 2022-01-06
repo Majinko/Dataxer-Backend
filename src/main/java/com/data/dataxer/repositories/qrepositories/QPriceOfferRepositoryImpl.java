@@ -2,7 +2,6 @@ package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.domain.QPriceOffer;
-import com.data.dataxer.models.enums.DocumentType;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -64,14 +63,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
 
         List<PriceOffer> priceOfferList = this.getPriceOfferPaginate(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
 
-        return new CustomPageImpl<>(priceOfferList, pageable, getTotalCount(predicate), getTotalPrice(predicate));
-    }
-
-    private BigDecimal getTotalPrice(Predicate predicate) {
-        return this.query.select(QPriceOffer.priceOffer.priceAfterDiscount.sum())
-                .from(QPriceOffer.priceOffer)
-                .where(predicate)
-                .fetchOne();
+        return new CustomPageImpl<>(priceOfferList, pageable, getTotalCount(predicate, companyIds), getTotalPrice(predicate, companyIds));
     }
 
     @Override
@@ -125,12 +117,21 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         ));
     }
 
-    private Long getTotalCount(Predicate predicate) {
+    private Long getTotalCount(Predicate predicate, List<Long> companyIds) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
 
         return query.selectFrom(qPriceOffer)
                 .where(predicate)
+                .where(QPriceOffer.priceOffer.company.id.in(companyIds))
                 .fetchCount();
+    }
+
+    private BigDecimal getTotalPrice(Predicate predicate, List<Long> companyIds) {
+        return this.query.select(QPriceOffer.priceOffer.priceAfterDiscount.sum())
+                .from(QPriceOffer.priceOffer)
+                .where(predicate)
+                .where(QPriceOffer.priceOffer.company.id.in(companyIds))
+                .fetchOne();
     }
 
     //todo tieto spolocne metody dat do abstrakntej triedy pre faktury a cenove ponuky
