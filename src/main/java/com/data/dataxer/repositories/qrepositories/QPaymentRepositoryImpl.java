@@ -118,12 +118,13 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public BigDecimal getPayedTotalPrice(Long documentId) {
+    public BigDecimal getPayedTotalPrice(Long documentId, DocumentType documentType) {
         QPayment qPayment = QPayment.payment;
 
         List<Payment> payments = this.query
                 .selectFrom(qPayment)
-                .where(qPayment.documentId.eq(documentId)) // todo pridat aj typ dokumentu lebo sa moze stat ze budu mat rovnake id naklad a faktura
+                .where(qPayment.documentId.eq(documentId))
+                .where(qPayment.documentType.eq(documentType))
                 .orderBy(qPayment.id.desc())
                 .fetch();
 

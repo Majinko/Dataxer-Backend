@@ -43,7 +43,7 @@ public class Invoice extends DocumentBase {
             foreignKey = @javax.persistence.ForeignKey(name = "none")
     )
     @OneToMany(fetch = FetchType.LAZY)
-    @Where(clause="document_type='INVOICE'")
+    @Where(clause="document_type!='COST'")
     @NotFound(action = NotFoundAction.IGNORE)
     private List<Payment> payments = new ArrayList<>();
 

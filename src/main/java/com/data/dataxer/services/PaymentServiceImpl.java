@@ -103,7 +103,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public BigDecimal getRestToPay(Long documentId, DocumentType documentType) {
         BigDecimal documentTotalPrice = this.qPaymentRepository.getDocumentTotalPrice(documentId, documentType);
-        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(documentId);
+        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(documentId, documentType);
 
         return documentTotalPrice.subtract(payedTotalPrice).setScale(2, RoundingMode.HALF_UP);
     }
