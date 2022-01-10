@@ -16,6 +16,11 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "app_profile_d", referencedColumnName = "id", updatable = false)
+    private AppProfile appProfile;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_id", referencedColumnName = "id", updatable = false)
     private Company company;
 

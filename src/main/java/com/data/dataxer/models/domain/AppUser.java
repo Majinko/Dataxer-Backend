@@ -52,6 +52,9 @@ public class AppUser implements Serializable {
     private Boolean connected = false;
 
     @OneToOne(fetch = FetchType.LAZY)
+    private AppProfile defaultProfile;
+
+    @OneToOne(fetch = FetchType.LAZY)
     private Company defaultCompany;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -60,6 +63,10 @@ public class AppUser implements Serializable {
     @Transient
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Company> companies = new ArrayList<>();
+
+    @Transient
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<AppProfile> defaultProfiles = new ArrayList<>();
 
     @Column(updatable = false)
     @CreationTimestamp
