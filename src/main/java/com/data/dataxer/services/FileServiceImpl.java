@@ -90,18 +90,18 @@ public class FileServiceImpl implements FileService {
     @Override
     public File getFileByName(String fileName) {
         return this.qFileRepository
-                .getByNameAndCompanyIds(fileName, SecurityUtils.companyId())
+                .getByNameAndProfileId(fileName, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("File not found " + fileName));
     }
 
     @Override
     public Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qFileRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return this.qFileRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     private String loadCompanyUploadDirectory() {
         Settings settings = this.qSettingsRepository
-                .getByName(CompanySettings.FILE_UPLOAD_DIRECTORY.getName(), SecurityUtils.companyId())
+                .getByName(CompanySettings.FILE_UPLOAD_DIRECTORY.getName(), SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Cannot load setting "
                         + CompanySettings.FILE_UPLOAD_DIRECTORY.getName()));
         return settings.getValue();

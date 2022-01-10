@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QRoleRepository {
-    Page<Role> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<Role> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId);
 
-    Optional<Role> getById(Long id, List<Long> companyIds);
+    Optional<Role> getById(Long id, Long appProfileId);
 }

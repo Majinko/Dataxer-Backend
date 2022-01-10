@@ -36,7 +36,7 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     }
 
     @Override
-    public Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -55,7 +55,7 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
 
         List<DocumentNumberGenerator> documentNumberGeneratorList = this.query.selectFrom(qDocumentNumberGenerator)
                 .where(predicate)
-                .where(qDocumentNumberGenerator.company.id.eq(companyId))
+                .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -65,7 +65,7 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     }
 
     @Override
-    public Optional<DocumentNumberGenerator> getById(Long id, Long companyId) {
+    public Optional<DocumentNumberGenerator> getById(Long id, Long appProfileId) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
         DocumentNumberGenerator documentNumberGenerator = this.query
@@ -78,25 +78,25 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     }
 
     @Override
-    public Optional<DocumentNumberGenerator> getByIdSimple(Long id, Long companyId) {
+    public Optional<DocumentNumberGenerator> getByIdSimple(Long id, Long appProfileId) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
         return Optional.ofNullable(this.query
                 .selectFrom(qDocumentNumberGenerator)
                 .where(qDocumentNumberGenerator.id.eq(id))
-                .where(qDocumentNumberGenerator.company.id.eq(companyId))
+                .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId))
                 .fetchOne());
     }
 
     @Override
-    public DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long companyId) {
+    public DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long appProfileId) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
         return this.query
                 .selectFrom(qDocumentNumberGenerator)
                 .where(qDocumentNumberGenerator.type.eq(documentType))
                 .where(qDocumentNumberGenerator.isDefault.eq(true))
-                .where(qDocumentNumberGenerator.company.id.eq(companyId))
+                .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId))
                 .fetchOne();
     }
 

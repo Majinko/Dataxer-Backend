@@ -37,7 +37,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -56,7 +56,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
         List<Payment> paymentList = this.query.selectFrom(qPayment)
                 .where(predicate)
-                .where(qPayment.company.id.in(companyIds))
+                .where(qPayment.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -66,12 +66,12 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public Optional<Payment> getById(Long id, List<Long> companyIds) {
+    public Optional<Payment> getById(Long id, Long appProfileId) {
         QPayment qPayment = QPayment.payment;
 
         return Optional.ofNullable(this.query
                 .selectFrom(qPayment)
-                .where(qPayment.company.id.in(companyIds))
+                .where(qPayment.appProfile.id.eq(appProfileId))
                 .where(qPayment.id.eq(id))
                 .orderBy(qPayment.id.desc())
                 .fetchOne());
@@ -137,24 +137,24 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public List<Payment> getPaymentsByDocumentIdSortedByPayDate(Long documentId, List<Long> companyIds) {
+    public List<Payment> getPaymentsByDocumentIdSortedByPayDate(Long documentId, Long appProfileId) {
         QPayment qPayment = QPayment.payment;
 
         return this.query.selectFrom(qPayment)
                 .where(qPayment.documentId.eq(documentId))
-                .where(qPayment.company.id.in(companyIds))
+                .where(qPayment.appProfile.id.eq(appProfileId))
                 .orderBy(qPayment.payedDate.desc())
                 .fetch();
 
     }
 
     @Override
-    public Optional<Payment> getNewestByDocumentId(Long documentId, List<Long> companyIds) {
+    public Optional<Payment> getNewestByDocumentId(Long documentId, Long appProfileId) {
         QPayment qPayment = QPayment.payment;
 
         return Optional.ofNullable(this.query.selectFrom(qPayment)
                 .where(qPayment.documentId.eq(documentId))
-                .where(qPayment.company.id.in(companyIds))
+                .where(qPayment.appProfile.id.eq(appProfileId))
                 .orderBy(qPayment.createdAt.desc())
                 .fetchFirst());
     }

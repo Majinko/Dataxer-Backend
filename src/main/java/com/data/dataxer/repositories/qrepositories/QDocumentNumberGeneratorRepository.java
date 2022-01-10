@@ -9,13 +9,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QDocumentNumberGeneratorRepository {
+    Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId);
 
-    Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
+    Optional<DocumentNumberGenerator> getById(Long id, Long appProfile);
 
-    Optional<DocumentNumberGenerator> getById(Long id, Long companyId);
+    Optional<DocumentNumberGenerator> getByIdSimple(Long id, Long appProfile);
 
-    Optional<DocumentNumberGenerator> getByIdSimple(Long id, Long companyId);
-
-    DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long companyId);
-
+    DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long appProfile);
 }

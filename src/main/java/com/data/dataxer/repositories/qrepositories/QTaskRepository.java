@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface QTaskRepository {
-    Task getById(Long id, Long companyId);
+    Task getById(Long id, Long appProfileId);
 
-    Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
+    Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId);
 }

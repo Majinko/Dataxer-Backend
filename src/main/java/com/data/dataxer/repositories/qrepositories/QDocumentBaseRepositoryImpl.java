@@ -19,16 +19,16 @@ public class QDocumentBaseRepositoryImpl implements QDocumentBaseRepository {
     }
 
     @Override
-    public List<DocumentBase> getAllDocumentByIds(List<Long> documentIds, Long companyId) {
+    public List<DocumentBase> getAllDocumentByIds(List<Long> documentIds, Long defaultProfileId) {
         return this.query.selectFrom(QDocumentBase.documentBase)
                 .where(QDocumentBase.documentBase.id.in(documentIds))
-                .where(QDocumentBase.documentBase.company.id.eq(companyId))
+                .where(QDocumentBase.documentBase.appProfile.id.eq(defaultProfileId))
                 .fetch();
 
     }
 
     @Override
-    public List<DocumentBase> getAllByQueryString(Long documentId, String search, Long companyId) {
+    public List<DocumentBase> getAllByQueryString(Long documentId, String search, Long defaultProfileId) {
         BooleanBuilder where = new BooleanBuilder();
 
         if (!search.isEmpty()) {
@@ -38,7 +38,7 @@ public class QDocumentBaseRepositoryImpl implements QDocumentBaseRepository {
         return this.query.selectFrom(QDocumentBase.documentBase)
                 .where(where)
                 .where(QDocumentBase.documentBase.id.notIn(documentId))
-                .where(QDocumentBase.documentBase.company.id.eq(companyId))
+                .where(QDocumentBase.documentBase.appProfile.id.eq(defaultProfileId))
                 .orderBy(QDocumentBase.documentBase.id.desc())
                 .limit(15L)
                 .fetch();

@@ -20,7 +20,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> all() {
-        return this.categoryRepository.findAllByCompanyIdInOrderByPositionAsc(SecurityUtils.companyIds());
+        return this.categoryRepository.findAllByAppProfileIdOrderByPositionAsc(SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -43,7 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void delete(Long id) {
-        if (!this.categoryRepository.findAllByParentIdAndCompanyId(id, SecurityUtils.companyId()).isEmpty()) {
+        if (!this.categoryRepository.findAllByParentIdAndAppProfileId(id, SecurityUtils.defaultProfileId()).isEmpty()) {
             throw new RuntimeException("Category has children :(");
         }
 
@@ -52,7 +52,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public List<Category> allByType(String type) {
-        return this.categoryRepository.findAllByType(CategoryType.valueOf(type), SecurityUtils.companyIds());
+        return this.categoryRepository.findAllByType(CategoryType.valueOf(type), SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -63,7 +63,7 @@ public class CategoryServiceImpl implements CategoryService {
             categoryTypes.add(CategoryType.valueOf(cType));
         });
 
-        return this.categoryRepository.findAllByCategoryTypeInAndCompanyIdIn(categoryTypes, SecurityUtils.companyIds());
+        return this.categoryRepository.findAllByCategoryTypeInAndAppProfileId(categoryTypes, SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -74,13 +74,13 @@ public class CategoryServiceImpl implements CategoryService {
             categoryGroups.add(CategoryGroup.valueOf(group));
         });
 
-        return this.categoryRepository.findAllByCategoryGroupInAndCompanyIdInOrderByPosition(categoryGroups, SecurityUtils.companyIds());
+        return this.categoryRepository.findAllByCategoryGroupInAndAppProfileIdOrderByPosition(categoryGroups, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public Category findById(Long id) {
         return this.categoryRepository
-                .findByIdAndCompanyIdIn(id, SecurityUtils.companyIds())
+                .findByIdAndAppProfileId(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("category not found"));
     }
 
@@ -90,16 +90,15 @@ public class CategoryServiceImpl implements CategoryService {
 
         // todo make better query in foreach is bad idea
         this.categoryRepository // fill categoriesId
-                .findAllByCategoryGroupAndCompanyIdInAndParentIdIsNullOrderByPosition(CategoryGroup.valueOf(group), SecurityUtils.companyIds())
-                .forEach(c -> categoriesId.addAll(this.categoryRepository.findAllChildIds(c.getId(), SecurityUtils.companyIds())));
+                .findAllByCategoryGroupAndAppProfileIdAndParentIdIsNullOrderByPosition(CategoryGroup.valueOf(group), SecurityUtils.defaultProfileId())
+                .forEach(c -> categoriesId.addAll(this.categoryRepository.findAllChildIds(c.getId(), SecurityUtils.defaultProfileId())));
 
-        return this.categoryRepository.findAllByIdInAndCompanyIdInOrderByPosition(new ArrayList<>(categoriesId), SecurityUtils.companyIds());
+        return this.categoryRepository.findAllByIdInAndAppProfileIdInOrderByPosition(new ArrayList<>(categoriesId), SecurityUtils.defaultProfileId());
     }
-
 
     // private methods
     private Category updateCategory(Category category) {
-        return this.categoryRepository.findByIdAndCompanyIdIn(category.getId(), SecurityUtils.companyIds()).map(c -> {
+        return this.categoryRepository.findByIdAndAppProfileId(category.getId(), SecurityUtils.defaultProfileId()).map(c -> {
             c.setName(category.getName());
             c.setParentId(category.getParentId());
             c.setCategoryType(category.getCategoryType());

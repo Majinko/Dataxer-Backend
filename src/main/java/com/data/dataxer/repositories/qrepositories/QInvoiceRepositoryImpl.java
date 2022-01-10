@@ -37,11 +37,11 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         Predicate predicate = buildPredicate(rqlFilter);
         OrderSpecifierList orderSpecifierList = buildSort(sortExpression);
 
-        List<Long> invoiceIds = this.getInvoiceIdsPaginate(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
+        List<Long> invoiceIds = this.getInvoiceIdsPaginate(pageable, rqlFilter, appProfileId, predicate, orderSpecifierList);
 
         List<Invoice> invoices = this.query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
@@ -51,17 +51,17 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .distinct()
                 .fetch();
 
-        return new CustomPageImpl<>(invoices, pageable, getTotalCount(predicate, companyIds), getTotalPrice(predicate, companyIds));
+        return new CustomPageImpl<>(invoices, pageable, getTotalCount(predicate, appProfileId), getTotalPrice(predicate, appProfileId));
     }
 
     @Override
-    public Optional<Invoice> getById(Long id, List<Long> companyIds) {
+    public Optional<Invoice> getById(Long id, Long appProfileId) {
         Invoice invoice = query.selectFrom(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
                 .where(QInvoice.invoice.id.eq(id))
-                .where(QInvoice.invoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.appProfile.id.in(appProfileId))
                 .orderBy(QDocumentPack.documentPack.position.asc())
                 .fetchOne();
 
@@ -91,17 +91,17 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Optional<Invoice> getByIdSimple(Long id, List<Long> companyIds) {
+    public Optional<Invoice> getByIdSimple(Long id, Long appProfileId) {
         QInvoice qInvoice = QInvoice.invoice;
 
         return Optional.ofNullable(query.selectFrom(qInvoice)
                 .where(qInvoice.id.eq(id))
-                .where(QInvoice.invoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .fetchOne());
     }
 
     @Override
-    public List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, List<Long> companyIds) {
+    public List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, Long appProfileId) {
         return this.query.selectDistinct(QInvoice.invoice)
                 .from(QInvoice.invoice)
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
@@ -109,7 +109,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
                 .where(QInvoice.invoice.id.in(ids))
                 .where(QInvoice.invoice.documentType.eq(type))
-                .where(QInvoice.invoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .fetch();
     }
 
@@ -123,20 +123,20 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .fetchOne();
     }
 
-    private long getTotalCount(Predicate predicate, List<Long> companyIds) {
+    private long getTotalCount(Predicate predicate, Long appProfileId) {
         QInvoice qInvoice = QInvoice.invoice;
 
         return this.query.selectFrom(qInvoice)
                 .where(predicate)
-                .where(QInvoice.invoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .fetchCount();
     }
 
-    private BigDecimal getTotalPrice(Predicate predicate, List<Long> companyIds) {
+    private BigDecimal getTotalPrice(Predicate predicate, Long appProfileId) {
         return this.query.select(QInvoice.invoice.priceAfterDiscount.sum())
                 .from(QInvoice.invoice)
                 .where(predicate)
-                .where(QInvoice.invoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .fetchOne();
     }
 
@@ -156,17 +156,13 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         ));
     }
 
-    private List<Long> getInvoiceIdsPaginate(Pageable pageable, String rqlFilter, List<Long> companyIds, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+    private List<Long> getInvoiceIdsPaginate(Pageable pageable, String rqlFilter, Long appProfileId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<Invoice> invoiceJPAQuery = this.query.selectFrom(QInvoice.invoice)
                 .where(predicate)
-                .where(QInvoice.invoice.company.id.in(companyIds))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
-
-        if (!rqlFilter.contains("invoice.company.id")) { // todo make refakt
-            invoiceJPAQuery.where(QInvoice.invoice.company.id.in(companyIds));
-        }
 
         return invoiceJPAQuery.select(QInvoice.invoice.id).fetch();
     }

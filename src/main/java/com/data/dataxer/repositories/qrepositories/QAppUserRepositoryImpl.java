@@ -34,16 +34,16 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
     }
 
     @Override
-    public List<AppUser> findWhereDefaultCompanyIs(Long companyId) {
+    public List<AppUser> findWhereDefaultProfileId(Long appProfileId) {
         return this.query.selectFrom(QAppUser.appUser)
-                .where(QAppUser.appUser.defaultCompany.id.eq(companyId))
+                .where(QAppUser.appUser.defaultProfile.id.eq(appProfileId))
                 .fetch();
     }
 
     @Override
     public Optional<AppUser> findByUid(String uid) {
         AppUser appUser = this.query.selectFrom(QAppUser.appUser)
-                .leftJoin(QAppUser.appUser.defaultCompany).fetchJoin()
+                .leftJoin(QAppUser.appUser.defaultProfile).fetchJoin()
                 .leftJoin(QAppUser.appUser.roles).fetchJoin()
                 .where(QAppUser.appUser.uid.eq(uid))
                 .fetchOne();
@@ -55,29 +55,29 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
     }
 
     @Override
-    public Optional<AppUser> findUserWithRolesAndPrivileges(String uid, Long companyId) {
+    public Optional<AppUser> findUserWithRolesAndPrivileges(String uid, Long appProfileId) {
         return Optional.ofNullable(
                 query.selectFrom(QAppUser.appUser)
                         .leftJoin(QAppUser.appUser.roles, QRole.role).fetchJoin()
                         .where(QAppUser.appUser.uid.eq(uid))
-                        .where(QAppUser.appUser.defaultCompany.id.eq(companyId))
+                        .where(QAppUser.appUser.defaultProfile.id.eq(appProfileId))
                         .fetchOne()
         );
     }
 
     @Override
-    public List<AppUser> getUsersByCompany(Pageable pageable, String qString, List<Long> companyIds) {
+    public List<AppUser> getUsersByAppProfileId(Pageable pageable, String qString, Long appProfileId) {
         Set<Long> userIds = new HashSet<>();
 
-        List<Company> companies = this.query
-                .selectFrom(QCompany.company)
-                .where(QCompany.company.id.in(companyIds))
+        List<AppProfile> profiles = this.query
+                .selectFrom(QAppProfile.appProfile)
+                .where(QAppProfile.appProfile.id.in(appProfileId))
                 .leftJoin(QCompany.company.appUsers, QAppUser.appUser).fetchJoin()
                 .distinct()
                 .fetch();
 
-        companies.forEach(c -> {
-            userIds.addAll(c.getAppUsers().stream().map(AppUser::getId).collect(Collectors.toList()));
+        profiles.forEach(profile -> {
+            userIds.addAll(profile.getAppUsers().stream().map(AppUser::getId).collect(Collectors.toList()));
         });
 
         return this.query

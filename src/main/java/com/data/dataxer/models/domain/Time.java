@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -27,6 +28,11 @@ public class Time extends BaseEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     Salary salary;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", referencedColumnName = "id", updatable = false)
+    private Company company;
 
     Integer time;
 

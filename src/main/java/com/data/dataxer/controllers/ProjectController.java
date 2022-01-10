@@ -144,7 +144,7 @@ public class ProjectController {
             @PathVariable Long id,
             @RequestParam(value = "companyIds", required = false) List<Long> companyIds
     ) {
-        return ResponseEntity.ok(this.projectService.getProjectManHours(id, companyIds));
+        return ResponseEntity.ok(this.projectService.getProjectManHours(id));
     }
 
     //todo remove

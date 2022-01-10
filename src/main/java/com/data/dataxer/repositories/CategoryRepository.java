@@ -12,40 +12,40 @@ import java.util.Optional;
 
 @Repository
 public interface CategoryRepository extends CrudRepository<Category, Long> {
-    Optional<List<Category>> findByParentIdIsNullAndCompanyId(Long companyId);
+    Optional<List<Category>> findByParentIdIsNullAndAppProfileId(Long appProfileId);
 
-    Optional<Category> findByIdAndCompanyIdIn(Long id, List<Long> companies);
+    Optional<Category> findByIdAndAppProfileId(Long id, Long appProfileId);
 
-    List<Category> findAllByCompanyIdInOrderByPositionAsc(List<Long> companyIds);
+    List<Category> findAllByAppProfileIdOrderByPositionAsc(Long appProfileId);
 
-    List<Category> findAllByIdInAndCompanyId(List<Long> ids, Long companyId);
+    List<Category> findAllByIdInAndAppProfileId(List<Long> ids, Long appProfileId);
 
-    List<Category> findAllByIdInAndCompanyIdInOrderByPosition(List<Long> ids, List<Long> companyIds);
+    List<Category> findAllByIdInAndAppProfileIdInOrderByPosition(List<Long> ids, Long appProfileId);
 
-    List<Category> findAllByParentIdAndCompanyId(Long parentId, Long companyId);
+    List<Category> findAllByParentIdAndAppProfileId(Long parentId, Long appProfileId);
 
-    List<Category> findAllByCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);
+    List<Category> findAllByCategoryTypeInAndAppProfileId(List<CategoryType> categoryTypes, Long appProfileId);
 
-    List<Category> findAllByCategoryGroupInAndCompanyIdInOrderByPosition(List<CategoryGroup> categoryGroups, List<Long> companyIds);
+    List<Category> findAllByCategoryGroupInAndAppProfileIdOrderByPosition(List<CategoryGroup> categoryGroups, Long appProfileId);
 
-    List<Category> findAllByCategoryGroupAndCompanyIdInAndParentIdIsNullOrderByPosition(CategoryGroup categoryGroup, List<Long> companyIds);
+    List<Category> findAllByCategoryGroupAndAppProfileIdAndParentIdIsNullOrderByPosition(CategoryGroup categoryGroup, Long appProfileId);
 
-    @Query("select c.id from Category c where c.categoryType in ?1 and c.company.id in ?2")
-    List<Long> findAllIdsCategoryTypeInAndCompanyIdIn(List<CategoryType> categoryTypes, List<Long> companyIds);
+    @Query("select c.id from Category c where c.categoryType in ?1 and c.appProfile.id = ?2")
+    List<Long> findAllIdsCategoryTypeInAndAppProfileId(List<CategoryType> categoryTypes, Long appProfileId);
 
-    @Query("SELECT c FROM Category c WHERE c.name = ?1 AND c.company.id = ?2")
-    Optional<Category> findCategoryByName(String categoryName, Long companyId);
-
-    @Query(
-            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id in ?2 and category.deleted_at is null and category.parent_id = ids.id) SELECT * FROM ids;",
-            nativeQuery = true)
-    List<Long> findAllChildIds(Long categoryId, List<Long> companyIds);
+    @Query("SELECT c FROM Category c WHERE c.name = ?1 AND c.appProfile.id = ?2")
+    Optional<Category> findCategoryByName(String categoryName, Long appProfile);
 
     @Query(
-            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.company_id = ?2 and category.parent_id = ids.id) SELECT * FROM ids where ids.id in (SELECT category_id from time);",
+            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where category.app_profile_id = ?2 and category.deleted_at is null and category.parent_id = ids.id) SELECT * FROM ids;",
             nativeQuery = true)
-    List<Long> findAllChildIdsHasTime(Long categoryId, Long companyId);
+    List<Long> findAllChildIds(Long categoryId, Long appProfileId);
 
-    @Query("SELECT c FROM Category c where c.categoryType = ?1 and c.company.id in ?2")
-    List<Category> findAllByType(CategoryType categoryType, List<Long> companyIds);
+    @Query(
+            value = "WITH RECURSIVE ids (id) as (SELECT category.id from category where id = ?1 UNION ALL SELECT category.id from ids, category where  category.app_profile_id = ?2 and category.parent_id = ids.id) SELECT * FROM ids where ids.id in (SELECT category_id from time);",
+            nativeQuery = true)
+    List<Long> findAllChildIdsHasTime(Long categoryId, Long appProfileId);
+
+    @Query("SELECT c FROM Category c where c.categoryType = ?1 and c.appProfile.id = ?2")
+    List<Category> findAllByType(CategoryType categoryType, Long appProfileId);
 }

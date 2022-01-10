@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DocumentRelationsRepository extends CrudRepository<DocumentRelation, Long> {
-    @Query("Select d FROM DocumentRelation d where d.relationDocumentId = ?1 and d.company.id = ?2")
-    List<DocumentRelation> findOriginalDocumentIdByRelative(Long id, Long companyId);
+    @Query("Select d FROM DocumentRelation d where d.relationDocumentId = ?1 and d.appProfile.id = ?2")
+    List<DocumentRelation> findOriginalDocumentIdByRelative(Long id, Long appProfileId);
 
-    @Query("Select d FROM DocumentRelation d where d.documentId = ?1 and d.company.id = ?2")
-    List<DocumentRelation> findAllRelationDocuments(Long originalId, Long companyId);
+    @Query("Select d FROM DocumentRelation d where d.documentId = ?1 and d.appProfile.id = ?2")
+    List<DocumentRelation> findAllRelationDocuments(Long originalId, Long appProfileId);
 
-    List<DocumentRelation> findAllByDocumentIdAndCompanyId(Long documentId, Long CompanyId);
+    List<DocumentRelation> findAllByDocumentIdAndAppProfileId(Long documentId, Long appProfileId);
 
-    Optional<DocumentRelation> findByDocumentIdAndRelationDocumentIdAndCompanyId(Long documentId, Long relatedDocumentId, Long companyId);
+    Optional<DocumentRelation> findByDocumentIdAndRelationDocumentIdAndAndAppProfileId(Long documentId, Long relatedDocumentId, Long appProfileId);
 }

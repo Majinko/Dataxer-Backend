@@ -52,14 +52,14 @@ public class AppUser implements Serializable {
     private Boolean connected = false;
 
     @OneToOne(fetch = FetchType.LAZY)
-    private Company defaultCompany;
+    private AppProfile defaultProfile;
 
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Role> roles = new ArrayList<>();
 
     @Transient
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Company> companies = new ArrayList<>();
+    private List<AppProfile> appProfiles = new ArrayList<>();
 
     @Column(updatable = false)
     @CreationTimestamp

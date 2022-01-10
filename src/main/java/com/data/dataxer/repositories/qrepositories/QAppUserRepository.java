@@ -11,11 +11,11 @@ import java.util.Optional;
 public interface QAppUserRepository {
     List<AppUser> all(List<Long> companyIds);
 
-    List<AppUser> findWhereDefaultCompanyIs(Long companyId);
+    List<AppUser> findWhereDefaultProfileId(Long appProfileId);
 
     Optional<AppUser> findByUid(String uid);
 
     Optional<AppUser> findUserWithRolesAndPrivileges(String uid, Long companyId);
 
-    List<AppUser> getUsersByCompany(Pageable pageable, String qString, List<Long> companyIds);
+    List<AppUser> getUsersByAppProfileId(Pageable pageable, String qString, Long appProfileId);
 }

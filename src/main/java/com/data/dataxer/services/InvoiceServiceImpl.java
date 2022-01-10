@@ -114,13 +114,13 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     @Override
     public Page<Invoice> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qInvoiceRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qInvoiceRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public Invoice getById(Long id) {
         return this.qInvoiceRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
@@ -134,7 +134,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     @Override
     public Invoice getByIdSimple(Long id) {
         return this.qInvoiceRepository
-                .getByIdSimple(id, SecurityUtils.companyIds())
+                .getByIdSimple(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Invoice not found"));
     }
 
@@ -145,7 +145,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     @Override
     public void makePay(Long id, LocalDate payedDate) {
-        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.companyIds()).orElseThrow(() -> new RuntimeException("Invoice not found"));
+        Invoice invoice = this.qInvoiceRepository.getByIdSimple(id, SecurityUtils.defaultProfileId()).orElseThrow(() -> new RuntimeException("Invoice not found"));
 
         invoice.setPaymentDate(payedDate);
         this.invoiceRepository.save(invoice);
@@ -174,20 +174,20 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     @Override
     public List<Invoice> findAllByRelatedDocuments(Long documentId) {
-        return this.invoiceRepository.findAllByIdInAndCompanyId(
-                documentRelationsRepository.findAllByDocumentIdAndCompanyId(documentId, SecurityUtils.companyId()).stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.companyId()
+        return this.invoiceRepository.findAllByIdInAndAppProfileId(
+                documentRelationsRepository.findAllByDocumentIdAndAppProfileId(documentId, SecurityUtils.defaultProfileId()).stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.defaultProfileId()
         );
     }
 
     @Override
     public List<Invoice> findAllByProject(Long projectId, List<Long> companyIds) {
-        return this.invoiceRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
+        return this.invoiceRepository.findAllByProjectIdAndAppProfileId(projectId, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public Invoice getInvoicesFromPriceOffer(Long id, String type) {
         DocumentType documentType = DocumentType.getTypeByName(type);
-        PriceOffer priceOffer = this.qPriceOfferRepository.getById(id, SecurityUtils.companyId())
+        PriceOffer priceOffer = this.qPriceOfferRepository.getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Price offer not found"));
         Invoice invoice = new Invoice();
         BeanUtils.copyProperties(priceOffer, invoice, "id", "title", "note", "number", "state",
@@ -244,9 +244,9 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
         switch (type) {
             case "priceOffer":
-                PriceOffer priceOffer = this.qPriceOfferRepository.getById(documentId, SecurityUtils.companyId())
+                PriceOffer priceOffer = this.qPriceOfferRepository.getById(documentId, SecurityUtils.defaultProfileId())
                         .orElseThrow(() -> new RuntimeException("Price offer not found"));
-                allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(priceOffer.getId(), SecurityUtils.companyId())
+                allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(priceOffer.getId(), SecurityUtils.defaultProfileId())
                         .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
                 BeanUtils.copyProperties(priceOffer, summaryInvoice,
                         "id", "packs", "title", "note", "number", "state", "discount", "price",
@@ -254,9 +254,9 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
                 summaryInvoicePacks = new ArrayList<>(priceOffer.getPacks());
                 break;
             case "invoice":
-                Invoice invoice = this.qInvoiceRepository.getById(documentId, SecurityUtils.companyIds()).orElseThrow(
+                Invoice invoice = this.qInvoiceRepository.getById(documentId, SecurityUtils.defaultProfileId()).orElseThrow(
                         () -> new RuntimeException("Invoice not found"));
-                allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(invoice.getId(), SecurityUtils.companyId())
+                allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(invoice.getId(), SecurityUtils.defaultProfileId())
                         .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
                 BeanUtils.copyProperties(invoice, summaryInvoice,
                         "id", "packs", "title", "note", "number", "state", "discount", "price",
@@ -267,7 +267,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
             case "taxDocument":
             default:
                 Invoice proformaInvoice = this.getOriginalProformaInvoiceFromTaxDocument(documentId);
-                allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(proformaInvoice.getId(), SecurityUtils.companyId())
+                allRelatedDocumentIds = this.documentRelationsRepository.findAllRelationDocuments(proformaInvoice.getId(), SecurityUtils.defaultProfileId())
                         .stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList());
                 BeanUtils.copyProperties(proformaInvoice, summaryInvoice,
                         "id", "packs", "title", "note", "number", "state", "discount", "price",
@@ -277,7 +277,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
                 break;
         }
 
-        List<Invoice> taxDocuments = this.qInvoiceRepository.getAllInvoicesIdInAndType(allRelatedDocumentIds, DocumentType.TAX_DOCUMENT, SecurityUtils.companyIds());
+        List<Invoice> taxDocuments = this.qInvoiceRepository.getAllInvoicesIdInAndType(allRelatedDocumentIds, DocumentType.TAX_DOCUMENT, SecurityUtils.defaultProfileId());
 
         summaryInvoice.setDocumentType(DocumentType.SUMMARY_INVOICE);
 
@@ -307,8 +307,8 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     }
 
     private Invoice getOriginalProformaInvoiceFromTaxDocument(Long taxDocumentId) {
-        List<Invoice> invoices = this.invoiceRepository.findAllByIdInAndCompanyId(
-                this.documentRelationsRepository.findOriginalDocumentIdByRelative(taxDocumentId, SecurityUtils.companyId()).stream().map(DocumentRelation::getDocumentId).collect(Collectors.toList()), SecurityUtils.companyId()
+        List<Invoice> invoices = this.invoiceRepository.findAllByIdInAndAppProfileId(
+                this.documentRelationsRepository.findOriginalDocumentIdByRelative(taxDocumentId, SecurityUtils.defaultProfileId()).stream().map(DocumentRelation::getDocumentId).collect(Collectors.toList()), SecurityUtils.defaultProfileId()
         );
         for (Invoice invoice : invoices) {
             if (invoice.getDocumentType().equals(DocumentType.PROFORMA)) {
@@ -507,7 +507,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     private BigDecimal getPaymentsValue(Long proformaInvoiceId) {
         BigDecimal paymentsValue = BigDecimal.ZERO;
-        List<Payment> payments = this.qPaymentRepository.getPaymentsByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.companyIds());
+        List<Payment> payments = this.qPaymentRepository.getPaymentsByDocumentIdSortedByPayDate(proformaInvoiceId, SecurityUtils.defaultProfileId());
 
         for (Payment payment : payments) {
             paymentsValue = paymentsValue.add(payment.getPayedValue());
@@ -517,10 +517,10 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     private BigDecimal getPayedValueFromRelatedType(Long proformaInvoiceId, DocumentType documentType) {
         BigDecimal payedValue = BigDecimal.ZERO;
-        List<Invoice> relatedInvoices = this.invoiceRepository.findAllByDocumentTypeAndIdInAndCompanyIdIn(
+        List<Invoice> relatedInvoices = this.invoiceRepository.findAllByDocumentTypeAndIdInAndAppProfileId(
                 documentType,
-                documentRelationsRepository.findAllByDocumentIdAndCompanyId(proformaInvoiceId, SecurityUtils.companyId()).stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList()),
-                SecurityUtils.companyId()
+                documentRelationsRepository.findAllByDocumentIdAndAppProfileId(proformaInvoiceId, SecurityUtils.defaultProfileId()).stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList()),
+                SecurityUtils.defaultProfileId()
         );
 
         for (Invoice invoice : relatedInvoices) {
@@ -530,7 +530,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     }
 
     private LocalDate getNewestPaymentPayedDate(Long proformaInvoiceId) {
-        Payment payment = this.qPaymentRepository.getNewestByDocumentId(proformaInvoiceId, SecurityUtils.companyIds())
+        Payment payment = this.qPaymentRepository.getNewestByDocumentId(proformaInvoiceId, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("No payment usable for tax document"));
         return payment.getPayedDate();
     }

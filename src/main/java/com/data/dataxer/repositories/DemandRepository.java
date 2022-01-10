@@ -7,5 +7,5 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DemandRepository extends JpaRepository<Demand, Long> {
-    Optional<Demand> findByIdAndCompanyId(Long id, Long companyId);
+    Optional<Demand> findByIdAndAppProfileId(Long id, Long appProfileId);
 }

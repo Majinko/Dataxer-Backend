@@ -23,7 +23,6 @@ import java.util.List;
 
 @Service
 public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGeneratorService {
-
     private final DocumentNumberGeneratorRepository documentNumberGeneratorRepository;
     private final QDocumentNumberGeneratorRepository qDocumentNumberGeneratorRepository;
     private final QInvoiceRepository qInvoiceRepository;
@@ -62,20 +61,20 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     @Override
     public Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qDocumentNumberGeneratorRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return this.qDocumentNumberGeneratorRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public DocumentNumberGenerator getById(Long id) {
         return this.qDocumentNumberGeneratorRepository
-                .getById(id, SecurityUtils.companyId())
+                .getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Document number generator not found"));
     }
 
     @Override
     public DocumentNumberGenerator getByIdSimple(Long id) {
         return this.qDocumentNumberGeneratorRepository
-                .getByIdSimple(id, SecurityUtils.companyId())
+                .getByIdSimple(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Document number generator not found"));
     }
 
@@ -86,7 +85,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     @Override
     public String generateNextNumberByDocumentType(DocumentType documentType) {
-        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.companyId());
+        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.defaultProfileId());
 
         if (documentNumberGenerator == null) {
             documentNumberGenerator = this.documentNumberGeneratorRepository.save(this.returnDefault(documentType));
@@ -322,7 +321,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     private void handleIfDefaultAlreadyExist(DocumentNumberGenerator documentNumberGenerator, boolean isUpdated) {
-        DocumentNumberGenerator defaultNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentNumberGenerator.getType(), SecurityUtils.companyId());
+        DocumentNumberGenerator defaultNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentNumberGenerator.getType(), SecurityUtils.defaultProfileId());
         if (defaultNumberGenerator != null) {
             if (isUpdated && documentNumberGenerator.getId().equals(defaultNumberGenerator.getId())) {
                 return;
@@ -331,5 +330,4 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             update(defaultNumberGenerator);
         }
     }
-
 }

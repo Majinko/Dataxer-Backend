@@ -44,11 +44,6 @@ public class CompanyController {
         return ResponseEntity.ok(companyMapper.toCompanyWithBillingInfoDTO(this.companyService.update(companyMapper.toCompany(companyDTO))));
     }
 
-    @GetMapping("/default")
-    public ResponseEntity<CompanyDTO> defaultCompany() {
-        return ResponseEntity.ok(companyMapper.toCompanyDTO(this.companyService.getDefaultCompany()));
-    }
-
     @GetMapping("/destroy/{id}")
     @PreAuthorize("hasPermission(null, 'Company', 'Company')")
     public void destroy(@PathVariable Long id) {

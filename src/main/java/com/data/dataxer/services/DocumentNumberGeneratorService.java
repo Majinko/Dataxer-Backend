@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface DocumentNumberGeneratorService {
-
     void store(DocumentNumberGenerator documentNumberGenerator);
 
     DocumentNumberGenerator update(DocumentNumberGenerator documentNumberGenerator);

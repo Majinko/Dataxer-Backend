@@ -91,9 +91,9 @@ public class UserController {
         ResponseEntity.ok(userMapper.appUserToAppUserDTO(userService.update(userMapper.appUserDTOtoAppUserWithRoles(appUserDTO))));
     }
 
-    @GetMapping("/switchCompany/{companyId}")
-    public void switchCompany(@PathVariable Long companyId) {
-        this.userService.switchCompany(companyId);
+    @GetMapping("/switchProfile/{appProfileId}")
+    public void switchProfile(@PathVariable Long appProfileId) {
+        this.userService.switchProfile(appProfileId);
     }
 
     @PostMapping("/assignRoles/{uid}")

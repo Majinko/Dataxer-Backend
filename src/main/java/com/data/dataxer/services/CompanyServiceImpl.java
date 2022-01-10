@@ -1,10 +1,9 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Company;
-import com.data.dataxer.repositories.AppUserRepository;
 import com.data.dataxer.repositories.CompanyRepository;
-import com.data.dataxer.repositories.qrepositories.QAppUserRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,16 +12,8 @@ import java.util.Optional;
 
 @Service
 public class CompanyServiceImpl implements CompanyService {
-    private final CompanyRepository companyRepository;
-    private final AppUserRepository appUserRepository;
-    private final QAppUserRepository qAppUserRepository;
-
-    public CompanyServiceImpl(CompanyRepository companyRepository, AppUserRepository appUserRepository,
-                              QAppUserRepository qAppUserRepository) {
-        this.companyRepository = companyRepository;
-        this.appUserRepository = appUserRepository;
-        this.qAppUserRepository = qAppUserRepository;
-    }
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @Override
     @Transactional
@@ -73,19 +64,12 @@ public class CompanyServiceImpl implements CompanyService {
     }
 
     @Override
-    public Company getDefaultCompany() {
-        return SecurityUtils.defaultCompany();
-    }
-
-    @Override
     public void destroy(Long id) {
         Company c = this.findById(id);
 
-        if (!this.qAppUserRepository.findWhereDefaultCompanyIs(id).isEmpty()) {
-            throw new RuntimeException("Cannot destroy company set as default fo some user");
-        }
+        throw new RuntimeException("cannot destroy company");
 
-        this.companyRepository.delete(c);
+        //this.companyRepository.delete(c);
     }
 
     private void checkCanCreateCompany(Company company) {

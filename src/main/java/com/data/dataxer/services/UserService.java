@@ -23,7 +23,7 @@ public interface UserService {
 
     void destroy(String uid);
 
-    void switchCompany(Long companyId);
+    void switchProfile(Long companyId);
 
     void assignRoles(String uid, List<Role> roleDTOStoRoles);
 
