@@ -17,7 +17,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TimeDTO {
-
     private Long id;
     private Integer time;
     private Integer timeFrom;
@@ -26,7 +25,6 @@ public class TimeDTO {
     private String description;
     private LocalDate dateWork;
     private Float km;
-
 
     @NotNull
     private Project project;

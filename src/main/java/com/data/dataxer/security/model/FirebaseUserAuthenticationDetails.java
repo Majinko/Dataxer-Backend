@@ -19,10 +19,10 @@ public class FirebaseUserAuthenticationDetails implements UserDetails {
 
     public FirebaseUserAuthenticationDetails(AppUser user, AppProfileRepository appProfileRepository) {
         this.user = user;
-        this.appProfiles = null; //appProfileRepository.findAllByAppUsersIn(List.of(user));
+        this.appProfiles = appProfileRepository.findAllByAppUsersIn(List.of(user));
 
         // set additional data
-        this.user.setAppProfiles(null);
+        this.user.setAppProfiles(appProfiles);
     }
 
     public AppUser getLoggedUser() {
