@@ -72,6 +72,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
                 .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.packs, QDocumentPack.documentPack).fetchJoin()
+                .leftJoin(QPriceOffer.priceOffer.company).fetchJoin()
                 .where(QPriceOffer.priceOffer.id.eq(id))
                 .orderBy(QDocumentPack.documentPack.position.asc())
                 .fetchOne();
@@ -95,9 +96,10 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     @Override
-    public PriceOffer getLastPriceOffer(Long appProfileId) {
+    public PriceOffer getLastPriceOffer(Long companyId, Long appProfileId) {
         return this.query.selectFrom(QPriceOffer.priceOffer)
                 .where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId))
+                .where(QPriceOffer.priceOffer.company.id.eq(companyId))
                 .orderBy(QPriceOffer.priceOffer.id.desc())
                 .limit(1L)
                 .fetchOne();

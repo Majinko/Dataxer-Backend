@@ -36,7 +36,7 @@ public class CostController {
 
     @PostMapping("/store")
     public ResponseEntity<CostDTO> store(@RequestBody UploadContextDTO<CostDTO> uploadContext) {
-        CostDTO cost = this.costMapper.costToCostDTO(this.costService.store(this.costMapper.costDTOToCost(uploadContext.getObject())));
+        CostDTO cost = this.costMapper.costToCostDTO(this.costService.store(this.costMapper.costDTOToCostWithCompany(uploadContext.getObject())));
 
         if (!uploadContext.getFiles().isEmpty()) {
             uploadContext.getFiles().forEach(file -> {
@@ -49,12 +49,12 @@ public class CostController {
 
     @GetMapping("/getById/{id}")
     public ResponseEntity<CostDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(this.costMapper.costToCostDTO(this.costService.getByIdWithRelation(id)));
+        return ResponseEntity.ok(this.costMapper.costToCostDTOWithCompany(this.costService.getByIdWithRelation(id)));
     }
 
     @PostMapping("/update")
     public ResponseEntity<CostDTO> update(@RequestBody UploadContextDTO<CostDTO> uploadContext) {
-        CostDTO cost = this.costMapper.costToCostDTO(this.costService.update(this.costMapper.costDTOToCost(uploadContext.getObject())));
+        CostDTO cost = this.costMapper.costToCostDTO(this.costService.update(this.costMapper.costDTOToCostWithCompany(uploadContext.getObject())));
 
         if (!uploadContext.getFiles().isEmpty()) {
             uploadContext.getFiles().forEach(file -> {

@@ -60,6 +60,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .leftJoin(QInvoice.invoice.packs, QDocumentPack.documentPack).fetchJoin()
+                .leftJoin(QInvoice.invoice.company).fetchJoin()
                 .where(QInvoice.invoice.id.eq(id))
                 .where(QInvoice.invoice.appProfile.id.in(appProfileId))
                 .orderBy(QDocumentPack.documentPack.position.asc())
@@ -114,9 +115,10 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Invoice getLastInvoice(DocumentType type, Long companyId) {
+    public Invoice getLastInvoice(DocumentType type, Long companyId, Long appProfileId) {
         return this.query.selectFrom(QInvoice.invoice)
                 .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .where(QInvoice.invoice.documentType.eq(type))
                 .orderBy(QInvoice.invoice.id.desc())
                 .limit(1l)

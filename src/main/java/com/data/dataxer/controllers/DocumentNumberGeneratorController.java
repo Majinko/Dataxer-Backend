@@ -13,11 +13,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/numberGenerator")
 @PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class DocumentNumberGeneratorController {
-
     private final DocumentNumberGeneratorService documentNumberGeneratorService;
     private final DocumentNumberGeneratorMapper documentNumberGeneratorMapper;
 
@@ -55,9 +56,10 @@ public class DocumentNumberGeneratorController {
 
     @GetMapping("/generateNextByType/{documentType}")
     public ResponseEntity<String> generateNextNumberByDocumentType(
-            @PathVariable DocumentType documentType
+            @PathVariable DocumentType documentType,
+            @RequestParam(value = "companyId", required = true) Long companyId
     ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, companyId));
     }
 
     @GetMapping("/destroy/{id}")
@@ -67,7 +69,7 @@ public class DocumentNumberGeneratorController {
 
     private DocumentNumberGeneratorDTO convertToDocumentNumberGeneratorDTO(DocumentNumberGenerator documentNumberGenerator) {
         DocumentNumberGeneratorDTO documentNumberGeneratorDTO = this.documentNumberGeneratorMapper.documentNumberGeneratorToDocumentNumberGeneratorDTO(documentNumberGenerator);
-        documentNumberGeneratorDTO.setNextNumber(this.documentNumberGeneratorService.getNextNumber(documentNumberGenerator));
+        //documentNumberGeneratorDTO.setNextNumber(this.documentNumberGeneratorService.getNextNumber(documentNumberGenerator));
         return documentNumberGeneratorDTO;
     }
 }

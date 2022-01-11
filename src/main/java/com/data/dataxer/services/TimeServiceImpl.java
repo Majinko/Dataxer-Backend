@@ -55,7 +55,7 @@ public class TimeServiceImpl implements TimeService {
     }
 
     private void addDataToTime(Time time) {
-        Salary salary = this.qSalaryRepository.getActiveSalary(SecurityUtils.loggedUser(), SecurityUtils.defaultProfileId());
+        Salary salary = this.qSalaryRepository.getActiveSalary(time.getCompany().getId(), SecurityUtils.loggedUser(), SecurityUtils.defaultProfileId());
 
         time.setSalary(salary);
         time.setUser(SecurityUtils.loggedUser());

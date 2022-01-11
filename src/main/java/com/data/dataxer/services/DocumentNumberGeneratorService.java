@@ -18,10 +18,7 @@ public interface DocumentNumberGeneratorService {
 
     void destroy(Long id);
 
-    String generateNextNumberByDocumentType(DocumentType documentType);
-
-    String generateNextNumberByDocumentTypeFromString(String type);
+    String generateNextNumberByDocumentType(DocumentType documentType, Long companyId);
 
     String getNextNumber(DocumentNumberGenerator documentNumberGenerator);
-
 }

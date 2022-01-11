@@ -24,5 +24,5 @@ public interface QCostRepository {
 
     BigDecimal getProjectTotalCostBetweenYears(LocalDate firstYearStart, LocalDate lastYearEnd, Boolean isInternal, Boolean isRepeated, List<Long> categoriesIdInProjectCost, Long appProfileId);
 
-    Cost getLastCost(Long appProfileId);
+    Cost getLastCost(Long companyId, Long appProfileId);
 }

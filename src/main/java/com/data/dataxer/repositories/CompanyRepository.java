@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CompanyRepository extends JpaRepository<Company, Long> {
+    @Query("SELECT c from Company c where c.id = ?1 and c.appProfile.id = ?2")
+    Optional<Company> findByAppProfileIdAndId(Long id, Long appProfileId);
+
     List<Company> findAllByAppUsersIn(List<AppUser> appUsers);
 
     Optional<Company> findByIdAndAppUsersIn(Long companyId, List<AppUser> appUsers);

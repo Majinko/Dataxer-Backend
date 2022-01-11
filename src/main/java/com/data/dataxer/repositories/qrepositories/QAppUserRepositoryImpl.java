@@ -8,7 +8,6 @@ import com.data.dataxer.utils.Helpers;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -72,7 +71,7 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
         List<AppProfile> profiles = this.query
                 .selectFrom(QAppProfile.appProfile)
                 .where(QAppProfile.appProfile.id.in(appProfileId))
-                .leftJoin(QCompany.company.appUsers, QAppUser.appUser).fetchJoin()
+                .leftJoin(QAppProfile.appProfile.appUsers, QAppUser.appUser).fetchJoin()
                 .distinct()
                 .fetch();
 

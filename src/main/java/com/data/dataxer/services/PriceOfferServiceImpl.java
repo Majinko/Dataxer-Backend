@@ -30,8 +30,11 @@ public class PriceOfferServiceImpl extends DocumentHelperService implements Pric
     }
 
     @Override
+    @Transactional
     public void update(PriceOffer priceOffer) {
         PriceOffer p = (PriceOffer) this.setDocumentPackAndItems(priceOffer);
+
+        p.setCompany(priceOffer.getCompany());
 
         this.priceOfferRepository.save(p);
     }

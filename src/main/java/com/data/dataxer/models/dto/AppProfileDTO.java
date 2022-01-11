@@ -8,4 +8,5 @@ import lombok.Setter;
 public class AppProfileDTO {
     private Long id;
     private String title;
+    private String logoUrl;
 }

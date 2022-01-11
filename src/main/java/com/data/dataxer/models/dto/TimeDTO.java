@@ -27,9 +27,11 @@ public class TimeDTO {
     private Float km;
 
     @NotNull
-    private Project project;
+    private ProjectDTO project;
     @NotNull
-    private Category category;
+    private CategoryDTO category;
+    @NotNull
+    private CompanyDTO company;
 
     private AppUser user;
 }

@@ -63,6 +63,7 @@ public class CostServiceImpl implements CostService {
         return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.defaultProfileId()).map(cost -> {
             cost.setContact(oldCost.getContact());
             cost.setProject(oldCost.getProject());
+            cost.setCompany(oldCost.getCompany());
             cost.setTitle(oldCost.getTitle());
             cost.setCostOrder(oldCost.getCostOrder());
             cost.setCategories(oldCost.getCategories());

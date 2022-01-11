@@ -22,7 +22,7 @@ public class MailAccounts extends BaseEntity {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", referencedColumnName = "id", updatable = false)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
     @Column(nullable = false)

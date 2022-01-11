@@ -3,7 +3,6 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,6 +17,9 @@ public class AppProfile {
     private Long id;
 
     private String title;
+
+    @Column(columnDefinition = "text")
+    private String logoUrl;
 
     @JoinTable(
             name = "app_user_profiles",

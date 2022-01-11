@@ -14,5 +14,5 @@ public interface QPriceOfferRepository {
 
     Optional<PriceOffer> getByIdSimple(Long id, Long appProfileId);
 
-    PriceOffer getLastPriceOffer(Long companyId);
+    PriceOffer getLastPriceOffer(Long companyId, Long appProfileId);
 }

@@ -19,5 +19,5 @@ public interface QInvoiceRepository {
 
     List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, Long appProfileId);
 
-    Invoice getLastInvoice(DocumentType type, Long appProfileId);
+    Invoice getLastInvoice(DocumentType type, Long companyId, Long appProfileId);
 }

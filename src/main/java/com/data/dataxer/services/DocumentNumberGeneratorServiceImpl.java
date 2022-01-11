@@ -1,11 +1,9 @@
 package com.data.dataxer.services;
 
-import com.data.dataxer.models.domain.Cost;
-import com.data.dataxer.models.domain.DocumentNumberGenerator;
-import com.data.dataxer.models.domain.Invoice;
-import com.data.dataxer.models.domain.PriceOffer;
+import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.models.enums.Periods;
+import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.DocumentNumberGeneratorRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
 import com.data.dataxer.repositories.qrepositories.QDocumentNumberGeneratorRepository;
@@ -14,35 +12,35 @@ import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.FormatValidator;
 import com.data.dataxer.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGeneratorService {
-    private final DocumentNumberGeneratorRepository documentNumberGeneratorRepository;
-    private final QDocumentNumberGeneratorRepository qDocumentNumberGeneratorRepository;
-    private final QInvoiceRepository qInvoiceRepository;
-    private final QCostRepository qCostRepository;
-    private final QPriceOfferRepository qPriceOfferRepository;
-
-    public DocumentNumberGeneratorServiceImpl(DocumentNumberGeneratorRepository documentNumberGeneratorRepository, QDocumentNumberGeneratorRepository qDocumentNumberGeneratorRepository,
-                                              QInvoiceRepository qInvoiceRepository, QCostRepository qCostRepository, QPriceOfferRepository qPriceOfferRepository) {
-        this.documentNumberGeneratorRepository = documentNumberGeneratorRepository;
-        this.qDocumentNumberGeneratorRepository = qDocumentNumberGeneratorRepository;
-        this.qInvoiceRepository = qInvoiceRepository;
-        this.qCostRepository = qCostRepository;
-        this.qPriceOfferRepository = qPriceOfferRepository;
-    }
+    @Autowired
+    private DocumentNumberGeneratorRepository documentNumberGeneratorRepository;
+    @Autowired
+    private QDocumentNumberGeneratorRepository qDocumentNumberGeneratorRepository;
+    @Autowired
+    private QInvoiceRepository qInvoiceRepository;
+    @Autowired
+    private QCostRepository qCostRepository;
+    @Autowired
+    private QPriceOfferRepository qPriceOfferRepository;
+    @Autowired
+    private CompanyRepository companyRepository;
 
     @Override
     public void store(DocumentNumberGenerator documentNumberGenerator) {
         FormatValidator.validateFormat(documentNumberGenerator.getFormat(), documentNumberGenerator.getPeriod());
         if (documentNumberGenerator.getIsDefault()) {
-            this.handleIfDefaultAlreadyExist(documentNumberGenerator, false);
+            this.handleIfDefaultAlreadyExist(documentNumberGenerator, documentNumberGenerator.getCompany().getId(), false);
         }
 
         this.documentNumberGeneratorRepository.save(documentNumberGenerator);
@@ -53,7 +51,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         FormatValidator.validateFormat(documentNumberGenerator.getFormat(), documentNumberGenerator.getPeriod());
 
         if (documentNumberGenerator.getIsDefault()) {
-            this.handleIfDefaultAlreadyExist(documentNumberGenerator, true);
+            this.handleIfDefaultAlreadyExist(documentNumberGenerator, documentNumberGenerator.getCompany().getId(), true);
         }
 
         return this.documentNumberGeneratorRepository.save(documentNumberGenerator);
@@ -84,23 +82,25 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public String generateNextNumberByDocumentType(DocumentType documentType) {
-        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, SecurityUtils.defaultProfileId());
+    public String generateNextNumberByDocumentType(DocumentType documentType, Long companyId) {
+        DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, companyId, SecurityUtils.defaultProfileId());
 
         if (documentNumberGenerator == null) {
-            documentNumberGenerator = this.documentNumberGeneratorRepository.save(this.returnDefault(documentType));
+            documentNumberGenerator = this.documentNumberGeneratorRepository.save(this.returnDefault(documentType, companyId));
         }
 
         return this.generateNextDocumentNumber(documentNumberGenerator, documentType);
     }
 
-    @Override
-    public String generateNextNumberByDocumentTypeFromString(String type) {
-        return this.generateNextNumberByDocumentType(DocumentType.valueOf(type));
-    }
 
-    private DocumentNumberGenerator returnDefault(DocumentType type) {
-        return new DocumentNumberGenerator("Default number generator", "YYYYNNNNNN", type, Periods.YEAR, true);
+    private DocumentNumberGenerator returnDefault(DocumentType type, Long companyId) {
+        Optional<Company> companyOptional = companyRepository.findByAppProfileIdAndId(companyId, SecurityUtils.defaultProfileId());
+
+        if (companyOptional.isPresent()) {
+            return new DocumentNumberGenerator("Default number generator", "YYYYNNNNNN", type, Periods.YEAR, true, companyOptional.get());
+        }
+
+        throw new RuntimeException("Unauthorized action");
     }
 
     @Override
@@ -121,25 +121,25 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     private String getNextNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type, LocalDate currentDate) {
         String lastNumber = "0";
-        switch(type) {
+        switch (type) {
             case INVOICE:
             case PROFORMA:
             case SUMMARY_INVOICE:
             case TAX_DOCUMENT:
-                Invoice invoice = this.qInvoiceRepository.getLastInvoice(type, documentNumberGenerator.getCompany().getId());
+                Invoice invoice = this.qInvoiceRepository.getLastInvoice(type, documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
                 if (invoice != null) {
                     lastNumber = invoice.getNumber();
                 }
                 break;
             case COST:
-                Cost cost = this.qCostRepository.getLastCost(documentNumberGenerator.getCompany().getId());
+                Cost cost = this.qCostRepository.getLastCost(documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
                 if (cost != null) {
                     lastNumber = cost.getNumber();
                 }
                 break;
             case PRICE_OFFER:
             default:
-                PriceOffer priceOffer = this.qPriceOfferRepository.getLastPriceOffer(documentNumberGenerator.getCompany().getId());
+                PriceOffer priceOffer = this.qPriceOfferRepository.getLastPriceOffer(documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
                 if (priceOffer != null) {
                     lastNumber = priceOffer.getNumber();
                 }
@@ -320,8 +320,8 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return generatedNumber.replace(forReplace, dayForReplace.toString());
     }
 
-    private void handleIfDefaultAlreadyExist(DocumentNumberGenerator documentNumberGenerator, boolean isUpdated) {
-        DocumentNumberGenerator defaultNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentNumberGenerator.getType(), SecurityUtils.defaultProfileId());
+    private void handleIfDefaultAlreadyExist(DocumentNumberGenerator documentNumberGenerator, Long companyId, boolean isUpdated) {
+        DocumentNumberGenerator defaultNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentNumberGenerator.getType(), companyId, SecurityUtils.defaultProfileId());
         if (defaultNumberGenerator != null) {
             if (isUpdated && documentNumberGenerator.getId().equals(defaultNumberGenerator.getId())) {
                 return;

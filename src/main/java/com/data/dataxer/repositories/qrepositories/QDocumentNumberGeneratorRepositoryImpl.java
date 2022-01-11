@@ -89,13 +89,15 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     }
 
     @Override
-    public DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long appProfileId) {
+    public DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long companyId, Long appProfileId) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
         return this.query
                 .selectFrom(qDocumentNumberGenerator)
+                .leftJoin(QDocumentNumberGenerator.documentNumberGenerator.company).fetchJoin()
                 .where(qDocumentNumberGenerator.type.eq(documentType))
                 .where(qDocumentNumberGenerator.isDefault.eq(true))
+                .where(qDocumentNumberGenerator.company.id.eq(companyId))
                 .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId))
                 .fetchOne();
     }

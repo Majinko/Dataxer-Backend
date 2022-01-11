@@ -46,6 +46,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .leftJoin(qTime.user).fetchJoin()
                 .leftJoin(qTime.company).fetchJoin()
                 .leftJoin(qTime.project).fetchJoin()
+                .leftJoin(qTime.company).fetchJoin()
                 .where(qTime.id.eq(id))
                 .where(qTime.appProfile.id.eq(appProfileId))
                 .where(qTime.user.id.eq(userId))
@@ -128,6 +129,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.appProfile.id.eq(appProfileId))
                 .where(QTime.time1.user.id.eq(userId))
                 .where(predicate)
+                .orderBy(QTime.time1.dateWork.desc())
                 .orderBy(QTime.time1.timeFrom.desc())
                 .fetch();
     }

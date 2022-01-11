@@ -15,5 +15,5 @@ public interface QDocumentNumberGeneratorRepository {
 
     Optional<DocumentNumberGenerator> getByIdSimple(Long id, Long appProfile);
 
-    DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long appProfile);
+    DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long companyId, Long appProfile);
 }

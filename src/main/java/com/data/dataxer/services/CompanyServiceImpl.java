@@ -20,7 +20,6 @@ public class CompanyServiceImpl implements CompanyService {
     public Company store(Company company) {
         this.checkCanCreateCompany(company);
 
-
         company.setAppUsers(List.of(SecurityUtils.loggedUser()));
 
         return this.companyRepository.save(company);

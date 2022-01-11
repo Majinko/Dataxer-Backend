@@ -18,7 +18,7 @@ public class DocumentNumberGenerator extends BaseEntity {
 
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", referencedColumnName = "id", updatable = false)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
     private Company company;
 
     private String title;
@@ -39,11 +39,13 @@ public class DocumentNumberGenerator extends BaseEntity {
             String format,
             DocumentType type,
             Periods period,
-            boolean isDefault) {
+            boolean isDefault,
+            Company company) {
         this.title = title;
         this.format = format;
         this.type = type;
         this.period = period;
         this.isDefault = isDefault;
+        this.company = company;
     }
 }

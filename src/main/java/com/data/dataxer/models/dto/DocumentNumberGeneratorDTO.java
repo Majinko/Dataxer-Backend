@@ -15,5 +15,5 @@ public class DocumentNumberGeneratorDTO {
     private Periods period;
     private Boolean isDefault;
     private String nextNumber;
-
+    private CompanyDTO company;
 }

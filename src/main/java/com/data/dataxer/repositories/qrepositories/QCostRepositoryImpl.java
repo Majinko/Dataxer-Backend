@@ -95,6 +95,7 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .leftJoin(QCost.cost.contact).fetchJoin()
                 .leftJoin(QCost.cost.project).fetchJoin()
                 .leftJoin(QCost.cost.files).fetchJoin()
+                .leftJoin(QCost.cost.company).fetchJoin()
                 .fetchOne();
 
         if (cost != null) {
@@ -156,8 +157,9 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Cost getLastCost(Long appProfileId) {
+    public Cost getLastCost(Long companyId, Long appProfileId) {
         return this.query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
                 .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .orderBy(QCost.cost.id.desc())
                 .limit(1L)
@@ -191,6 +193,7 @@ public class QCostRepositoryImpl implements QCostRepository {
     private List<Long> returnCostsIdsForPaginate(Pageable pageable, String rqlFilter, Long appProfileId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<Cost> costJPAQuery = this.query.selectFrom(QCost.cost)
                 .where(predicate)
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
