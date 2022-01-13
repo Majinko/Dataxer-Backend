@@ -108,6 +108,11 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return this.generateNextDocumentNumber(documentNumberGenerator, documentNumberGenerator.getType());
     }
 
+    @Override
+    public List<DocumentNumberGenerator> getAll() {
+        return this.documentNumberGeneratorRepository.findAllByAppProfileId(SecurityUtils.defaultProfileId());
+    }
+
     private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type) {
         LocalDate currentDate = LocalDate.now();
         String generatedNumber = this.replaceYear(documentNumberGenerator.getFormat(), currentDate);

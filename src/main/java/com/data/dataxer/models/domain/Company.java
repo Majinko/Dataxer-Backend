@@ -72,5 +72,7 @@ public class Company implements Serializable {
 
     private String vatin;
 
+    private Integer position;
+
     private LocalDateTime deletedAt;
 }

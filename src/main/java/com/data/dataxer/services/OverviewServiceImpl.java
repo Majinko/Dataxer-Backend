@@ -61,8 +61,14 @@ public class OverviewServiceImpl implements OverviewService {
                     Integer newUserDayTime = userTimeData.get(time.getUser()).get(time.getDateWork().getDayOfMonth()) + time.getTime();
                     userTimeData.get(time.getUser()).replace(time.getDateWork().getDayOfMonth(), newUserDayTime);
 
-                    BigDecimal newUserDayTotalPrice = userDayTotalPrice.get(time.getUser()).get(time.getDateWork().getDayOfMonth()).add(time.getPrice());
-                    userDayTotalPrice.get(time.getUser()).replace(time.getDateWork().getDayOfMonth(), newUserDayTotalPrice);
+                    try {
+                        BigDecimal newUserDayTotalPrice = userDayTotalPrice.get(time.getUser()).get(time.getDateWork().getDayOfMonth()).add(time.getPrice());
+                        userDayTotalPrice.get(time.getUser()).replace(time.getDateWork().getDayOfMonth(), newUserDayTotalPrice);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+
+                        // todo pozriet zapisovanie casu, pri katke a simonovy ktory su fix je price null
+                    }
                 } else {
                     userTimeData.get(time.getUser()).put(time.getDateWork().getDayOfMonth(), time.getTime());
                     userDayTotalPrice.get(time.getUser()).put(time.getDateWork().getDayOfMonth(), time.getPrice());

@@ -217,6 +217,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void switchProfile(Long appProfileId) {
+        // todo pridat kontrolu aby si mohol switchnut profili len ktore ma
         AppUser user = SecurityUtils.loggedUser();
 
         user.setDefaultProfile(this.appProfileRepository.findById(appProfileId).orElse(null));

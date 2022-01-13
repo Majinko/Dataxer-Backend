@@ -28,6 +28,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public BankAccount update(BankAccount bankAccount) {
         return this.bankAccountRepository.findById(bankAccount.getId()).map(account -> {
 
+            account.setCompany(bankAccount.getCompany());
             account.setAccountNumber(bankAccount.getAccountNumber());
             account.setBankCode(bankAccount.getBankCode());
             account.setBankName(bankAccount.getBankName());

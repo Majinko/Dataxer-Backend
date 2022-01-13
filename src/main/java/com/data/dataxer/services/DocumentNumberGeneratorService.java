@@ -5,6 +5,8 @@ import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
+
 public interface DocumentNumberGeneratorService {
     void store(DocumentNumberGenerator documentNumberGenerator);
 
@@ -21,4 +23,6 @@ public interface DocumentNumberGeneratorService {
     String generateNextNumberByDocumentType(DocumentType documentType, Long companyId);
 
     String getNextNumber(DocumentNumberGenerator documentNumberGenerator);
+
+    List<DocumentNumberGenerator> getAll();
 }

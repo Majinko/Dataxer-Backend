@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/company")
@@ -48,5 +49,10 @@ public class CompanyController {
     @PreAuthorize("hasPermission(null, 'Company', 'Company')")
     public void destroy(@PathVariable Long id) {
         this.companyService.destroy(id);
+    }
+
+    @PostMapping("/updatePosition")
+    public void updatePosition(@RequestBody List<CompanyDTO> companyDTOS) {
+        this.companyService.updatePosition(companyDTOS.stream().map(companyMapper::toCompany).collect(Collectors.toList()));
     }
 }

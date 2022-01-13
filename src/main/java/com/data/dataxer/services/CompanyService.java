@@ -14,4 +14,6 @@ public interface CompanyService {
     Company update(Company company);
 
     void destroy(Long id);
+
+    void updatePosition(List<Company> collect);
 }

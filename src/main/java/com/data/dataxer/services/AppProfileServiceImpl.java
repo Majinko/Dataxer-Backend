@@ -28,6 +28,8 @@ public class AppProfileServiceImpl implements AppProfileService {
     public void store(AppProfile appProfile) {
         this.checkCanCreateProfile(appProfile);
 
+        appProfile.setAppUsers(List.of(SecurityUtils.loggedUser()));
+
         this.appProfileRepository.save(appProfile);
     }
 

@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/numberGenerator")
@@ -62,6 +63,11 @@ public class DocumentNumberGeneratorController {
         return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, companyId));
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<List<DocumentNumberGeneratorDTO>> getAll() {
+        return ResponseEntity.ok(this.documentNumberGeneratorService.getAll().stream().map(this::convertToDocumentNumberGeneratorDTO).collect(Collectors.toList()));
+    }
+
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.documentNumberGeneratorService.destroy(id);
@@ -69,7 +75,13 @@ public class DocumentNumberGeneratorController {
 
     private DocumentNumberGeneratorDTO convertToDocumentNumberGeneratorDTO(DocumentNumberGenerator documentNumberGenerator) {
         DocumentNumberGeneratorDTO documentNumberGeneratorDTO = this.documentNumberGeneratorMapper.documentNumberGeneratorToDocumentNumberGeneratorDTO(documentNumberGenerator);
-        //documentNumberGeneratorDTO.setNextNumber(this.documentNumberGeneratorService.getNextNumber(documentNumberGenerator));
+
+        try {
+            documentNumberGeneratorDTO.setNextNumber(this.documentNumberGeneratorService.getNextNumber(documentNumberGenerator));
+        } catch (StringIndexOutOfBoundsException e) {
+            documentNumberGeneratorDTO.setNextNumber("0");
+        }
+
         return documentNumberGeneratorDTO;
     }
 }

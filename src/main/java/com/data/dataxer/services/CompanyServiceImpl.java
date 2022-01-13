@@ -20,6 +20,7 @@ public class CompanyServiceImpl implements CompanyService {
     public Company store(Company company) {
         this.checkCanCreateCompany(company);
 
+        company.setAppProfile(SecurityUtils.defaultProfile());
         company.setAppUsers(List.of(SecurityUtils.loggedUser()));
 
         return this.companyRepository.save(company);
@@ -27,7 +28,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     @Override
     public List<Company> findAll() {
-        return this.companyRepository.findAllByAppUsersIn(List.of(SecurityUtils.loggedUser()));
+        return this.companyRepository.findAllByAppUsersInAndAppProfileIdOrderByPositionAsc(List.of(SecurityUtils.loggedUser()), SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -69,6 +70,17 @@ public class CompanyServiceImpl implements CompanyService {
         throw new RuntimeException("cannot destroy company");
 
         //this.companyRepository.delete(c);
+    }
+
+    @Override
+    public void updatePosition(List<Company> companies) {
+        companies.forEach(company -> {
+            this.companyRepository.findByAppProfileIdAndId(company.getId(), SecurityUtils.defaultProfileId()).map(c -> {
+                c.setPosition(company.getPosition());
+
+                return companyRepository.save(c);
+            });
+        });
     }
 
     private void checkCanCreateCompany(Company company) {
