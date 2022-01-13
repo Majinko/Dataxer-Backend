@@ -3,6 +3,7 @@ package com.data.dataxer.mappers;
 import com.data.dataxer.models.domain.DocumentNumberGenerator;
 import com.data.dataxer.models.dto.DocumentNumberGeneratorDTO;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper
 public interface DocumentNumberGeneratorMapper {

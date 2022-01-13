@@ -40,7 +40,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -65,7 +65,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
         List<Project> projectList = this.query.selectFrom(qProject)
                 .leftJoin(qProject.contact).fetchJoin()
                 .where(predicate)
-                .where(qProject.company.id.in(companyIds))
+                .where(qProject.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -75,10 +75,10 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public Project getById(Long id, List<Long> companyIds) {
+    public Project getById(Long id, Long appProfileId) {
         return query
                 .selectFrom(QProject.project)
-                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.appProfile.id.eq(appProfileId))
                 .where(QProject.project.id.eq(id))
                 .leftJoin(QProject.project.contact).fetchJoin()
                 .leftJoin(QProject.project.categories).fetchJoin()
@@ -87,41 +87,41 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public List<Project> search(List<Long> companyIds, String queryString) {
+    public List<Project> search(Long appProfileId, String queryString) {
         return query.selectFrom(QProject.project)
-                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.appProfile.id.eq(appProfileId))
                 .where(QProject.project.title.containsIgnoreCase(queryString))
                 .fetch();
     }
 
     @Override
-    public List<Project> allHasCost(List<Long> companyIds) {
+    public List<Project> allHasCost(Long appProfileId) {
         return query.selectFrom(QProject.project)
-                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.appProfile.id.eq(appProfileId))
                 .where(QProject.project.id.in(JPAExpressions.select(QCost.cost.project.id).from(QCost.cost).fetchAll()))
                 .fetch();
     }
 
     @Override
-    public List<Project> allHasInvoice(List<Long> companyIds) {
+    public List<Project> allHasInvoice(Long appProfileId) {
         return query.selectFrom(QProject.project)
-                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.appProfile.id.eq(appProfileId))
                 .where(QProject.project.id.in(JPAExpressions.select(QInvoice.invoice.project.id).from(QInvoice.invoice).fetchAll()))
                 .fetch();
     }
 
     @Override
-    public List<Project> allHasPriceOffer(List<Long> companyIds) {
+    public List<Project> allHasPriceOffer(Long appProfileId) {
         return query.selectFrom(QProject.project)
-                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.appProfile.id.eq(appProfileId))
                 .where(QProject.project.id.in(JPAExpressions.select(QPriceOffer.priceOffer.project.id).from(QPriceOffer.priceOffer).fetchAll()))
                 .fetch();
     }
 
     @Override
-    public List<Project> allHasUserTime(String uid, List<Long> companyIds) {
+    public List<Project> allHasUserTime(String uid, Long appProfileId) {
         return query.selectFrom(QProject.project)
-                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.appProfile.id.eq(appProfileId))
                 .where(QProject.project.id.in(
                         JPAExpressions
                                 .select(QTime.time1.project.id)
@@ -133,10 +133,10 @@ public class QProjectRepositoryImpl implements QProjectRepository {
     }
 
     @Override
-    public List<Project> getAllByIds(List<Long> ids, List<Long> companyIds) {
+    public List<Project> getAllByIds(List<Long> ids, Long appProfileId) {
         return this.query.selectFrom(QProject.project)
                 .where(QProject.project.id.in(ids))
-                .where(QProject.project.company.id.in(companyIds))
+                .where(QProject.project.appProfile.id.eq(appProfileId))
                 .fetch();
     }
 

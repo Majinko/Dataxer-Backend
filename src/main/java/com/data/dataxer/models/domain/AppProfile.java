@@ -3,7 +3,6 @@ package com.data.dataxer.models.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -12,13 +11,15 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-@Where(clause = "deleted_at is null")
 public class AppProfile {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
+
+    @Column(columnDefinition = "text")
+    private String logoUrl;
 
     @JoinTable(
             name = "app_user_profiles",

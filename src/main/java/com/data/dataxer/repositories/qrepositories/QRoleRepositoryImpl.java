@@ -38,7 +38,7 @@ public class QRoleRepositoryImpl implements QRoleRepository {
     }
 
     @Override
-    public Page<Role> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Role> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
 
@@ -56,7 +56,7 @@ public class QRoleRepositoryImpl implements QRoleRepository {
 
         List<Long> roleIds = this.query.selectFrom(QRole.role)
                 .where(predicate)
-                .where(QRole.role.company.id.in(companyIds))
+                .where(QRole.role.appProfile.id.eq(appProfileId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .select(QRole.role.id)
@@ -73,12 +73,12 @@ public class QRoleRepositoryImpl implements QRoleRepository {
     }
 
     @Override
-    public Optional<Role> getById(Long id, List<Long> companyIds) {
+    public Optional<Role> getById(Long id, Long appProfileId) {
         return Optional.ofNullable(
                 this.query.selectFrom(QRole.role)
                         .join(QRole.role.privileges, QPrivilege.privilege).fetchJoin()
                         .where(QRole.role.id.eq(id))
-                        .where(QRole.role.company.id.in(companyIds))
+                        .where(QRole.role.appProfile.id.eq(appProfileId))
                         .fetchOne()
         );
     }

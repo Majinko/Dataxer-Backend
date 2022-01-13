@@ -54,15 +54,12 @@ public class AppUser implements Serializable {
     @OneToOne(fetch = FetchType.LAZY)
     private AppProfile defaultProfile;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Company defaultCompany;
-
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Role> roles = new ArrayList<>();
 
     @Transient
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Company> companies = new ArrayList<>();
+    private List<AppProfile> appProfiles = new ArrayList<>();
 
     @Transient
     @ManyToMany(fetch = FetchType.LAZY)

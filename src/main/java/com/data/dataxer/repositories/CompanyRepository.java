@@ -9,7 +9,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CompanyRepository extends JpaRepository<Company, Long> {
-    List<Company> findAllByAppUsersIn(List<AppUser> appUsers);
+    @Query("SELECT c from Company c where c.id = ?1 and c.appProfile.id = ?2")
+    Optional<Company> findByAppProfileIdAndId(Long id, Long appProfileId);
+
+    List<Company> findAllByAppUsersInAndAppProfileIdOrderByPositionAsc(List<AppUser> appUsers, Long appProfileId);
 
     Optional<Company> findByIdAndAppUsersIn(Long companyId, List<AppUser> appUsers);
 

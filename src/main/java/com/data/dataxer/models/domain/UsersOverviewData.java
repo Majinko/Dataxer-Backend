@@ -12,8 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @Setter
-public class UsersOverviewData {
-
+public class UsersOverviewData extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,18 +26,4 @@ public class UsersOverviewData {
     private Integer month;
 
     private Integer yearMonthHours;
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", referencedColumnName = "id", updatable = false)
-    private Company company;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @CreationTimestamp
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false)
-    @UpdateTimestamp
-    private LocalDateTime updatedAt;
-
 }

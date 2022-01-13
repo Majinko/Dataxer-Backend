@@ -29,5 +29,6 @@ public class PriceOfferDTO {
 
     private ContactDTO contact;
     private ProjectDTO project;
+    private CompanyDTO company;
     List<DocumentPackDTO> packs = new ArrayList<>();
 }

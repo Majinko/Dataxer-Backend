@@ -16,6 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
+// todo opravit na app profile nie company
+
 @Service
 public class SettingsServiceImpl implements SettingsService{
     @Value("${file.upload-dir}")
@@ -40,12 +42,12 @@ public class SettingsServiceImpl implements SettingsService{
 
     @Override
     public List<Settings> getCompanySettings(Long id) {
-        return this.qSettingsRepository.getByCompanyId(id);
+        return this.qSettingsRepository.getByAppProfileId(id);
     }
 
     @Override
     public Settings getByName(String name) {
-        return this.qSettingsRepository.getByName(name, SecurityUtils.companyId())
+        return this.qSettingsRepository.getByName(name, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Setting does not exists!"));
     }
 
@@ -68,7 +70,7 @@ public class SettingsServiceImpl implements SettingsService{
                     CompanySettings.FILE_UPLOAD_DIRECTORY.getName(),
                     fileUploadDirectory
             );
-            settings.setCompany(company);
+
             this.settingsRepository.save(settings);
     }
 

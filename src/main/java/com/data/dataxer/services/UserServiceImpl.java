@@ -2,9 +2,11 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.mappers.RoleMapper;
 import com.data.dataxer.mappers.SalaryMapper;
+import com.data.dataxer.models.domain.AppProfile;
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.dto.AppUserOverviewDTO;
+import com.data.dataxer.repositories.AppProfileRepository;
 import com.data.dataxer.repositories.AppUserRepository;
 import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.SalaryRepository;
@@ -41,7 +43,7 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private QTimeRepository qTimeRepository;
     @Autowired
-    private CompanyRepository companyRepository;
+    private AppProfileRepository appProfileRepository;
     @Autowired
     private SalaryRepository salaryRepository;
     @Autowired
@@ -63,7 +65,7 @@ public class UserServiceImpl implements UserService {
     public AppUser store(AppUser appUser) {
         AppUser user = this.userRepository.findUserByEmail(appUser.getEmail()).orElse(this.storeUserAndSendRegistrationEmail(appUser));
 
-        this.addCompanyToUser(SecurityUtils.companyId(), user);
+        this.addProfileToUser(SecurityUtils.defaultProfileId(), user);
 
         return user;
     }
@@ -73,7 +75,7 @@ public class UserServiceImpl implements UserService {
         UserRecord userRecord = this.createFirebaseUser(appUser, pass);
 
         appUser.setUid(userRecord.getUid());
-        appUser.setDefaultCompany(SecurityUtils.defaultCompany());
+        appUser.setDefaultProfile(SecurityUtils.defaultProfile());
 
         this.mailAccountsService.sendEmail(EmailUtils.newUser(appUser.getEmail(), pass), List.of(appUser.getEmail()));
 
@@ -103,13 +105,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<AppUser> all() {
-        return this.userRepository.findAllByDefaultCompanyId(SecurityUtils.companyId());
+        return this.userRepository.findAllByDefaultProfileId(SecurityUtils.defaultProfileId());
     }
 
     @Override
     public Page<AppUserOverviewDTO> overview(Pageable pageable, String qString) {
         List<AppUserOverviewDTO> appUserOverviewDTOS = new ArrayList<>();
-        List<AppUser> appUsers = this.qAppUserRepository.getUsersByCompany(pageable, qString, SecurityUtils.companyIds());
+        List<AppUser> appUsers = this.qAppUserRepository.getUsersByAppProfileId(pageable, qString, SecurityUtils.defaultProfileId());
 
         appUsers.forEach(user -> {
             appUserOverviewDTOS.add(fillAppUserOverview(user, false));
@@ -117,7 +119,7 @@ public class UserServiceImpl implements UserService {
 
         Collections.sort(appUserOverviewDTOS);
 
-        return new PageImpl<>(appUserOverviewDTOS, pageable, this.userRepository.countAllByDefaultCompanyId(SecurityUtils.companyId()));
+        return new PageImpl<>(appUserOverviewDTOS, pageable, this.userRepository.countAllByDefaultProfileId(SecurityUtils.defaultProfileId()));
     }
 
     private AppUserOverviewDTO fillAppUserOverview(AppUser user, Boolean moreData) {
@@ -127,14 +129,14 @@ public class UserServiceImpl implements UserService {
         appUserOverviewDTO.setUid(user.getUid());
         appUserOverviewDTO.setFullName(user.getFirstName() + ' ' + user.getLastName());
         appUserOverviewDTO.setPhotoUrl(user.getPhotoUrl());
-        appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), false));
-        appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.companyId(), true)));
-        appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.companyId()));
-        appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.companyId()));
+        appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.defaultProfileId(), false));
+        appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.defaultProfileId(), true)));
+        appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.defaultProfileId()));
+        appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.defaultProfileId()));
 
         if (moreData) {
             appUserOverviewDTO.setRoles(roleMapper.rolesToRoleDTOs(user.getRoles()));
-            appUserOverviewDTO.setSalary(salaryMapper.salaryToSalaryDTO(salaryRepository.findByUserUidAndFinishIsNullAndCompanyId(user.getUid(), SecurityUtils.companyId())));
+            appUserOverviewDTO.setSalary(salaryMapper.salaryToSalaryDTO(salaryRepository.findByUserUidAndFinishIsNullAndAppProfileId(user.getUid(), SecurityUtils.defaultProfileId())));
         }
 
         return appUserOverviewDTO;
@@ -142,7 +144,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUser update(AppUser appUser) {
-        return this.userRepository.findByUidAndDefaultCompanyId(appUser.getUid(), SecurityUtils.companyId()).map(user -> {
+        return this.userRepository.findByUidAndDefaultProfileId(appUser.getUid(), SecurityUtils.defaultProfileId()).map(user -> {
 
             user.setFirstName(appUser.getFirstName());
             user.setLastName(appUser.getLastName());
@@ -200,7 +202,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUser getByUid(String uid) {
-        return this.userRepository.findByUidAndDefaultCompanyId(uid, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("User not found :)"));
+        return this.userRepository.findByUidAndDefaultProfileId(uid, SecurityUtils.defaultProfileId()).orElseThrow(() -> new RuntimeException("User not found :)"));
     }
 
     @Override
@@ -214,11 +216,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-
-    public void switchCompany(Long companyId) {
+    public void switchProfile(Long appProfileId) {
+        // todo pridat kontrolu aby si mohol switchnut profili len ktore ma
         AppUser user = SecurityUtils.loggedUser();
 
-        user.setDefaultCompany(this.companyRepository.getById(companyId));
+        user.setDefaultProfile(this.appProfileRepository.findById(appProfileId).orElse(null));
 
         userRepository.save(user);
     }
@@ -230,10 +232,11 @@ public class UserServiceImpl implements UserService {
         this.userRepository.save(user);
     }
 
-    private void addCompanyToUser(Long companyId, AppUser appUser) {
-        Company company = this.companyRepository.findByIdWithUsers(companyId);
+    private void addProfileToUser(Long defaultProfileId, AppUser appUser) {
+        AppProfile appProfile = this.appProfileRepository.findByIdWithUsers(defaultProfileId);
 
-        company.getAppUsers().add(appUser);
-        this.companyRepository.save(company);
+        appProfile.getAppUsers().add(appUser);
+
+        this.appProfileRepository.save(appProfile);
     }
 }

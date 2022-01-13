@@ -7,6 +7,7 @@ import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.services.DocumentNumberGeneratorService;
 import com.data.dataxer.services.InvoiceService;
 import com.data.dataxer.services.PdfService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,40 +22,30 @@ import java.util.List;
 @RequestMapping("/api/invoice")
 @PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class InvoiceController {
-    private final InvoiceService invoiceService;
-    private final InvoiceMapper invoiceMapper;
-    private final DocumentNumberGeneratorService documentNumberGeneratorService;
+    @Autowired
+    private InvoiceService invoiceService;
 
-    public InvoiceController(InvoiceService invoiceService, InvoiceMapper invoiceMapper, DocumentNumberGeneratorService documentNumberGeneratorService) {
-        this.invoiceService = invoiceService;
-        this.invoiceMapper = invoiceMapper;
-        this.documentNumberGeneratorService = documentNumberGeneratorService;
-    }
+    @Autowired
+    private InvoiceMapper invoiceMapper;
 
     @PostMapping("/store")
     public void store(@RequestBody InvoiceDTO invoiceDTO) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType());
-
-        this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
+        this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoiceWithCompany(invoiceDTO));
     }
 
     @PostMapping("/store/{oldInvoiceId}")
     public void store(@RequestBody InvoiceDTO invoiceDTO, @PathVariable Long oldInvoiceId) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(invoiceDTO.getDocumentType().equals(DocumentType.PROFORMA) ? DocumentType.PROFORMA : DocumentType.INVOICE);
-
-        this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), oldInvoiceId);
+        this.invoiceService.store(invoiceMapper.invoiceDTOtoInvoiceWithCompany(invoiceDTO), oldInvoiceId);
     }
 
     @RequestMapping(value = "/storeSummaryInvoice", method = RequestMethod.POST)
     public void storeTaxDocument(@RequestParam(value = "id1") Long taxDocumentId, @RequestParam(value = "id2") Long proformaId, @RequestBody InvoiceDTO invoiceDTO) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.INVOICE);
-
-        this.invoiceService.storeSummaryInvoice(this.invoiceMapper.invoiceDTOtoInvoice(invoiceDTO), taxDocumentId, proformaId);
+        this.invoiceService.storeSummaryInvoice(this.invoiceMapper.invoiceDTOtoInvoiceWithCompany(invoiceDTO), taxDocumentId, proformaId);
     }
 
     @PostMapping("/update")
     public void update(@RequestBody InvoiceDTO invoiceDTO) {
-        this.invoiceService.update(invoiceMapper.invoiceDTOtoInvoice(invoiceDTO));
+        this.invoiceService.update(invoiceMapper.invoiceDTOtoInvoiceWithCompany(invoiceDTO));
     }
 
     @RequestMapping(value = "/changeState", method = RequestMethod.PUT)
@@ -80,7 +71,7 @@ public class InvoiceController {
 
     @GetMapping("/{id}")
     public ResponseEntity<InvoiceDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.getById(id)));
+        return ResponseEntity.ok(invoiceMapper.invoiceToInvoiceDTOWithCompany(this.invoiceService.getById(id)));
     }
 
     @GetMapping(value = "/duplicate/{id}")
@@ -106,11 +97,6 @@ public class InvoiceController {
     @GetMapping("/summary-invoice/{type}/{id}")
     public ResponseEntity<InvoiceDTO> getSummaryInvoiceByType(@PathVariable String type, @PathVariable Long id) {
         return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateSummaryInvoice(id, type)));
-    }
-
-    @GetMapping("/change-type-create-new/{id}/{type}")
-    public ResponseEntity<InvoiceDTO> changeType(@PathVariable Long id, @PathVariable String type) {
-        return ResponseEntity.ok(invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.changeTypeAndSave(id, type, documentNumberGeneratorService.generateNextNumberByDocumentTypeFromString(type))));
     }
 
     @GetMapping("/all-related-invoices/{id}")

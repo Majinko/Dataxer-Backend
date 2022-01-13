@@ -6,7 +6,7 @@ import com.data.dataxer.models.domain.Salary;
 import java.util.List;
 
 public interface QSalaryRepository {
-    Salary getActiveSalary(AppUser user, Long companyId);
+    Salary getActiveSalary(AppUser user, Long apProfileId);
 
-    List<Salary> getSalariesForUsersByIds(List<Long> userIds, Long companyId);
+    List<Salary> getSalariesForUsersByIds(List<Long> userIds, Long apProfileId);
 }

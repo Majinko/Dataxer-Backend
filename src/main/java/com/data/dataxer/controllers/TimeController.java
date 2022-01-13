@@ -37,12 +37,12 @@ public class TimeController {
 
     @PostMapping("/store")
     public void store(@RequestBody @Valid TimeDTO timeDTO) {
-        this.timeService.store(this.timeMapper.timeDTOToTime(timeDTO));
+        this.timeService.store(this.timeMapper.timeDTOToTimeWithCompany(timeDTO));
     }
 
     @PostMapping("/update")
     public void update(@RequestBody TimeDTO timeDTO) {
-        this.timeService.update(this.timeMapper.timeDTOToTime(timeDTO));
+        this.timeService.update(this.timeMapper.timeDTOToTimeWithCompany(timeDTO));
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
@@ -111,7 +111,7 @@ public class TimeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TimeDTO> getTimeById(@PathVariable Long id) {
-        return ResponseEntity.ok(this.timeMapper.timeToTimeDTO(this.timeService.getTimeById(id)));
+        return ResponseEntity.ok(this.timeMapper.timeToTimeDTOWithCompany(this.timeService.getTimeById(id)));
     }
 
     @GetMapping("/destroy/{id}")

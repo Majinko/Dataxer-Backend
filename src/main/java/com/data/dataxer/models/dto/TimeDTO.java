@@ -17,7 +17,6 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TimeDTO {
-
     private Long id;
     private Integer time;
     private Integer timeFrom;
@@ -27,11 +26,10 @@ public class TimeDTO {
     private LocalDate dateWork;
     private Float km;
 
-
     @NotNull
-    private Project project;
+    private ProjectDTO project;
     @NotNull
-    private Category category;
+    private CategoryDTO category;
 
     private AppUser user;
 }

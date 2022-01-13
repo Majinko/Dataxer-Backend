@@ -13,11 +13,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/numberGenerator")
 @PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class DocumentNumberGeneratorController {
-
     private final DocumentNumberGeneratorService documentNumberGeneratorService;
     private final DocumentNumberGeneratorMapper documentNumberGeneratorMapper;
 
@@ -55,9 +57,15 @@ public class DocumentNumberGeneratorController {
 
     @GetMapping("/generateNextByType/{documentType}")
     public ResponseEntity<String> generateNextNumberByDocumentType(
-            @PathVariable DocumentType documentType
+            @PathVariable DocumentType documentType,
+            @RequestParam(value = "companyId", required = true) Long companyId
     ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType));
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, companyId));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<DocumentNumberGeneratorDTO>> getAll() {
+        return ResponseEntity.ok(this.documentNumberGeneratorService.getAll().stream().map(this::convertToDocumentNumberGeneratorDTO).collect(Collectors.toList()));
     }
 
     @GetMapping("/destroy/{id}")
@@ -67,7 +75,13 @@ public class DocumentNumberGeneratorController {
 
     private DocumentNumberGeneratorDTO convertToDocumentNumberGeneratorDTO(DocumentNumberGenerator documentNumberGenerator) {
         DocumentNumberGeneratorDTO documentNumberGeneratorDTO = this.documentNumberGeneratorMapper.documentNumberGeneratorToDocumentNumberGeneratorDTO(documentNumberGenerator);
-        documentNumberGeneratorDTO.setNextNumber(this.documentNumberGeneratorService.getNextNumber(documentNumberGenerator));
+
+        try {
+            documentNumberGeneratorDTO.setNextNumber(this.documentNumberGeneratorService.getNextNumber(documentNumberGenerator));
+        } catch (StringIndexOutOfBoundsException e) {
+            documentNumberGeneratorDTO.setNextNumber("0");
+        }
+
         return documentNumberGeneratorDTO;
     }
 }

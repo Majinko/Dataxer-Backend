@@ -7,9 +7,9 @@ import java.util.Optional;
 
 public interface QSettingsRepository {
 
-    Optional<Settings> getByName(String name, Long companyId);
+    Optional<Settings> getByName(String name, Long apProfileId);
 
-    List<Settings> getByCompanyId(Long companyId);
+    List<Settings> getByAppProfileId(Long apProfileId);
 
-    void deleteAllSettingsByCompany(Long companyId);
+    void deleteAllSettingsByCompany(Long apProfileId);
 }

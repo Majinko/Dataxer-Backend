@@ -38,7 +38,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     @Override
-    public Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -61,17 +61,18 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
 
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<PriceOffer> priceOfferList = this.getPriceOfferPaginate(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
+        List<PriceOffer> priceOfferList = this.getPriceOfferPaginate(pageable, rqlFilter, appProfileId, predicate, orderSpecifierList);
 
-        return new CustomPageImpl<>(priceOfferList, pageable, getTotalCount(predicate, companyIds), getTotalPrice(predicate, companyIds));
+        return new CustomPageImpl<>(priceOfferList, pageable, getTotalCount(predicate, appProfileId), getTotalPrice(predicate, appProfileId));
     }
 
     @Override
-    public Optional<PriceOffer> getById(Long id, Long companyId) {
+    public Optional<PriceOffer> getById(Long id, Long appProfileId) {
         PriceOffer priceOffer = query.selectFrom(QPriceOffer.priceOffer)
                 .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.packs, QDocumentPack.documentPack).fetchJoin()
+                .leftJoin(QPriceOffer.priceOffer.company).fetchJoin()
                 .where(QPriceOffer.priceOffer.id.eq(id))
                 .orderBy(QDocumentPack.documentPack.position.asc())
                 .fetchOne();
@@ -85,18 +86,19 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     @Override
-    public Optional<PriceOffer> getByIdSimple(Long id, Long companyId) {
+    public Optional<PriceOffer> getByIdSimple(Long id, Long appProfileId) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
 
         return Optional.ofNullable(query.selectFrom(qPriceOffer)
                 .where(qPriceOffer.id.eq(id))
-                .where(qPriceOffer.company.id.eq(companyId))
+                .where(qPriceOffer.appProfile.id.eq(appProfileId))
                 .fetchOne());
     }
 
     @Override
-    public PriceOffer getLastPriceOffer(Long companyId) {
+    public PriceOffer getLastPriceOffer(Long companyId, Long appProfileId) {
         return this.query.selectFrom(QPriceOffer.priceOffer)
+                .where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId))
                 .where(QPriceOffer.priceOffer.company.id.eq(companyId))
                 .orderBy(QPriceOffer.priceOffer.id.desc())
                 .limit(1L)
@@ -117,37 +119,33 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         ));
     }
 
-    private Long getTotalCount(Predicate predicate, List<Long> companyIds) {
+    private Long getTotalCount(Predicate predicate, Long appProfileId) {
         QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
 
         return query.selectFrom(qPriceOffer)
                 .where(predicate)
-                .where(QPriceOffer.priceOffer.company.id.in(companyIds))
+                .where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId))
                 .fetchCount();
     }
 
-    private BigDecimal getTotalPrice(Predicate predicate, List<Long> companyIds) {
+    private BigDecimal getTotalPrice(Predicate predicate, Long appProfileId) {
         return this.query.select(QPriceOffer.priceOffer.priceAfterDiscount.sum())
                 .from(QPriceOffer.priceOffer)
                 .where(predicate)
-                .where(QPriceOffer.priceOffer.company.id.in(companyIds))
+                .where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId))
                 .fetchOne();
     }
 
     //todo tieto spolocne metody dat do abstrakntej triedy pre faktury a cenove ponuky
-    private List<PriceOffer> getPriceOfferPaginate(Pageable pageable, String rqlFilter, List<Long> companyIds, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+    private List<PriceOffer> getPriceOfferPaginate(Pageable pageable, String rqlFilter, Long appProfileId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<PriceOffer> priceOfferJPAQuery = this.query.selectFrom(QPriceOffer.priceOffer)
                 .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
                 .where(predicate)
-                .where(QPriceOffer.priceOffer.company.id.in(companyIds))
+                .where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
-
-        if (!rqlFilter.contains("priceOffer.company.id")) { // todo make refakt
-            priceOfferJPAQuery.where(QPriceOffer.priceOffer.company.id.in(companyIds));
-        }
 
         return priceOfferJPAQuery.fetch();
     }

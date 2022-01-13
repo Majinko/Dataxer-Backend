@@ -13,22 +13,33 @@ import java.util.List;
 
 @Mapper
 public interface PriceOfferMapper {
+    PriceOffer priceOfferDTOtoPriceOfferWithCompany(PriceOfferDTO priceOfferDTO);
+
+    @Mapping(target = "project.categories", ignore = true)
+    @Mapping(target = "project.contact", ignore = true)
+    @Mapping(target = "item.files", ignore = true)
+    PriceOfferDTO priceOfferToPriceOfferDTOWithCompany(PriceOffer priceOffer);
+
+    @Mapping(target = "company", ignore = true)
     PriceOffer priceOfferDTOtoPriceOffer(PriceOfferDTO priceOfferDTO);
 
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "item.files", ignore = true)
+    @Mapping(target = "company", ignore = true)
     PriceOfferDTO priceOfferToPriceOfferDTO(PriceOffer priceOffer);
 
     @Mapping(target = "packs", ignore = true)
     @Mapping(target = "contact", ignore = true)
     @Mapping(target = "project", ignore = true)
+    @Mapping(target = "company", ignore = true)
     @Named(value = "priceOfferToPriceOfferDTOWithoutRelation")
     PriceOfferDTO priceOfferToPriceOfferDTOWithoutRelation(PriceOffer priceOffer);
 
     @Mapping(target = "packs", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "project.contact", ignore = true)
+    @Mapping(target = "company", ignore = true)
     PriceOfferDTO priceOfferToPriceOfferDTOSimple(PriceOffer priceOffer);
 
     @Mapping(target = "item.categories", ignore = true)

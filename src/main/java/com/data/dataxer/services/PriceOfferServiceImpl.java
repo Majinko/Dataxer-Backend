@@ -5,6 +5,7 @@ import com.data.dataxer.repositories.PriceOfferRepository;
 import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -14,13 +15,11 @@ import java.util.List;
 
 @Service
 public class PriceOfferServiceImpl extends DocumentHelperService implements PriceOfferService {
-    private final PriceOfferRepository priceOfferRepository;
-    private final QPriceOfferRepository qPriceOfferRepository;
+    @Autowired
+    private PriceOfferRepository priceOfferRepository;
 
-    public PriceOfferServiceImpl(PriceOfferRepository priceOfferRepository, QPriceOfferRepository qPriceOfferRepository) {
-        this.priceOfferRepository = priceOfferRepository;
-        this.qPriceOfferRepository = qPriceOfferRepository;
-    }
+    @Autowired
+    private QPriceOfferRepository qPriceOfferRepository;
 
     @Override
     @Transactional
@@ -31,28 +30,31 @@ public class PriceOfferServiceImpl extends DocumentHelperService implements Pric
     }
 
     @Override
+    @Transactional
     public void update(PriceOffer priceOffer) {
         PriceOffer p = (PriceOffer) this.setDocumentPackAndItems(priceOffer);
+
+        p.setCompany(priceOffer.getCompany());
 
         this.priceOfferRepository.save(p);
     }
 
     @Override
     public Page<PriceOffer> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qPriceOfferRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qPriceOfferRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public PriceOffer getById(Long id) {
         return this.qPriceOfferRepository
-                .getById(id, SecurityUtils.companyId())
+                .getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Price offer not found"));
     }
 
     @Override
     public PriceOffer getByIdSimple(Long id) {
         return this.qPriceOfferRepository
-                .getByIdSimple(id, SecurityUtils.companyId())
+                .getByIdSimple(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Price offer not found"));
     }
 
@@ -63,7 +65,7 @@ public class PriceOfferServiceImpl extends DocumentHelperService implements Pric
 
     @Override
     public List<PriceOffer> findAllByProject(Long projectId, List<Long> companyIds) {
-        return this.priceOfferRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
+        return this.priceOfferRepository.findAllByProjectIdAndAndAppProfileId(projectId, SecurityUtils.defaultProfileId());
     }
 
     @Override

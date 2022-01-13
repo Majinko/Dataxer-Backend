@@ -16,13 +16,8 @@ import java.time.LocalDateTime;
 public abstract class BaseEntity implements Serializable {
     @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "app_profile_d", referencedColumnName = "id", updatable = false)
+    @JoinColumn(name = "app_profile_id", referencedColumnName = "id", updatable = false)
     private AppProfile appProfile;
-
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", referencedColumnName = "id", updatable = false)
-    private Company company;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
@@ -36,9 +31,9 @@ public abstract class BaseEntity implements Serializable {
     private void persist() {
         if (SecurityContextHolder.getContext().getAuthentication() != null)
             try {
-                company = SecurityUtils.defaultCompany();
+                appProfile = SecurityUtils.defaultProfile();
             } catch (NullPointerException ex) {
-                company = null;
+                appProfile = null;
             }
     }
 }

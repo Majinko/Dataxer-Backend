@@ -6,6 +6,7 @@ import com.data.dataxer.repositories.ItemPriceRepository;
 import com.data.dataxer.repositories.ItemRepository;
 import com.data.dataxer.repositories.qrepositories.QItemRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -15,15 +16,14 @@ import java.util.List;
 
 @Service
 public class ItemServiceImpl implements ItemService {
-    private final ItemRepository itemRepository;
-    private final QItemRepository qItemRepository;
-    private final ItemPriceRepository itemPriceRepository;
+    @Autowired
+    private ItemRepository itemRepository;
 
-    public ItemServiceImpl(ItemRepository itemRepository, QItemRepository qItemRepository, ItemPriceRepository itemPriceRepository) {
-        this.itemRepository = itemRepository;
-        this.qItemRepository = qItemRepository;
-        this.itemPriceRepository = itemPriceRepository;
-    }
+    @Autowired
+    private QItemRepository qItemRepository;
+
+    @Autowired
+    private ItemPriceRepository itemPriceRepository;
 
     @Transactional
     public Item store(Item item, ItemPrice itemPrice) {
@@ -40,7 +40,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Page<Item> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return qItemRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return qItemRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -65,19 +65,19 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public Item getById(long id) {
-        return this.qItemRepository.getById(id, SecurityUtils.companyIds());
+        return this.qItemRepository.getById(id, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public Item getByIdSimple(long id) {
-        return this.itemRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds())
+        return this.itemRepository.findByIdAndAppProfileId(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Item not found"));
     }
 
     @Override
     public List<Item> search(String q) {
         return this.qItemRepository
-                .findAllByTitleContainsAndCompanyIdIn(q, SecurityUtils.companyIds())
+                .findAllByTitleContainsAndAppProfileId(q, SecurityUtils.defaultProfileId())
                 .orElse(null);
     }
 

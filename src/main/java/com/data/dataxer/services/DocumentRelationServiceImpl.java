@@ -21,7 +21,7 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
 
     @Override
     public void store(Long originalDocumentId, Long relatedDocumentId) {
-        if (this.documentRelationsRepository.findByDocumentIdAndRelationDocumentIdAndCompanyId(originalDocumentId, relatedDocumentId, SecurityUtils.companyId()).isPresent()) {
+        if (this.documentRelationsRepository.findByDocumentIdAndRelationDocumentIdAndAndAppProfileId(originalDocumentId, relatedDocumentId, SecurityUtils.defaultProfileId()).isPresent()) {
             throw new RuntimeException("This related is present");
         }
 
@@ -35,18 +35,18 @@ public class DocumentRelationServiceImpl implements DocumentRelationService {
 
     @Override
     public List<DocumentBase> getRelatedDocuments(Long id) {
-        return this.qDocumentBaseRepository.getAllDocumentByIds(this.documentRelationsRepository.findAllRelationDocuments(id, SecurityUtils.companyId()).stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.companyId());
+        return this.qDocumentBaseRepository.getAllDocumentByIds(this.documentRelationsRepository.findAllRelationDocuments(id, SecurityUtils.defaultProfileId()).stream().map(DocumentRelation::getRelationDocumentId).collect(Collectors.toList()), SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<DocumentBase> search(Long documentId, String queryString) {
-        return this.qDocumentBaseRepository.getAllByQueryString(documentId, queryString, SecurityUtils.companyId());
+        return this.qDocumentBaseRepository.getAllByQueryString(documentId, queryString, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public void destroy(Long documentId, Long relationDocumentId) {
-        DocumentRelation documentRelation = this.documentRelationsRepository.findByDocumentIdAndRelationDocumentIdAndCompanyId(
-                documentId, relationDocumentId, SecurityUtils.companyId()
+        DocumentRelation documentRelation = this.documentRelationsRepository.findByDocumentIdAndRelationDocumentIdAndAndAppProfileId(
+                documentId, relationDocumentId, SecurityUtils.defaultProfileId()
         ).orElseThrow(() -> new RuntimeException("Document relation not found"));
 
         documentRelationsRepository.delete(documentRelation);

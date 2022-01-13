@@ -10,15 +10,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QPaymentRepository {
-    Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId);
 
-    Optional<Payment> getById(Long id, List<Long> companyIds);
+    Optional<Payment> getById(Long id, Long appProfileId);
 
     BigDecimal getDocumentTotalPrice(Long id, DocumentType documentType);
 
     BigDecimal getPayedTotalPrice(Long id, DocumentType documentType);
 
-    List<Payment> getPaymentsByDocumentIdSortedByPayDate(Long documentId, List<Long> companyIds);
+    List<Payment> getPaymentsByDocumentIdSortedByPayDate(Long documentId, Long appProfileId);
 
-    Optional<Payment> getNewestByDocumentId(Long documentId, List<Long> companyIds);
+    Optional<Payment> getNewestByDocumentId(Long documentId, Long appProfileId);
 }

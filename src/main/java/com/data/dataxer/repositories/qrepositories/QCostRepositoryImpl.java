@@ -41,7 +41,7 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds) {
+    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -68,7 +68,7 @@ public class QCostRepositoryImpl implements QCostRepository {
 
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Long> costIds = this.returnCostsIdsForPaginate(pageable, rqlFilter, companyIds, predicate, orderSpecifierList);
+        List<Long> costIds = this.returnCostsIdsForPaginate(pageable, rqlFilter, appProfileId, predicate, orderSpecifierList);
 
         List<Cost> costList = this.query.selectFrom(qCost)
                 .leftJoin(qCost.contact).fetchJoin()
@@ -79,27 +79,28 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .distinct()
                 .fetch();
 
-        return new CustomPageImpl<Cost>(costList, pageable, getTotalCount(predicate, companyIds), getTotalPrice(predicate, companyIds));
+        return new CustomPageImpl<Cost>(costList, pageable, getTotalCount(predicate, appProfileId), getTotalPrice(predicate, appProfileId));
     }
 
     @Override
-    public Optional<Cost> getById(Long id, List<Long> companyIds) {
+    public Optional<Cost> getById(Long id, Long appProfileId) {
         return Optional.ofNullable(
-                this.constructGetAllByIdAndCompanyId(id, companyIds).fetchOne()
+                this.constructGetAllByIdAndCompanyId(id, appProfileId).fetchOne()
         );
     }
 
     @Override
-    public Optional<Cost> getByIdWithRelation(Long id, List<Long> companyIds) {
-        Cost cost = this.constructGetAllByIdAndCompanyId(id, companyIds)
+    public Optional<Cost> getByIdWithRelation(Long id, Long appProfileId) {
+        Cost cost = this.constructGetAllByIdAndCompanyId(id, appProfileId)
                 .leftJoin(QCost.cost.contact).fetchJoin()
                 .leftJoin(QCost.cost.project).fetchJoin()
                 .leftJoin(QCost.cost.files).fetchJoin()
+                .leftJoin(QCost.cost.company).fetchJoin()
                 .fetchOne();
 
         if (cost != null) {
             cost.setCategories(
-                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, companyIds)
+                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, appProfileId)
                                     .leftJoin(QCost.cost.categories).fetchJoin()
                                     .fetchOne())
                             .getCategories()
@@ -142,62 +143,60 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public BigDecimal getProjectTotalCostBetweenYears(LocalDate firstYearStart, LocalDate lastYearEnd, Boolean isInternal, Boolean isRepeated, List<Long> categoriesIdInProjectCost, List<Long> companyIds) {
+    public BigDecimal getProjectTotalCostBetweenYears(LocalDate firstYearStart, LocalDate lastYearEnd, Boolean isInternal, Boolean isRepeated, List<Long> categoriesIdInProjectCost, Long appProfileId) {
         return this.query.from(QCost.cost)
                 .select(QCost.cost.price.sum())
                 .where(QCost.cost.deliveredDate.gt(firstYearStart))
                 .where(QCost.cost.deliveredDate.lt(lastYearEnd))
                 .where(QCost.cost.isInternal.eq(isInternal))
                 .where(QCost.cost.isRepeated.eq(isRepeated))
-                .where(QCost.cost.company.id.in(companyIds))
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .where(QCategory.category.id.in(categoriesIdInProjectCost))
                 .join(QCost.cost.categories, QCategory.category)
                 .fetchOne();
     }
 
     @Override
-    public Cost getLastCost(Long companyId) {
+    public Cost getLastCost(Long companyId, Long appProfileId) {
         return this.query.selectFrom(QCost.cost)
                 .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .orderBy(QCost.cost.id.desc())
                 .limit(1L)
                 .fetchOne();
     }
 
-    private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, List<Long> companyIds) {
+    private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, Long appProfileId) {
         return query.selectFrom(QCost.cost)
-                .where(QCost.cost.company.id.in(companyIds))
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .where(QCost.cost.id.eq(id));
     }
 
-    private long getTotalCount(Predicate predicate, List<Long> companyIds) {
+    private long getTotalCount(Predicate predicate, Long appProfileId) {
         QCost qCost = QCost.cost;
 
         return this.query.selectFrom(qCost)
                 .where(predicate)
-                .where(QCost.cost.company.id.in(companyIds))
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .fetchCount();
     }
 
-    private BigDecimal getTotalPrice(Predicate predicate, List<Long> companyIds) {
+    private BigDecimal getTotalPrice(Predicate predicate, Long appProfileId) {
         return this.query
                 .select(QCost.cost.price.sum())
                 .from(QCost.cost)
                 .where(predicate)
-                .where(QCost.cost.company.id.in(companyIds))
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .fetchOne();
     }
 
-    private List<Long> returnCostsIdsForPaginate(Pageable pageable, String rqlFilter, List<Long> companyIds, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+    private List<Long> returnCostsIdsForPaginate(Pageable pageable, String rqlFilter, Long appProfileId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<Cost> costJPAQuery = this.query.selectFrom(QCost.cost)
                 .where(predicate)
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
-
-        if (!rqlFilter.contains("cost.company.id")) {
-            costJPAQuery.where(QCost.cost.company.id.in(companyIds));
-        } // todo somethnig can hack, only change company id in header query params manual alebo nejaku grupu pre usera
 
         return costJPAQuery.select(QCost.cost.id).fetch();
     }

@@ -28,28 +28,13 @@ public class SettingsController {
         this.settingsService.makeSettingsForCompany(companyId);
     }
 
-    @GetMapping("/getAll/{companyId}")
-    public ResponseEntity<List<SettingsDTO>> getAllCompanySettings(@PathVariable Long companyId) {
-        return ResponseEntity.ok(this.settingsMapper.settingsListToSettingsDTOList(this.settingsService.getCompanySettings(companyId)));
+    @GetMapping("/getAll/{appProfileId}")
+    public ResponseEntity<List<SettingsDTO>> getAllCompanySettings(@PathVariable Long appProfileId) {
+        return ResponseEntity.ok(this.settingsMapper.settingsListToSettingsDTOList(this.settingsService.getCompanySettings(appProfileId)));
     }
 
     @GetMapping("/getByName/{settingName}")
     public ResponseEntity<SettingsDTO> getSettingByName(@PathVariable String settingName) {
         return ResponseEntity.ok(this.settingsMapper.settingsToSettingsDTO(this.settingsService.getByName(settingName)));
-    }
-
-    @PostMapping("/store")
-    public void store(@RequestBody Map<String, String> keyValueMap) {
-
-    }
-
-    @PostMapping("/destroyCompanySettings/{companyId}")
-    public void destroyAllCompanySettings(@PathVariable Long companyId) {
-        this.settingsService.destroyAllCompanySettings(companyId);
-    }
-
-    @PutMapping("/regenerateCompanySettings/{companyId}")
-    public void regenerateCompanySettings(@PathVariable Long companyId) {
-        this.settingsService.regenerateCompanySettings(companyId);
     }
 }

@@ -1,5 +1,6 @@
 package com.data.dataxer.services;
 
+import com.data.dataxer.models.domain.AppProfile;
 import com.data.dataxer.models.domain.Company;
 import com.data.dataxer.models.dto.CategoryCostsOverviewDTO;
 import com.data.dataxer.models.dto.UserHourOverviewDTO;
@@ -13,7 +14,7 @@ public interface OverviewService {
 
     List<UserYearOverviewDTO> getAllUsersYearsOverview();
 
-    CategoryCostsOverviewDTO getCategoriesCostsForYear(Integer year, Long categoryId);
+    CategoryCostsOverviewDTO getCategoriesCostsForYear(Integer year, Long appProfile);
 
-    String executeUsersYearsHours(String params, Company company);
+    String executeUsersYearsHours(String params, AppProfile appProfile);
 }

@@ -34,12 +34,12 @@ public class QTaskRepositoryImpl implements QTaskRepository {
     }
 
     @Override
-    public Task getById(Long id, Long companyId) {
+    public Task getById(Long id, Long appProfileId) {
         QTask qTask = QTask.task;
 
         return query
                 .selectFrom(qTask)
-                .where(qTask.company.id.eq(companyId))
+                .where(qTask.appProfile.id.eq(appProfileId))
                 .where(qTask.id.eq(id))
                 .leftJoin(qTask.files).fetchJoin()
                 .leftJoin(qTask.user).fetchJoin()
@@ -51,7 +51,7 @@ public class QTaskRepositoryImpl implements QTaskRepository {
 
 
     @Override
-    public Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<Task> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -76,7 +76,7 @@ public class QTaskRepositoryImpl implements QTaskRepository {
                 .leftJoin(qTask.project).fetchJoin()
                 .leftJoin(qTask.category).fetchJoin()
                 .where(predicate)
-                .where(qTask.company.id.eq(companyId))
+                .where(qTask.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

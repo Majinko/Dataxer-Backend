@@ -13,25 +13,35 @@ import java.util.List;
 public interface TimeMapper {
     @Mapping(target = "user.roles", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
+    Time timeDTOToTimeWithCompany(TimeDTO timeDTO);
+
+    @Mapping(target = "project.contact", ignore = true)
+    @Mapping(target = "project.categories", ignore = true)
+    @Mapping(target = "user.roles", ignore = true)
+    @Mapping(target = "user.defaultProfile", ignore = true)
+    TimeDTO timeToTimeDTOWithCompany(Time time);
+
+    @Mapping(target = "user.roles", ignore = true)
+    @Mapping(target = "project.categories", ignore = true)
     Time timeDTOToTime(TimeDTO timeDTO);
 
     @Named("timeToTimeDTO")
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
-    @Mapping(target = "user.defaultCompany", ignore = true)
+    @Mapping(target = "user.defaultProfile", ignore = true)
     TimeDTO timeToTimeDTO(Time time);
 
     @Named("timeToTimeDTOSimple")
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
-    @Mapping(target = "user.defaultCompany", ignore = true)
+    @Mapping(target = "user.defaultProfile", ignore = true)
     TimeDTO timeToTimeDTOSimple(Time time);
 
     @Named("timeToTimeDTOWithoutRelations")
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
-    @Mapping(target = "user.defaultCompany", ignore = true)
+    @Mapping(target = "user.defaultProfile", ignore = true)
     @Mapping(target = "category", ignore = true)
     TimeDTO timeToTimeDTOWithoutRelations(Time time);
 

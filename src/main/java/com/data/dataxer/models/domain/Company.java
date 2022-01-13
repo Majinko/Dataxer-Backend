@@ -38,6 +38,9 @@ public class Company implements Serializable {
     @Enumerated(EnumType.STRING)
     private CompanyTaxType companyTaxType;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private AppProfile appProfile;
+
     @Column(columnDefinition = "text")
     private String logoUrl;
 
@@ -68,6 +71,8 @@ public class Company implements Serializable {
     private String tin;
 
     private String vatin;
+
+    private Integer position;
 
     private LocalDateTime deletedAt;
 }

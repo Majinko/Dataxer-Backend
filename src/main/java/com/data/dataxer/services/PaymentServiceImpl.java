@@ -59,13 +59,13 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qPaymentRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public Payment getById(Long id) {
         return this.qPaymentRepository
-                .getById(id, SecurityUtils.companyIds())
+                .getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Payment not found"));
     }
 
@@ -85,7 +85,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void setCostPayment(Long costId, LocalDate date, DocumentState documentState) {
-        Cost cost = this.costRepository.findByIdAndCompanyIdIn(costId, SecurityUtils.companyIds());
+        Cost cost = this.costRepository.findByIdAndAppProfileId(costId, SecurityUtils.defaultProfileId());
         cost.setPaymentDate(date);
         cost.setState(documentState);
 
@@ -93,7 +93,7 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private void setInvoicePayment(Long invoiceId, LocalDate date, DocumentState documentState) {
-        Invoice invoice = this.invoiceRepository.findByIdAndCompanyIdIn(invoiceId, SecurityUtils.companyIds());
+        Invoice invoice = this.invoiceRepository.findByIdAndAppProfileId(invoiceId, SecurityUtils.defaultProfileId());
         invoice.setPaymentDate(date);
         invoice.setState(documentState);
 

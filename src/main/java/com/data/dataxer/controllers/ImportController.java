@@ -30,7 +30,7 @@ public class ImportController {
 
     @GetMapping("/importCostFile")
     public String importCost() {
-        Iterable<Cost> costs = this.costRepository.findAllByCompanyId(144L);
+ /*       Iterable<Cost> costs = this.costRepository.findAllByCompanyId(144L);
 
         costs.forEach(cost -> {
             File folder = new File("/Users/marekhlavco/Work/dataxerZalohy/2021_12_20/public/uploads/c4ca4238a0b923820dcc509a6f75849b/costs/" + cost.getId());
@@ -57,7 +57,7 @@ public class ImportController {
                     }
                 }
             }
-        });
+        });*/
 
         return "importerWork";
     }

@@ -40,15 +40,6 @@ public class Helpers {
         return cal;
     }
 
-    public static void checkCompanyIdFromRql(String parseThis) {
-        String[] strings = parseThis.split(".company.id==");
-        Long companyId = Long.parseLong(strings[strings.length - 1].replaceAll("[^0-9?!\\.]", ""));
-
-        if (!SecurityUtils.companyIds().contains(companyId)) {
-            throw new RuntimeException("ha ha ha");
-        }
-    }
-
     public static String getDateFormat(LocalDate date) {
         SimpleDateFormat DateFor = new SimpleDateFormat("dd.MM.yyyy");
 

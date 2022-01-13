@@ -37,7 +37,7 @@ public class QDemandRepositoryImpl implements QDemandRepository {
     }
 
     @Override
-    public Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -58,7 +58,7 @@ public class QDemandRepositoryImpl implements QDemandRepository {
                 .leftJoin(qDemand.category).fetchJoin()
                 .leftJoin(qDemand.contact).fetchJoin()
                 .where(predicate)
-                .where(qDemand.company.id.eq(companyId))
+                .where(qDemand.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -68,11 +68,11 @@ public class QDemandRepositoryImpl implements QDemandRepository {
     }
 
     @Override
-    public Optional<Demand> getById(Long id, Long companyId) {
+    public Optional<Demand> getById(Long id, Long appProfileId) {
         QDemand qDemand = QDemand.demand;
 
         return Optional.ofNullable(query.selectFrom(qDemand)
-                .where(qDemand.company.id.eq(companyId))
+                .where(qDemand.appProfile.id.eq(appProfileId))
                 .where(qDemand.id.eq(id))
                 .leftJoin(qDemand.category).fetchJoin()
                 .leftJoin(qDemand.contact).fetchJoin()

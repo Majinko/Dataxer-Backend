@@ -11,11 +11,11 @@ public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
     @Query("select i from Invoice i left join fetch i.payments p where p.documentType in ('INVOICE', 'TAX_DOCUMENT', 'SUMMARY_INVOICE', 'PROFORMA')")
     List<Invoice> findAllWithPayments();
 
-    List<Invoice> findAllByIdInAndCompanyId(List<Long> invoiceIds, Long companyId);
+    List<Invoice> findAllByIdInAndAppProfileId(List<Long> invoiceIds, Long appProfileId);
 
-    List<Invoice> findAllByDocumentTypeAndIdInAndCompanyIdIn(DocumentType documentType, List<Long> invoiceIds, Long companyId);
+    List<Invoice> findAllByDocumentTypeAndIdInAndAppProfileId(DocumentType documentType, List<Long> invoiceIds, Long appProfileId);
 
-    Invoice findByIdAndCompanyIdIn(Long invoiceId, List<Long> companyIds);
+    Invoice findByIdAndAppProfileId(Long invoiceId, Long appProfileId);
 
-    List<Invoice> findAllByProjectIdAndCompanyIdIn(Long projectId, List<Long> companyIds);
+    List<Invoice> findAllByProjectIdAndAppProfileId(Long projectId, Long appProfileId);
 }
