@@ -30,8 +30,6 @@ public class TimeDTO {
     private ProjectDTO project;
     @NotNull
     private CategoryDTO category;
-    @NotNull
-    private CompanyDTO company;
 
     private AppUser user;
 }

@@ -29,11 +29,6 @@ public class Time extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     Salary salary;
 
-    @JsonIgnore
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "company_id", referencedColumnName = "id")
-    private Company company;
-
     Integer time;
 
     Integer timeFrom;

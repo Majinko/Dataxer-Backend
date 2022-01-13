@@ -23,7 +23,6 @@ public interface TimeMapper {
 
     @Mapping(target = "user.roles", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
-    @Mapping(target = "company", ignore = true)
     Time timeDTOToTime(TimeDTO timeDTO);
 
     @Named("timeToTimeDTO")
@@ -31,14 +30,12 @@ public interface TimeMapper {
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
     @Mapping(target = "user.defaultProfile", ignore = true)
-    @Mapping(target = "company", ignore = true)
     TimeDTO timeToTimeDTO(Time time);
 
     @Named("timeToTimeDTOSimple")
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
     @Mapping(target = "user.defaultProfile", ignore = true)
-    @Mapping(target = "company", ignore = true)
     TimeDTO timeToTimeDTOSimple(Time time);
 
     @Named("timeToTimeDTOWithoutRelations")
@@ -46,14 +43,12 @@ public interface TimeMapper {
     @Mapping(target = "user.roles", ignore = true)
     @Mapping(target = "user.defaultProfile", ignore = true)
     @Mapping(target = "category", ignore = true)
-    @Mapping(target = "company", ignore = true)
     TimeDTO timeToTimeDTOWithoutRelations(Time time);
 
 
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "category", ignore = true)
-    @Mapping(target = "company", ignore = true)
     TimeDTO timeToTimeDTOWithoutRelation(Time time);
 
     @IterableMapping(qualifiedByName = "timeToTimeDTO")
