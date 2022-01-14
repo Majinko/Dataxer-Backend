@@ -51,8 +51,8 @@ public class BankAccountServiceImpl implements BankAccountService {
     }
 
     @Override
-    public BankAccount getDefaultBankAccount() {
-        return this.bankAccountRepository.findByIsDefaultAndCompanyId(true, SecurityUtils.defaultProfileId()).orElseThrow(
+    public BankAccount getDefaultBankAccount(Long companyId) {
+        return this.bankAccountRepository.findByIsDefaultAndCompanyIdAndAppProfileId(true, companyId, SecurityUtils.defaultProfileId()).orElseThrow(
                 () -> new RuntimeException("Default account not found, please set it")
         );
     }

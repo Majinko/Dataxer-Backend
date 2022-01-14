@@ -52,8 +52,10 @@ public class BankAccountController {
     }
 
     @GetMapping("/get-default")
-    public ResponseEntity<BankAccountDTO> getDefault() {
-        return ResponseEntity.ok(bankAccountMapper.bankAccountToBankAccountDTO(bankAccountService.getDefaultBankAccount()));
+    public ResponseEntity<BankAccountDTO> getDefault(
+            @RequestParam(value = "companyId", required = true) Long companyId
+    ) {
+        return ResponseEntity.ok(bankAccountMapper.bankAccountToBankAccountDTO(bankAccountService.getDefaultBankAccount(companyId)));
     }
 
     @GetMapping("/get-all")

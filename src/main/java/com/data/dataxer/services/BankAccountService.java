@@ -12,7 +12,7 @@ public interface BankAccountService {
 
     BankAccount getById(Long id);
 
-    BankAccount getDefaultBankAccount();
+    BankAccount getDefaultBankAccount(Long companyId);
 
     void setDefaultBankAccount(Long id);
 
