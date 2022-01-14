@@ -29,7 +29,10 @@
 
         </div>
         <div class="col-md-5 float-right">
-            <h1 style="margin-bottom: 0;"><span class="h1" th:text="${type == 'I'} ? 'Faktúra ' + ${document.getNumber()} : 'Cenová ponuka ' + ${document.getNumber()}"></span></h1>
+            <h1 style="margin-bottom: 0;"><span class="h1" th:if="${document.getDocumentType().getName() == 'proforma'}"
+                                                    th:text="'Zálohová faktúra ' + ${document.getNumber()}"></span></h1>
+            <h1 style="margin-bottom: 0;"><span class="h1" th:if="${document.getDocumentType().getName() != 'proforma'}"
+                                                th:text="'Faktúra ' + ${document.getNumber()}"></span></h1>
 
             <div class="fields-box-text fields-box-only-text" th:with="contact=${document.getContact()}">
                 <p>
