@@ -92,7 +92,10 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Category> getAllProjectCategories(Long projectId) {
-        List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.defaultProfileId()).getCategories();
+        List<Category> categories = this
+                .qProjectRepository
+                .getById(projectId, SecurityUtils.defaultProfileId())
+                .getCategories();
 
         categories.sort(Comparator.comparing(category -> category.getPosition() != null ? category.getPosition() : 0));
 

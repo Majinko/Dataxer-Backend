@@ -81,7 +81,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
                 .where(QProject.project.appProfile.id.eq(appProfileId))
                 .where(QProject.project.id.eq(id))
                 .leftJoin(QProject.project.contact).fetchJoin()
-                .leftJoin(QProject.project.categories).fetchJoin()
+                .leftJoin(QProject.project.categories, QCategory.category).fetchJoin()
                 .fetchOne();
 
     }

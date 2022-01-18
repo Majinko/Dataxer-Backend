@@ -14,6 +14,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -92,14 +93,21 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     public DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long companyId, Long appProfileId) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
-        return this.query
+        JPAQuery<DocumentNumberGenerator> query = this.query
                 .selectFrom(qDocumentNumberGenerator)
                 .leftJoin(QDocumentNumberGenerator.documentNumberGenerator.company).fetchJoin()
-                .where(qDocumentNumberGenerator.type.eq(documentType))
                 .where(qDocumentNumberGenerator.isDefault.eq(true))
                 .where(qDocumentNumberGenerator.company.id.eq(companyId))
-                .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId))
-                .fetchOne();
+                .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId));
+
+        if (documentType.equals(DocumentType.PROFORMA)) {
+            query.where(qDocumentNumberGenerator.type.eq(documentType));
+        } else {
+            // ak sa jedna o fakturu, danovy doklad, alebo vyuctovaciu fakturu pouzivam ciselnik na generovanie faktur
+            query.where(qDocumentNumberGenerator.type.eq(DocumentType.INVOICE));
+        }
+
+        return query.fetchOne();
     }
 
     private long getTotalCount(Predicate predicate) {

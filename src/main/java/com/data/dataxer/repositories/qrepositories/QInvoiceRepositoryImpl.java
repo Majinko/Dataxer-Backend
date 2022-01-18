@@ -120,7 +120,18 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(QInvoice.invoice.company.id.eq(companyId))
                 .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .where(QInvoice.invoice.documentType.eq(type))
-                .orderBy(QInvoice.invoice.id.desc())
+                .orderBy(QInvoice.invoice.createdDate.desc())
+                .limit(1l)
+                .fetchOne();
+    }
+
+    @Override
+    public Invoice getLastInvoice(Long companyId, Long appProfileId) {
+        return this.query.selectFrom(QInvoice.invoice)
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
+                .where(QInvoice.invoice.documentType.notIn(DocumentType.PROFORMA))
+                .orderBy(QInvoice.invoice.createdDate.desc())
                 .limit(1l)
                 .fetchOne();
     }

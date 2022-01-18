@@ -3,6 +3,7 @@ package com.data.dataxer.services;
 import com.data.dataxer.models.domain.AppUser;
 import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.security.model.Role;
+import com.google.firebase.auth.FirebaseAuthException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -36,4 +37,6 @@ public interface UserService {
     AppUser connect(String uid);
 
     AppUser disconnect(String uid);
+
+    void resetToken(String uid);
 }

@@ -11,6 +11,7 @@ public interface InvoiceRepository extends CrudRepository<Invoice, Long> {
     @Query("select i from Invoice i left join fetch i.payments p where p.documentType in ('INVOICE', 'TAX_DOCUMENT', 'SUMMARY_INVOICE', 'PROFORMA')")
     List<Invoice> findAllWithPayments();
 
+    @Query("select i from Invoice  i left join fetch i.company where i.id in ?1 and i.appProfile.id = ?2")
     List<Invoice> findAllByIdInAndAppProfileId(List<Long> invoiceIds, Long appProfileId);
 
     List<Invoice> findAllByDocumentTypeAndIdInAndAppProfileId(DocumentType documentType, List<Long> invoiceIds, Long appProfileId);

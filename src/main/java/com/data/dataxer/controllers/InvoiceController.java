@@ -86,17 +86,17 @@ public class InvoiceController {
 
     @GetMapping("/tax-invoice/{id}")
     public ResponseEntity<InvoiceDTO> getTaxDocument(@PathVariable Long id) {
-        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateTaxDocument(id)));
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTOWithCompany(this.invoiceService.generateTaxDocument(id)));
     }
 
     @GetMapping("/summary-invoice/{id}")
     public ResponseEntity<InvoiceDTO> getSummaryInvoice(@PathVariable Long id) {
-        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateSummaryInvoice(id, "taxDocument")));
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTOWithCompany(this.invoiceService.generateSummaryInvoice(id, "taxDocument")));
     }
 
     @GetMapping("/summary-invoice/{type}/{id}")
     public ResponseEntity<InvoiceDTO> getSummaryInvoiceByType(@PathVariable String type, @PathVariable Long id) {
-        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTO(this.invoiceService.generateSummaryInvoice(id, type)));
+        return ResponseEntity.ok(this.invoiceMapper.invoiceToInvoiceDTOWithCompany(this.invoiceService.generateSummaryInvoice(id, type)));
     }
 
     @GetMapping("/all-related-invoices/{id}")

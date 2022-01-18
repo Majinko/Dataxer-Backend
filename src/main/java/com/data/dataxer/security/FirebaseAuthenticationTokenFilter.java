@@ -1,6 +1,7 @@
 package com.data.dataxer.security;
 
 import com.data.dataxer.security.service.FirebaseUserDetailService;
+import lombok.SneakyThrows;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,6 +29,7 @@ public class FirebaseAuthenticationTokenFilter extends UsernamePasswordAuthentic
         this.firebaseAuth = firebaseAuth;
     }
 
+    @SneakyThrows
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
         final HttpServletRequest httpRequest = (HttpServletRequest) request;
@@ -35,6 +37,7 @@ public class FirebaseAuthenticationTokenFilter extends UsernamePasswordAuthentic
 
         if (authToken != null) {
             FirebaseToken firebaseToken = null;
+
 
             try {
                 firebaseToken = firebaseAuth.verifyIdToken(authToken);

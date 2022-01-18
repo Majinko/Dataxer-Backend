@@ -50,9 +50,8 @@ public class UserServiceImpl implements UserService {
     private SalaryMapper salaryMapper;
     @Autowired
     private RoleMapper roleMapper;
-
     @Autowired
-    MailAccountsServiceImpl mailAccountsService;
+    private MailAccountsServiceImpl mailAccountsService;
 
 
     @Override
@@ -198,6 +197,23 @@ public class UserServiceImpl implements UserService {
         userRepository.save(appUser);
 
         return appUser;
+    }
+
+    @Override
+    public void resetToken(String uid) {
+        try {
+            FirebaseAuth.getInstance().revokeRefreshTokens(uid);
+
+            FirebaseAuth.getInstance().getUser(uid);
+
+            UserRecord userRecord = FirebaseAuth.getInstance().getUser(uid);
+
+
+
+            long revocationSecond = userRecord.getTokensValidAfterTimestamp() / 1000;
+        } catch (FirebaseAuthException e) {
+            String test = "test";
+        }
     }
 
     @Override

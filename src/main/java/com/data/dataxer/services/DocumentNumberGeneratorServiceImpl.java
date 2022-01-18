@@ -127,11 +127,16 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     private String getNextNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type, LocalDate currentDate) {
         String lastNumber = "0";
         switch (type) {
-            case INVOICE:
             case PROFORMA:
+                Invoice proforma = this.qInvoiceRepository.getLastInvoice(type, documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
+                if (proforma != null) {
+                    lastNumber = proforma.getNumber();
+                }
+                break;
+            case INVOICE:
             case SUMMARY_INVOICE:
             case TAX_DOCUMENT:
-                Invoice invoice = this.qInvoiceRepository.getLastInvoice(type, documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
+                Invoice invoice = this.qInvoiceRepository.getLastInvoice(documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
                 if (invoice != null) {
                     lastNumber = invoice.getNumber();
                 }

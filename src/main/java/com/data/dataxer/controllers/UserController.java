@@ -41,6 +41,11 @@ public class UserController {
         return ResponseEntity.ok(userMapper.appUserToAppUserDTOs(this.userService.all()));
     }
 
+    @GetMapping("/resetToken/{uid}")
+    public void resetToken(@PathVariable String uid) {
+        userService.resetToken(uid);
+    }
+
     @GetMapping("/{uid}")
     public ResponseEntity<AppUserDTO> getByUid(@PathVariable String uid) {
         return ResponseEntity.ok(userMapper.appUserToAppUserDTO(this.userService.getByUid(uid)));
