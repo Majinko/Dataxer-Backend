@@ -100,7 +100,7 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
                 .where(qDocumentNumberGenerator.company.id.eq(companyId))
                 .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId));
 
-        if (documentType.equals(DocumentType.PROFORMA)) {
+        if (documentType.equals(DocumentType.PROFORMA) || documentType.equals(DocumentType.PRICE_OFFER)) {
             query.where(qDocumentNumberGenerator.type.eq(documentType));
         } else {
             // ak sa jedna o fakturu, danovy doklad, alebo vyuctovaciu fakturu pouzivam ciselnik na generovanie faktur
