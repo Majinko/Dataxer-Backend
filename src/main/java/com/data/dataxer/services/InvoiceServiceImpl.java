@@ -89,6 +89,9 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
     @Override
     public void update(Invoice invoice) {
+        this.invoiceRepository.save((Invoice) this.cleanDocumentPacksBeforeUpdate(this.qInvoiceRepository.getById(invoice.getId(), SecurityUtils.defaultProfileId())
+                .orElseThrow(() -> new RuntimeException("Invoice not found"))));
+
         Invoice invoiceUpdated = (Invoice) this.setDocumentPackAndItems(invoice);
 
         if (!invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT)) {

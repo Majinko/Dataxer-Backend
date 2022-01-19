@@ -30,8 +30,10 @@ public class PriceOfferServiceImpl extends DocumentHelperService implements Pric
     }
 
     @Override
-    @Transactional
     public void update(PriceOffer priceOffer) {
+        this.priceOfferRepository.save((PriceOffer) this.cleanDocumentPacksBeforeUpdate(this.qPriceOfferRepository.getById(priceOffer.getId(), SecurityUtils.defaultProfileId())
+                .orElseThrow(() -> new RuntimeException("PriceOffer not found"))));
+
         PriceOffer p = (PriceOffer) this.setDocumentPackAndItems(priceOffer);
 
         p.setCompany(priceOffer.getCompany());
