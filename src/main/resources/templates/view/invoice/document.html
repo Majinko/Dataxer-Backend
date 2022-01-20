@@ -83,7 +83,7 @@
                     <td class="text-right"
                         th:text="${#numbers.formatDecimal(pack.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
                     <td class="text-center white-space-nowrap"
-                        th:text="${pack.getTax() != null} ? ${pack.getTax()} + ' %' : ''"></td>
+                        th:text="${pack.getTax() != null && pack.getCustomPrice() == true} ? ${pack.getTax()} + ' %' : ''"></td>
                     <td class="text-right"
                         th:text="${#numbers.formatDecimal(pack.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
                     <td class="text-right"
