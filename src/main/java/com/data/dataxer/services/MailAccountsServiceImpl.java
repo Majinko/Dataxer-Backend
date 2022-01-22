@@ -20,14 +20,12 @@ import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.activation.FileDataSource;
 import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,50 +107,14 @@ public class MailAccountsServiceImpl implements MailAccountsService {
         }
     }
 
-    @Override
-    public void sendEmail(String emailSubject, String emailContent, List<String> emails) {
-        try {
-            JavaMailSenderImpl mailSender = this.getMailSenderByCompanyId(SecurityUtils.defaultProfileId());
-
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
-
-            helper.setFrom(mailSender.getUsername());
-            helper.setSubject(emailSubject);
-            helper.setText(emailContent, true);
-
-            for (String email : emails) {
-                helper.setTo(email);
-                mailSender.send(mimeMessage);
-            }
-        } catch (MessagingException e) {
-            throw new RuntimeException("Sending email failed. Reason: " + e.getMessage());
-        }
-    }
 
     @Override
     public void sendEmail(EmailMessage emailMessage, List<String> emails) {
-        try {
-            JavaMailSenderImpl mailSender = this.getMailSenderByCompanyId(SecurityUtils.defaultProfileId());
-
-            MimeMessage mimeMessage = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false);
-
-            helper.setFrom(mailSender.getUsername());
-            helper.setSubject(emailMessage.getSubject());
-            helper.setText(emailMessage.getBody(), true);
-
-            for (String email : emails) {
-                helper.setTo(email);
-                mailSender.send(mimeMessage);
-            }
-        } catch (MessagingException e) {
-            throw new RuntimeException("Sending email failed. Reason: " + e.getMessage());
-        }
+        this.sendEmailWithAttachments(emailMessage.getSubject(), emailMessage.getBody(), new ArrayList<>(), emails, null, null, null);
     }
 
     @Override
-    public void sendEmailWithAttachments(String subject, String content, List<Long> recipientIds, Long templateId, List<String> fileNames, Long companyId) {
+    public void sendEmailWithAttachments(String subject, String content, List<Long> recipientIds, List<String> recipientEmails, Long templateId, List<String> fileNames, Long companyId) {
         companyId = companyId != null ? companyId : SecurityUtils.defaultProfileId();
 
         MailAccounts mailAccounts = this.getByCompanyId(companyId);
@@ -168,17 +130,17 @@ public class MailAccountsServiceImpl implements MailAccountsService {
         String username = mailAccounts != null ? mailAccounts.getUserName() : environment.getProperty("spring.mail.username");
         String password = mailAccounts != null ? mailAccounts.getPassword() : environment.getProperty("spring.mail.password");
 
-        Email email = createEmail(username, subject, content, recipientIds, fileNames);
+        Email email = createEmail(username, subject, content, recipientIds, recipientEmails, fileNames);
 
         MailerBuilder.withSMTPServer(host, port, username, password)
                 .buildMailer()
                 .sendMail(email);
     }
 
-    private Email createEmail(String from, String subject, String body, List<Long> recipientIds, List<String> fileNames) {
+    private Email createEmail(String from, String subject, String body, List<Long> recipientIds, List<String> recipientEmails, List<String> fileNames) {
         return EmailBuilder.startingBlank()
                 .from(from)
-                .to(this.makeRecipients(recipientIds))
+                .to(this.makeRecipients(recipientIds, recipientEmails))
                 .withSubject(subject)
                 .withHTMLText(body)
                 .withEmbeddedImageAutoResolutionForFiles(true)
@@ -209,24 +171,29 @@ public class MailAccountsServiceImpl implements MailAccountsService {
         return attachments;
     }
 
-    private List<Recipient> makeRecipients(List<Long> recipientIds) {
+    private List<Recipient> makeRecipients(List<Long> recipientIds, List<String> recipientEmails) {
         List<Recipient> recipients = new ArrayList<>();
 
-        List<Contact> participants = this.contactService.getContactByIds(recipientIds);
+        if (recipientIds != null && !recipientIds.isEmpty()) {
+            List<Contact> participants = this.contactService.getContactByIds(recipientIds);
 
-        participants.forEach(participant -> {
-            if (EmailAddressValidator.isValid(participant.getEmail(), EmailAddressCriteria.RFC_COMPLIANT)) {
-                Recipient recipient = new Recipient(participant.getName(), participant.getEmail(), Message.RecipientType.TO);
+            participants.forEach(participant -> {
+                if (EmailAddressValidator.isValid(participant.getEmail(), EmailAddressCriteria.RFC_COMPLIANT)) {
+                    Recipient recipient = new Recipient(participant.getName(), participant.getEmail(), Message.RecipientType.TO);
+                    recipients.add(recipient);
+                } else {
+                }
+            });
+        }
+
+        if (recipientEmails != null && !recipientEmails.isEmpty()) {
+            recipientEmails.forEach(recipientEmail -> {
+                Recipient recipient = new Recipient("", recipientEmail, Message.RecipientType.TO);
                 recipients.add(recipient);
-            }
-        });
+            });
+        }
 
         return recipients;
-    }
-
-    private JavaMailSenderImpl getMailSenderByCompanyId(Long companyId) {
-        MailAccounts mailAccounts = this.getByCompanyId(companyId);
-        return this.getMailSender(mailAccounts);
     }
 
     private MailAccounts getByCompanyId(Long companyId) {
