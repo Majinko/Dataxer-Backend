@@ -23,4 +23,6 @@ public interface QContactRepository {
     List<Contact> allHasPriceOffer(Long appProfileId);
 
     List<Contact> allHasProject(Long appProfileId);
+
+    List<Contact> allHasPriceOfferCostInvoice(Long defaultProfileId);
 }

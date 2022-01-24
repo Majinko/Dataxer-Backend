@@ -67,6 +67,11 @@ public class ContactController {
         return ResponseEntity.ok(contactMapper.toContactDTOs(this.contactService.allHasCost()));
     }
 
+    @GetMapping("/allHasPriceOfferCostInvoice")
+    public ResponseEntity<List<ContactDTO>> allHasPriceOfferCostInvoice() {
+        return ResponseEntity.ok(contactMapper.toContactDTOs(this.contactService.allHasPriceOfferCostInvoice()));
+    }
+
     @GetMapping("/allHasInvoice")
     public ResponseEntity<List<ContactDTO>> allHasInvoice() {
         return ResponseEntity.ok(contactMapper.toContactDTOs(this.contactService.allHasInvoice()));

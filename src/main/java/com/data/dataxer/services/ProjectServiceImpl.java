@@ -275,6 +275,11 @@ public class ProjectServiceImpl implements ProjectService {
         return this.qProjectRepository.allHasUserTime(SecurityUtils.uid(), SecurityUtils.defaultProfileId());
     }
 
+    @Override
+    public List<Project> allHasPriceOfferCostInvoice() {
+        return this.qProjectRepository.allHasPriceOfferCostInvoice(SecurityUtils.defaultProfileId());
+    }
+
     private BigDecimal getUserCostToHour(Integer startYear, Integer endYear, String userUid, BigDecimal projectTotalCost) {
         int userTimeBetweenYears = this.qTimeRepository.getUserProjectTimeBetweenYears(startYear, endYear, userUid, SecurityUtils.defaultProfileId());
         int userActiveMonths = this.qTimeRepository.getUserActiveMonths(startYear, endYear, userUid, SecurityUtils.defaultProfileId()).size();

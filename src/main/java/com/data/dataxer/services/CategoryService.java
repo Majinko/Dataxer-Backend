@@ -22,4 +22,6 @@ public interface CategoryService {
     List<Category> allByGroupFromParent(String group);
 
     List<Category> allByGroups(List<String> asList);
+
+    List<Category> allUserCategoryByTime(String uid);
 }

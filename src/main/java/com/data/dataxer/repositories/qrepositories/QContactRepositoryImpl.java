@@ -20,9 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
@@ -129,6 +127,37 @@ public class QContactRepositoryImpl implements QContactRepository {
                 .where(QContact.contact.appProfile.id.eq(appProfileId))
                 .where(QContact.contact.id.in(JPAExpressions.select(QProject.project.contact.id).from(QProject.project).fetchAll()))
                 .fetch();
+    }
+
+    @Override
+    public List<Contact> allHasPriceOfferCostInvoice(Long appProfileId) {
+        return query.selectFrom(QContact.contact)
+                .where(QContact.contact.appProfile.id.eq(appProfileId))
+                .where(
+                        QContact.contact.id.in(this.contactIdsInDocuments(appProfileId))
+                )
+                .fetch();
+    }
+
+    private List<Long> contactIdsInDocuments(Long appProfileId) {
+        Set<Long> contactIds = new HashSet<Long>();
+
+        // add all price offer contact
+        contactIds.addAll(
+                this.query.select(QPriceOffer.priceOffer.contact.id).from(QPriceOffer.priceOffer).where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId)).fetch()
+        );
+
+        // add all invoice contact
+        contactIds.addAll(
+                this.query.select(QInvoice.invoice.contact.id).from(QInvoice.invoice).where(QInvoice.invoice.appProfile.id.eq(appProfileId)).fetch()
+        );
+
+        // cost all invoice contact
+        contactIds.addAll(
+                this.query.select(QCost.cost.contact.id).from(QCost.cost).where(QCost.cost.appProfile.id.eq(appProfileId)).fetch()
+        );
+
+        return new ArrayList<>(contactIds);
     }
 
     private long getTotalCount(Predicate predicate, Long appProfileId) {

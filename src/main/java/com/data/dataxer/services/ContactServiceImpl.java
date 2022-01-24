@@ -83,4 +83,9 @@ public class ContactServiceImpl implements ContactService {
     public List<Contact> allHasProject() {
         return this.qContactRepository.allHasProject(SecurityUtils.defaultProfileId());
     }
+
+    @Override
+    public List<Contact> allHasPriceOfferCostInvoice() {
+        return this.qContactRepository.allHasPriceOfferCostInvoice(SecurityUtils.defaultProfileId());
+    }
 }

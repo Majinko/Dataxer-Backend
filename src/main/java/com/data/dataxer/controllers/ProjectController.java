@@ -101,6 +101,11 @@ public class ProjectController {
         return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasPriceOffer()));
     }
 
+    @GetMapping("/allHasPriceOfferCostInvoice")
+    public ResponseEntity<List<ProjectDTO>> allHasPriceOfferCostInvoice() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasPriceOfferCostInvoice()));
+    }
+
     @GetMapping("/allHasUserTime")
     public ResponseEntity<List<ProjectDTO>> allHasUserTime() {
         return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasUserTime()));

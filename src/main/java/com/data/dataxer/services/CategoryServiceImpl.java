@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.Category;
 import com.data.dataxer.models.enums.CategoryGroup;
 import com.data.dataxer.models.enums.CategoryType;
 import com.data.dataxer.repositories.CategoryRepository;
+import com.data.dataxer.repositories.qrepositories.QCategoryRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,9 @@ import java.util.Set;
 public class CategoryServiceImpl implements CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
+
+    @Autowired
+    private QCategoryRepository qCategoryRepository;
 
     @Override
     public List<Category> all() {
@@ -75,6 +79,11 @@ public class CategoryServiceImpl implements CategoryService {
         });
 
         return this.categoryRepository.findAllByCategoryGroupInAndAppProfileIdOrderByPosition(categoryGroups, SecurityUtils.defaultProfileId());
+    }
+
+    @Override
+    public List<Category> allUserCategoryByTime(String uid) {
+        return this.qCategoryRepository.allUserCategoryByTime(uid, SecurityUtils.defaultProfileId());
     }
 
     @Override

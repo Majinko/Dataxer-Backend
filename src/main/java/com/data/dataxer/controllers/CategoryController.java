@@ -28,6 +28,13 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toCategoryDTOs(categoryService.all()));
     }
 
+    @GetMapping("/allUserCategoryByTime")
+    public ResponseEntity<List<CategoryDTO>> allUserCategoryByTime(
+            @RequestParam(value = "uid") String uid
+    ) {
+        return ResponseEntity.ok(categoryMapper.toCategoryDTOs(this.categoryService.allUserCategoryByTime(uid)));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<CategoryDTO> finById(@PathVariable Long id) {
         return ResponseEntity.ok(this.categoryMapper.toCategoryDTO(this.categoryService.findById(id)));

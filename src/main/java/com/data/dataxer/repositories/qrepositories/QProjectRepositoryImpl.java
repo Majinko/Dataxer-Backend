@@ -20,8 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.vineey.rql.filter.FilterContext.withBuilderAndParam;
 
@@ -140,6 +139,43 @@ public class QProjectRepositoryImpl implements QProjectRepository {
                 .fetch();
     }
 
+    @Override
+    public List<Project> allHasPriceOfferCostInvoice(Long appProfileId) {
+        return query.selectFrom(QProject.project)
+                .where(QProject.project.appProfile.id.eq(appProfileId))
+                .where(QProject.project.id.in(this.projectIdsInDocument(appProfileId)))
+                .fetch();
+    }
+
+    private List<Long> projectIdsInDocument(Long appProfileId) {
+        Set<Long> projectIds = new HashSet<Long>();
+
+        // add all price offer contact
+        projectIds.addAll(
+                this.query.select(QPriceOffer.priceOffer.project.id)
+                        .from(QPriceOffer.priceOffer)
+                        .where(QPriceOffer.priceOffer.project.id.isNotNull())
+                        .where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId)).fetch()
+        );
+
+        // add all invoice contact
+        projectIds.addAll(
+                this.query.select(QInvoice.invoice.project.id)
+                        .from(QInvoice.invoice)
+                        .where(QInvoice.invoice.project.id.isNotNull())
+                        .where(QInvoice.invoice.appProfile.id.eq(appProfileId)).fetch()
+        );
+
+        // cost all invoice contact
+        projectIds.addAll(
+                this.query.select(QCost.cost.project.id)
+                        .from(QCost.cost)
+                        .where(QCost.cost.project.id.isNotNull())
+                        .where(QCost.cost.appProfile.id.eq(appProfileId)).fetch()
+        );
+
+        return new ArrayList<>(projectIds);
+    }
 
     private long getTotalCount(Predicate predicate) {
         QProject qProject = QProject.project;

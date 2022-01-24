@@ -217,7 +217,6 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         BeanUtils.copyProperties(originalInvoice, duplicatedInvoice, "id", "packs");
         duplicatedInvoice.setPacks(this.duplicateDocumentPacks(originalInvoice.getPacks()));
         this.setDocumentPackAndItems(duplicatedInvoice);
-        //this.invoiceRepository.save(duplicatedInvoice);
         return duplicatedInvoice;
     }
 
@@ -356,7 +355,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
         taxDocumentPack.setTax(tax);
         taxDocumentPack.setPrice(price);
-        taxDocumentPack.setTotalPrice(price.multiply(new BigDecimal(1.0 + ((double)tax/100))).setScale(2, RoundingMode.HALF_UP));
+        taxDocumentPack.setTotalPrice(price.multiply(new BigDecimal(1.0 + ((double) tax / 100))).setScale(2, RoundingMode.HALF_UP));
         taxDocumentPack.setTitle("Daňový doklad k prijatej platbe");
         taxDocumentPack.setShowItems(true);
 
@@ -389,7 +388,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         documentPackItem.setDiscount(BigDecimal.valueOf(0));
         documentPackItem.setTax(tax);
         documentPackItem.setPrice(price);
-        documentPackItem.setTotalPrice(price.multiply(new BigDecimal(1.0 + ((double)tax/100))).setScale(2, RoundingMode.HALF_UP));
+        documentPackItem.setTotalPrice(price.multiply(new BigDecimal(1.0 + ((double) tax / 100))).setScale(2, RoundingMode.HALF_UP));
 
         return documentPackItem;
     }

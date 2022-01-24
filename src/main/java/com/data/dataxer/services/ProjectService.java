@@ -55,4 +55,6 @@ public interface ProjectService {
     List<Project> allHasPriceOffer();
 
     List<Project> allHasUserTime();
+
+    List<Project> allHasPriceOfferCostInvoice();
 }

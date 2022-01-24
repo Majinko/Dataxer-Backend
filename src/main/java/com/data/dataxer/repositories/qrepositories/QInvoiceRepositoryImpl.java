@@ -120,7 +120,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(QInvoice.invoice.company.id.eq(companyId))
                 .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .where(QInvoice.invoice.documentType.eq(type))
-                .orderBy(QInvoice.invoice.createdDate.desc())
+                .orderBy(QInvoice.invoice.createdAt.desc())
                 .limit(1l)
                 .fetchOne();
     }

@@ -30,4 +30,6 @@ public interface ContactService {
     List<Contact> allHasPriceOffer();
 
     List<Contact> allHasProject();
+
+    List<Contact> allHasPriceOfferCostInvoice();
 }
