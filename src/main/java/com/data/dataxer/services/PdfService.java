@@ -82,12 +82,14 @@ public class PdfService {
     private Context getInvoiceContext(Invoice invoice) {
         Context context = getBasicContext(invoice);
 
+        LinkedHashMap<Integer, BigDecimal> payedValue = Helpers.sortHashmapAndSubtractDiscount(invoiceService.getInvoicePayedTaxesValuesMap(invoice.getPacks()), BigDecimal.ZERO);
+
         context.setVariable("headerComment", invoice.getHeaderComment());
         context.setVariable("paymentMethod", invoice.getPaymentMethod());
         context.setVariable("variableSymbol", invoice.getVariableSymbol());
         context.setVariable("subject", invoice.getSubject() == null || Objects.equals(invoice.getSubject(), "") ? (invoice.getProject() != null ? invoice.getProject().getTitle() : "") : invoice.getSubject());
         context.setVariable("document", invoice);
-        context.setVariable("payedValue", invoiceService.getInvoicePayedTaxesValuesMap(invoice.getPacks()));
+        context.setVariable("payedValue", payedValue);
         context.setVariable("payedTaxValue", invoiceService.getTaxPayedTaxesValuesMap(invoice.getPacks()));
 
         if (invoice.getDocumentType() == DocumentType.TAX_DOCUMENT) {
