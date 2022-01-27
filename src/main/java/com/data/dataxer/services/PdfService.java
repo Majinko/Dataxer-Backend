@@ -52,7 +52,7 @@ public class PdfService {
             Invoice invoice = this.invoiceService.getById(id);
             company = this.companyService.findById(invoice.getCompany().getId());
             context = getInvoiceContext(invoice);
-            html = loadAndFillTemplate(context, company.getCompanyTaxType());
+            html = loadAndFillTemplate(context, company.getCompanyTaxType()); // todo malo by sa prat z documentData kde je ulozena spolocnost a pri nej tax type lebo sa to moze casom menit
             return renderPdf(html, invoice);
         } else {
             PriceOffer priceOffer = this.priceOfferService.getById(id);

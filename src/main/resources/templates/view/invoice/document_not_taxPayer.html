@@ -38,9 +38,7 @@
                 <p>
                     <span th:text="${document.getCreatedDate() != null } ? 'Dátum vystavenia: ' + ${#temporals.format(document.createdDate, 'dd.MM.yyyy')} : 'Dátum vystavenia: '"></span>
                     <br></br>
-                    <span th:if="${type == 'I'}" th:text="${document.getDeliveredDate() != null} ? 'Dátum dodania: ' + ${#temporals.format(document.getDeliveredDate(), 'dd.MM.yyyy')} : 'Dátum dodania: '"></span>
-                    <span th:if="${type == 'P'}" th:text="${document.getDueDate() != null} ? 'Platné do: ' + ${#temporals.format(document.getDueDate(), 'dd.MM.yyyy')} : 'Platné do: '"></span>
-                    <br></br>
+                    <span th:text="${document.getDeliveredDate() != null} ? 'Dátum dodania: ' + ${#temporals.format(document.getDeliveredDate(), 'dd.MM.yyyy')} : 'Dátum dodania: '"></span>
                 </p>
 
                 <p style="font-weight: bold; margin-top: 20px;" th:text="'Odberateľ:'"></p>
@@ -88,9 +86,9 @@
                         <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}" th:text="''"></td>
                         <td class="text-center" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getUnit()}"></td>
                         <td class="text-center" th:if="${pack.getCustomPrice() == true}" th:text="''"></td>
-                        <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null} ? ${#numbers.formatDecimal(packItem.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
+                        <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getPrice() != null} ? ${#numbers.formatDecimal(packItem.getPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
                         <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getTotalPrice() == null}" th:text="''"></td>
-                        <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null and packItem.getDiscount() != null} ? ${#numbers.formatDecimal(packItem.countItemPriceWithTax(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
+                        <td class="text-right" th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}" th:text="${packItem.getTotalPrice() != null and packItem.getDiscount() != null} ? ${#numbers.formatDecimal(packItem.getTotalPrice(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;' : ''"></td>
                         <td class="text-right" th:if="${pack.getCustomPrice() == true || packItem.getTotalPrice() == null}" th:text="''"></td>
                     </tr>
 

@@ -68,6 +68,6 @@ public class PriceOfferController {
 
     @GetMapping("/duplicate/{oldPriceOfferId}")
     public ResponseEntity<PriceOfferDTO> duplicate(@PathVariable Long oldPriceOfferId) {
-        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTO(this.priceOfferService.duplicate(oldPriceOfferId)));
+        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTOWithCompany(this.priceOfferService.duplicate(oldPriceOfferId)));
     }
 }
