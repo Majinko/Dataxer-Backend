@@ -138,7 +138,6 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             case SUMMARY_INVOICE:
             case TAX_DOCUMENT:
                 Invoice invoice;
-
                 // todo dorobit neberie sa vobec ohlad na to aky je typ periody
                 if (documentNumberGenerator.getPeriod().equals(Periods.MONTHLY)) {
                     invoice = this.qInvoiceRepository.getLastInvoiceByMonthAndYear(LocalDate.now(), documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
