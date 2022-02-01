@@ -116,6 +116,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type) {
         LocalDate currentDate = LocalDate.now();
         String generatedNumber = this.replaceYear(documentNumberGenerator.getFormat(), currentDate);
+
         generatedNumber = this.replaceMonth(generatedNumber, currentDate);
         generatedNumber = this.replaceQuarter(generatedNumber, currentDate);
         generatedNumber = this.replaceHalfYear(generatedNumber, currentDate);
@@ -136,7 +137,14 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             case INVOICE:
             case SUMMARY_INVOICE:
             case TAX_DOCUMENT:
-                Invoice invoice = this.qInvoiceRepository.getLastInvoice(documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
+                Invoice invoice;
+
+                // todo dorobit neberie sa vobec ohlad na to aky je typ periody
+                if (documentNumberGenerator.getPeriod().equals(Periods.MONTHLY)) {
+                    invoice = this.qInvoiceRepository.getLastInvoiceByMonthAndYear(LocalDate.now(), documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
+                } else {
+                    invoice = this.qInvoiceRepository.getLastInvoice(documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
+                }
                 if (invoice != null) {
                     lastNumber = invoice.getNumber();
                 }

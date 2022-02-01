@@ -5,6 +5,7 @@ import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,4 +23,6 @@ public interface QInvoiceRepository {
     Invoice getLastInvoice(DocumentType type, Long companyId, Long appProfileId);
 
     Invoice getLastInvoice(Long companyId, Long appProfileId);
+
+    Invoice getLastInvoiceByMonthAndYear(LocalDate localDate, Long companyId, Long appProfileId);
 }

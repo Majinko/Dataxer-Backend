@@ -22,10 +22,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.time.LocalDate;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -131,6 +129,19 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(QInvoice.invoice.company.id.eq(companyId))
                 .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .where(QInvoice.invoice.documentType.notIn(DocumentType.PROFORMA))
+                .orderBy(QInvoice.invoice.createdDate.desc())
+                .limit(1l)
+                .fetchOne();
+    }
+
+    @Override
+    public Invoice getLastInvoiceByMonthAndYear(LocalDate localDate, Long companyId, Long appProfileId) {
+        return this.query.selectFrom(QInvoice.invoice)
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
+                .where(QInvoice.invoice.documentType.notIn(DocumentType.PROFORMA))
+                .where(QInvoice.invoice.createdDate.month().eq(localDate.getMonthValue()))
+                .where(QInvoice.invoice.createdDate.year().eq(localDate.getYear()))
                 .orderBy(QInvoice.invoice.createdDate.desc())
                 .limit(1l)
                 .fetchOne();

@@ -147,6 +147,7 @@ public class QProjectRepositoryImpl implements QProjectRepository {
                 .fetch();
     }
 
+    // spravit krajsie
     private List<Long> projectIdsInDocument(Long appProfileId) {
         Set<Long> projectIds = new HashSet<Long>();
 

@@ -15,10 +15,10 @@
             <div >
                 <p style="font-weight: bold; margin-top: 41px" th:text="'Dodávateľ:' "></p>
                 <p>
-                    <span th:text="${firm.get('name')}"></span><br></br>
-                    <span th:text="${firm.get('street')}"></span><br></br>
-                    <span th:text="${firm.get('postalCode')} + ' '+ ${firm.get('city')}"></span><br></br>
-                    <span th:text="${firm.get('country')}"></span><br></br>
+                    <span th:if="${firm.get('name') != null}" th:text="${firm.get('name')}"></span><br></br>
+                    <span th:if="${firm.get('street') != null}" th:text="${firm.get('street')}"></span><br></br>
+                    <span th:text="${firm.get('postalCode') != null ? firm.get('postalCode') : ''} + ' ' + ${firm.get('city') != null ? firm.get('city') : ''}"></span><br></br>
+                    <span th:if="${firm.get('country') != null}" th:text="${firm.get('country')}"></span><br></br>
                 </p>
                 <p>
                     <span th:if="${firm.get('cin') != null}" th:text="'IČO:  ' + ${firm.get('cin')}"></span><br></br>
@@ -43,13 +43,15 @@
 
                 <p style="font-weight: bold; margin-top: 20px;" th:text="'Odberateľ:'"></p>
                 <p>
-                    <span th:text="${contact != null } ? ${document.contact.getName()} : ''"></span><br></br>
-                    <span th:text="${contact != null } ? ${document.contact.getStreet()} : ''"></span><br></br>
-                    <span th:text="${contact != null } ? ${document.contact.getPostalCode()} + ' ' + ${document.contact.getCity()} : ''"></span><br></br>
-                    <span th:text="${contact != null } ? ${document.contact.getCountry()} : ''"></span><br></br>
-                    <span th:text="${contact != null } ? (${document.contact.getCin()} ? 'IČO: ' + ${document.contact.getCin()} : '') : ''"></span><br></br>
-                    <span th:text="${contact != null } ? (${document.contact.getTin()} ? 'DIČ: ' + ${document.contact.getTin()} : '') : ''"></span><br></br>
-                    <span th:text="${contact != null } ? (${document.contact.getVatin()} ? 'IČ DPH: ' + ${document.contact.getVatin()} : '') : ''"></span><br></br>
+                    <span th:text="${document.contact != null && document.contact.getName() != null} ? ${document.contact.getName()} : ''"></span><br></br>
+                    <span th:text="${document.contact != null && document.contact.getStreet() != null} ? ${document.contact.getStreet()} : ''"></span><br></br>
+                    <span th:text="${document.contact != null} ? (${document.contact.getPostalCode() != null ? document.contact.getPostalCode() : ''} + ' ' + ${document.contact.getCity() != null ? document.contact.getCity() : ''}) : ''"></span><br></br>
+                    <span th:text="${document.contact != null && document.contact.getCountry() != null} ? ${document.contact.getCountry()} : ''"></span><br></br>
+                </p>
+                <p>
+                    <span th:text="${document.contact != null } ? (${document.contact.getCin()} ? 'IČO: ' + ${document.contact.getCin()} : '') : ''"></span><br></br>
+                    <span th:text="${document.contact != null } ? (${document.contact.getTin()} ? 'DIČ: ' + ${document.contact.getTin()} : '') : ''"></span><br></br>
+                    <span th:text="${document.contact != null } ? (${document.contact.getVatin()} ? 'IČ DPH: ' + ${document.contact.getVatin()} : '') : ''"></span><br></br>
                 </p>
             </div>
         </div>
