@@ -82,14 +82,14 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     }
 
     @Override
-    public String generateNextNumberByDocumentType(DocumentType documentType, Long companyId) {
+    public String generateNextNumberByDocumentType(DocumentType documentType, LocalDate date, Long companyId) {
         DocumentNumberGenerator documentNumberGenerator = this.qDocumentNumberGeneratorRepository.getDefaultByDocumentType(documentType, companyId, SecurityUtils.defaultProfileId());
 
         if (documentNumberGenerator == null) {
             documentNumberGenerator = this.documentNumberGeneratorRepository.save(this.returnDefault(documentType, companyId));
         }
 
-        return this.generateNextDocumentNumber(documentNumberGenerator, documentType);
+        return this.generateNextDocumentNumber(documentNumberGenerator, date, documentType);
     }
 
 
@@ -105,7 +105,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     @Override
     public String getNextNumber(DocumentNumberGenerator documentNumberGenerator) {
-        return this.generateNextDocumentNumber(documentNumberGenerator, documentNumberGenerator.getType());
+        return this.generateNextDocumentNumber(documentNumberGenerator, LocalDate.now(), documentNumberGenerator.getType());
     }
 
     @Override
@@ -113,16 +113,15 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return this.documentNumberGeneratorRepository.findAllByAppProfileId(SecurityUtils.defaultProfileId());
     }
 
-    private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type) {
-        LocalDate currentDate = LocalDate.now();
-        String generatedNumber = this.replaceYear(documentNumberGenerator.getFormat(), currentDate);
+    private String generateNextDocumentNumber(DocumentNumberGenerator documentNumberGenerator, LocalDate date, DocumentType type) {
+        String generatedNumber = this.replaceYear(documentNumberGenerator.getFormat(), date);
 
-        generatedNumber = this.replaceMonth(generatedNumber, currentDate);
-        generatedNumber = this.replaceQuarter(generatedNumber, currentDate);
-        generatedNumber = this.replaceHalfYear(generatedNumber, currentDate);
-        generatedNumber = this.replaceDay(generatedNumber, currentDate);
+        generatedNumber = this.replaceMonth(generatedNumber, date);
+        generatedNumber = this.replaceQuarter(generatedNumber, date);
+        generatedNumber = this.replaceHalfYear(generatedNumber, date);
+        generatedNumber = this.replaceDay(generatedNumber, date);
 
-        return this.replaceNumber(generatedNumber, getNextNumber(documentNumberGenerator, type, currentDate));
+        return this.replaceNumber(generatedNumber, getNextNumber(documentNumberGenerator, type, date));
     }
 
     private String getNextNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type, LocalDate dateToGenerate) {

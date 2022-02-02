@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,9 +59,13 @@ public class DocumentNumberGeneratorController {
     @GetMapping("/generateNextByType/{documentType}")
     public ResponseEntity<String> generateNextNumberByDocumentType(
             @PathVariable DocumentType documentType,
-            @RequestParam(value = "companyId", required = true) Long companyId
-    ) {
-        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, companyId));
+            @RequestParam(value = "companyId", required = true) Long companyId,
+            @RequestParam(value = "generationDate", required = false) LocalDate generationDate
+            ) {
+        if (generationDate == null) {
+            generationDate = LocalDate.now();
+        }
+        return ResponseEntity.ok(this.documentNumberGeneratorService.generateNextNumberByDocumentType(documentType, generationDate, companyId));
     }
 
     @GetMapping("/all")

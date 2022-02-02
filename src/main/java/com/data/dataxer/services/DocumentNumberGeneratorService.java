@@ -5,6 +5,7 @@ import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface DocumentNumberGeneratorService {
@@ -20,7 +21,7 @@ public interface DocumentNumberGeneratorService {
 
     void destroy(Long id);
 
-    String generateNextNumberByDocumentType(DocumentType documentType, Long companyId);
+    String generateNextNumberByDocumentType(DocumentType documentType, LocalDate date, Long companyId);
 
     String getNextNumber(DocumentNumberGenerator documentNumberGenerator);
 
