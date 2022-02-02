@@ -23,6 +23,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -113,35 +114,58 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
     }
 
     @Override
-    public Invoice getLastInvoice(DocumentType type, Long companyId, Long appProfileId) {
+    public Invoice getLastInvoiceByDayAndMonthAndYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId) {
         return this.query.selectFrom(QInvoice.invoice)
                 .where(QInvoice.invoice.company.id.eq(companyId))
                 .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
-                .where(QInvoice.invoice.documentType.eq(type))
-                .orderBy(QInvoice.invoice.createdAt.desc())
-                .limit(1l)
-                .fetchOne();
-    }
-
-    @Override
-    public Invoice getLastInvoice(Long companyId, Long appProfileId) {
-        return this.query.selectFrom(QInvoice.invoice)
-                .where(QInvoice.invoice.company.id.eq(companyId))
-                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
-                .where(QInvoice.invoice.documentType.notIn(DocumentType.PROFORMA))
+                .where(QInvoice.invoice.createdDate.dayOfMonth().eq(localDate.getDayOfMonth()))
+                .where(QInvoice.invoice.createdDate.month().eq(localDate.getMonthValue()))
+                .where(QInvoice.invoice.createdDate.year().eq(localDate.getYear()))
+                .where(QInvoice.invoice.documentType.in(types))
                 .orderBy(QInvoice.invoice.createdDate.desc())
                 .limit(1l)
                 .fetchOne();
     }
 
     @Override
-    public Invoice getLastInvoiceByMonthAndYear(LocalDate localDate, Long companyId, Long appProfileId) {
+    public Invoice getLastInvoiceByMonthAndYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId) {
         return this.query.selectFrom(QInvoice.invoice)
                 .where(QInvoice.invoice.company.id.eq(companyId))
                 .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
-                .where(QInvoice.invoice.documentType.notIn(DocumentType.PROFORMA))
                 .where(QInvoice.invoice.createdDate.month().eq(localDate.getMonthValue()))
                 .where(QInvoice.invoice.createdDate.year().eq(localDate.getYear()))
+                .where(QInvoice.invoice.documentType.in(types))
+                .orderBy(QInvoice.invoice.createdDate.desc())
+                .limit(1l)
+                .fetchOne();
+    }
+
+    @Override
+    public Invoice getLastInvoiceByQuarterAndYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId) {
+        return this.query.selectFrom(QInvoice.invoice)
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
+                .where(QInvoice.invoice.createdDate.month().divide(3.0).ceil().eq(localDate.get(IsoFields.QUARTER_OF_YEAR)))
+                .where(QInvoice.invoice.createdDate.year().eq(localDate.getYear()))
+                .where(QInvoice.invoice.documentType.in(types))
+                .orderBy(QInvoice.invoice.createdDate.desc())
+                .limit(1l)
+                .fetchOne();
+    }
+
+    @Override
+    public Invoice getLastInvoiceByHalfAndYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId) {
+        //to-do find the way for hal of year
+        return null;
+    }
+
+    @Override
+    public Invoice getLastInvoiceByYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId) {
+        return this.query.selectFrom(QInvoice.invoice)
+                .where(QInvoice.invoice.company.id.eq(companyId))
+                .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
+                .where(QInvoice.invoice.createdDate.year().eq(localDate.getYear()))
+                .where(QInvoice.invoice.documentType.in(types))
                 .orderBy(QInvoice.invoice.createdDate.desc())
                 .limit(1l)
                 .fetchOne();

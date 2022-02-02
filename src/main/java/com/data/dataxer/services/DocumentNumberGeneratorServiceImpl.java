@@ -125,44 +125,33 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return this.replaceNumber(generatedNumber, getNextNumber(documentNumberGenerator, type, currentDate));
     }
 
-    private String getNextNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type, LocalDate currentDate) {
+    private String getNextNumber(DocumentNumberGenerator documentNumberGenerator, DocumentType type, LocalDate dateToGenerate) {
         String lastNumber = "0";
         switch (type) {
             case PROFORMA:
-                Invoice proforma = this.qInvoiceRepository.getLastInvoice(type, documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
-                if (proforma != null) {
-                    lastNumber = proforma.getNumber();
-                }
-                break;
             case INVOICE:
             case SUMMARY_INVOICE:
             case TAX_DOCUMENT:
-                Invoice invoice;
-                // todo dorobit neberie sa vobec ohlad na to aky je typ periody
-                if (documentNumberGenerator.getPeriod().equals(Periods.MONTHLY)) {
-                    invoice = this.qInvoiceRepository.getLastInvoiceByMonthAndYear(LocalDate.now(), documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
-                } else {
-                    invoice = this.qInvoiceRepository.getLastInvoice(documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
-                }
+                Invoice invoice = this.loadLastInvoiceByPeriod(type, dateToGenerate, documentNumberGenerator.getPeriod(), documentNumberGenerator.getCompany().getId());
                 if (invoice != null) {
                     lastNumber = invoice.getNumber();
                 }
                 break;
             case COST:
-                Cost cost = this.qCostRepository.getLastCost(documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
+                Cost cost = this.loadLastCostByPeriod(dateToGenerate, documentNumberGenerator.getPeriod(), documentNumberGenerator.getCompany().getId());
                 if (cost != null) {
                     lastNumber = cost.getNumber();
                 }
                 break;
             case PRICE_OFFER:
             default:
-                PriceOffer priceOffer = this.qPriceOfferRepository.getLastPriceOffer(documentNumberGenerator.getCompany().getId(), SecurityUtils.defaultProfileId());
+                PriceOffer priceOffer = this.loadLastPriceOfferByPeriod(dateToGenerate, documentNumberGenerator.getPeriod(), documentNumberGenerator.getCompany().getId());
                 if (priceOffer != null) {
                     lastNumber = priceOffer.getNumber();
                 }
                 break;
         }
-        String nextNumber = this.getNextNumber(documentNumberGenerator.getFormat(), lastNumber, currentDate);
+        String nextNumber = this.getNextNumber(documentNumberGenerator.getFormat(), lastNumber, dateToGenerate);
 
         if (nextNumber.length() > StringUtils.countCharacters(documentNumberGenerator.getFormat(), 'N')) {
             documentNumberGenerator.setFormat(this.extendFormat(documentNumberGenerator.getFormat()));
@@ -172,7 +161,50 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
         return nextNumber;
     }
 
+    private Invoice loadLastInvoiceByPeriod(DocumentType type, LocalDate date, Periods period, Long companyId) {
+        List<DocumentType> typesToSearch;
+        if (type.equals(DocumentType.PROFORMA)) {
+            typesToSearch = List.of(type);
+        } else {
+            typesToSearch = List.of(DocumentType.INVOICE, DocumentType.SUMMARY_INVOICE, DocumentType.TAX_DOCUMENT);
+        }
+        switch (period) {
+            case DAILY: return this.qInvoiceRepository.getLastInvoiceByDayAndMonthAndYear(typesToSearch, date, companyId, SecurityUtils.defaultProfileId());
+            case MONTHLY: return this.qInvoiceRepository.getLastInvoiceByMonthAndYear(typesToSearch, date, companyId, SecurityUtils.defaultProfileId());
+            case QUARTER: return this.qInvoiceRepository.getLastInvoiceByQuarterAndYear(typesToSearch, date, companyId, SecurityUtils.defaultProfileId());
+            case HALF_YEAR:
+            case YEAR:
+            default: return this.qInvoiceRepository.getLastInvoiceByYear(typesToSearch, date, companyId, SecurityUtils.defaultProfileId());
+        }
+    }
+
+    private PriceOffer loadLastPriceOfferByPeriod(LocalDate date, Periods period, Long companyId) {
+        switch (period) {
+            case DAILY: return this.qPriceOfferRepository.getLastPriceOfferByDayAndMonthAndYear(date, companyId, SecurityUtils.defaultProfileId());
+            case MONTHLY: return this.qPriceOfferRepository.getLastPriceOfferByMonthAndYear(date, companyId, SecurityUtils.defaultProfileId());
+            case QUARTER: return this.qPriceOfferRepository.getLastPriceOfferByQuarterAndYear(date, companyId, SecurityUtils.defaultProfileId());
+            case HALF_YEAR:
+            case YEAR:
+            default: return this.qPriceOfferRepository.getLastPriceOfferByYear(date, companyId, SecurityUtils.defaultProfileId());
+        }
+    }
+
+    private Cost loadLastCostByPeriod(LocalDate date, Periods period, Long companyId) {
+        switch (period) {
+            case DAILY: return this.qCostRepository.getLastCostByDayAndMonthAndYear(date, companyId, SecurityUtils.defaultProfileId());
+            case MONTHLY: return this.qCostRepository.getLastCostByMonthAndYear(date, companyId, SecurityUtils.defaultProfileId());
+            case QUARTER: return this.qCostRepository.getLastCostByQuarterAndYear(date, companyId, SecurityUtils.defaultProfileId());
+            case HALF_YEAR:
+            case YEAR:
+            default: return this.qCostRepository.getLastCostOfferByYear(date, companyId, SecurityUtils.defaultProfileId());
+        }
+    }
+
     private String parseNumber(String format, String lastNumber) {
+        //check if number generator was changed
+        if (format.length() != lastNumber.length()) {
+            return "0";
+        }
         int countOfNumber = StringUtils.countCharacters(format, 'N');
         int firstPosition = format.indexOf('N');
 
@@ -228,9 +260,8 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             return "";
         }
 
-        if (hasResetNumber(format, lastNumber, currentDate)) {
-            lastNumber = "0";
-        } else {
+        //ak sme nacitali dokument potrebujeme cislo vyparsovat
+        if (!lastNumber.equals("0")) {
             lastNumber = parseNumber(format, lastNumber);
         }
 
@@ -239,24 +270,6 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             nextNumber = "0" + nextNumber;
         }
         return nextNumber;
-    }
-
-    private boolean hasResetNumber(String format, String lastNumber, LocalDate currentDate) {
-        int positionOfYear = format.indexOf('Y');
-        int countOfYear = StringUtils.countCharacters(format, 'Y');
-
-        //format neobsahuje rok alebo este nie je ziadne cislo a teda je uz resetovane
-        if (positionOfYear == -1 || lastNumber.equals("0")) {
-            return true;
-        }
-
-        String lastNumberYear = lastNumber.substring(positionOfYear, positionOfYear + countOfYear);
-
-        if (countOfYear == 2) {
-            return !lastNumberYear.equals(String.valueOf(currentDate.getYear()).substring(2));
-        } else {
-            return !lastNumberYear.equals(String.valueOf(currentDate.getYear()));
-        }
     }
 
     private String replaceNumber(String generatedNumber, String newNumber) {

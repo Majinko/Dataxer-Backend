@@ -20,9 +20,18 @@ public interface QInvoiceRepository {
 
     List<Invoice> getAllInvoicesIdInAndType(List<Long> ids, DocumentType type, Long appProfileId);
 
-    Invoice getLastInvoice(DocumentType type, Long companyId, Long appProfileId);
+    //last for DAILY period
+    Invoice getLastInvoiceByDayAndMonthAndYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId);
 
-    Invoice getLastInvoice(Long companyId, Long appProfileId);
+    //last for monthly
+    Invoice getLastInvoiceByMonthAndYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId);
 
-    Invoice getLastInvoiceByMonthAndYear(LocalDate localDate, Long companyId, Long appProfileId);
+    //last for quarter period
+    Invoice getLastInvoiceByQuarterAndYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId);
+
+    //last for half-year period
+    Invoice getLastInvoiceByHalfAndYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId);
+
+    //last for year period
+    Invoice getLastInvoiceByYear(List<DocumentType> types, LocalDate localDate, Long companyId, Long appProfileId);
 }

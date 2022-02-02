@@ -22,6 +22,8 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -96,9 +98,47 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     }
 
     @Override
-    public PriceOffer getLastPriceOffer(Long companyId, Long appProfileId) {
+    public PriceOffer getLastPriceOfferByDayAndMonthAndYear(LocalDate date, Long companyId, Long defaultProfileId) {
         return this.query.selectFrom(QPriceOffer.priceOffer)
-                .where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId))
+                .where(QPriceOffer.priceOffer.createdDate.dayOfMonth().eq(date.getDayOfMonth()))
+                .where(QPriceOffer.priceOffer.createdDate.month().eq(date.getMonthValue()))
+                .where(QPriceOffer.priceOffer.createdDate.year().eq(date.getYear()))
+                .where(QPriceOffer.priceOffer.appProfile.id.eq(defaultProfileId))
+                .where(QPriceOffer.priceOffer.company.id.eq(companyId))
+                .orderBy(QPriceOffer.priceOffer.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    @Override
+    public PriceOffer getLastPriceOfferByMonthAndYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QPriceOffer.priceOffer)
+                .where(QPriceOffer.priceOffer.createdDate.month().eq(date.getMonthValue()))
+                .where(QPriceOffer.priceOffer.createdDate.year().eq(date.getYear()))
+                .where(QPriceOffer.priceOffer.appProfile.id.eq(defaultProfileId))
+                .where(QPriceOffer.priceOffer.company.id.eq(companyId))
+                .orderBy(QPriceOffer.priceOffer.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    @Override
+    public PriceOffer getLastPriceOfferByQuarterAndYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QPriceOffer.priceOffer)
+                .where(QPriceOffer.priceOffer.createdDate.month().divide(3.0).ceil().eq(date.get(IsoFields.QUARTER_OF_YEAR)))
+                .where(QPriceOffer.priceOffer.createdDate.year().eq(date.getYear()))
+                .where(QPriceOffer.priceOffer.appProfile.id.eq(defaultProfileId))
+                .where(QPriceOffer.priceOffer.company.id.eq(companyId))
+                .orderBy(QPriceOffer.priceOffer.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    @Override
+    public PriceOffer getLastPriceOfferByYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QPriceOffer.priceOffer)
+                .where(QPriceOffer.priceOffer.createdDate.year().eq(date.getYear()))
+                .where(QPriceOffer.priceOffer.appProfile.id.eq(defaultProfileId))
                 .where(QPriceOffer.priceOffer.company.id.eq(companyId))
                 .orderBy(QPriceOffer.priceOffer.id.desc())
                 .limit(1L)

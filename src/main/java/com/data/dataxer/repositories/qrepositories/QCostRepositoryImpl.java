@@ -24,6 +24,7 @@ import org.springframework.stereotype.Repository;
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -157,10 +158,48 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Cost getLastCost(Long companyId, Long appProfileId) {
+    public Cost getLastCostByDayAndMonthAndYear(LocalDate date, Long companyId, Long defaultProfileId) {
         return this.query.selectFrom(QCost.cost)
                 .where(QCost.cost.company.id.eq(companyId))
-                .where(QCost.cost.appProfile.id.eq(appProfileId))
+                .where(QCost.cost.appProfile.id.eq(defaultProfileId))
+                .where(QCost.cost.createdDate.dayOfMonth().eq(date.getDayOfMonth()))
+                .where(QCost.cost.createdDate.month().eq(date.getMonthValue()))
+                .where(QCost.cost.createdDate.year().eq(date.getYear()))
+                .orderBy(QCost.cost.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    @Override
+    public Cost getLastCostByMonthAndYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.appProfile.id.eq(defaultProfileId))
+                .where(QCost.cost.createdDate.month().eq(date.getMonthValue()))
+                .where(QCost.cost.createdDate.year().eq(date.getYear()))
+                .orderBy(QCost.cost.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    @Override
+    public Cost getLastCostByQuarterAndYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.appProfile.id.eq(defaultProfileId))
+                .where(QCost.cost.createdDate.month().divide(3.0).ceil().eq(date.get(IsoFields.QUARTER_OF_YEAR)))
+                .where(QCost.cost.createdDate.year().eq(date.getYear()))
+                .orderBy(QCost.cost.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    @Override
+    public Cost getLastCostOfferByYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.appProfile.id.eq(defaultProfileId))
+                .where(QCost.cost.createdDate.year().eq(date.getYear()))
                 .orderBy(QCost.cost.id.desc())
                 .limit(1L)
                 .fetchOne();
