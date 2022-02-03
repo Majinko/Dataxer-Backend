@@ -122,7 +122,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(QInvoice.invoice.createdDate.month().eq(localDate.getMonthValue()))
                 .where(QInvoice.invoice.createdDate.year().eq(localDate.getYear()))
                 .where(QInvoice.invoice.documentType.in(types))
-                .orderBy(QInvoice.invoice.createdDate.desc())
+                .orderBy(QInvoice.invoice.id.desc())
                 .limit(1l)
                 .fetchOne();
     }
@@ -135,7 +135,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(QInvoice.invoice.createdDate.month().eq(localDate.getMonthValue()))
                 .where(QInvoice.invoice.createdDate.year().eq(localDate.getYear()))
                 .where(QInvoice.invoice.documentType.in(types))
-                .orderBy(QInvoice.invoice.createdDate.desc())
+                .orderBy(QInvoice.invoice.id.desc())
                 .limit(1l)
                 .fetchOne();
     }
@@ -148,7 +148,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(QInvoice.invoice.createdDate.month().divide(3.0).ceil().eq(localDate.get(IsoFields.QUARTER_OF_YEAR)))
                 .where(QInvoice.invoice.createdDate.year().eq(localDate.getYear()))
                 .where(QInvoice.invoice.documentType.in(types))
-                .orderBy(QInvoice.invoice.createdDate.desc())
+                .orderBy(QInvoice.invoice.id.desc())
                 .limit(1l)
                 .fetchOne();
     }
