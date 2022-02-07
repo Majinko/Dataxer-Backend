@@ -9,13 +9,15 @@ import java.math.BigDecimal;
 @Setter
 public class DocumentPackItemDTO {
     private Long id;
-    private ItemDTO item;
     private Float qty;
     private String title;
     private String unit;
-    Integer position;
+    private Integer position;
     private BigDecimal discount;
     private BigDecimal price;
     private Integer tax;
     private BigDecimal totalPrice;
+
+    private ItemDTO item;
+    private CategoryDTO category;
 }
