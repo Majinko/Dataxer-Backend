@@ -63,4 +63,6 @@ public interface QTimeRepository {
     List<Time> getAllProjectTimesOrdered(Long projectId, Long appProfileId);
 
     List<Tuple> getAllUserTimesFromDateToDate(LocalDate processFromDate, LocalDate processToDate, Long appProfileId);
+
+    List<Time> getAllProjectTimes(Long projectId, Long defaultProfileId);
 }

@@ -2,8 +2,10 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.StorageMapper;
 import com.data.dataxer.models.domain.Cost;
+import com.data.dataxer.models.domain.Item;
 import com.data.dataxer.models.dto.StorageFileDTO;
 import com.data.dataxer.repositories.CostRepository;
+import com.data.dataxer.repositories.ItemRepository;
 import com.data.dataxer.services.storage.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,11 +16,15 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLConnection;
 import java.nio.file.Files;
+import java.util.List;
 
 
 @RestController
 @RequestMapping("/api/import")
 public class ImportController {
+    @Autowired
+    private ItemRepository itemRepository;
+
     @Autowired
     private CostRepository costRepository;
 
@@ -56,6 +62,22 @@ public class ImportController {
                         }
                     }
                 }
+            }
+        });*/
+
+        return "importerWork";
+    }
+
+
+    @GetMapping("/importItemCategories")
+    public String importItemCategories() {
+        List<Item> items = this.itemRepository.findAllWithCategories();
+
+    /*    items.forEach(item -> {
+            if (!item.getCategories().isEmpty()) {
+                item.setCategory(item.getCategories().get(0));
+
+                this.itemRepository.save(item);
             }
         });*/
 

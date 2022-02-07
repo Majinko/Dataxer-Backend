@@ -410,6 +410,17 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
+    public List<Time> getAllProjectTimes(Long projectId, Long appProfileId) {
+        return this.query.selectFrom(QTime.time1)
+                .where(QTime.time1.project.id.eq(projectId))
+                .where(QTime.time1.appProfile.id.in(appProfileId))
+                .leftJoin(QTime.time1.user, QAppUser.appUser).fetchJoin()
+                .leftJoin(QTime.time1.category, QCategory.category).fetchJoin()
+                .orderBy(QTime.time1.dateWork.asc())
+                .fetch();
+    }
+
+    @Override
     public List<Tuple> getAllUserTimesFromDateToDate(LocalDate processFromDate, LocalDate processToDate, Long companyId) {
         BooleanBuilder condition = new BooleanBuilder();
 

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/time")
@@ -75,6 +76,13 @@ public class TimeController {
             @RequestParam(value = "companyIds", required = false) List<Long> companyIds
     ) {
         return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOWithoutRelations(this.timeService.allByProject(projectId, companyIds)));
+    }
+
+    @GetMapping("/allByProjectDetail/{projectId}")
+    public ResponseEntity<List<TimeDTO>> allByProjectDetail(
+            @PathVariable Long projectId
+    ) {
+        return ResponseEntity.ok(this.timeService.allByProject(projectId).stream().map(timeMapper::timeToTimeDTOWithoutProject).collect(Collectors.toList()));
     }
 
     @GetMapping("/userMonths")

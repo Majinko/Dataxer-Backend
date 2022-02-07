@@ -32,6 +32,11 @@ public interface TimeMapper {
     @Mapping(target = "user.defaultProfile", ignore = true)
     TimeDTO timeToTimeDTO(Time time);
 
+    @Mapping(target = "project", ignore = true)
+    @Mapping(target = "user.roles", ignore = true)
+    @Mapping(target = "user.defaultProfile", ignore = true)
+    TimeDTO timeToTimeDTOWithoutProject(Time time);
+
     @Named("timeToTimeDTOSimple")
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
