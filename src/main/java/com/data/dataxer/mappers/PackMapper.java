@@ -34,7 +34,6 @@ public interface PackMapper {
             target = "item.itemPrice",
             expression = "java(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null))"
     )
-    @Mapping(target = "item.category", ignore = true)
     @Mapping(target = "item.supplier", ignore = true)
     @Mapping(target = "item.files", ignore = true)
     PackItemDTO packItemToPackItemDTO(PackItem packItem);

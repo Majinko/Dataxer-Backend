@@ -25,6 +25,9 @@ public class DocumentPackItem extends BaseEntity {
     @JoinColumn(name = "item_id", referencedColumnName = "id")
     private Item item;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private Category category;
+
     private Float qty;
 
     private String title;
@@ -58,7 +61,7 @@ public class DocumentPackItem extends BaseEntity {
 
     //zlava zmenit pre invoice template
     public BigDecimal countItemPriceWithTax() {
-        return price.add(price.multiply(new BigDecimal((double) tax/100)).setScale(2, RoundingMode.HALF_UP));
+        return price.add(price.multiply(new BigDecimal((double) tax / 100)).setScale(2, RoundingMode.HALF_UP));
     }
 
     public BigDecimal countPriceDiscount() {

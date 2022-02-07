@@ -70,6 +70,7 @@ public class QPackRepositoryImpl implements QPackRepository {
                 .leftJoin(QPack.pack.packItems, QPackItem.packItem).orderBy(QPackItem.packItem.position.desc()).fetchJoin()
                 .leftJoin(QPackItem.packItem.item, QItem.item).fetchJoin()
                 .leftJoin(QItem.item.itemPrices, QItemPrice.itemPrice).fetchJoin()
+                .leftJoin(QItem.item.category, QCategory.category).fetchJoin()
                 .fetchOne();
     }
 
