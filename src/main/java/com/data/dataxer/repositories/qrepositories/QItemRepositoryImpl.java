@@ -38,6 +38,7 @@ public class QItemRepositoryImpl implements QItemRepository {
         Item item = this.constructGetAllByIdAndCompanyId(id, appProfileId)
                 .where(QItem.item.appProfile.id.eq(appProfileId))
                 .where(QItem.item.id.eq(id))
+                .leftJoin(QItem.item.category, QCategory.category)
                 .leftJoin(QItem.item.itemPrices, QItemPrice.itemPrice).fetchJoin()
                 .leftJoin(QItem.item.supplier, QContact.contact).fetchJoin()
                 .fetchOne();
@@ -48,14 +49,6 @@ public class QItemRepositoryImpl implements QItemRepository {
                                     .leftJoin(QItem.item.files, QStorage.storage).fetchJoin()
                                     .fetchOne())
                             .getFiles()
-            );
-
-            item.setCategories(
-                    Objects.requireNonNull(
-                                    this.constructGetAllByIdAndCompanyId(id, appProfileId)
-                                            .leftJoin(QItem.item.categories, QCategory.category).fetchJoin()
-                                            .fetchOne())
-                            .getCategories()
             );
         }
 
@@ -76,6 +69,7 @@ public class QItemRepositoryImpl implements QItemRepository {
                 .selectFrom(qItem)
                 .where(QItem.item.appProfile.id.eq(appProfileId))
                 .where(qItem.title.containsIgnoreCase(q))
+                .leftJoin(QItem.item.category, QCategory.category)
                 .leftJoin(qItem.itemPrices).fetchJoin()
                 .fetch());
     }
