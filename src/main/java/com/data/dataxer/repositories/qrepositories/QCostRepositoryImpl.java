@@ -72,7 +72,7 @@ public class QCostRepositoryImpl implements QCostRepository {
         List<Cost> costList = this.query.selectFrom(qCost)
                 .leftJoin(qCost.contact).fetchJoin()
                 .leftJoin(qCost.project).fetchJoin()
-                .join(QCost.cost.categories, QCategory.category).fetchJoin()
+                .leftJoin(QCost.cost.categories, QCategory.category).fetchJoin()
                 .where(qCost.id.in(costIds))
                 .fetch();
 
