@@ -101,6 +101,16 @@ public class UserController {
         this.userService.switchProfile(appProfileId);
     }
 
+    @GetMapping("/deactivate/{uid}")
+    public void deactivateUser(@PathVariable String uid) {
+        this.userService.deactivateUser(uid);
+    }
+
+    @GetMapping("/activate/{uid}")
+    public void activateUser(@PathVariable String uid) {
+        this.userService.activateUser(uid);
+    }
+
     @PostMapping("/assignRoles/{uid}")
     public void assignRoles(@PathVariable String uid, @RequestBody List<RoleDTO> roleDTOS) {
         this.userService.assignRoles(uid, this.roleMapper.roleDTOStoRoles(roleDTOS));

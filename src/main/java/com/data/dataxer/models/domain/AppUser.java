@@ -51,6 +51,8 @@ public class AppUser implements Serializable {
     @Column(name = "connected")
     private Boolean connected = false;
 
+    private Boolean isDisabled = false;
+
     @OneToOne(fetch = FetchType.LAZY)
     private AppProfile defaultProfile;
 

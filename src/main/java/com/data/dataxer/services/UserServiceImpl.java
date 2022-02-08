@@ -89,7 +89,6 @@ public class UserServiceImpl implements UserService {
         createRequest.setDisplayName(appUser.getFirstName() + " " + appUser.getLastName());
 
         UserRecord userRecord;
-
         try {
             userRecord = firebaseAuth.createUser(createRequest);
             return userRecord;
@@ -126,6 +125,7 @@ public class UserServiceImpl implements UserService {
 
         appUserOverviewDTO.setId(user.getId());
         appUserOverviewDTO.setUid(user.getUid());
+        appUserOverviewDTO.setIsDisabled(user.getIsDisabled());
         appUserOverviewDTO.setFullName(user.getFirstName() + ' ' + user.getLastName());
         appUserOverviewDTO.setPhotoUrl(user.getPhotoUrl());
         appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.defaultProfileId(), false));
@@ -208,11 +208,47 @@ public class UserServiceImpl implements UserService {
 
             UserRecord userRecord = FirebaseAuth.getInstance().getUser(uid);
 
-
-
             long revocationSecond = userRecord.getTokensValidAfterTimestamp() / 1000;
         } catch (FirebaseAuthException e) {
             String test = "test";
+        }
+    }
+
+    @Override
+    public void deactivateUser(String uid) {
+        AppUser appUser = this.getByUid(uid);
+
+        appUser.setIsDisabled(true);
+
+        this.userRepository.save(appUser);
+
+        UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid);
+
+        updateRequest.setDisabled(true);
+
+        try {
+            firebaseAuth.updateUser(updateRequest);
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void activateUser(String uid) {
+        AppUser appUser = this.getByUid(uid);
+
+        appUser.setIsDisabled(false);
+
+        this.userRepository.save(appUser);
+
+        UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid);
+
+        updateRequest.setDisabled(false);
+
+        try {
+            firebaseAuth.updateUser(updateRequest);
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
         }
     }
 
