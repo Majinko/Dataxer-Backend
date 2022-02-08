@@ -101,6 +101,7 @@ public class UserController {
         this.userService.switchProfile(appProfileId);
     }
 
+
     @PostMapping("/assignRoles/{uid}")
     public void assignRoles(@PathVariable String uid, @RequestBody List<RoleDTO> roleDTOS) {
         this.userService.assignRoles(uid, this.roleMapper.roleDTOStoRoles(roleDTOS));

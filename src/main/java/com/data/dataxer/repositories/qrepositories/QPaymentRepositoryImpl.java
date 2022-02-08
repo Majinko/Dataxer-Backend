@@ -78,10 +78,11 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public BigDecimal getDocumentTotalPrice(Long documentId, DocumentType documentType) {
+    public BigDecimal getDocumentTotalPrice(Long documentId, DocumentType documentType, Long appProfileId) {
         switch (documentType) {
             case COST:
                 Cost cost = this.query.selectFrom(QCost.cost)
+                        .where(QCost.cost.appProfile.id.eq(appProfileId))
                         .where(QCost.cost.id.eq(documentId))
                         .fetchOne();
 
@@ -90,10 +91,9 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
             case PROFORMA:
             case SUMMARY_INVOICE:
             case TAX_DOCUMENT:
-                QInvoice qInvoice = QInvoice.invoice;
-
-                Invoice invoice = this.query.selectFrom(qInvoice)
-                        .where(qInvoice.id.eq(documentId))
+                Invoice invoice = this.query.selectFrom(QInvoice.invoice)
+                        .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
+                        .where(QInvoice.invoice.id.eq(documentId))
                         .fetchOne();
 
                 if (invoice != null) {
@@ -104,10 +104,9 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
             case PRICE_OFFER:
             default:
-                QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-
-                PriceOffer priceOffer = this.query.selectFrom(qPriceOffer)
-                        .where(qPriceOffer.id.eq(documentId))
+                PriceOffer priceOffer = this.query.selectFrom(QPriceOffer.priceOffer)
+                        .where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId))
+                        .where(QPriceOffer.priceOffer.id.eq(documentId))
                         .fetchOne();
                 if (priceOffer != null) {
                     return priceOffer.getTotalPrice();
@@ -118,14 +117,13 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public BigDecimal getPayedTotalPrice(Long documentId, DocumentType documentType) {
-        QPayment qPayment = QPayment.payment;
-
+    public BigDecimal getPayedTotalPrice(Long documentId, DocumentType documentType, Long appProfileId) {
         List<Payment> payments = this.query
-                .selectFrom(qPayment)
-                .where(qPayment.documentId.eq(documentId))
-                .where(qPayment.documentType.eq(documentType))
-                .orderBy(qPayment.id.desc())
+                .selectFrom(QPayment.payment)
+                .where(QPayment.payment.appProfile.id.eq(appProfileId))
+                .where(QPayment.payment.documentId.eq(documentId))
+                .where(QPayment.payment.documentType.eq(documentType))
+                .orderBy(QPayment.payment.id.desc())
                 .fetch();
 
         BigDecimal payedTotalPrice = BigDecimal.valueOf(0);
@@ -133,6 +131,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
         for (Payment payment : payments) {
             payedTotalPrice = payedTotalPrice.add(payment.getPayedValue());
         }
+
         return payedTotalPrice;
     }
 

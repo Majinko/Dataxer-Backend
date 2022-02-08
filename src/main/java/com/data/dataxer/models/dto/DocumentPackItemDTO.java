@@ -19,5 +19,6 @@ public class DocumentPackItemDTO {
     private BigDecimal totalPrice;
 
     private ItemDTO item;
+    private ProjectDTO project;
     private CategoryDTO category;
 }

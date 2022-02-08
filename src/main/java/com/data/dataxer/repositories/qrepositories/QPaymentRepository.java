@@ -14,9 +14,9 @@ public interface QPaymentRepository {
 
     Optional<Payment> getById(Long id, Long appProfileId);
 
-    BigDecimal getDocumentTotalPrice(Long id, DocumentType documentType);
+    BigDecimal getDocumentTotalPrice(Long id, DocumentType documentType, Long appProfileId);
 
-    BigDecimal getPayedTotalPrice(Long id, DocumentType documentType);
+    BigDecimal getPayedTotalPrice(Long id, DocumentType documentType, Long appProfileId);
 
     List<Payment> getPaymentsByDocumentIdSortedByPayDate(Long documentId, Long appProfileId);
 

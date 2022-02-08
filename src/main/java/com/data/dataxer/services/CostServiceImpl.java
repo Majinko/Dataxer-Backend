@@ -98,7 +98,7 @@ public class CostServiceImpl implements CostService {
     }
 
     private void checkCostPayment(Cost cost) {
-        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(cost.getId(), DocumentType.COST);
+        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(cost.getId(), DocumentType.COST, SecurityUtils.defaultProfileId());
 
         boolean isPayed = cost.getTotalPrice().subtract(payedTotalPrice).setScale(2, RoundingMode.HALF_UP).compareTo(BigDecimal.ZERO) == 0;
 

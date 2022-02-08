@@ -11,5 +11,5 @@ public interface PaymentRepository extends CrudRepository<Payment, Long> {
     @Query(value = "SELECT * FROM payment WHERE app_profile_id = ?1 AND document_id = ?2 AND tax_document_created = false", nativeQuery = true)
     List<Payment> findAllWithoutTaxDocumentByDocumentId(Long defaultProfile, Long id);
 
-    List<Payment> findAllByDocumentIdAndDocumentType(Long documentId, DocumentType documentType);
+    List<Payment> findAllByDocumentIdAndDocumentTypeAndAppProfileId(Long documentId, DocumentType documentType, Long appProfileID);
 }

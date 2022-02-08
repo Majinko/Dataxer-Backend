@@ -28,6 +28,9 @@ public class DocumentPackItem extends BaseEntity {
     @OneToOne(fetch = FetchType.LAZY)
     private Category category;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private Project project;
+
     private Float qty;
 
     private String title;

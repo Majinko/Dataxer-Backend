@@ -192,7 +192,8 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         List<DocumentPackItem> invoicePackItems = query.selectFrom(QDocumentPackItem.documentPackItem)
                 .where(QDocumentPackItem.documentPackItem.pack.id.in(invoice.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
                 .leftJoin(QDocumentPackItem.documentPackItem.item, QItem.item).fetchJoin()
-                .leftJoin(QDocumentPackItem.documentPackItem.item.category, QCategory.category)
+                .leftJoin(QDocumentPackItem.documentPackItem.category, QCategory.category).fetchJoin()
+                .leftJoin(QDocumentPackItem.documentPackItem.project, QProject.project).fetchJoin()
                 .orderBy(QDocumentPackItem.documentPackItem.position.asc())
                 .fetch();
 

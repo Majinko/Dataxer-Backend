@@ -102,7 +102,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     }
 
     private void checkInvoicePayment(Invoice invoice) {
-        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(invoice.getId(), invoice.getDocumentType());
+        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(invoice.getId(), invoice.getDocumentType(), SecurityUtils.defaultProfileId());
 
         boolean isPayed = invoice.getTotalPrice().subtract(payedTotalPrice).setScale(2, RoundingMode.HALF_UP).compareTo(BigDecimal.ZERO) == 0;
 
