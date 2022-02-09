@@ -45,6 +45,7 @@ public interface PriceOfferMapper {
     @Mapping(target = "item.category", ignore = true)
     @Mapping(target = "item.supplier", ignore = true)
     @Mapping(target = "item.files", ignore = true)
+    @Mapping(target = "project.categories", ignore = true)
     DocumentPackItemDTO documentPackItemToDocumentPackItemDTO(DocumentPackItem documentPackItem);
 
     @IterableMapping(qualifiedByName = "priceOfferToPriceOfferDTOWithoutRelation")

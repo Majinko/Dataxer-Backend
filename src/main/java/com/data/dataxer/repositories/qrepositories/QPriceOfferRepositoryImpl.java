@@ -149,6 +149,8 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
         List<DocumentPackItem> priceOfferPackItems = query.selectFrom(QDocumentPackItem.documentPackItem)
                 .where(QDocumentPackItem.documentPackItem.pack.id.in(priceOffer.getPacks().stream().map(DocumentPack::getId).collect(Collectors.toList())))
                 .leftJoin(QDocumentPackItem.documentPackItem.item, QItem.item).fetchJoin()
+                .leftJoin(QDocumentPackItem.documentPackItem.category, QCategory.category).fetchJoin()
+                .leftJoin(QDocumentPackItem.documentPackItem.project, QProject.project).fetchJoin()
                 .orderBy(QDocumentPackItem.documentPackItem.position.asc())
                 .fetch();
 

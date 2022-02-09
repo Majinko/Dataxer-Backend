@@ -38,7 +38,7 @@ public class QItemRepositoryImpl implements QItemRepository {
         Item item = this.constructGetAllByIdAndCompanyId(id, appProfileId)
                 .where(QItem.item.appProfile.id.eq(appProfileId))
                 .where(QItem.item.id.eq(id))
-                .leftJoin(QItem.item.category, QCategory.category)
+                .leftJoin(QItem.item.category, QCategory.category).fetchJoin()
                 .leftJoin(QItem.item.itemPrices, QItemPrice.itemPrice).fetchJoin()
                 .leftJoin(QItem.item.supplier, QContact.contact).fetchJoin()
                 .fetchOne();
