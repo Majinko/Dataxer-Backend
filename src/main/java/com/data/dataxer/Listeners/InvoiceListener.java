@@ -9,20 +9,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PrePersist;
-import javax.persistence.PreRemove;
-import javax.persistence.PreUpdate;
+import javax.persistence.*;
 
 public class InvoiceListener {
 
-    @PrePersist
+    @PostPersist
     public void prePersist(Invoice invoice) {
         logAction(invoice, AuditLogAction.INSERT);
     }
 
-    @PreUpdate
-    public void preUpdate(Invoice invoice) {
+    @PostUpdate
+    public void postUpdate(Invoice invoice) {
         logAction(invoice, AuditLogAction.UPDATE);
     }
 
@@ -31,7 +28,6 @@ public class InvoiceListener {
         logAction(invoice, AuditLogAction.DELETE);
     }
 
-    @Transactional
     protected void logAction(Invoice invoice, AuditLogAction action) {
         ObjectMapper objectMapper = new ObjectMapper();
         EntityManager entityManager = BeanUtil.getBean(EntityManager.class);
@@ -45,6 +41,7 @@ public class InvoiceListener {
 
             entityManager.persist(auditLog);
         } catch (JsonProcessingException e) {
+            System.out.println("Error");
         }
     }
 

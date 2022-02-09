@@ -24,6 +24,7 @@ public class AuditLog extends BaseEntity {
 
     private Long objectId;
 
+    @Column(columnDefinition = "TEXT")
     private String loggedObject;
 
 }
