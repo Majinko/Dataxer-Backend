@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.Listeners.InvoiceListener;
 import com.data.dataxer.models.enums.DeliveryMethod;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
@@ -20,6 +21,7 @@ import java.util.List;
 @Getter
 @DiscriminatorValue("INVOICE")
 @SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
+@EntityListeners(InvoiceListener.class)
 public class Invoice extends DocumentBase {
     private String variableSymbol;
 

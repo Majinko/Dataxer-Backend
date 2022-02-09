@@ -22,9 +22,8 @@ public class AuditLog extends BaseEntity {
     @JoinColumn(name = "uid", referencedColumnName = "uid")
     private AppUser initiator;
 
-    private String oldObject;
+    private Long objectId;
 
-    private String newObject;
-
+    private String loggedObject;
 
 }
