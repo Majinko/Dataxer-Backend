@@ -416,7 +416,8 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                 .where(QTime.time1.appProfile.id.in(appProfileId))
                 .leftJoin(QTime.time1.user, QAppUser.appUser).fetchJoin()
                 .leftJoin(QTime.time1.category, QCategory.category).fetchJoin()
-                .orderBy(QTime.time1.dateWork.asc())
+                .orderBy(QTime.time1.dateWork.desc())
+                .orderBy(QTime.time1.timeFrom.desc())
                 .fetch();
     }
 
