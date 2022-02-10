@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.listeners.InvoiceListener;
 import com.data.dataxer.models.enums.DeliveryMethod;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
@@ -8,7 +9,6 @@ import org.hibernate.annotations.*;
 
 import javax.persistence.*;
 import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -20,6 +20,7 @@ import java.util.List;
 @Getter
 @DiscriminatorValue("INVOICE")
 @SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
+@EntityListeners(InvoiceListener.class)
 public class Invoice extends DocumentBase {
     private String variableSymbol;
 
