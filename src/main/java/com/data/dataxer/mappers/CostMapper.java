@@ -38,7 +38,7 @@ public interface CostMapper {
     @Mapping(target = "files", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "project.contact", ignore = true)
-    @Mapping(target = "company", ignore = true)
+    //@Mapping(target = "company", ignore = true)
     CostDTO costToCostDTOPaginate(Cost cost);
 
     @IterableMapping(qualifiedByName = "cosToCostDTOWithoutRelations")

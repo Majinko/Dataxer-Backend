@@ -66,26 +66,21 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
 
     @Override
     public List<AppUser> getUsersByAppProfileId(Pageable pageable, String qString, Long appProfileId) {
-        Set<Long> userIds = new HashSet<>();
-
-        List<AppProfile> profiles = this.query
-                .selectFrom(QAppProfile.appProfile)
-                .where(QAppProfile.appProfile.id.in(appProfileId))
-                .leftJoin(QAppProfile.appProfile.appUsers, QAppUser.appUser).fetchJoin()
-                .distinct()
-                .fetch();
-
-        profiles.forEach(profile -> {
-            userIds.addAll(profile.getAppUsers().stream().map(AppUser::getId).collect(Collectors.toList()));
-        });
-
         return this.query
                 .selectFrom(QAppUser.appUser)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .where(search(qString))
-                .where(QAppUser.appUser.id.in(userIds))
+                .where(QAppUser.appUser.id.in(this.userIds(appProfileId)))
                 //.where(QAppUser.appUser.uid.in(this.queryForGetActiveUser()))
+                .fetch();
+    }
+
+    @Override
+    public List<AppUser> getUsersByAppProfileId(Long appProfileId) {
+        return this.query
+                .selectFrom(QAppUser.appUser)
+                .where(QAppUser.appUser.id.in(this.userIds(appProfileId)))
                 .fetch();
     }
 
@@ -123,5 +118,22 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
                     .or(QAppUser.appUser.email.containsIgnoreCase(queryString));
 
         return where;
+    }
+
+    private Set<Long> userIds(Long appProfileId){
+        Set<Long> userIds = new HashSet<>();
+
+        List<AppProfile> profiles = this.query
+                .selectFrom(QAppProfile.appProfile)
+                .where(QAppProfile.appProfile.id.in(appProfileId))
+                .leftJoin(QAppProfile.appProfile.appUsers, QAppUser.appUser).fetchJoin()
+                .distinct()
+                .fetch();
+
+        profiles.forEach(profile -> {
+            userIds.addAll(profile.getAppUsers().stream().map(AppUser::getId).collect(Collectors.toList()));
+        });
+
+        return userIds;
     }
 }

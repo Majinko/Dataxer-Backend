@@ -39,7 +39,7 @@ public interface PriceOfferMapper {
     @Mapping(target = "packs", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "project.contact", ignore = true)
-    @Mapping(target = "company", ignore = true)
+    //@Mapping(target = "company", ignore = true)
     PriceOfferDTO priceOfferToPriceOfferDTOSimple(PriceOffer priceOffer);
 
     @Mapping(target = "item.categories", ignore = true)

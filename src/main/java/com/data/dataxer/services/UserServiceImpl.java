@@ -103,7 +103,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<AppUser> all() {
-        return this.userRepository.findAllByDefaultProfileId(SecurityUtils.defaultProfileId());
+        return this.qAppUserRepository.getUsersByAppProfileId(SecurityUtils.defaultProfileId());
     }
 
     @Override

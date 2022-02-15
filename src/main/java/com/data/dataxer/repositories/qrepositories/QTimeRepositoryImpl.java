@@ -109,6 +109,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
                 .put("time.id", QTime.time1.id)
                 .put("time.project.id", QTime.time1.project.id)
+                .put("time.user.id", QTime.time1.user.id)
                 .put("time.category.id", QTime.time1.category.id)
                 .put("time.description", QTime.time1.description)
                 .put("time.start", QTime.time1.dateWork)
@@ -120,16 +121,20 @@ public class QTimeRepositoryImpl implements QTimeRepository {
                     .setMapping(pathMapping)));
         }
 
-        return this.query.selectFrom(QTime.time1)
+        JPAQuery<Time> timeJPAQuery = this.query.selectFrom(QTime.time1)
                 .leftJoin(QTime.time1.user).fetchJoin()
                 .leftJoin(QTime.time1.project).fetchJoin()
                 .join(QTime.time1.category).fetchJoin()
                 .where(QTime.time1.appProfile.id.eq(appProfileId))
-                .where(QTime.time1.user.id.eq(userId))
                 .where(predicate)
                 .orderBy(QTime.time1.dateWork.desc())
-                .orderBy(QTime.time1.timeFrom.desc())
-                .fetch();
+                .orderBy(QTime.time1.timeFrom.desc());
+
+        if (!rqlFilter.contains("time.user.id")) {
+            timeJPAQuery.where(QTime.time1.user.id.eq(userId));
+        }
+
+        return timeJPAQuery.fetch();
     }
 
     @Override

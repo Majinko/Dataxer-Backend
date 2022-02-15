@@ -179,6 +179,7 @@ public class QPriceOfferRepositoryImpl implements QPriceOfferRepository {
     //todo tieto spolocne metody dat do abstrakntej triedy pre faktury a cenove ponuky
     private List<PriceOffer> getPriceOfferPaginate(Pageable pageable, String rqlFilter, Long appProfileId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<PriceOffer> priceOfferJPAQuery = this.query.selectFrom(QPriceOffer.priceOffer)
+                .leftJoin(QPriceOffer.priceOffer.company).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.contact).fetchJoin()
                 .leftJoin(QPriceOffer.priceOffer.project).fetchJoin()
                 .where(predicate)

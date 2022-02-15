@@ -18,4 +18,6 @@ public interface QAppUserRepository {
     Optional<AppUser> findUserWithRolesAndPrivileges(String uid, Long companyId);
 
     List<AppUser> getUsersByAppProfileId(Pageable pageable, String qString, Long appProfileId);
+
+    List<AppUser> getUsersByAppProfileId(Long appProfileId);
 }

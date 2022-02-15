@@ -1,5 +1,6 @@
 package com.data.dataxer.repositories;
 
+import com.data.dataxer.models.domain.AppProfile;
 import com.data.dataxer.models.domain.AppUser;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
