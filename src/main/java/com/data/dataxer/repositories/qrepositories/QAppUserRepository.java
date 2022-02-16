@@ -1,6 +1,7 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.AppUser;
+import com.querydsl.core.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.parameters.P;

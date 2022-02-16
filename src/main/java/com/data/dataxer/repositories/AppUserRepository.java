@@ -24,6 +24,6 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     @Query("SELECT u FROM AppUser u WHERE u.id in (SELECT c.appUsers FROM Company c )")
     List<AppUser> findAllByDefaultProfileIdOrderByIdAsc(Pageable pageable, Long appProfileId);
 
-    Long countAllByDefaultProfileId(Long appProfileId);
+    Long countAllByDefaultProfileIdAndIsDisabled(Long appProfileId, boolean disabled);
 }
 

@@ -31,6 +31,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.Month;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class ProjectServiceImpl implements ProjectService {
@@ -45,7 +46,6 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
     private CategoryRepository categoryRepository;
-
 
     @Autowired
     private QCostRepository qCostRepository;
@@ -97,9 +97,29 @@ public class ProjectServiceImpl implements ProjectService {
                 .getById(projectId, SecurityUtils.defaultProfileId())
                 .getCategories();
 
-        categories.sort(Comparator.comparing(category -> category.getPosition() != null ? category.getPosition() : 0));
+        Set<Category> parenCategories = new HashSet<>();
 
-        return this.qProjectRepository.getById(projectId, SecurityUtils.defaultProfileId()).getCategories();
+        // odflitrujem rodicovske kategorie, aby som pre nich nehladal parentov, lebo s tomto strome chceme mat len spodne deticky
+        categories.forEach(category -> {
+            Optional<Category> parentCategory = categories.stream().filter(category1 -> {
+                return category1.getId().equals(category.getParentId());
+            }).findFirst();
+
+            parentCategory.ifPresent(parenCategories::add);
+        });
+
+        categories.removeAll(parenCategories);
+
+        // aby sa na frontende vedel zostavit strom potrebujem aj parent kategorie ktore su pri projekte
+        Set<Long> parentIds = categories.stream().map(Category::getParentId).collect(Collectors.toSet());
+
+        categories.addAll(this.categoryRepository.findAllByIdInAndAppProfileId(new ArrayList<>(parentIds), SecurityUtils.defaultProfileId()));
+
+        List<Category> categoriesWithoutDuplicates = new ArrayList<>(new HashSet<>(categories));
+
+        categoriesWithoutDuplicates.sort(Comparator.comparing(category -> category.getPosition() != null ? category.getPosition() : 0));
+
+        return categoriesWithoutDuplicates;
     }
 
     @Override

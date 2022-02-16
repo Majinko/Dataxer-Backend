@@ -4,10 +4,14 @@ import com.data.dataxer.models.domain.*;
 import com.data.dataxer.security.model.Privilege;
 import com.data.dataxer.security.model.QPrivilege;
 import com.data.dataxer.security.model.QRole;
+import com.data.dataxer.security.model.Role;
 import com.data.dataxer.utils.Helpers;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
@@ -66,14 +70,33 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
 
     @Override
     public List<AppUser> getUsersByAppProfileId(Pageable pageable, String qString, Long appProfileId) {
-        return this.query
+        List<AppUser> appUsers = this.query
                 .selectFrom(QAppUser.appUser)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+                .leftJoin(QAppUser.appUser.overviewData, QUsersOverviewData.usersOverviewData).fetchJoin()
                 .where(search(qString))
                 .where(QAppUser.appUser.id.in(this.userIds(appProfileId)))
-                //.where(QAppUser.appUser.uid.in(this.queryForGetActiveUser()))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .where(QAppUser.appUser.isDisabled.eq(false))
+                .orderBy(QAppUser.appUser.isDisabled.asc())
                 .fetch();
+
+
+        // ger roles by users
+        List<Role> roles = this.query.selectFrom(QRole.role)
+                .leftJoin(QRole.role.users, QAppUser.appUser).fetchJoin()
+                .where(QAppUser.appUser.in(appUsers))
+                .distinct()
+                .fetch();
+
+        // users set roles
+        appUsers.forEach(user -> {
+            user.setRoles(
+                    roles.stream().filter(role -> role.getUsers().contains(user)).collect(Collectors.toList())
+            );
+        });
+
+        return appUsers;
     }
 
     @Override
@@ -120,7 +143,7 @@ public class QAppUserRepositoryImpl implements QAppUserRepository {
         return where;
     }
 
-    private Set<Long> userIds(Long appProfileId){
+    private Set<Long> userIds(Long appProfileId) {
         Set<Long> userIds = new HashSet<>();
 
         List<AppProfile> profiles = this.query
