@@ -208,8 +208,6 @@ public class UserServiceImpl implements UserService {
 
             UserRecord userRecord = FirebaseAuth.getInstance().getUser(uid);
 
-
-
             long revocationSecond = userRecord.getTokensValidAfterTimestamp() / 1000;
         } catch (FirebaseAuthException e) {
             String test = "test";
