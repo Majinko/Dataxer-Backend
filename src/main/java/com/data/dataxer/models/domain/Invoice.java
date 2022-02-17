@@ -4,11 +4,16 @@ import com.data.dataxer.models.enums.DeliveryMethod;
 import com.data.dataxer.models.enums.PaymentMethod;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.ForeignKey;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Setter
@@ -17,8 +22,6 @@ import java.time.LocalDate;
 @SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
 public class Invoice extends DocumentBase {
     private String variableSymbol;
-
-    private String subject;
 
     private String specificSymbol;
 
@@ -33,12 +36,29 @@ public class Invoice extends DocumentBase {
 
     private LocalDate paymentDate;
 
+    @JoinTable(
+            name = "payment",
+            joinColumns = @JoinColumn(name = "documentId"),
+            inverseJoinColumns = @JoinColumn(name = "id"),
+            foreignKey = @javax.persistence.ForeignKey(name = "none")
+    )
+    @OneToMany(fetch = FetchType.LAZY)
+    @Where(clause="document_type!='COST'")
+    @NotFound(action = NotFoundAction.IGNORE)
+    private List<Payment> payments = new ArrayList<>();
+
     @Override
     public BigDecimal countDiscountTotalPrice() {
         return this.totalPrice.multiply(this.discount.divide(BigDecimal.valueOf(100)));
     }
 
+    /**
+     * Vrati sumu s DPH na zaklade ceny bez DPH a dane
+     * @param price
+     * @param tax
+     * @return
+     */
     public BigDecimal countTaxPrice(BigDecimal price, Integer tax) {
-        return price.multiply(new BigDecimal(tax.floatValue() / 100));
+        return price.multiply(new BigDecimal (tax.doubleValue()/100)).setScale(2, RoundingMode.HALF_UP);
     }
 }

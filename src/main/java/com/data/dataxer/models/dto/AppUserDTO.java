@@ -13,6 +13,7 @@ public class AppUserDTO {
     private String uid;
     private String firstName;
     private String lastName;
+    private String photoUrl;
     private String email;
     private String phone;
     private String street;

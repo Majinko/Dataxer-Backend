@@ -14,13 +14,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ContactRepository extends JpaRepository<Contact, Long>, QuerydslPredicateExecutor<Contact>, QuerydslBinderCustomizer<QContact> {
-    Optional<Contact> findByIdAndCompanyIdIn(Long id, List<Long> companyIds);
+    Optional<List<Contact>> findAllByAppProfileId(Long appProfileId);
 
-    Optional<List<Contact>> findAllByCompanyIdIn(List<Long> companyIds);
-
-    Optional<List<Contact>> findFirst5ByNameContaining(String name);
-
-    Optional<Page<Contact>> findAllByEmailContainingAndCompanyIdIn(Pageable pageable, String email, List<Long> companyIds);
+    Optional<List<Contact>> findFirst5ByNameContainingAndAppProfileId(String name, Long appProfileId);
 
     @Override
     default public void customize(QuerydslBindings bindings, QContact root) {

@@ -48,7 +48,7 @@ public class OverviewServiceImpl implements OverviewService {
 
     @Override
     public List<UserHourOverviewDTO> getAllUsersHourOverview(LocalDate fromDate, LocalDate toDate) {
-        List<Time> allUsersTimes = this.qTimeRepository.getHourOverviewForAllUsers(fromDate, toDate, SecurityUtils.companyId());
+        List<Time> allUsersTimes = this.qTimeRepository.getHourOverviewForAllUsers(fromDate, toDate, SecurityUtils.defaultProfileId());
 
         this.userTimeData = new HashMap<>();
         this.userDayTotalPrice = new HashMap<>();
@@ -61,8 +61,14 @@ public class OverviewServiceImpl implements OverviewService {
                     Integer newUserDayTime = userTimeData.get(time.getUser()).get(time.getDateWork().getDayOfMonth()) + time.getTime();
                     userTimeData.get(time.getUser()).replace(time.getDateWork().getDayOfMonth(), newUserDayTime);
 
-                    BigDecimal newUserDayTotalPrice = userDayTotalPrice.get(time.getUser()).get(time.getDateWork().getDayOfMonth()).add(time.getPrice());
-                    userDayTotalPrice.get(time.getUser()).replace(time.getDateWork().getDayOfMonth(), newUserDayTotalPrice);
+                    try {
+                        BigDecimal newUserDayTotalPrice = userDayTotalPrice.get(time.getUser()).get(time.getDateWork().getDayOfMonth()).add(time.getPrice());
+                        userDayTotalPrice.get(time.getUser()).replace(time.getDateWork().getDayOfMonth(), newUserDayTotalPrice);
+                    } catch (NullPointerException e) {
+                        e.printStackTrace();
+
+                        // todo pozriet zapisovanie casu, pri katke a simonovy ktory su fix je price null
+                    }
                 } else {
                     userTimeData.get(time.getUser()).put(time.getDateWork().getDayOfMonth(), time.getTime());
                     userDayTotalPrice.get(time.getUser()).put(time.getDateWork().getDayOfMonth(), time.getPrice());
@@ -89,8 +95,8 @@ public class OverviewServiceImpl implements OverviewService {
     public List<UserYearOverviewDTO> getAllUsersYearsOverview() {
         HashMap<AppUser, HashMap<Integer, Integer>> preparedData = new HashMap<>();
 
-        List<UsersOverviewData> data = this.usersOverviewDataRepository.findAllByCompanyId(SecurityUtils.companyId());
-        List<Time> todayData = this.qTimeRepository.getAllTimeRecordsFromTo(LocalDate.now(), LocalDate.now(), SecurityUtils.companyId());
+        List<UsersOverviewData> data = this.usersOverviewDataRepository.findAllByAppProfileId(SecurityUtils.defaultProfileId());
+        List<Time> todayData = this.qTimeRepository.getAllTimeRecordsFromTo(LocalDate.now(), LocalDate.now(), SecurityUtils.defaultProfileId());
 
         //najprv spracujeme ulozene statisticke data
         data.forEach(dataToProcess -> {
@@ -135,11 +141,11 @@ public class OverviewServiceImpl implements OverviewService {
         CategoryCostsOverviewDTO response = new CategoryCostsOverviewDTO();
 
         if (categoryId == null) {
-            List<Category> rootCategories = this.categoryRepository.findByParentIdIsNullAndCompanyId(SecurityUtils.companyId()).orElse(new ArrayList<>());
+            List<Category> rootCategories = this.categoryRepository.findByParentIdIsNullAndAppProfileId(SecurityUtils.defaultProfileId()).orElse(new ArrayList<>());
 
             response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(rootCategories, year));
         } else {
-            List<Category> categories = this.categoryRepository.findAllByParentIdAndCompanyId(categoryId, SecurityUtils.companyId());
+            List<Category> categories = this.categoryRepository.findAllByParentIdAndAppProfileId(categoryId, SecurityUtils.defaultProfileId());
 
             response.setCategoryMonthsCostsDTOS(this.generateCategoryMonthCosts(categories, year));
         }
@@ -156,9 +162,10 @@ public class OverviewServiceImpl implements OverviewService {
      * @return
      */
     @Override
-    public String executeUsersYearsHours(String params, Company company) {
+    public String executeUsersYearsHours(String params, AppProfile appProfile) {
         LocalDate processFromDate = null;
         LocalDate processToDate;
+
         if (params != null) {
             processFromDate = LocalDate.parse(params).plusDays(1);
             processToDate = LocalDate.parse(params).plusDays(1);
@@ -166,18 +173,18 @@ public class OverviewServiceImpl implements OverviewService {
             processToDate = LocalDate.now().minusDays(1);
         }
 
-        Long companyId = company != null ? company.getId() : SecurityUtils.companyId();
+        Long appProfileId = appProfile != null ? appProfile.getId() : SecurityUtils.defaultProfileId();
 
-        List<Tuple> usersTimesToProcess = this.qTimeRepository.getAllUserTimesFromDateToDate(processFromDate, processToDate, companyId);
+        List<Tuple> usersTimesToProcess = this.qTimeRepository.getAllUserTimesFromDateToDate(processFromDate, processToDate, appProfileId);
 
         HashMap<String, AppUser> mappedUsers = new HashMap<>();
-        List<AppUser> users = this.appUserRepository.findAllByDefaultCompanyId(companyId);
+        List<AppUser> users = this.appUserRepository.findAllByDefaultProfileId(appProfileId);
         users.forEach(user -> mappedUsers.put(user.getUid(), user));
 
         //kazdy riadok je unikatny pre usera, rok a mesiac
         usersTimesToProcess.forEach(tuple -> {
-            UsersOverviewData usersOverviewData = this.usersOverviewDataRepository.findByUserUidAndYearAndMonthAndCompanyId(
-                    tuple.get(QTime.time1.user.uid), tuple.get(QTime.time1.dateWork.year()), tuple.get(QTime.time1.dateWork.month()), companyId
+            UsersOverviewData usersOverviewData = this.usersOverviewDataRepository.findByUserUidAndYearAndMonthAndAppProfileId(
+                    tuple.get(QTime.time1.user.uid), tuple.get(QTime.time1.dateWork.year()), tuple.get(QTime.time1.dateWork.month()), appProfileId
             );
             if (usersOverviewData == null) {
                 usersOverviewData = new UsersOverviewData();
@@ -185,10 +192,10 @@ public class OverviewServiceImpl implements OverviewService {
                 usersOverviewData.setYear(tuple.get(QTime.time1.dateWork.year()));
                 usersOverviewData.setMonth(tuple.get(QTime.time1.dateWork.month()));
                 usersOverviewData.setYearMonthHours(tuple.get(QTime.time1.time.sum()));
-                if (company != null) {
-                    usersOverviewData.setCompany(company);
+                if (appProfile != null) {
+                    usersOverviewData.setAppProfile(appProfile);
                 } else {
-                    usersOverviewData.setCompany(SecurityUtils.defaultCompany());
+                    usersOverviewData.setAppProfile(SecurityUtils.defaultProfile());
                 }
             } else {
                 usersOverviewData.setYearMonthHours(
@@ -244,10 +251,10 @@ public class OverviewServiceImpl implements OverviewService {
         List<CategoryMonthsCostsDTO> categoryMonthsCostsDTOS = new ArrayList<>();
 
         categories.forEach(category -> {
-            List<Long> childrenIds = this.categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyIds());
+            List<Long> childrenIds = this.categoryRepository.findAllChildIds(category.getId(), SecurityUtils.defaultProfileId());
 
-            List<Cost> costList = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds, year, SecurityUtils.companyId());
-            List<Cost> onlyChildrenCost = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds.stream().filter(childId -> !childId.equals(category.getId())).collect(Collectors.toList()), year, SecurityUtils.companyId());
+            List<Cost> costList = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds, year, SecurityUtils.defaultProfileId());
+            List<Cost> onlyChildrenCost = this.qCostRepository.getCostsWhereCategoryIdIn(childrenIds.stream().filter(childId -> !childId.equals(category.getId())).collect(Collectors.toList()), year, SecurityUtils.defaultProfileId());
 
             if (!costList.isEmpty()) {
                 CategoryMonthsCostsDTO categoryMonthsCostsDTO = new CategoryMonthsCostsDTO();
@@ -279,6 +286,7 @@ public class OverviewServiceImpl implements OverviewService {
                 userYearOverviewDTO.setFirstName(key.getFirstName());
                 userYearOverviewDTO.setLastName(key.getLastName());
                 userYearOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
+                userYearOverviewDTO.setPhotoUrl(key.getPhotoUrl());
                 userYearOverviewDTO.setYearHours(this.generateUserHoursStringFromMinutes(preparedData.get(key)));
                 response.add(userYearOverviewDTO);
             }
@@ -297,9 +305,11 @@ public class OverviewServiceImpl implements OverviewService {
         userTimeData.keySet().iterator().forEachRemaining(key -> {
             if (userSalaryHashMap.get(key.getId()) != null) {
                 UserHourOverviewDTO userHourOverviewDTO = new UserHourOverviewDTO();
+
                 userHourOverviewDTO.setFirstName(key.getFirstName());
                 userHourOverviewDTO.setLastName(key.getLastName());
                 userHourOverviewDTO.setFullName(key.getFirstName() + " " + key.getLastName());
+                userHourOverviewDTO.setPhotoUrl(key.getPhotoUrl());
                 userHourOverviewDTO.setUserTimePrices(userDayTotalPrice.get(key));
                 userHourOverviewDTO.setSalaryType(userSalaryHashMap.get(key.getId()).getSalaryType());
                 userHourOverviewDTO.setActiveHourPrice(userSalaryHashMap.get(key.getId()).getPrice());
@@ -321,7 +331,7 @@ public class OverviewServiceImpl implements OverviewService {
         HashMap<Long, Salary> userSalaryHashMap = new HashMap<>();
 
         //load just needed salaries
-        List<Salary> userSalaries = this.qSalaryRepository.getSalariesForUsersByIds(userIds, SecurityUtils.companyId());
+        List<Salary> userSalaries = this.qSalaryRepository.getSalariesForUsersByIds(userIds, SecurityUtils.defaultProfileId());
 
         for (Salary salary : userSalaries) {
             userSalaryHashMap.put(salary.getUser().getId(), salary);

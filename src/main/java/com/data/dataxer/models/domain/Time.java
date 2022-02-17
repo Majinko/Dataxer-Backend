@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -43,6 +44,4 @@ public class Time extends BaseEntity {
     float km;
 
     private LocalDate dateWork;
-
-
 }

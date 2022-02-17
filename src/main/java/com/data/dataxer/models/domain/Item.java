@@ -26,6 +26,10 @@ public class Item extends BaseEntity {
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     private List<Category> categories = new ArrayList<>();
 
+    @NotFound(action = NotFoundAction.IGNORE)
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Category category;
+
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "item")
     private List<ItemPrice> itemPrices = new ArrayList<>();
 

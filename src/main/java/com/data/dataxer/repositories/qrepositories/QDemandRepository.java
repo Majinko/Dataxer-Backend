@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QDemandRepository {
-   Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
+   Page<Demand> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId);
 
-    Optional<Demand> getById(Long id, Long companyId);
+    Optional<Demand> getById(Long id, Long appProfileId);
 }

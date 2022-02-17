@@ -37,18 +37,18 @@ public class PackServiceImpl implements PackService {
 
     @Override
     public List<Pack> search(String q) {
-        return qPackRepository.search(q, SecurityUtils.companyId());
+        return qPackRepository.search(q, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public Pack getByIdSimple(Long id) {
-        return this.packRepository.findByIdAndCompanyId(id, SecurityUtils.companyId())
+        return this.packRepository.findByIdAndAppProfileId(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Pack not found"));
     }
 
     @Override
     public Page<Pack> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qPackRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return this.qPackRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -60,7 +60,7 @@ public class PackServiceImpl implements PackService {
 
     @Override
     public Pack getById(Long id) {
-        return this.qPackRepository.getById(id, SecurityUtils.companyId());
+        return this.qPackRepository.getById(id, SecurityUtils.defaultProfileId());
     }
 
     private void preparePackItems(Pack pack){

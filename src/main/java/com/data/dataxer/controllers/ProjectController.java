@@ -28,18 +28,12 @@ public class ProjectController {
     private final TimeMapper timeMapper;
     private final UserMapper userMapper;
 
-    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper,
-                             TimeMapper timeMapper, UserMapper userMapper) {
+    public ProjectController(ProjectService projectService, ProjectMapper projectMapper, CategoryMapper categoryMapper, TimeMapper timeMapper, UserMapper userMapper) {
         this.projectService = projectService;
         this.projectMapper = projectMapper;
         this.categoryMapper = categoryMapper;
         this.timeMapper = timeMapper;
         this.userMapper = userMapper;
-    }
-
-    @PostMapping("/store")
-    public ResponseEntity<ProjectDTO> store(@RequestBody ProjectDTO projectDTO) {
-        return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.store(projectMapper.projectDTOtoProject(projectDTO))));
     }
 
     @GetMapping("/paginate")
@@ -49,7 +43,7 @@ public class ProjectController {
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
             @RequestParam(value = "sortExpression", defaultValue = "sort(-project.number)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("numberew")));
 
         return ResponseEntity.ok(projectService.paginate(pageable, rqlFilter, sortExpression).map(projectMapper::projectToProjectDTOWithoutCategory));
     }
@@ -74,9 +68,22 @@ public class ProjectController {
         this.projectService.destroy(id);
     }
 
+
+    @PostMapping("/store")
+    public ResponseEntity<ProjectDTO> store(@RequestBody ProjectDTO projectDTO) {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTO(this.projectService.store(projectMapper.projectDTOtoProject(projectDTO))));
+    }
+
     @GetMapping("/all")
     public ResponseEntity<List<ProjectDTO>> all() {
         return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.all()));
+    }
+
+    @GetMapping("/allByClient")
+    public ResponseEntity<List<ProjectDTO>> allByClient(
+            @RequestParam(value = "clientId") Long clientId
+    ) {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allByClient(clientId)));
     }
 
     @GetMapping("/allHasCost")
@@ -92,6 +99,11 @@ public class ProjectController {
     @GetMapping("/allHasPriceOffer")
     public ResponseEntity<List<ProjectDTO>> allHasPriceOffer() {
         return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasPriceOffer()));
+    }
+
+    @GetMapping("/allHasPriceOfferCostInvoice")
+    public ResponseEntity<List<ProjectDTO>> allHasPriceOfferCostInvoice() {
+        return ResponseEntity.ok(projectMapper.projectToProjectDTOs(this.projectService.allHasPriceOfferCostInvoice()));
     }
 
     @GetMapping("/allHasUserTime")
@@ -137,7 +149,7 @@ public class ProjectController {
             @PathVariable Long id,
             @RequestParam(value = "companyIds", required = false) List<Long> companyIds
     ) {
-        return ResponseEntity.ok(this.projectService.getProjectManHours(id, companyIds));
+        return ResponseEntity.ok(this.projectService.getProjectManHours(id));
     }
 
     //todo remove

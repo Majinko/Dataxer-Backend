@@ -29,7 +29,7 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public List<Role> getAll() {
-        return this.roleRepository.findAllByCompanyIdIn(SecurityUtils.companyIds());
+        return this.roleRepository.findAllByAppProfileId(SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -43,13 +43,13 @@ public class RoleServiceImpl implements RoleService {
 
     @Override
     public Role getById(Long id) {
-        return this.qRoleRepository.getById(id, SecurityUtils.companyIds())
+        return this.qRoleRepository.getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Role not found"));
     }
 
     @Override
     public Page<Role> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qRoleRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qRoleRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override

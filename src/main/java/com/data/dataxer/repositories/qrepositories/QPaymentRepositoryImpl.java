@@ -37,7 +37,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<Payment> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -56,7 +56,7 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
         List<Payment> paymentList = this.query.selectFrom(qPayment)
                 .where(predicate)
-                .where(qPayment.company.id.eq(companyId))
+                .where(qPayment.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -66,22 +66,23 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public Optional<Payment> getById(Long id, Long companyId) {
+    public Optional<Payment> getById(Long id, Long appProfileId) {
         QPayment qPayment = QPayment.payment;
 
         return Optional.ofNullable(this.query
                 .selectFrom(qPayment)
-                .where(qPayment.company.id.eq(companyId))
+                .where(qPayment.appProfile.id.eq(appProfileId))
                 .where(qPayment.id.eq(id))
                 .orderBy(qPayment.id.desc())
                 .fetchOne());
     }
 
     @Override
-    public BigDecimal getDocumentTotalPrice(Long documentId, DocumentType documentType) {
+    public BigDecimal getDocumentTotalPrice(Long documentId, DocumentType documentType, Long appProfileId) {
         switch (documentType) {
             case COST:
                 Cost cost = this.query.selectFrom(QCost.cost)
+                        .where(QCost.cost.appProfile.id.eq(appProfileId))
                         .where(QCost.cost.id.eq(documentId))
                         .fetchOne();
 
@@ -90,10 +91,9 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
             case PROFORMA:
             case SUMMARY_INVOICE:
             case TAX_DOCUMENT:
-                QInvoice qInvoice = QInvoice.invoice;
-
-                Invoice invoice = this.query.selectFrom(qInvoice)
-                        .where(qInvoice.id.eq(documentId))
+                Invoice invoice = this.query.selectFrom(QInvoice.invoice)
+                        .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
+                        .where(QInvoice.invoice.id.eq(documentId))
                         .fetchOne();
 
                 if (invoice != null) {
@@ -104,10 +104,9 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
 
             case PRICE_OFFER:
             default:
-                QPriceOffer qPriceOffer = QPriceOffer.priceOffer;
-
-                PriceOffer priceOffer = this.query.selectFrom(qPriceOffer)
-                        .where(qPriceOffer.id.eq(documentId))
+                PriceOffer priceOffer = this.query.selectFrom(QPriceOffer.priceOffer)
+                        .where(QPriceOffer.priceOffer.appProfile.id.eq(appProfileId))
+                        .where(QPriceOffer.priceOffer.id.eq(documentId))
                         .fetchOne();
                 if (priceOffer != null) {
                     return priceOffer.getTotalPrice();
@@ -118,41 +117,43 @@ public class QPaymentRepositoryImpl implements QPaymentRepository {
     }
 
     @Override
-    public BigDecimal getPayedTotalPrice(Long documentId) {
-        QPayment qPayment = QPayment.payment;
-
+    public BigDecimal getPayedTotalPrice(Long documentId, DocumentType documentType, Long appProfileId) {
         List<Payment> payments = this.query
-                .selectFrom(qPayment)
-                .where(qPayment.documentId.eq(documentId))
-                .orderBy(qPayment.id.desc())
+                .selectFrom(QPayment.payment)
+                .where(QPayment.payment.appProfile.id.eq(appProfileId))
+                .where(QPayment.payment.documentId.eq(documentId))
+                .where(QPayment.payment.documentType.eq(documentType))
+                .orderBy(QPayment.payment.id.desc())
                 .fetch();
 
         BigDecimal payedTotalPrice = BigDecimal.valueOf(0);
+
         for (Payment payment : payments) {
             payedTotalPrice = payedTotalPrice.add(payment.getPayedValue());
         }
+
         return payedTotalPrice;
     }
 
     @Override
-    public List<Payment> getPaymentsByDocumentIdSortedByPayDate(Long documentId, Long companyId) {
+    public List<Payment> getPaymentsByDocumentIdSortedByPayDate(Long documentId, Long appProfileId) {
         QPayment qPayment = QPayment.payment;
 
         return this.query.selectFrom(qPayment)
                 .where(qPayment.documentId.eq(documentId))
-                .where(qPayment.company.id.eq(companyId))
+                .where(qPayment.appProfile.id.eq(appProfileId))
                 .orderBy(qPayment.payedDate.desc())
                 .fetch();
 
     }
 
     @Override
-    public Optional<Payment> getNewestByDocumentId(Long documentId, Long companyId) {
+    public Optional<Payment> getNewestByDocumentId(Long documentId, Long appProfileId) {
         QPayment qPayment = QPayment.payment;
 
         return Optional.ofNullable(this.query.selectFrom(qPayment)
                 .where(qPayment.documentId.eq(documentId))
-                .where(qPayment.company.id.eq(companyId))
+                .where(qPayment.appProfile.id.eq(appProfileId))
                 .orderBy(qPayment.createdAt.desc())
                 .fetchFirst());
     }

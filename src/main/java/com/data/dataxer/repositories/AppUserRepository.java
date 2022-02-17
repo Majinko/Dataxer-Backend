@@ -11,19 +11,18 @@ import java.util.Optional;
 public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     Optional<AppUser> findUserByEmail(String email);
 
-    Optional<AppUser> findByUid(String uid);
-
     Optional<AppUser> findByIdAndUid(Long id, String uid);
 
-    Optional<AppUser> findByUidAndDefaultCompanyId(String uid, Long companyId);
+    Optional<AppUser> findByUidAndDefaultProfileId(String uid, Long appProfileId);
 
-    @Query("SELECT u FROM AppUser u left join fetch u.roles where u.uid = ?1 and u.defaultCompany.id = ?2")
-    AppUser findByUidAndDefaultCompanyIdWithRoles(String uid, Long companyId);
+    @Query("SELECT u FROM AppUser u left join fetch u.roles where u.uid = ?1")
+    AppUser findByUid(String uid); // todo add company
 
-    List<AppUser> findAllByDefaultCompanyId(Long companyId);
+    List<AppUser> findAllByDefaultProfileId(Long appProfileId);
 
-    List<AppUser> findAllByDefaultCompanyIdOrderByIdAsc(Pageable pageable, Long companyId);
+    @Query("SELECT u FROM AppUser u WHERE u.id in (SELECT c.appUsers FROM Company c )")
+    List<AppUser> findAllByDefaultProfileIdOrderByIdAsc(Pageable pageable, Long appProfileId);
 
-    Long countAllByDefaultCompanyId(Long companyId);
+    Long countAllByDefaultProfileId(Long appProfileId);
 }
 

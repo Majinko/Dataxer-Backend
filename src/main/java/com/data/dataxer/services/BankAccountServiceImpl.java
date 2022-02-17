@@ -28,6 +28,7 @@ public class BankAccountServiceImpl implements BankAccountService {
     public BankAccount update(BankAccount bankAccount) {
         return this.bankAccountRepository.findById(bankAccount.getId()).map(account -> {
 
+            account.setCompany(bankAccount.getCompany());
             account.setAccountNumber(bankAccount.getAccountNumber());
             account.setBankCode(bankAccount.getBankCode());
             account.setBankName(bankAccount.getBankName());
@@ -41,24 +42,24 @@ public class BankAccountServiceImpl implements BankAccountService {
 
     @Override
     public List<BankAccount> findAll() {
-        return this.bankAccountRepository.findAllByCompanyId(SecurityUtils.companyId());
+        return this.bankAccountRepository.findAllByAppProfileId(SecurityUtils.defaultProfileId());
     }
 
     @Override
     public BankAccount getById(Long id) {
-        return bankAccountRepository.findByIdAndCompanyId(id, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Bank account not found"));
+        return bankAccountRepository.findByIdAndAppProfileId(id, SecurityUtils.defaultProfileId()).orElseThrow(() -> new RuntimeException("Bank account not found"));
     }
 
     @Override
-    public BankAccount getDefaultBankAccount() {
-        return this.bankAccountRepository.findByIsDefaultAndCompanyId(true, SecurityUtils.companyId()).orElseThrow(
+    public BankAccount getDefaultBankAccount(Long companyId) {
+        return this.bankAccountRepository.findByIsDefaultAndCompanyIdAndAppProfileId(true, companyId, SecurityUtils.defaultProfileId()).orElseThrow(
                 () -> new RuntimeException("Default account not found, please set it")
         );
     }
 
     @Override
     public void setDefaultBankAccount(Long id) {
-        List<BankAccount> bankAccounts = bankAccountRepository.findAllByCompanyId(SecurityUtils.companyId());
+        List<BankAccount> bankAccounts = bankAccountRepository.findAllByAppProfileId(SecurityUtils.defaultProfileId());
 
         bankAccounts.forEach(bankAccount -> {
             bankAccount.setIsDefault(bankAccount.getId().equals(id));

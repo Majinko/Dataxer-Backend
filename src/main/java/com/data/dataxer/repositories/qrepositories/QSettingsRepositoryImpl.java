@@ -19,32 +19,32 @@ public class QSettingsRepositoryImpl implements QSettingsRepository {
     }
 
     @Override
-    public Optional<Settings> getByName(String name, Long companyId) {
+    public Optional<Settings> getByName(String name, Long apProfileId) {
         QSettings qSettings = QSettings.settings;
 
         return Optional.ofNullable(
                 this.query.selectFrom(qSettings)
                         .where(qSettings.name.eq(name))
-                        .where(qSettings.company.id.eq(companyId))
+                        .where(qSettings.appProfile.id.eq(apProfileId))
                         .fetchOne()
         );
     }
 
     @Override
-    public List<Settings> getByCompanyId(Long companyId) {
+    public List<Settings> getByAppProfileId(Long apProfileId) {
         QSettings qSettings = QSettings.settings;
 
         return this.query.selectFrom(qSettings)
-                .where(qSettings.company.id.eq(companyId))
+                .where(qSettings.appProfile.id.eq(apProfileId))
                 .fetch();
     }
 
     @Override
-    public void deleteAllSettingsByCompany(Long companyId) {
+    public void deleteAllSettingsByCompany(Long apProfileId) {
         QSettings qSettings = QSettings.settings;
 
         this.query.delete(qSettings)
-                .where(qSettings.company.id.eq(companyId))
+                .where(qSettings.appProfile.id.eq(apProfileId))
                 .execute();
     }
 }

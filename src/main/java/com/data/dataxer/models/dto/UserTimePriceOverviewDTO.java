@@ -11,6 +11,7 @@ import java.math.BigDecimal;
 public class UserTimePriceOverviewDTO implements Comparable<UserTimePriceOverviewDTO> {
 
     private String name;
+    private String photoUrl;
     private Integer hours;
 
     private BigDecimal hourNetto;

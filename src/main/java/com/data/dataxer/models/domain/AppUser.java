@@ -32,6 +32,9 @@ public class AppUser implements Serializable {
 
     private String lastName;
 
+    @Column(columnDefinition = "text")
+    private String photoUrl;
+
     @Column(unique = true, nullable = false, updatable = false, length = 50)
     private String email;
 
@@ -48,15 +51,19 @@ public class AppUser implements Serializable {
     @Column(name = "connected")
     private Boolean connected = false;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private AppProfile defaultProfile;
+
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Role> roles = new ArrayList<>();
 
-    @OneToOne(fetch = FetchType.LAZY)
-    private Company defaultCompany;
+    @Transient
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<AppProfile> appProfiles = new ArrayList<>();
 
     @Transient
     @ManyToMany(fetch = FetchType.LAZY)
-    private List<Company> companies = new ArrayList<>();
+    private List<AppProfile> defaultProfiles = new ArrayList<>();
 
     @Column(updatable = false)
     @CreationTimestamp

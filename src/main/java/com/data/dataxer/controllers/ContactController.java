@@ -30,9 +30,14 @@ public class ContactController {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.store(contactMapper.toContact(contactDto))));
     }
 
-    @PutMapping("/update")
+    @PostMapping("/update")
     public ResponseEntity<ContactDTO> update(@RequestBody ContactDTO contactDto) {
         return ResponseEntity.ok(contactMapper.toContactDto(contactService.update(contactMapper.toContact(contactDto))));
+    }
+
+    @GetMapping("/destroy/{id}")
+    public void destroy(@PathVariable Long id) {
+        contactService.destroy(id);
     }
 
     @GetMapping("/getById/{id}")
@@ -52,11 +57,6 @@ public class ContactController {
         return ResponseEntity.ok(contactService.paginate(pageable, rqlFilter, sortExpression).map(contactMapper::toContactDto));
     }
 
-    @GetMapping("/destroy/{id}")
-    public void destroy(@PathVariable Long id) {
-        contactService.destroy(id);
-    }
-
     @GetMapping("/all")
     public ResponseEntity<List<ContactDTO>> all() {
         return ResponseEntity.ok(contactMapper.toContactDTOs(contactService.findAll()));
@@ -65,6 +65,11 @@ public class ContactController {
     @GetMapping("/allHasCost")
     public ResponseEntity<List<ContactDTO>> allHasCost() {
         return ResponseEntity.ok(contactMapper.toContactDTOs(this.contactService.allHasCost()));
+    }
+
+    @GetMapping("/allHasPriceOfferCostInvoice")
+    public ResponseEntity<List<ContactDTO>> allHasPriceOfferCostInvoice() {
+        return ResponseEntity.ok(contactMapper.toContactDTOs(this.contactService.allHasPriceOfferCostInvoice()));
     }
 
     @GetMapping("/allHasInvoice")

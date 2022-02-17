@@ -1,30 +1,39 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Cost;
+import com.data.dataxer.models.domain.Payment;
+import org.springframework.data.domain.Page;
 import com.data.dataxer.models.enums.DocumentState;
+import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.qrepositories.QCostRepository;
+import com.data.dataxer.repositories.qrepositories.QPaymentRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.MandatoryValidator;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.domain.Page;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 
 @Service
 public class CostServiceImpl implements CostService {
+    @Autowired
+    private CostRepository costRepository;
 
-    private final CostRepository costRepository;
-    private final QCostRepository qCostRepository;
+    @Autowired
+    private QCostRepository qCostRepository;
 
-    public CostServiceImpl(CostRepository costRepository, QCostRepository qCostRepository) {
-        this.costRepository = costRepository;
-        this.qCostRepository = qCostRepository;
-    }
+    @Autowired
+    private PaymentService paymentService;
+
+    @Autowired
+    private QPaymentRepository qPaymentRepository;
 
     @Override
     public Cost store(Cost cost) {
@@ -37,15 +46,24 @@ public class CostServiceImpl implements CostService {
             cost.setNextRepeatedCost(this.getNextRepeat(cost));
             this.costRepository.save(fromRepeatedCost);
         }
-        return this.costRepository.save(cost);
+
+        Cost newCost = this.costRepository.save(cost);
+
+        if (newCost.getState() == DocumentState.PAYED) {
+            this.storeCostPayment(newCost); // todo tpm odstranit ked sa opravia platby pri nakladoch
+        }
+
+        return newCost;
     }
 
     @Override
     public Cost update(Cost oldCost) {
-        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.companyIds()).map(cost -> {
+        this.checkCostPayment(oldCost);
 
+        return this.qCostRepository.getByIdWithRelation(oldCost.getId(), SecurityUtils.defaultProfileId()).map(cost -> {
             cost.setContact(oldCost.getContact());
             cost.setProject(oldCost.getProject());
+            cost.setCompany(oldCost.getCompany());
             cost.setTitle(oldCost.getTitle());
             cost.setCostOrder(oldCost.getCostOrder());
             cost.setCategories(oldCost.getCategories());
@@ -79,9 +97,23 @@ public class CostServiceImpl implements CostService {
         }).orElse(null);
     }
 
+    private void checkCostPayment(Cost cost) {
+        BigDecimal payedTotalPrice = this.qPaymentRepository.getPayedTotalPrice(cost.getId(), DocumentType.COST, SecurityUtils.defaultProfileId());
+
+        boolean isPayed = cost.getTotalPrice().subtract(payedTotalPrice).setScale(2, RoundingMode.HALF_UP).compareTo(BigDecimal.ZERO) == 0;
+
+        if (!isPayed) {
+            cost.setPaymentDate(null);
+            cost.setState(DocumentState.UNPAID);
+        } else {
+            cost.setState(DocumentState.PAYED);
+            cost.setPaymentDate(LocalDate.now());
+        }
+    }
+
     @Override
     public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qCostRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return this.qCostRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -101,7 +133,7 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost changeState(Long id, DocumentState state) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         oldCost.setState(state);
         return this.update(oldCost);
@@ -114,18 +146,18 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public Cost getById(Long id) {
-        return this.qCostRepository.getById(id, SecurityUtils.companyIds())
+        return this.qCostRepository.getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
     }
 
     @Override
     public Cost getByIdWithRelation(Long id) {
-        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.companyIds()).orElse(null);
+        return this.qCostRepository.getByIdWithRelation(id, SecurityUtils.defaultProfileId()).orElse(null);
     }
 
     @Override
     public Cost duplicate(Long id) {
-        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.companyIds())
+        Cost oldCost = this.qCostRepository.getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Cost not found"));
         Cost newCost = new Cost();
         BeanUtils.copyProperties(oldCost, newCost, "id");
@@ -134,12 +166,12 @@ public class CostServiceImpl implements CostService {
 
     @Override
     public List<Cost> findAllByProject(Long projectId, List<Long> companyIds) {
-        return costRepository.findAllByProjectIdAndCompanyIdIn(projectId, SecurityUtils.companyIds(companyIds));
+        return costRepository.findAllByProjectIdAndAppProfileId(projectId, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<Integer> getCostsYears() {
-        List<Integer> years = this.qCostRepository.getCostsYears(SecurityUtils.companyId());
+        List<Integer> years = this.qCostRepository.getCostsYears(SecurityUtils.defaultProfileId());
 
         years.sort(Collections.reverseOrder());
 
@@ -182,5 +214,17 @@ public class CostServiceImpl implements CostService {
             return nextRepeatedCost;
         }
         return LocalDate.now();
+    }
+
+    private void storeCostPayment(Cost cost) {
+        Payment payment = new Payment();
+
+        payment.setPaymentMethod(cost.getPaymentMethod());
+        payment.setDocumentId(cost.getId());
+        payment.setPayedValue(cost.getPrice());
+        payment.setDocumentType(DocumentType.COST);
+        payment.setPayedDate(cost.getPaymentDate());
+
+        this.paymentService.store(payment);
     }
 }

@@ -7,18 +7,21 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 public interface QProjectRepository {
+    Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId);
 
-    Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Project getById(Long id, Long appProfileId);
 
-    Project getById(Long id, List<Long> companyIds);
+    List<Project> search(Long appProfileId, String queryString);
 
-    List<Project> search(List<Long> companyIds, String queryString);
+    List<Project> allHasCost(Long appProfileId);
 
-    List<Project> allHasCost(List<Long> companyIds);
+    List<Project> allHasInvoice(Long appProfileId);
 
-    List<Project> allHasInvoice(List<Long> companyIds);
+    List<Project> allHasPriceOffer(Long appProfileId);
 
-    List<Project> allHasPriceOffer(List<Long> companyIds);
+    List<Project> allHasUserTime(String uid, Long appProfileId);
 
-    List<Project> allHasUserTime(String uid, List<Long> companyIds);
+    List<Project> getAllByIds(List<Long> ids, Long appProfileId);
+
+    List<Project> allHasPriceOfferCostInvoice(Long defaultProfileId);
 }

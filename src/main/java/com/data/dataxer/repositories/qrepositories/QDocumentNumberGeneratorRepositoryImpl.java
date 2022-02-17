@@ -14,6 +14,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -36,7 +37,7 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     }
 
     @Override
-    public Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<DocumentNumberGenerator> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -55,7 +56,7 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
 
         List<DocumentNumberGenerator> documentNumberGeneratorList = this.query.selectFrom(qDocumentNumberGenerator)
                 .where(predicate)
-                .where(qDocumentNumberGenerator.company.id.eq(companyId))
+                .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -65,7 +66,7 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     }
 
     @Override
-    public Optional<DocumentNumberGenerator> getById(Long id, Long companyId) {
+    public Optional<DocumentNumberGenerator> getById(Long id, Long appProfileId) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
         DocumentNumberGenerator documentNumberGenerator = this.query
@@ -78,26 +79,35 @@ public class QDocumentNumberGeneratorRepositoryImpl implements QDocumentNumberGe
     }
 
     @Override
-    public Optional<DocumentNumberGenerator> getByIdSimple(Long id, Long companyId) {
+    public Optional<DocumentNumberGenerator> getByIdSimple(Long id, Long appProfileId) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
         return Optional.ofNullable(this.query
                 .selectFrom(qDocumentNumberGenerator)
                 .where(qDocumentNumberGenerator.id.eq(id))
-                .where(qDocumentNumberGenerator.company.id.eq(companyId))
+                .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId))
                 .fetchOne());
     }
 
     @Override
-    public DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long companyId) {
+    public DocumentNumberGenerator getDefaultByDocumentType(DocumentType documentType, Long companyId, Long appProfileId) {
         QDocumentNumberGenerator qDocumentNumberGenerator = QDocumentNumberGenerator.documentNumberGenerator;
 
-        return this.query
+        JPAQuery<DocumentNumberGenerator> query = this.query
                 .selectFrom(qDocumentNumberGenerator)
-                .where(qDocumentNumberGenerator.type.eq(documentType))
+                .leftJoin(QDocumentNumberGenerator.documentNumberGenerator.company).fetchJoin()
                 .where(qDocumentNumberGenerator.isDefault.eq(true))
                 .where(qDocumentNumberGenerator.company.id.eq(companyId))
-                .fetchOne();
+                .where(qDocumentNumberGenerator.appProfile.id.eq(appProfileId));
+
+        if (documentType.equals(DocumentType.PROFORMA) || documentType.equals(DocumentType.PRICE_OFFER)) {
+            query.where(qDocumentNumberGenerator.type.eq(documentType));
+        } else {
+            // ak sa jedna o fakturu, danovy doklad, alebo vyuctovaciu fakturu pouzivam ciselnik na generovanie faktur
+            query.where(qDocumentNumberGenerator.type.eq(DocumentType.INVOICE));
+        }
+
+        return query.fetchOne();
     }
 
     private long getTotalCount(Predicate predicate) {

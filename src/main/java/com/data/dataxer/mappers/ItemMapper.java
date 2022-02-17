@@ -21,16 +21,15 @@ public interface ItemMapper {
     Item toItem(ItemDTO itemDTO);
 
     @Named(value = "itemToItemDTOWithPrice")
-    @Mapping(target = "categories", ignore = true)
     @Mapping(target = "supplier", ignore = true)
+    @Mapping(target = "files", ignore = true)
     @Mapping(target = "itemPrice", expression = "java(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null))")
     ItemDTO itemToItemDTOWithPrice(Item item);
 
-    @Named(value = "useWithoutPrice")
-    @Mapping(target = "itemPrice", ignore = true)
-    @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "category", ignore = true)
     @Mapping(target = "supplier", ignore = true)
     @Mapping(target = "files", ignore = true)
+    @Mapping(target = "itemPrice", expression = "java(toItemPriceDto(!item.getItemPrices().isEmpty() ? item.getItemPrices().get(0) : null))")
     ItemDTO itemToItemDtoSimple(Item item);
 
 

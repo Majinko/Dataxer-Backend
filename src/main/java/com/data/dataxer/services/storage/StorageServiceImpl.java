@@ -27,7 +27,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public Storage getPreview(Long id, String type) {
-        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndCompanyIdInAndIsDefault(id, type, SecurityUtils.companyIds(), true);
+        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndAppProfileIdAndIsDefault(id, type, SecurityUtils.defaultProfileId(), true);
 
         if (storage != null)
             storage.setContent(this.getFileContent(storage.getPath()));
@@ -37,7 +37,7 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public Storage getById(Long id) {
-        Storage storage = this.storageRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds());
+        Storage storage = this.storageRepository.findByIdAndAppProfileId(id, SecurityUtils.defaultProfileId());
 
         storage.setContent(this.getFileContent(storage.getPath()));
 
@@ -79,14 +79,14 @@ public class StorageServiceImpl implements StorageService {
 
     @Override
     public void destroy(Long id, String type) {
-        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndCompanyIdInAndIsDefault(id, type, SecurityUtils.companyIds(), true);
+        Storage storage = this.storageRepository.findByFileAbleIdAndFileAbleTypeAndAppProfileIdAndIsDefault(id, type, SecurityUtils.defaultProfileId(), true);
 
         this.destroy(storage);
     }
 
     @Override
     public void destroy(Long id) {
-        Storage storage = this.storageRepository.findByIdAndCompanyIdIn(id, SecurityUtils.companyIds());
+        Storage storage = this.storageRepository.findByIdAndAppProfileId(id, SecurityUtils.defaultProfileId());
 
         this.destroy(storage);
     }
@@ -102,9 +102,9 @@ public class StorageServiceImpl implements StorageService {
         HashMap<String, String> fileData = new HashMap<String, String>();
 
         String name = generateFileName(file.getFileName());
-        String path = SecurityUtils.defaultCompany().getName().toLowerCase().replaceAll("[^a-zA-Z0-9]", " ") + "/" + type + '/' + name;
+        String path = SecurityUtils.defaultProfile().getTitle().toLowerCase().replaceAll("[^a-zA-Z0-9]", " ") + "/" + type + '/' + name;
 
-        Blob blob = bucket.create(path, file.getContent(), file.getContentType());
+        bucket.create(path, file.getContent(), file.getContentType());
 
         fileData.put("name", name);
         fileData.put("path", path);

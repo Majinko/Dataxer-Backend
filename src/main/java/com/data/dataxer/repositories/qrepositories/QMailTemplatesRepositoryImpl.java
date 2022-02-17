@@ -36,17 +36,17 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
     }
 
     @Override
-    public Optional<MailTemplate> getById(Long id, Long companyId) {
+    public Optional<MailTemplate> getById(Long id, Long appProfileId) {
         return Optional.ofNullable(
             this.query.selectFrom(QMailTemplate.mailTemplate)
                 .where(QMailTemplate.mailTemplate.id.eq(id))
-                .where(QMailTemplate.mailTemplate.company.id.eq(companyId))
+                .where(QMailTemplate.mailTemplate.appProfile.id.eq(appProfileId))
                 .fetchOne()
         );
     }
 
     @Override
-    public Page<MailTemplate> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<MailTemplate> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -66,7 +66,7 @@ public class QMailTemplatesRepositoryImpl implements QMailTemplatesRepository {
 
         List<MailTemplate> mailTemplatesList = this.query.selectFrom(QMailTemplate.mailTemplate)
                 .where(predicate)
-                .where(QMailTemplate.mailTemplate.company.id.eq(companyId))
+                .where(QMailTemplate.mailTemplate.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

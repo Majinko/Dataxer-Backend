@@ -8,19 +8,21 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QContactRepository {
-    List<Contact> allWithProjects(List<Long> companyIds);
+    List<Contact> allWithProjects(Long appProfileId);
 
-    Page<Contact> paginate(Pageable pageable, String rqlFilter, String sortExpression, List<Long> companyIds);
+    Page<Contact> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId);
 
-    Optional<Contact> getById(Long id, List<Long> companyIds);
+    Optional<Contact> getById(Long id, Long appProfileId);
 
-    List<Contact> getAllByIds(List<Long> contactIds, List<Long> companyIds);
+    List<Contact> getAllByIds(List<Long> contactIds, Long appProfileId);
 
-    List<Contact> allHasCost(List<Long> companyIds);
+    List<Contact> allHasCost(Long appProfileId);
 
-    List<Contact> allHasInvoice(List<Long> companyIds);
+    List<Contact> allHasInvoice(Long appProfileId);
 
-    List<Contact> allHasPriceOffer(List<Long> companyIds);
+    List<Contact> allHasPriceOffer(Long appProfileId);
 
-    List<Contact> allHasProject(List<Long> companyIds);
+    List<Contact> allHasProject(Long appProfileId);
+
+    List<Contact> allHasPriceOfferCostInvoice(Long defaultProfileId);
 }

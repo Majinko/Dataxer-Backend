@@ -13,5 +13,6 @@ public class MailDataDTO {
     private Long templateId;
     private Long companyId;
     private List<Long> participantIds;
+    private List<String> participantEmails;
     private List<String> fileNames;
 }

@@ -32,6 +32,6 @@ public class ItemDTO {
     ContactDTO supplier;
     ItemPriceDTO itemPrice;
 
+    private CategoryDTO category;
     private List<StorageFileDTO> files = new ArrayList<>();
-    private List<CategoryDTO> categories = new ArrayList<>();
 }

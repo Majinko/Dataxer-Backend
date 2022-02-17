@@ -31,20 +31,20 @@ public class MailTemplatesServiceImpl implements MailTemplatesService {
     @Override
     @Transactional
     public void update(MailTemplate mailTemplates) {
-        if (this.qMailTemplatesRepository.updateByMailTemplates(mailTemplates, SecurityUtils.companyId()) != 1) {
+        if (this.qMailTemplatesRepository.updateByMailTemplates(mailTemplates, SecurityUtils.defaultProfileId()) != 1) {
             throw new RuntimeException("Mail template update failed");
         }
     }
 
     @Override
     public MailTemplate getById(Long id) {
-        return this.qMailTemplatesRepository.getById(id, SecurityUtils.companyId())
+        return this.qMailTemplatesRepository.getById(id, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Mail templates not found"));
     }
 
     @Override
     public Page<MailTemplate> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qMailTemplatesRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyId());
+        return this.qMailTemplatesRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -54,7 +54,7 @@ public class MailTemplatesServiceImpl implements MailTemplatesService {
 
     @Override
     public List<MailTemplate> getAll() {
-        return this.mailTemplatesRepository.findAllByCompanyId(SecurityUtils.companyId());
+        return this.mailTemplatesRepository.findAllByAppProfileId(SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -64,6 +64,6 @@ public class MailTemplatesServiceImpl implements MailTemplatesService {
 
     @Override
     public MailTemplate getByType(String type) {
-        return this.mailTemplatesRepository.findByType(MailTemplateType.valueOf(type), SecurityUtils.companyId());
+        return this.mailTemplatesRepository.findByType(MailTemplateType.valueOf(type), SecurityUtils.defaultProfileId());
     }
 }

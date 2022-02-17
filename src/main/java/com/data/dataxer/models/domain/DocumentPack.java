@@ -14,6 +14,7 @@ import java.util.List;
 @Entity
 @Setter
 @Getter
+// todo pridad profile id
 public class DocumentPack implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

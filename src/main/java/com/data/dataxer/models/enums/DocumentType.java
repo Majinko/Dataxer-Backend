@@ -15,7 +15,7 @@ public enum DocumentType {
     }
 
     public static DocumentType getTypeByName(String name) {
-        return  DocumentType.valueOf(name);
+        return DocumentType.valueOf(name);
     }
 
     public String getName() {

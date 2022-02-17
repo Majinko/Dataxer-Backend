@@ -41,6 +41,11 @@ public class UserController {
         return ResponseEntity.ok(userMapper.appUserToAppUserDTOs(this.userService.all()));
     }
 
+    @GetMapping("/resetToken/{uid}")
+    public void resetToken(@PathVariable String uid) {
+        userService.resetToken(uid);
+    }
+
     @GetMapping("/{uid}")
     public ResponseEntity<AppUserDTO> getByUid(@PathVariable String uid) {
         return ResponseEntity.ok(userMapper.appUserToAppUserDTO(this.userService.getByUid(uid)));
@@ -59,11 +64,12 @@ public class UserController {
     @GetMapping("/overview")
     public ResponseEntity<Page<AppUserOverviewDTO>> overview(
             @RequestParam(value = "page", defaultValue = "0") int page,
-            @RequestParam(value = "size", defaultValue = "15") int size
+            @RequestParam(value = "size", defaultValue = "15") int size,
+            @RequestParam(value = "qString", required = false) String qString
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(this.userService.overview(pageable));
+        return ResponseEntity.ok(this.userService.overview(pageable, qString));
     }
 
     // todo move to other controller
@@ -81,7 +87,7 @@ public class UserController {
     public void store(@RequestBody AppUserInitDTO appUserInitDTO) {
         this.salaryService.initUserStoreSalary(
                 salaryMapper.salaryDTOtoSalary(appUserInitDTO.getSalary()),
-                userMapper.appUserDTOtoAppUser(userMapper.appUserToAppUserDTO(userService.store(userMapper.appUserDTOtoAppUser(appUserInitDTO.getUser()))))
+                userMapper.appUserDTOtoAppUserWithRoles(userMapper.appUserToAppUserDTO(userService.store(userMapper.appUserDTOtoAppUserWithRoles(appUserInitDTO.getUser()))))
         );
     }
 
@@ -90,10 +96,11 @@ public class UserController {
         ResponseEntity.ok(userMapper.appUserToAppUserDTO(userService.update(userMapper.appUserDTOtoAppUserWithRoles(appUserDTO))));
     }
 
-    @GetMapping("/switchCompany/{companyId}")
-    public void switchCompany(@PathVariable Long companyId) {
-        this.userService.switchCompany(companyId);
+    @GetMapping("/switchProfile/{appProfileId}")
+    public void switchProfile(@PathVariable Long appProfileId) {
+        this.userService.switchProfile(appProfileId);
     }
+
 
     @PostMapping("/assignRoles/{uid}")
     public void assignRoles(@PathVariable String uid, @RequestBody List<RoleDTO> roleDTOS) {

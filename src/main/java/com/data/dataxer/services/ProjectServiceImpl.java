@@ -5,6 +5,7 @@ import com.data.dataxer.models.dto.EvaluationPreparationDTO;
 import com.data.dataxer.models.dto.ProjectManHoursDTO;
 import com.data.dataxer.models.dto.ProjectTimePriceOverviewCategoryDTO;
 import com.data.dataxer.models.dto.UserTimePriceOverviewDTO;
+import com.data.dataxer.models.enums.CategoryType;
 import com.data.dataxer.repositories.CategoryRepository;
 import com.data.dataxer.repositories.CostRepository;
 import com.data.dataxer.repositories.ProjectRepository;
@@ -45,14 +46,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Autowired
     private CategoryRepository categoryRepository;
 
-    @Autowired
-    private CostRepository costRepository;
 
     @Autowired
     private QCostRepository qCostRepository;
-
-    @Autowired
-    private QInvoiceRepository qInvoiceRepository;
 
     @Override
     public Project store(Project project) {
@@ -61,7 +57,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project getById(Long id) {
-        return this.qProjectRepository.getById(id, SecurityUtils.companyIds());
+        return this.qProjectRepository.getById(id, SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -71,32 +67,44 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Page<Project> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return qProjectRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return qProjectRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public void destroy(Long id) {
-        this.projectRepository.delete(this.qProjectRepository.getById(id, SecurityUtils.companyIds()));
+        this.projectRepository.delete(this.qProjectRepository.getById(id, SecurityUtils.defaultProfileId()));
     }
 
     @Override
     public List<Project> all() {
-        return this.projectRepository.findAllByCompanyIdIn(SecurityUtils.companyIds());
+        return this.projectRepository.findAllByAppProfileId(SecurityUtils.defaultProfileId());
+    }
+
+    @Override
+    public List<Project> allByClient(Long clientId) {
+        return this.projectRepository.findAllByContactIdAndAppProfileId(clientId, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<Project> search(String queryString) {
-        return this.qProjectRepository.search(SecurityUtils.companyIds(), queryString);
+        return this.qProjectRepository.search(SecurityUtils.defaultProfileId(), queryString);
     }
 
     @Override
     public List<Category> getAllProjectCategories(Long projectId) {
-        return this.qProjectRepository.getById(projectId, SecurityUtils.companyIds()).getCategories();
+        List<Category> categories = this
+                .qProjectRepository
+                .getById(projectId, SecurityUtils.defaultProfileId())
+                .getCategories();
+
+        categories.sort(Comparator.comparing(category -> category.getPosition() != null ? category.getPosition() : 0));
+
+        return this.qProjectRepository.getById(projectId, SecurityUtils.defaultProfileId()).getCategories();
     }
 
     @Override
     public List<Category> getAllProjectCategoriesOrderedByPosition(Long projectId) {
-        List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.companyIds()).getCategories();
+        List<Category> categories = this.qProjectRepository.getById(projectId, SecurityUtils.defaultProfileId()).getCategories();
         categories.sort(Comparator.comparing(Category::getPosition));
 
         return categories;
@@ -105,7 +113,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<ProjectTimePriceOverviewCategoryDTO> getProjectCategoryOverview(Long id, Long categoryParentId) {
-        List<Integer> projectYears = this.getAllProjectYears(id, null);
+        List<Integer> projectYears = this.getAllProjectYears(id);
         List<ProjectTimePriceOverviewCategoryDTO> response = new ArrayList<>();
 
         if (!projectYears.isEmpty()) {
@@ -114,7 +122,7 @@ public class ProjectServiceImpl implements ProjectService {
 
             categoriesForReport.forEach(category -> {
                 List<UserTimePriceOverviewDTO> responseValue = new ArrayList<>();
-                List<Tuple> categoryUsersData = this.qTimeRepository.getAllProjectUserCategoryData(id, this.categoryRepository.findAllChildIdsHasTime(category.getId(), SecurityUtils.companyId()), SecurityUtils.companyId());
+                List<Tuple> categoryUsersData = this.qTimeRepository.getAllProjectUserCategoryData(id, this.categoryRepository.findAllChildIdsHasTime(category.getId(), SecurityUtils.defaultProfileId()), SecurityUtils.defaultProfileId());
 
                 categoryUsersData.forEach(tuple -> {
                     UserTimePriceOverviewDTO projectTimePriceOverviewDTO = new UserTimePriceOverviewDTO();
@@ -136,14 +144,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     private List<Category> prepareParentCategories(Long categoryParentId) {
         return categoryParentId == null
-                ? this.categoryRepository.findByParentIdIsNullAndCompanyId(SecurityUtils.companyId()).orElse(new ArrayList<>())
-                : this.categoryRepository.findAllByParentIdAndCompanyId(categoryParentId, SecurityUtils.companyId());
+                ? this.categoryRepository.findByParentIdIsNullAndAppProfileId(SecurityUtils.defaultProfileId()).orElse(new ArrayList<>())
+                : this.categoryRepository.findAllByParentIdAndAppProfileId(categoryParentId, SecurityUtils.defaultProfileId());
     }
 
     private void prepareProjectTimePriceOverviewDTO(Tuple userData, UserTimePriceOverviewDTO projectTimePriceOverviewDTO, BigDecimal projectTotalCost, Integer firstYear, Integer lastYear) {
         BigDecimal costToHour = this.getUserCostToHour(firstYear, lastYear, userData.get(QTime.time1.user.uid), projectTotalCost);
 
         projectTimePriceOverviewDTO.setName(StringUtils.getAppUserFullName(userData.get(QTime.time1.user.firstName), userData.get(QTime.time1.user.lastName)));
+        projectTimePriceOverviewDTO.setPhotoUrl(userData.get(QTime.time1.user.photoUrl));
         projectTimePriceOverviewDTO.setHours(userData.get(QTime.time1.time.sum()));
 
         projectTimePriceOverviewDTO.setPriceNetto(userData.get(QTime.time1.price.sum()));
@@ -159,27 +168,27 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<Time> getProjectUsersTimesOverview(Long id, LocalDate dateFrom, LocalDate dateTo, String categoryName, String userUid) {
         Category category = categoryName.equals("_all_") ? null :
-                this.categoryRepository.findCategoryByName(categoryName, SecurityUtils.companyId()).orElse(null);
+                this.categoryRepository.findCategoryByName(categoryName, SecurityUtils.defaultProfileId()).orElse(null);
 
-        return this.qTimeRepository.getProjectAllUsersTimes(id, category, dateFrom, dateTo, userUid, SecurityUtils.companyId());
+        return this.qTimeRepository.getProjectAllUsersTimes(id, category, dateFrom, dateTo, userUid, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public String getProjectTimeForThisYear(Long id) {
         Integer currentYear = LocalDate.now().getYear();
 
-        return StringUtils.convertMinutesTimeToHoursString(this.qTimeRepository.getTotalProjectTimeForYear(id, currentYear, SecurityUtils.companyId()));
+        return StringUtils.convertMinutesTimeToHoursString(this.qTimeRepository.getTotalProjectTimeForYear(id, currentYear, SecurityUtils.defaultProfileId()));
     }
 
     @Override
-    public ProjectManHoursDTO getProjectManHours(Long id, List<Long> companyIds) {
+    public ProjectManHoursDTO getProjectManHours(Long id) {
         ProjectManHoursDTO projectManHoursDTO = new ProjectManHoursDTO();
-        List<Integer> projectYears = this.getAllProjectYears(id, companyIds);
+        List<Integer> projectYears = this.getAllProjectYears(id);
 
         if (!projectYears.isEmpty()) {
             List<UserTimePriceOverviewDTO> projectTimePriceOverviewDTOList = new ArrayList<>();
-            BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1));
-            List<Tuple> userTimesPriceSums = this.qTimeRepository.getProjectUsersTimePriceSums(id, SecurityUtils.companyIds(companyIds));
+            BigDecimal projectTotalCost = this.getProjectTotalCostForYears(projectYears.get(0), projectYears.get(projectYears.size() - 1)); // todo k nakladom pridat aj casy ktore suvisia s chodom firmy teda niesu ziskove
+            List<Tuple> userTimesPriceSums = this.qTimeRepository.getProjectUsersTimePriceSums(id, SecurityUtils.defaultProfileId());
 
             userTimesPriceSums.forEach(tuple -> {
                 UserTimePriceOverviewDTO projectTimePriceOverviewDTO = new UserTimePriceOverviewDTO();
@@ -202,19 +211,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public EvaluationPreparationDTO evaluationPreparationProjectData(Long id) {
-        EvaluationPreparationDTO response = new EvaluationPreparationDTO();
-
- /*       List<Cost> costs = this.costRepository.findAllByProjectIdAndCompanyId(id, SecurityUtils.companyId());
-        List<Invoice> invoices = this.qInvoiceRepository.getAllProjectInvoices(id, SecurityUtils.companyId());
-        List<Time> times = this.qTimeRepository.getAllProjectTimesOrdered(id, SecurityUtils.companyId());*/
-
-        return response;
+        return new EvaluationPreparationDTO();
     }
 
     @Override
     public void addProfitUser(Long id, AppUser user) {
         ObjectMapper objectMapper = new ObjectMapper();
-        Project project = this.qProjectRepository.getById(id, SecurityUtils.companyIds());
+        Project project = this.qProjectRepository.getById(id, SecurityUtils.defaultProfileId());
 
         try {
             Set<String> uniqueUsers = new HashSet<>();
@@ -235,7 +238,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public void removeProfitUser(Long id, AppUser user) {
         ObjectMapper objectMapper = new ObjectMapper();
-        Project project = this.qProjectRepository.getById(id, SecurityUtils.companyIds());
+        Project project = this.qProjectRepository.getById(id, SecurityUtils.defaultProfileId());
 
         try {
             if (project.getProfitUsers() != null && project.getProfitUsers() != "") {
@@ -254,28 +257,33 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> allHasCost() {
-        return this.qProjectRepository.allHasCost(SecurityUtils.companyIds());
+        return this.qProjectRepository.allHasCost(SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<Project> allHasInvoice() {
-        return this.qProjectRepository.allHasInvoice(SecurityUtils.companyIds());
+        return this.qProjectRepository.allHasInvoice(SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<Project> allHasPriceOffer() {
-        return this.qProjectRepository.allHasPriceOffer(SecurityUtils.companyIds());
+        return this.qProjectRepository.allHasPriceOffer(SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<Project> allHasUserTime() {
-        return this.qProjectRepository.allHasUserTime(SecurityUtils.uid(), SecurityUtils.companyIds());
+        return this.qProjectRepository.allHasUserTime(SecurityUtils.uid(), SecurityUtils.defaultProfileId());
+    }
+
+    @Override
+    public List<Project> allHasPriceOfferCostInvoice() {
+        return this.qProjectRepository.allHasPriceOfferCostInvoice(SecurityUtils.defaultProfileId());
     }
 
     private BigDecimal getUserCostToHour(Integer startYear, Integer endYear, String userUid, BigDecimal projectTotalCost) {
-        int userTimeBetweenYears = this.qTimeRepository.getUserProjectTimeBetweenYears(startYear, endYear, userUid, SecurityUtils.companyIds());
-        int userActiveMonths = this.qTimeRepository.getUserActiveMonths(startYear, endYear, userUid, SecurityUtils.companyIds()).size();
-        BigDecimal allActiveMonths = new BigDecimal(this.qTimeRepository.getProjectAllUsersActiveMonth(startYear, endYear, SecurityUtils.companyIds()).size());
+        int userTimeBetweenYears = this.qTimeRepository.getUserProjectTimeBetweenYears(startYear, endYear, userUid, SecurityUtils.defaultProfileId());
+        int userActiveMonths = this.qTimeRepository.getUserActiveMonths(startYear, endYear, userUid, SecurityUtils.defaultProfileId()).size();
+        BigDecimal allActiveMonths = new BigDecimal(this.qTimeRepository.getProjectAllUsersActiveMonth(startYear, endYear, SecurityUtils.defaultProfileId()).size());
 
         if (userActiveMonths == 0 || projectTotalCost == null) {
             return new BigDecimal(userActiveMonths);
@@ -296,30 +304,22 @@ public class ProjectServiceImpl implements ProjectService {
         return minutePrice.multiply(new BigDecimal(60)).setScale(2, RoundingMode.HALF_UP);
     }
 
-    private List<Integer> getAllProjectYears(Long id, List<Long> companyIds) {
-        return this.qTimeRepository.getProjectYears(id, SecurityUtils.companyIds(companyIds));
+    private List<Integer> getAllProjectYears(Long id) {
+        return this.qTimeRepository.getProjectYears(id, SecurityUtils.defaultProfileId());
     }
 
-    private BigDecimal getProjectTotalCostForYears(Integer firstYear, Integer lastYear) {
-        return this.getProjectTotalCostForYears(firstYear, lastYear, null);
-    }
-
-    private BigDecimal getProjectTotalCostForYears(Integer firstYear, Integer lastYear, List<Long> companyIds) { // ak by som chcel naklad k hodinovke // todo nezabudnut k hodinovke aj mzdy
+    private BigDecimal getProjectTotalCostForYears(Integer firstYear, Integer lastYear) { // ak by som chcel naklad k hodinovke // todo nezabudnut k hodinovke aj mzdy
         LocalDate firstYearStart = LocalDate.of(firstYear, Month.JANUARY, 1);
         LocalDate lastYearEnd = LocalDate.of(lastYear, Month.DECEMBER, 31);
 
-        return this.qCostRepository.getProjectTotalCostBetweenYears(firstYearStart, lastYearEnd, Boolean.FALSE, Boolean.FALSE, this.getCategoriesIdInProjectCost(), SecurityUtils.companyIds(companyIds));
+        return this.qCostRepository.getProjectTotalCostBetweenYears(firstYearStart, lastYearEnd, Boolean.FALSE, Boolean.FALSE, this.getCategoriesIdInProjectCost(), SecurityUtils.defaultProfileId());
     }
 
+    /**
+     * Get categories ids
+     */
     private List<Long> getCategoriesIdInProjectCost() {
-        List<Long> categoriesIds = new ArrayList<>();
-        List<Category> categories = this.categoryRepository.findAllByIsInProjectOverviewAndCompanyIdIn(true, SecurityUtils.companyIds());
-
-        categories.forEach(category -> {
-            categoriesIds.addAll(categoryRepository.findAllChildIds(category.getId(), SecurityUtils.companyIds()));
-        });
-
-        return categoriesIds;
+        return this.categoryRepository.findAllIdsCategoryTypeInAndAppProfileId(CategoryType.getManHoursTypes(), SecurityUtils.defaultProfileId());
     }
 
     private double convertTimeSecondsToHours(int time) {

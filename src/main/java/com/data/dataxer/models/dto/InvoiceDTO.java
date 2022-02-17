@@ -41,5 +41,7 @@ public class InvoiceDTO {
 
     private ContactDTO contact;
     private ProjectDTO project;
+    private CompanyDTO company;
+    List<PaymentDTO> payments = new ArrayList<>();
     List<DocumentPackDTO> packs = new ArrayList<>();
 }

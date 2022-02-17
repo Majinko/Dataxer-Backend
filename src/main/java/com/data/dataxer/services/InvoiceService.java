@@ -39,14 +39,22 @@ public interface InvoiceService {
 
     HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems);
 
-    List<DocumentPackItem> getInvoiceItems(List<DocumentPack> packs);
+    HashMap<Integer, BigDecimal> getInvoicePayedTaxesValuesMap(List<DocumentPack> packs);
 
+    BigDecimal getTaxDocumentPayedValue(List<DocumentPack> packs);
+
+    HashMap<Integer, BigDecimal> getTaxPayedTaxesValuesMap(List<DocumentPack> packs);
+
+    List<DocumentPackItem> getInvoiceItems(List<DocumentPack> packs);
     //parameter je id danoveho dokladu
-    Invoice generateSummaryInvoice(Long taxDocumentId);
+
+    Invoice generateSummaryInvoice(Long documentId, String documentType);
 
     Invoice changeTypeAndSave(Long id, String type, String number);
 
     List<Invoice> findAllByRelatedDocuments(Long documentId);
 
     List<Invoice> findAllByProject(Long projectId, List<Long> companyIds);
+
+    Invoice getInvoicesFromPriceOffer(Long id, String type);
 }

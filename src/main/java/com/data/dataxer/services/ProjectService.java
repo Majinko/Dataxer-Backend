@@ -26,6 +26,8 @@ public interface ProjectService {
 
     List<Project> all();
 
+    List<Project> allByClient(Long clientId);
+
     List<Project> search(String queryString);
 
     List<Category> getAllProjectCategories(Long projectId);
@@ -38,7 +40,7 @@ public interface ProjectService {
 
     String getProjectTimeForThisYear(Long id);
 
-    ProjectManHoursDTO getProjectManHours(Long id, List<Long> companyIds);
+    ProjectManHoursDTO getProjectManHours(Long id);
 
     EvaluationPreparationDTO evaluationPreparationProjectData(Long id);
 
@@ -53,4 +55,6 @@ public interface ProjectService {
     List<Project> allHasPriceOffer();
 
     List<Project> allHasUserTime();
+
+    List<Project> allHasPriceOfferCostInvoice();
 }

@@ -43,8 +43,9 @@ public class CostDTO {
     private BigDecimal totalPrice;
     private Integer tax;
 
-    Contact contact;
-    Project project;
+    ContactDTO contact;
+    ProjectDTO project;
+    CompanyDTO company;
 
     private List<StorageFileDTO> files = new ArrayList<>();
     private List<CategoryDTO> categories = new ArrayList<>();

@@ -3,8 +3,10 @@ package com.data.dataxer.models.domain;
 import com.data.dataxer.mappers.HashMapConverter;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.DocumentType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Formula;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -39,7 +41,14 @@ public abstract class DocumentBase extends BaseEntity {
     @JoinColumn(name = "project_id")
     Project project;
 
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
+
     protected String title;
+
+    protected String subject;
 
     protected String number;
 
@@ -57,6 +66,9 @@ public abstract class DocumentBase extends BaseEntity {
     protected BigDecimal price;
 
     protected BigDecimal totalPrice;
+
+    @Formula("price - (price * (discount / 100))")
+    private BigDecimal priceAfterDiscount;
 
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)

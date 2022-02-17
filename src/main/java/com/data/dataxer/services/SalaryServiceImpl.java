@@ -33,12 +33,12 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override
     public List<Salary> getUserSalaries(String uid, Sort sort) {
-        return this.salaryRepository.findAllByUserUidAndCompanyId(uid, sort, SecurityUtils.companyId());
+        return this.salaryRepository.findAllByUserUidAndAppProfileId(uid, sort, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public void store(Salary salary) {
-        Salary lastUserSalary = this.salaryRepository.findByUserUidAndFinishIsNullAndCompanyId(salary.getUser().getUid(), SecurityUtils.companyId());
+        Salary lastUserSalary = this.salaryRepository.findByUserUidAndFinishIsNullAndAppProfileId(salary.getUser().getUid(), SecurityUtils.defaultProfileId());
 
         if (lastUserSalary != null) {
             if (salary.getStart().isBefore(lastUserSalary.getStart())) {
@@ -55,16 +55,21 @@ public class SalaryServiceImpl implements SalaryService {
 
     @Override
     public Salary getById(Long id) {
-        return this.salaryRepository.findByIdAndAndCompanyId(id, SecurityUtils.companyId()).orElseThrow(() -> new RuntimeException("Salary not found :("));
+        return this.salaryRepository.findByIdAndAppProfileId(id, SecurityUtils.defaultProfileId()).orElseThrow(() -> new RuntimeException("Salary not found :("));
+    }
+
+    @Override
+    public Salary getActiveSalary(String uid) {
+        return this.salaryRepository.findByUserUidAndFinishIsNullAndAppProfileId(uid, SecurityUtils.defaultProfileId());
     }
 
     @Override
     // todo finish later
     public void update(Salary salary) {
-        List<Time> times = this.timeRepository.findAllBySalaryIdAndAndCompanyId(salary.getId(), SecurityUtils.companyId());
+        List<Time> times = this.timeRepository.findAllBySalaryIdAndAndAndAppProfileId(salary.getId(), SecurityUtils.defaultProfileId());
 
         //todo update and time price
-        salaryRepository.findByIdAndAndCompanyId(salary.getId(), SecurityUtils.companyId()).map(s -> {
+        salaryRepository.findByIdAndAppProfileId(salary.getId(), SecurityUtils.defaultProfileId()).map(s -> {
             s.setPrice(salary.getPrice());
             s.setIsActive(salary.getIsActive());
 

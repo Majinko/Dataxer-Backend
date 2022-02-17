@@ -5,10 +5,7 @@ import com.data.dataxer.services.PdfService;
 import com.lowagie.text.DocumentException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletResponse;
@@ -19,7 +16,7 @@ import java.nio.file.Paths;
 
 @Controller
 @RequestMapping("/api/pdf")
-@PreAuthorize("hasPermission(null, 'Pdf', 'Pdf')")
+@PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class PdfController {
     private final PdfService pdfService;
     private final InvoiceService invoiceService;
@@ -36,10 +33,12 @@ public class PdfController {
         return modelAndView;
     }
 
-    @RequestMapping(value = "/download-pdf/{id}", method = RequestMethod.GET)
-    public void downloadPDFResource(@PathVariable Long id, HttpServletResponse response) {
+    @RequestMapping(value = "/downloadPdf/{id}", method = RequestMethod.GET)
+    public void downloadPDFResource(@PathVariable Long id,
+                                    @RequestParam(value = "docType", defaultValue = "") String documentType,
+                                    HttpServletResponse response) {
         try {
-            Path file = Paths.get(pdfService.generatePdf(id).getAbsolutePath());
+            Path file = Paths.get(pdfService.generatePdf(id, documentType).getAbsolutePath());
 
             if (Files.exists(file)) {
                 response.setContentType("application/pdf");

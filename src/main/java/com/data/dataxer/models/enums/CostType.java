@@ -1,8 +1,12 @@
 package com.data.dataxer.models.enums;
 
 public enum CostType {
-    // todo zahrnut v inporte
     INVOICE("invoice"),
+    BILL("bill"),
+    INTERNAL("internal"),
+    CONTRIBUTION("contribution"),
+    RECEIVED_CREDIT_NOTE("received_credit_note"),
+    NONDEDUCTIBLE("nondeductible"),
     OTHER("other");
 
     private String name;
@@ -18,5 +22,4 @@ public enum CostType {
     public String getName() {
         return this.name;
     }
-
 }

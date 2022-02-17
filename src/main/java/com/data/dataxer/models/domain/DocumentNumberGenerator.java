@@ -2,6 +2,7 @@ package com.data.dataxer.models.domain;
 
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.models.enums.Periods;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,10 +12,14 @@ import javax.persistence.*;
 @Getter
 @Setter
 public class DocumentNumberGenerator extends BaseEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
 
     private String title;
 
@@ -27,8 +32,6 @@ public class DocumentNumberGenerator extends BaseEntity {
 
     private Boolean isDefault;
 
-    private String lastNumber;
-
     public DocumentNumberGenerator() {}
 
     public DocumentNumberGenerator(
@@ -37,12 +40,12 @@ public class DocumentNumberGenerator extends BaseEntity {
             DocumentType type,
             Periods period,
             boolean isDefault,
-            String lastNumber) {
+            Company company) {
         this.title = title;
         this.format = format;
         this.type = type;
         this.period = period;
         this.isDefault = isDefault;
-        this.lastNumber = lastNumber;
+        this.company = company;
     }
 }

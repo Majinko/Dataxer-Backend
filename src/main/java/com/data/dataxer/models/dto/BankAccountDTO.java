@@ -8,7 +8,7 @@ import java.math.BigInteger;
 @Getter
 @Setter
 public class BankAccountDTO {
-    private Long id;
+    Long id;
     Integer bankCode;
     BigInteger accountNumber;
     String bankName;
@@ -16,4 +16,5 @@ public class BankAccountDTO {
     String iban;
     String swift;
     Boolean isDefault;
+    CompanyDTO company;
 }

@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface QFileRepository {
+    Optional<File> getByNameAndProfileId(String fileName, Long appProfileId);
 
-    Optional<File> getByNameAndCompanyIds(String fileName, Long companyId);
-
-    Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId);
+    Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId);
 }

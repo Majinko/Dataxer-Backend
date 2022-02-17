@@ -5,8 +5,10 @@ import com.data.dataxer.models.enums.DocumentType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-public interface DocumentNumberGeneratorService {
+import java.time.LocalDate;
+import java.util.List;
 
+public interface DocumentNumberGeneratorService {
     void store(DocumentNumberGenerator documentNumberGenerator);
 
     DocumentNumberGenerator update(DocumentNumberGenerator documentNumberGenerator);
@@ -19,15 +21,9 @@ public interface DocumentNumberGeneratorService {
 
     void destroy(Long id);
 
-    String generateNextNumberByDocumentType(DocumentType documentType, boolean storeGenerated);
-
-    String generateNextNumberByDocumentTypeFromString(String type);
+    String generateNextNumberByDocumentType(DocumentType documentType, LocalDate date, Long companyId);
 
     String getNextNumber(DocumentNumberGenerator documentNumberGenerator);
 
-    void resetGenerationByType(DocumentType documentType);
-
-    void resetGenerationById(Long id);
-
-    String generateNextNumberByDocumentId(Long id, boolean storeGenerated);
+    List<DocumentNumberGenerator> getAll();
 }

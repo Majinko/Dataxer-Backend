@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/bank-account")
-@PreAuthorize("hasPermission(null, 'Settings', 'Settings')")
+@PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class BankAccountController {
     private final BankAccountService bankAccountService;
     private final BankAccountMapper bankAccountMapper;
@@ -52,8 +52,10 @@ public class BankAccountController {
     }
 
     @GetMapping("/get-default")
-    public ResponseEntity<BankAccountDTO> getDefault() {
-        return ResponseEntity.ok(bankAccountMapper.bankAccountToBankAccountDTO(bankAccountService.getDefaultBankAccount()));
+    public ResponseEntity<BankAccountDTO> getDefault(
+            @RequestParam(value = "companyId", required = true) Long companyId
+    ) {
+        return ResponseEntity.ok(bankAccountMapper.bankAccountToBankAccountDTO(bankAccountService.getDefaultBankAccount(companyId)));
     }
 
     @GetMapping("/get-all")

@@ -5,6 +5,7 @@ import com.data.dataxer.models.dto.PriceOfferDTO;
 import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.services.DocumentNumberGeneratorService;
 import com.data.dataxer.services.PriceOfferService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,26 +20,20 @@ import java.util.List;
 @RequestMapping("/api/priceOffer")
 @PreAuthorize("hasPermission(null, 'Document', 'Document')")
 public class PriceOfferController {
-    private final PriceOfferService priceOfferService;
-    private final PriceOfferMapper priceOfferMapper;
-    private final DocumentNumberGeneratorService documentNumberGeneratorService;
+    @Autowired
+    private PriceOfferService priceOfferService;
 
-    public PriceOfferController(PriceOfferService priceOfferService, PriceOfferMapper priceOfferMapper, DocumentNumberGeneratorService documentNumberGeneratorService) {
-        this.priceOfferService = priceOfferService;
-        this.priceOfferMapper = priceOfferMapper;
-        this.documentNumberGeneratorService = documentNumberGeneratorService;
-    }
+    @Autowired
+    private PriceOfferMapper priceOfferMapper;
 
     @PostMapping("/store")
     public void store(@RequestBody PriceOfferDTO priceOfferDTO) {
-        this.documentNumberGeneratorService.generateNextNumberByDocumentType(DocumentType.valueOf("PRICE_OFFER"), true);
-
-        this.priceOfferService.store(priceOfferMapper.priceOfferDTOtoPriceOffer(priceOfferDTO));
+        this.priceOfferService.store(priceOfferMapper.priceOfferDTOtoPriceOfferWithCompany(priceOfferDTO));
     }
 
     @PostMapping("/update")
     public void update(@RequestBody PriceOfferDTO priceOfferDTO) {
-        this.priceOfferService.update(priceOfferMapper.priceOfferDTOtoPriceOffer(priceOfferDTO));
+        this.priceOfferService.update(priceOfferMapper.priceOfferDTOtoPriceOfferWithCompany(priceOfferDTO));
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
@@ -55,7 +50,7 @@ public class PriceOfferController {
 
     @GetMapping("/getById/{id}")
     public ResponseEntity<PriceOfferDTO> getById(@PathVariable Long id) {
-        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTO(this.priceOfferService.getById(id)));
+        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTOWithCompany(this.priceOfferService.getById(id)));
     }
 
     @GetMapping("/destroy/{id}")
@@ -73,7 +68,6 @@ public class PriceOfferController {
 
     @GetMapping("/duplicate/{oldPriceOfferId}")
     public ResponseEntity<PriceOfferDTO> duplicate(@PathVariable Long oldPriceOfferId) {
-        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTO(this.priceOfferService.duplicate(oldPriceOfferId)));
+        return ResponseEntity.ok(priceOfferMapper.priceOfferToPriceOfferDTOWithCompany(this.priceOfferService.duplicate(oldPriceOfferId)));
     }
-
 }

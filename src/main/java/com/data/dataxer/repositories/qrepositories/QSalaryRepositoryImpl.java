@@ -19,20 +19,20 @@ public class QSalaryRepositoryImpl implements QSalaryRepository {
     }
 
     @Override
-    public Salary getPriceFromSalaryByUserFinishIsNull(AppUser user, Long companyId) {
+    public Salary getActiveSalary(AppUser user, Long apProfileId) {
         return this.query.select(QSalary.salary)
                 .from(QSalary.salary)
                 .where(QSalary.salary.user.eq(user))
                 .where(QSalary.salary.finish.isNull())
-                .where(QSalary.salary.company.id.eq(companyId))
+                .where(QSalary.salary.appProfile.id.eq(apProfileId))
                 .fetchOne();
     }
 
     @Override
-    public List<Salary> getSalariesForUsersByIds(List<Long> userIds, Long companyId) {
+    public List<Salary> getSalariesForUsersByIds(List<Long> userIds, Long apProfileId) {
         return this.query.selectFrom(QSalary.salary)
                 .leftJoin(QSalary.salary.user).fetchJoin()
-                .where(QSalary.salary.company.id.eq(companyId))
+                .where(QSalary.salary.appProfile.id.eq(apProfileId))
                 .where(QSalary.salary.finish.isNull())
                 .where(QSalary.salary.user.id.in(userIds))
                 .fetch();

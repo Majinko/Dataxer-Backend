@@ -1,5 +1,6 @@
 package com.data.dataxer.models.domain;
 
+import com.data.dataxer.models.enums.CategoryGroup;
 import com.data.dataxer.models.enums.ProjectState;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,6 +24,7 @@ public class Project extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotFound(action = NotFoundAction.IGNORE)
     @JoinColumn(name = "client_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Contact contact;
@@ -36,7 +38,7 @@ public class Project extends BaseEntity {
     private String profitUsers;
 
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Category> categories = new ArrayList<>();
 
     private String title;

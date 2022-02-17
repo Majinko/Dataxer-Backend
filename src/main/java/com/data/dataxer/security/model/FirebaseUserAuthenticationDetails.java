@@ -1,8 +1,8 @@
 package com.data.dataxer.security.model;
 
+import com.data.dataxer.models.domain.AppProfile;
 import com.data.dataxer.models.domain.AppUser;
-import com.data.dataxer.models.domain.Company;
-import com.data.dataxer.repositories.CompanyRepository;
+import com.data.dataxer.repositories.AppProfileRepository;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -15,14 +15,14 @@ import java.util.List;
 @Getter
 public class FirebaseUserAuthenticationDetails implements UserDetails {
     private final AppUser user;
-    private final List<Company> companies;
+    private final List<AppProfile> appProfiles;
 
-    public FirebaseUserAuthenticationDetails(AppUser user, CompanyRepository companyRepository) {
+    public FirebaseUserAuthenticationDetails(AppUser user, AppProfileRepository appProfileRepository) {
         this.user = user;
-        this.companies = companyRepository.findAllByAppUsersIn(List.of(user));
+        this.appProfiles = appProfileRepository.findAllByAppUsersIn(List.of(user));
 
         // set additional data
-        this.user.setCompanies(this.companies);
+        this.user.setAppProfiles(appProfiles);
     }
 
     public AppUser getLoggedUser() {

@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/time")
 @PreAuthorize("hasPermission(null, 'Time', 'Time')")
 public class TimeController {
-
     private final TimeService timeService;
     private final TimeMapper timeMapper;
     private final ProjectMapper projectMapper;
@@ -37,13 +37,13 @@ public class TimeController {
     }
 
     @PostMapping("/store")
-    public ResponseEntity<TimeDTO> store(@RequestBody @Valid TimeDTO timeDTO) {
-        return ResponseEntity.ok(this.timeMapper.timeToTimeDTO(this.timeService.store(this.timeMapper.timeDTOToTime(timeDTO))));
+    public void store(@RequestBody @Valid TimeDTO timeDTO) {
+        this.timeService.store(this.timeMapper.timeDTOToTimeWithCompany(timeDTO));
     }
 
     @PostMapping("/update")
     public void update(@RequestBody TimeDTO timeDTO) {
-        this.timeService.update(this.timeMapper.timeDTOToTime(timeDTO));
+        this.timeService.update(this.timeMapper.timeDTOToTimeWithCompany(timeDTO));
     }
 
     @RequestMapping(value = "/paginate", method = RequestMethod.GET)
@@ -53,7 +53,7 @@ public class TimeController {
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
             @RequestParam(value = "sortExpression", defaultValue = "sort(-time.id)") String sortExpression
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("date_work")));
 
         return ResponseEntity.ok(this.timeService.paginate(pageable, rqlFilter, sortExpression).map(this.timeMapper::timeToTimeDTO));
     }
@@ -76,6 +76,13 @@ public class TimeController {
             @RequestParam(value = "companyIds", required = false) List<Long> companyIds
     ) {
         return ResponseEntity.ok(this.timeMapper.timeListToTimeDTOWithoutRelations(this.timeService.allByProject(projectId, companyIds)));
+    }
+
+    @GetMapping("/allByProjectDetail/{projectId}")
+    public ResponseEntity<List<TimeDTO>> allByProjectDetail(
+            @PathVariable Long projectId
+    ) {
+        return ResponseEntity.ok(this.timeService.allByProject(projectId).stream().map(timeMapper::timeToTimeDTOWithoutProject).collect(Collectors.toList()));
     }
 
     @GetMapping("/userMonths")
@@ -112,7 +119,7 @@ public class TimeController {
 
     @GetMapping("/{id}")
     public ResponseEntity<TimeDTO> getTimeById(@PathVariable Long id) {
-        return ResponseEntity.ok(this.timeMapper.timeToTimeDTO(this.timeService.getTimeById(id)));
+        return ResponseEntity.ok(this.timeMapper.timeToTimeDTOWithCompany(this.timeService.getTimeById(id)));
     }
 
     @GetMapping("/destroy/{id}")

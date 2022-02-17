@@ -5,6 +5,7 @@ import com.data.dataxer.models.enums.CostType;
 import com.data.dataxer.models.enums.CostsPeriods;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.models.enums.PaymentMethod;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.NotFound;
@@ -50,12 +51,17 @@ public class Cost extends BaseEntity {
     @Where(clause="file_able_type='cost'")
     private List<Storage> files = new ArrayList<>();
 
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    private Company company;
+
     private String title;
 
     private String costOrder;
 
     @NotFound(action = NotFoundAction.IGNORE)
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Category> categories = new ArrayList<>();
 
     protected String number;

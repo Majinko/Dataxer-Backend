@@ -36,19 +36,19 @@ public class QMailAccountsRepositoryImpl implements QMailAccountsRepository {
     }
 
     @Override
-    public Optional<MailAccounts> getById(Long id, Long companyId) {
+    public Optional<MailAccounts> getById(Long id, Long appProfileId) {
         QMailAccounts qMailAccounts = QMailAccounts.mailAccounts;
 
         return Optional.ofNullable(
                 this.query.selectFrom(qMailAccounts)
                         .where(qMailAccounts.id.eq(id))
-                        .where(qMailAccounts.company.id.eq(companyId))
+                        .where(qMailAccounts.appProfile.id.eq(appProfileId))
                         .fetchOne()
         );
     }
 
     @Override
-    public long updateByMailAccounts(MailAccounts mailAccounts, Long companyId) {
+    public long updateByMailAccounts(MailAccounts mailAccounts, Long appProfileId) {
         QMailAccounts qMailAccounts = QMailAccounts.mailAccounts;
 
         return this.query.update(qMailAccounts)
@@ -58,12 +58,12 @@ public class QMailAccountsRepositoryImpl implements QMailAccountsRepository {
                 .set(qMailAccounts.password, mailAccounts.getPassword())
                 .set(qMailAccounts.state, mailAccounts.getState())
                 .where(qMailAccounts.id.eq(mailAccounts.getId()))
-                .where(qMailAccounts.company.id.eq(companyId))
+                .where(qMailAccounts.appProfile.id.eq(appProfileId))
                 .execute();
     }
 
     @Override
-    public Page<MailAccounts> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<MailAccounts> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -85,7 +85,7 @@ public class QMailAccountsRepositoryImpl implements QMailAccountsRepository {
 
         List<MailAccounts> mailAccountsList = this.query.selectFrom(qMailAccounts)
                 .where(predicate)
-                .where(qMailAccounts.company.id.eq(companyId))
+                .where(qMailAccounts.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -95,12 +95,12 @@ public class QMailAccountsRepositoryImpl implements QMailAccountsRepository {
     }
 
     @Override
-    public Optional<MailAccounts> getByCompaniesId(Long companyId) {
+    public Optional<MailAccounts> getByCompaniesId(Long appProfileId) {
         QMailAccounts qMailAccounts = QMailAccounts.mailAccounts;
 
         return Optional.ofNullable(
                 this.query.selectFrom(qMailAccounts)
-                    .where(qMailAccounts.company.id.eq(companyId))
+                    .where(qMailAccounts.appProfile.id.eq(appProfileId))
                     .fetchOne()
         );
     }

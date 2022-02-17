@@ -34,12 +34,12 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public Page<Contact> paginate(Pageable pageable, String rqlFilter, String sortExpression) {
-        return this.qContactRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.companyIds());
+        return this.qContactRepository.paginate(pageable, rqlFilter, sortExpression, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public Contact getById(Long id) {
-        return this.qContactRepository.getById(id, SecurityUtils.companyIds()).orElse(null);
+        return this.qContactRepository.getById(id, SecurityUtils.defaultProfileId()).orElse(null);
     }
 
     @Override
@@ -49,38 +49,43 @@ public class ContactServiceImpl implements ContactService {
 
     @Override
     public List<Contact> getContactByIds(List<Long> contactIds) {
-        return this.qContactRepository.getAllByIds(contactIds, SecurityUtils.companyIds());
+        return this.qContactRepository.getAllByIds(contactIds, SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<Contact> findAll() {
-        return contactRepository.findAllByCompanyIdIn(SecurityUtils.companyIds()).orElse(null);
+        return contactRepository.findAllByAppProfileId(SecurityUtils.defaultProfileId()).orElse(null);
     }
 
     @Override
     public List<Contact> findByName(String name) {
         return contactRepository
-                .findFirst5ByNameContaining(name)
+                .findFirst5ByNameContainingAndAppProfileId(name, SecurityUtils.defaultProfileId())
                 .orElseThrow(() -> new RuntimeException("Contact not found"));
     }
 
     @Override
     public List<Contact> allHasCost() {
-        return this.qContactRepository.allHasCost(SecurityUtils.companyIds());
+        return this.qContactRepository.allHasCost(SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<Contact> allHasInvoice() {
-        return this.qContactRepository.allHasInvoice(SecurityUtils.companyIds());
+        return this.qContactRepository.allHasInvoice(SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<Contact> allHasPriceOffer() {
-        return this.qContactRepository.allHasPriceOffer(SecurityUtils.companyIds());
+        return this.qContactRepository.allHasPriceOffer(SecurityUtils.defaultProfileId());
     }
 
     @Override
     public List<Contact> allHasProject() {
-        return this.qContactRepository.allHasProject(SecurityUtils.companyIds());
+        return this.qContactRepository.allHasProject(SecurityUtils.defaultProfileId());
+    }
+
+    @Override
+    public List<Contact> allHasPriceOfferCostInvoice() {
+        return this.qContactRepository.allHasPriceOfferCostInvoice(SecurityUtils.defaultProfileId());
     }
 }

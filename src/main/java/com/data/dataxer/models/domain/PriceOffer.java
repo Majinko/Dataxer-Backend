@@ -7,6 +7,7 @@ import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity
 @Setter
@@ -15,14 +16,13 @@ import java.math.BigDecimal;
 @Where(clause = "deleted_at is null")
 @SQLDelete(sql = "UPDATE document_base SET deleted_at = now() WHERE id = ?")
 public class PriceOffer extends DocumentBase {
-
     @Override
     public BigDecimal countDiscountTotalPrice() {
-        return BigDecimal.ZERO;
+        return this.totalPrice.multiply(this.discount.divide(BigDecimal.valueOf(100)));
     }
 
     @Override
     public BigDecimal countTaxPrice(BigDecimal price, Integer tax) {
-        return BigDecimal.ZERO;
+        return price.multiply(new BigDecimal (tax.doubleValue()/100)).setScale(2, RoundingMode.HALF_UP);
     }
 }

@@ -3,7 +3,8 @@ package com.data.dataxer.repositories.qrepositories;
 import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.QCategory;
 import com.data.dataxer.models.domain.QCost;
-import com.data.dataxer.utils.Helpers;
+import org.springframework.data.domain.Page;
+import com.data.dataxer.models.page.CustomPageImpl;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -17,14 +18,13 @@ import com.querydsl.core.types.Path;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.IsoFields;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -42,7 +42,7 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<Cost> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -54,50 +54,54 @@ public class QCostRepositoryImpl implements QCostRepository {
                 .put("cost.company.id", QCost.cost.company.id)
                 .put("cost.title", QCost.cost.title)
                 .put("cost.state", QCost.cost.state)
-                .put("cost.contact.id", QCost.cost.contact.id)
-                .put("cost.contact.name", QCost.cost.contact.name)
+                .put("cost.contractor.id", QCost.cost.contact.id)
+                .put("cost.contractor.name", QCost.cost.contact.name)
                 .put("cost.project.id", QCost.cost.project.id)
-                .put("cost.start", QCost.cost.createdAt)
-                .put("cost.end", QCost.cost.createdAt)
+                .put("cost.documentType", QCost.cost.type)
+                .put("cost.start", QCost.cost.createdDate)
+                .put("cost.end", QCost.cost.createdDate)
                 .build();
 
         if (!rqlFilter.equals("")) {
             predicate = filterParser.parse(rqlFilter, withBuilderAndParam(new QuerydslFilterBuilder(), new QuerydslFilterParam()
                     .setMapping(pathMapping)));
         }
+
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
-        List<Long> costIds = this.returnCostsIdsForPaginate(pageable, rqlFilter, companyId, predicate, orderSpecifierList);
+        List<Long> costIds = this.returnCostsIdsForPaginate(pageable, rqlFilter, appProfileId, predicate, orderSpecifierList);
 
         List<Cost> costList = this.query.selectFrom(qCost)
                 .leftJoin(qCost.contact).fetchJoin()
                 .leftJoin(qCost.project).fetchJoin()
                 .leftJoin(QCost.cost.categories, QCategory.category).fetchJoin()
                 .where(qCost.id.in(costIds))
+                .orderBy(QCost.cost.id.desc())
+                .distinct()
                 .fetch();
 
-
-        return new PageImpl<>(costList, pageable, getTotalCount(predicate));
+        return new CustomPageImpl<Cost>(costList, pageable, getTotalCount(predicate, appProfileId), getTotalPrice(predicate, appProfileId));
     }
 
     @Override
-    public Optional<Cost> getById(Long id, List<Long> companyIds) {
+    public Optional<Cost> getById(Long id, Long appProfileId) {
         return Optional.ofNullable(
-                this.constructGetAllByIdAndCompanyId(id, companyIds).fetchOne()
+                this.constructGetAllByIdAndCompanyId(id, appProfileId).fetchOne()
         );
     }
 
     @Override
-    public Optional<Cost> getByIdWithRelation(Long id, List<Long> companyIds) {
-        Cost cost = this.constructGetAllByIdAndCompanyId(id, companyIds)
+    public Optional<Cost> getByIdWithRelation(Long id, Long appProfileId) {
+        Cost cost = this.constructGetAllByIdAndCompanyId(id, appProfileId)
                 .leftJoin(QCost.cost.contact).fetchJoin()
                 .leftJoin(QCost.cost.project).fetchJoin()
                 .leftJoin(QCost.cost.files).fetchJoin()
+                .leftJoin(QCost.cost.company).fetchJoin()
                 .fetchOne();
 
         if (cost != null) {
             cost.setCategories(
-                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, companyIds)
+                    Objects.requireNonNull(this.constructGetAllByIdAndCompanyId(id, appProfileId)
                                     .leftJoin(QCost.cost.categories).fetchJoin()
                                     .fetchOne())
                             .getCategories()
@@ -140,46 +144,98 @@ public class QCostRepositoryImpl implements QCostRepository {
     }
 
     @Override
-    public BigDecimal getProjectTotalCostBetweenYears(LocalDate firstYearStart, LocalDate lastYearEnd, Boolean isInternal, Boolean isRepeated, List<Long> categoriesIdInProjectCost, List<Long> companyIds) {
+    public BigDecimal getProjectTotalCostBetweenYears(LocalDate firstYearStart, LocalDate lastYearEnd, Boolean isInternal, Boolean isRepeated, List<Long> categoriesIdInProjectCost, Long appProfileId) {
         return this.query.from(QCost.cost)
                 .select(QCost.cost.price.sum())
                 .where(QCost.cost.deliveredDate.gt(firstYearStart))
                 .where(QCost.cost.deliveredDate.lt(lastYearEnd))
                 .where(QCost.cost.isInternal.eq(isInternal))
                 .where(QCost.cost.isRepeated.eq(isRepeated))
-                .where(QCost.cost.company.id.in(companyIds))
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .where(QCategory.category.id.in(categoriesIdInProjectCost))
                 .join(QCost.cost.categories, QCategory.category)
                 .fetchOne();
     }
 
-    private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, List<Long> companyIds) {
+    @Override
+    public Cost getLastCostByDayAndMonthAndYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.appProfile.id.eq(defaultProfileId))
+                .where(QCost.cost.createdDate.dayOfMonth().eq(date.getDayOfMonth()))
+                .where(QCost.cost.createdDate.month().eq(date.getMonthValue()))
+                .where(QCost.cost.createdDate.year().eq(date.getYear()))
+                .orderBy(QCost.cost.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    @Override
+    public Cost getLastCostByMonthAndYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.appProfile.id.eq(defaultProfileId))
+                .where(QCost.cost.createdDate.month().eq(date.getMonthValue()))
+                .where(QCost.cost.createdDate.year().eq(date.getYear()))
+                .orderBy(QCost.cost.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    @Override
+    public Cost getLastCostByQuarterAndYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.appProfile.id.eq(defaultProfileId))
+                .where(QCost.cost.createdDate.month().divide(3.0).ceil().eq(date.get(IsoFields.QUARTER_OF_YEAR)))
+                .where(QCost.cost.createdDate.year().eq(date.getYear()))
+                .orderBy(QCost.cost.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    @Override
+    public Cost getLastCostOfferByYear(LocalDate date, Long companyId, Long defaultProfileId) {
+        return this.query.selectFrom(QCost.cost)
+                .where(QCost.cost.company.id.eq(companyId))
+                .where(QCost.cost.appProfile.id.eq(defaultProfileId))
+                .where(QCost.cost.createdDate.year().eq(date.getYear()))
+                .orderBy(QCost.cost.id.desc())
+                .limit(1L)
+                .fetchOne();
+    }
+
+    private JPAQuery<Cost> constructGetAllByIdAndCompanyId(Long id, Long appProfileId) {
         return query.selectFrom(QCost.cost)
-                .where(QCost.cost.company.id.in(companyIds))
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .where(QCost.cost.id.eq(id));
     }
 
-    private long getTotalCount(Predicate predicate) {
+    private long getTotalCount(Predicate predicate, Long appProfileId) {
         QCost qCost = QCost.cost;
 
         return this.query.selectFrom(qCost)
                 .where(predicate)
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .fetchCount();
     }
 
-    private List<Long> returnCostsIdsForPaginate(Pageable pageable, String rqlFilter, Long companyId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
+    private BigDecimal getTotalPrice(Predicate predicate, Long appProfileId) {
+        return this.query
+                .select(QCost.cost.price.sum())
+                .from(QCost.cost)
+                .where(predicate)
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
+                .fetchOne();
+    }
+
+    private List<Long> returnCostsIdsForPaginate(Pageable pageable, String rqlFilter, Long appProfileId, Predicate predicate, OrderSpecifierList orderSpecifierList) {
         JPAQuery<Cost> costJPAQuery = this.query.selectFrom(QCost.cost)
                 .where(predicate)
+                .where(QCost.cost.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize());
-
-        if (!rqlFilter.contains("cost.company.id")) {
-            costJPAQuery.where(QCost.cost.company.id.eq(companyId));
-        } // todo somethnig can hack, only change company id in header query params manual alebo nejaku grupu pre usera
-        else {
-            Helpers.checkCompanyIdFromRql(rqlFilter); //todo only hot fix make somthing group for user app account
-        }
 
         return costJPAQuery.select(QCost.cost.id).fetch();
     }

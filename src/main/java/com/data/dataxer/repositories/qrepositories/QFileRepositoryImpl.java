@@ -36,15 +36,15 @@ public class QFileRepositoryImpl implements QFileRepository{
     }
 
     @Override
-    public Optional<File> getByNameAndCompanyIds(String fileName, Long companyId) {
+    public Optional<File> getByNameAndProfileId(String fileName, Long appProfileId) {
         return Optional.ofNullable(this.query.selectFrom(QFile.file)
                 .where(QFile.file.name.eq(fileName))
-                .where(QFile.file.company.id.eq(companyId))
+                .where(QFile.file.appProfile.id.eq(appProfileId))
                 .fetchOne());
     }
 
     @Override
-    public Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long companyId) {
+    public Page<File> paginate(Pageable pageable, String rqlFilter, String sortExpression, Long appProfileId) {
         DefaultSortParser sortParser = new DefaultSortParser();
         DefaultFilterParser filterParser = new DefaultFilterParser();
         Predicate predicate = new BooleanBuilder();
@@ -63,7 +63,7 @@ public class QFileRepositoryImpl implements QFileRepository{
 
         List<File> fileList = this.query.selectFrom(qFile)
                 .where(predicate)
-                .where(QFile.file.company.id.eq(companyId))
+                .where(QFile.file.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

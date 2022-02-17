@@ -26,5 +26,6 @@ public class CompanyDTO {
     private String vatin;
     private String logoUrl;
     private String signatureUrl;
+    private Integer position;
     private CompanyTaxType companyTaxType;
 }
