@@ -51,19 +51,22 @@ public class AppUser implements Serializable {
     @Column(name = "connected")
     private Boolean connected = false;
 
+    private Boolean isDisabled = false;
+
     @OneToOne(fetch = FetchType.LAZY)
     private AppProfile defaultProfile;
 
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Role> roles = new ArrayList<>();
 
-    @Transient
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<AppProfile> appProfiles = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<UsersOverviewData> overviewData = new ArrayList<>();
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
+    private List<Time> times = new ArrayList<>();
 
     @Transient
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<AppProfile> defaultProfiles = new ArrayList<>();
+    private List<AppProfile> appProfiles = new ArrayList<>();
 
     @Column(updatable = false)
     @CreationTimestamp

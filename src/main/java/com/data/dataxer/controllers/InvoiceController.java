@@ -36,7 +36,7 @@ public class InvoiceController {
     }
 
     @RequestMapping(value = "/storeSummaryInvoice", method = RequestMethod.POST)
-    public void storeTaxDocument(@RequestParam(value = "id1") Long taxDocumentId, @RequestParam(value = "id2") Long proformaId, @RequestBody InvoiceDTO invoiceDTO) {
+    public void storeSummaryInvoice(@RequestParam(value = "id1") Long taxDocumentId, @RequestParam(value = "id2") Long proformaId, @RequestBody InvoiceDTO invoiceDTO) {
         this.invoiceService.storeSummaryInvoice(this.invoiceMapper.invoiceDTOtoInvoiceWithCompany(invoiceDTO), taxDocumentId, proformaId);
     }
 

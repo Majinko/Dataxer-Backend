@@ -43,6 +43,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
         List<Long> invoiceIds = this.getInvoiceIdsPaginate(pageable, rqlFilter, appProfileId, predicate, orderSpecifierList);
 
         List<Invoice> invoices = this.query.selectFrom(QInvoice.invoice)
+                .leftJoin(QInvoice.invoice.company).fetchJoin()
                 .leftJoin(QInvoice.invoice.contact).fetchJoin()
                 .leftJoin(QInvoice.invoice.project).fetchJoin()
                 .leftJoin(QInvoice.invoice.payments).fetchJoin()

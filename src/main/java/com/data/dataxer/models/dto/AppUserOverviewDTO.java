@@ -19,6 +19,7 @@ public class AppUserOverviewDTO implements Comparable<AppUserOverviewDTO> {
     Long projectCount;
     Integer sumTime;
     SalaryDTO salary;
+    Boolean isDisabled;
     List<RoleDTO> roles;
 
     @Override

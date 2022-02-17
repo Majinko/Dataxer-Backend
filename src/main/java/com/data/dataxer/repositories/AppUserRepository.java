@@ -1,5 +1,6 @@
 package com.data.dataxer.repositories;
 
+import com.data.dataxer.models.domain.AppProfile;
 import com.data.dataxer.models.domain.AppUser;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,6 +24,6 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     @Query("SELECT u FROM AppUser u WHERE u.id in (SELECT c.appUsers FROM Company c )")
     List<AppUser> findAllByDefaultProfileIdOrderByIdAsc(Pageable pageable, Long appProfileId);
 
-    Long countAllByDefaultProfileId(Long appProfileId);
+    Long countAllByDefaultProfileIdAndIsDisabled(Long appProfileId, boolean disabled);
 }
 

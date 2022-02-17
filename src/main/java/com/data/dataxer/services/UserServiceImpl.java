@@ -2,9 +2,7 @@ package com.data.dataxer.services;
 
 import com.data.dataxer.mappers.RoleMapper;
 import com.data.dataxer.mappers.SalaryMapper;
-import com.data.dataxer.models.domain.AppProfile;
-import com.data.dataxer.models.domain.AppUser;
-import com.data.dataxer.models.domain.Company;
+import com.data.dataxer.models.domain.*;
 import com.data.dataxer.models.dto.AppUserOverviewDTO;
 import com.data.dataxer.repositories.AppProfileRepository;
 import com.data.dataxer.repositories.AppUserRepository;
@@ -19,16 +17,14 @@ import com.data.dataxer.utils.StringUtils;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseAuthException;
 import com.google.firebase.auth.UserRecord;
+import com.querydsl.core.Tuple;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static com.data.dataxer.utils.Helpers.getDiffYears;
 
@@ -52,7 +48,6 @@ public class UserServiceImpl implements UserService {
     private RoleMapper roleMapper;
     @Autowired
     private MailAccountsServiceImpl mailAccountsService;
-
 
     @Override
     public AppUser loggedUser() {
@@ -89,7 +84,6 @@ public class UserServiceImpl implements UserService {
         createRequest.setDisplayName(appUser.getFirstName() + " " + appUser.getLastName());
 
         UserRecord userRecord;
-
         try {
             userRecord = firebaseAuth.createUser(createRequest);
             return userRecord;
@@ -104,7 +98,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<AppUser> all() {
-        return this.userRepository.findAllByDefaultProfileId(SecurityUtils.defaultProfileId());
+        return this.qAppUserRepository.getUsersByAppProfileId(SecurityUtils.defaultProfileId());
     }
 
     @Override
@@ -113,29 +107,40 @@ public class UserServiceImpl implements UserService {
         List<AppUser> appUsers = this.qAppUserRepository.getUsersByAppProfileId(pageable, qString, SecurityUtils.defaultProfileId());
 
         appUsers.forEach(user -> {
-            appUserOverviewDTOS.add(fillAppUserOverview(user, false));
+            Integer sumTime = user.getOverviewData().stream().mapToInt(UsersOverviewData::getYearMonthHours).sum();
+
+            appUserOverviewDTOS.add(fillAppUserOverview(user, false, sumTime));
         });
 
         Collections.sort(appUserOverviewDTOS);
 
-        return new PageImpl<>(appUserOverviewDTOS, pageable, this.userRepository.countAllByDefaultProfileId(SecurityUtils.defaultProfileId()));
+        return new PageImpl<>(appUserOverviewDTOS, pageable, this.userRepository.countAllByDefaultProfileIdAndIsDisabled(SecurityUtils.defaultProfileId(), false));
     }
 
-    private AppUserOverviewDTO fillAppUserOverview(AppUser user, Boolean moreData) {
+    private AppUserOverviewDTO fillAppUserOverview(AppUser user, Boolean moreData, Integer sumTime) {
         AppUserOverviewDTO appUserOverviewDTO = new AppUserOverviewDTO();
 
         appUserOverviewDTO.setId(user.getId());
         appUserOverviewDTO.setUid(user.getUid());
+        appUserOverviewDTO.setIsDisabled(user.getIsDisabled());
         appUserOverviewDTO.setFullName(user.getFirstName() + ' ' + user.getLastName());
         appUserOverviewDTO.setPhotoUrl(user.getPhotoUrl());
-        appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.defaultProfileId(), false));
-        appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.defaultProfileId(), true)));
-        appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.defaultProfileId()));
-        appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.defaultProfileId()));
+        appUserOverviewDTO.setRoles(roleMapper.rolesToRoleDTOsSimple(user.getRoles()));
+        appUserOverviewDTO.setSalary(salaryMapper.salaryToSalaryDTO(salaryRepository.findByUserUidAndFinishIsNullAndAppProfileId(user.getUid(), SecurityUtils.defaultProfileId())));
+
+        if (sumTime != null) {
+            appUserOverviewDTO.setSumTime(sumTime);
+        }
 
         if (moreData) {
-            appUserOverviewDTO.setRoles(roleMapper.rolesToRoleDTOs(user.getRoles()));
-            appUserOverviewDTO.setSalary(salaryMapper.salaryToSalaryDTO(salaryRepository.findByUserUidAndFinishIsNullAndAppProfileId(user.getUid(), SecurityUtils.defaultProfileId())));
+            appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.defaultProfileId()));
+            appUserOverviewDTO.setStartWork(this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.defaultProfileId(), false));
+            appUserOverviewDTO.setYears(getDiffYears(appUserOverviewDTO.getStartWork(), this.qTimeRepository.getUserFirstLastRecord(user.getId(), SecurityUtils.defaultProfileId(), true)));
+            appUserOverviewDTO.setProjectCount(qTimeRepository.getCountProjects(user.getId(), SecurityUtils.defaultProfileId()));
+
+            if (sumTime == null) {
+                appUserOverviewDTO.setSumTime(this.qTimeRepository.sumUserTime(user.getId(), SecurityUtils.defaultProfileId()));
+            }
         }
 
         return appUserOverviewDTO;
@@ -174,7 +179,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AppUserOverviewDTO userOverview(String uid) {
-        return this.fillAppUserOverview(this.userWithRoles(uid), true);
+        return this.fillAppUserOverview(this.userWithRoles(uid), true, null);
     }
 
     @Override
@@ -211,6 +216,44 @@ public class UserServiceImpl implements UserService {
             long revocationSecond = userRecord.getTokensValidAfterTimestamp() / 1000;
         } catch (FirebaseAuthException e) {
             String test = "test";
+        }
+    }
+
+    @Override
+    public void deactivateUser(String uid) {
+        AppUser appUser = this.getByUid(uid);
+
+        appUser.setIsDisabled(true);
+
+        this.userRepository.save(appUser);
+
+        UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid);
+
+        updateRequest.setDisabled(true);
+
+        try {
+            firebaseAuth.updateUser(updateRequest);
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void activateUser(String uid) {
+        AppUser appUser = this.getByUid(uid);
+
+        appUser.setIsDisabled(false);
+
+        this.userRepository.save(appUser);
+
+        UserRecord.UpdateRequest updateRequest = new UserRecord.UpdateRequest(uid);
+
+        updateRequest.setDisabled(false);
+
+        try {
+            firebaseAuth.updateUser(updateRequest);
+        } catch (FirebaseAuthException e) {
+            e.printStackTrace();
         }
     }
 

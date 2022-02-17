@@ -3,11 +3,11 @@ package com.data.dataxer.controllers;
 import com.data.dataxer.mappers.CostMapper;
 import com.data.dataxer.mappers.StorageMapper;
 import com.data.dataxer.models.dto.CostDTO;
-import com.data.dataxer.models.page.CustomPageDTO;
 import com.data.dataxer.models.dto.UploadContextDTO;
 import com.data.dataxer.models.enums.DocumentState;
 import com.data.dataxer.services.CostService;
 import com.data.dataxer.services.storage.StorageService;
+import com.google.firebase.messaging.FirebaseMessagingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -71,7 +71,7 @@ public class CostController {
             @RequestParam(value = "size", defaultValue = "15") int size,
             @RequestParam(value = "filters", defaultValue = "") String rqlFilter,
             @RequestParam(value = "sortExpression", defaultValue = "sort(-cost.id)") String sortExpression
-    ) {
+    ) throws FirebaseMessagingException {
         Pageable pageable = PageRequest.of(page, size);
 
         return ResponseEntity.ok(this.costService.paginate(pageable, rqlFilter, sortExpression).map(this.costMapper::costToCostDTOPaginate));

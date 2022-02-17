@@ -39,4 +39,8 @@ public interface UserService {
     AppUser disconnect(String uid);
 
     void resetToken(String uid);
+
+    void deactivateUser(String uid);
+
+    void activateUser(String uid);
 }

@@ -32,7 +32,7 @@ public interface InvoiceMapper {
     @Mapping(target = "packs", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "project.contact", ignore = true)
-    @Mapping(target = "company", ignore = true)
+    //@Mapping(target = "company", ignore = true)
     InvoiceDTO invoiceToInvoiceDTOSimple(Invoice invoice);
 
     @Mapping(target = "packs", ignore = true)
