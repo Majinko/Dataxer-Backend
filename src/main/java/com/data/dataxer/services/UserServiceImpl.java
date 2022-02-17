@@ -49,7 +49,6 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private MailAccountsServiceImpl mailAccountsService;
 
-
     @Override
     public AppUser loggedUser() {
         return SecurityUtils.loggedUser();
