@@ -42,7 +42,9 @@ public class DemandController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        return ResponseEntity.ok(demandService.paginate(pageable, rqlFilter, sortExpression).map(demandMapper::demandToDemandDTO));
+        //return ResponseEntity.ok(demandService.paginate(pageable, rqlFilter, sortExpression).map(demandMapper::demandToDemandDTO));
+
+        return null;
     }
 
     @GetMapping("/{id}")
