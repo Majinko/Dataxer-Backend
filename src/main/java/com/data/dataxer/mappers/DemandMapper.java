@@ -4,6 +4,7 @@ import com.data.dataxer.models.domain.Demand;
 import com.data.dataxer.models.dto.DemandDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 @Mapper
 public interface DemandMapper {
@@ -11,7 +12,6 @@ public interface DemandMapper {
 
     DemandDTO demandToDemandDTO(Demand demand);
 
-    @Mapping(target = "category", ignore = true)
-    @Mapping(target = "contact", ignore = true)
+    @Named(value = "demandToDemandDTOSimple")
     DemandDTO demandToDemandDTOSimple(Demand demand);
 }

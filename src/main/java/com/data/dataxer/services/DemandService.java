@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface DemandService {
-
     void store(Demand demand);
 
     void update(Demand demandDTOtoDemand);

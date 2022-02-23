@@ -1,8 +1,6 @@
 package com.data.dataxer.repositories.qrepositories;
 
-import com.data.dataxer.models.domain.Cost;
 import com.data.dataxer.models.domain.Demand;
-import com.data.dataxer.models.domain.QCost;
 import com.data.dataxer.models.domain.QDemand;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
@@ -55,8 +53,6 @@ public class QDemandRepositoryImpl implements QDemandRepository {
         OrderSpecifierList orderSpecifierList = sortParser.parse(sortExpression, QuerydslSortContext.withMapping(pathMapping));
 
         List<Demand> demandList = this.query.selectFrom(qDemand)
-                .leftJoin(qDemand.category).fetchJoin()
-                .leftJoin(qDemand.contact).fetchJoin()
                 .where(predicate)
                 .where(qDemand.appProfile.id.eq(appProfileId))
                 .orderBy(orderSpecifierList.getOrders().toArray(new OrderSpecifier[0]))
@@ -74,8 +70,6 @@ public class QDemandRepositoryImpl implements QDemandRepository {
         return Optional.ofNullable(query.selectFrom(qDemand)
                 .where(qDemand.appProfile.id.eq(appProfileId))
                 .where(qDemand.id.eq(id))
-                .leftJoin(qDemand.category).fetchJoin()
-                .leftJoin(qDemand.contact).fetchJoin()
                 .fetchOne());
     }
 

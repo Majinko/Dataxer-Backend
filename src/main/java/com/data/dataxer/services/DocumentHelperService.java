@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DocumentHelperService {
-
     protected DocumentBase cleanDocumentPacksBeforeUpdate(DocumentBase documentBase) {
         documentBase.setPacks(new ArrayList<>());
         return documentBase;

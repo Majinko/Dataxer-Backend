@@ -23,16 +23,12 @@ public class Demand extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    Category category;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     Project project;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "client_id")
-    Contact contact;
+    @ManyToMany(fetch = FetchType.LAZY)
+    List<Contact> contacts;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "demand")
     private List<DemandPack> packs;

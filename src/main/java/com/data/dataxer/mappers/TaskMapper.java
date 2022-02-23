@@ -1,31 +1,31 @@
 package com.data.dataxer.mappers;
 
-import com.data.dataxer.models.domain.Task;
-import com.data.dataxer.models.dto.TaskDTO;
+import com.data.dataxer.models.domain.Todo;
+import com.data.dataxer.models.dto.TodoDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper
 public interface TaskMapper {
-    Task taskDTOtoTask(TaskDTO taskDTO);
+    Todo taskDTOtoTask(TodoDTO taskDTO);
 
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
     @Mapping(target = "userFrom.roles", ignore = true)
-    TaskDTO taskToTaskDTO(Task task);
+    TodoDTO taskToTaskDTO(Todo task);
 
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
     @Mapping(target = "userFrom.roles", ignore = true)
     @Mapping(target = "files", ignore = true)
-    TaskDTO taskToTaskDTOSimple(Task task);
+    TodoDTO taskToTaskDTOSimple(Todo task);
 
     @Mapping(target = "files", ignore = true)
     @Mapping(target = "project.contact", ignore = true)
     @Mapping(target = "project.categories", ignore = true)
     @Mapping(target = "user.roles", ignore = true)
     @Mapping(target = "userFrom.roles", ignore = true)
-    TaskDTO taskToTaskDTOPaginate(Task task);
+    TodoDTO taskToTaskDTOPaginate(Todo task);
 }

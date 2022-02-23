@@ -96,6 +96,8 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
         if (!invoice.getDocumentType().equals(DocumentType.TAX_DOCUMENT)) {
             this.checkInvoicePayment(invoice);
+        } else {
+            invoice.setState(DocumentState.PAYED);
         }
 
         this.invoiceRepository.save(invoiceUpdated);

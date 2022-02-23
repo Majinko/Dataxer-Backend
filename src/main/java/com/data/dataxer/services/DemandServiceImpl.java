@@ -1,12 +1,15 @@
 package com.data.dataxer.services;
 
 import com.data.dataxer.models.domain.Demand;
+import com.data.dataxer.models.domain.DemandPack;
+import com.data.dataxer.models.domain.DemandPackItem;
 import com.data.dataxer.repositories.DemandRepository;
 import com.data.dataxer.repositories.qrepositories.QDemandRepository;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DemandServiceImpl implements DemandService {
@@ -19,8 +22,23 @@ public class DemandServiceImpl implements DemandService {
     }
 
     @Override
+    @Transactional
     public void store(Demand demand) {
-        this.demandRepository.save(demand);
+        Demand storedDemand = this.demandRepository.save(demand);
+
+        int demandPackPosition = 0;
+        for (DemandPack demandPack : demand.getPacks()) {
+            demandPack.setDemand(storedDemand);
+            demandPack.setPosition(demandPackPosition);
+
+            int demandPackItemPosition = 0;
+            for (DemandPackItem demandPackItem : demandPack.getDemandPackItems()) {
+                demandPackItem.setDemand(storedDemand);
+                demandPackItem.setPosition(demandPackItemPosition);
+
+                demandPackItemPosition++;
+            }
+        }
     }
 
     @Override

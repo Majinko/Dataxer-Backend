@@ -9,9 +9,7 @@ import com.data.dataxer.security.model.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -47,7 +45,7 @@ public class RoleConfig {
         privileges.add("Document");
         privileges.add(Project.class.getSimpleName());
         privileges.add(Settings.class.getSimpleName());
-        privileges.add(Task.class.getSimpleName());
+        privileges.add(Todo.class.getSimpleName());
         privileges.add(Time.class.getSimpleName());
         privileges.add(Category.class.getSimpleName());
         privileges.add("Overview");

@@ -1,12 +1,20 @@
 package com.data.dataxer.models.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 
 @Entity
+@Getter
+@Setter
 public class DemandPackItem extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @ManyToOne
+    private Demand demand;
 
     @ManyToOne
     private DemandPack demandPack;
