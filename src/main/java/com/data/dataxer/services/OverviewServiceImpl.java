@@ -158,7 +158,7 @@ public class OverviewServiceImpl implements OverviewService {
 
     /**
      * @param params  Obsahuje LocalDate posledneho behu tasku
-     * @param company Nie je null ked spusta task -> task nema session a setnutu default company tak beriu podla company id z tasku
+     * @param appProfile Je null ked spusta task -> task nema session a setnuty default profil tak beriu podla profil id z tasku
      * @return
      */
     @Override

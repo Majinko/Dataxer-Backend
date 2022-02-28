@@ -1,6 +1,7 @@
 package com.data.dataxer.repositories.qrepositories;
 
 import com.data.dataxer.models.domain.*;
+import com.data.dataxer.models.domain.QTime;
 import com.github.vineey.rql.filter.parser.DefaultFilterParser;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterBuilder;
 import com.github.vineey.rql.querydsl.filter.QuerydslFilterParam;
@@ -427,7 +428,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
     }
 
     @Override
-    public List<Tuple> getAllUserTimesFromDateToDate(LocalDate processFromDate, LocalDate processToDate, Long companyId) {
+    public List<Tuple> getAllUserTimesFromDateToDate(LocalDate processFromDate, LocalDate processToDate, Long appProfileId) {
         BooleanBuilder condition = new BooleanBuilder();
 
         if (processFromDate != null) {
@@ -438,6 +439,7 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         return this.query.select(QTime.time1.user.uid, QTime.time1.time.sum(), QTime.time1.dateWork.year(), QTime.time1.dateWork.month())
                 .from(QTime.time1)
                 .where(condition)
+                .where(QTime.time1.appProfile.id.eq(appProfileId))
                 .groupBy(QTime.time1.user.uid)
                 .groupBy(QTime.time1.dateWork.year())
                 .groupBy(QTime.time1.dateWork.month())
