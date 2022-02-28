@@ -231,7 +231,7 @@
 
         <div class="row" style="text-align: center; margin-top: 23px; bottom: 0px; margin-bottom: 2px">
             <p style="font-size: 7px; margin-bottom: 0; padding-bottom: 0;"
-               th:text="'Vystavil:' + ${user.get('name') != null && user.get('name') != '' ? user.get('name') : user.get('displayName')} + '&nbsp;|&nbsp;' + ${user.get('phone')} + '&nbsp;|&nbsp;' + ${createdWeb} + '&nbsp;|&nbsp;' + ${user.get('email')}"></p>
+               th:text="'Vystavil: ' + ${user.get('name') != null && user.get('name') != '' ? user.get('name') : user.get('displayName')} + '&nbsp;|&nbsp;' + ${user.get('phone') != null && user.get('phone') != '' ? user.get('phone') + '&nbsp;|&nbsp;' : ''} + ${createdWeb != null && createdWeb != '' ? createdWeb + '&nbsp;|&nbsp;' : ''} + ${user.get('email') != null && user.get('email') != '' ? user.get('email') : ''}"></p>
             <p style="font-size: 7px;" th:text="'Vygenerované cez dataxer.com'"></p>
         </div>
     </div>
