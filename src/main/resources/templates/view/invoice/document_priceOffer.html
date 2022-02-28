@@ -47,9 +47,9 @@
                     <span th:text="${document.contact != null && document.contact.getCountry() != null} ? ${document.contact.getCountry()} : ''"></span><br></br>
                 </p>
                 <p>
-                    <span th:text="${document.contact != null } ? (${document.contact.getCin()} ? 'IČO: ' + ${document.contact.getCin()} : '') : ''"></span><br></br>
-                    <span th:text="${document.contact != null } ? (${document.contact.getTin()} ? 'DIČ: ' + ${document.contact.getTin()} : '') : ''"></span><br></br>
-                    <span th:text="${document.contact != null } ? (${document.contact.getVatin()} ? 'IČ DPH: ' + ${document.contact.getVatin()} : '') : ''"></span><br></br>
+                    <span th:text="${document.contact != null && document.contact.getCin() != ''} ? 'IČO: ' + ${document.contact.getCin()} : ''"></span><br></br>
+                    <span th:text="${document.contact != null && document.contact.getTin() != ''} ? 'DIČ: ' + ${document.contact.getTin()} : ''"></span><br></br>
+                    <span th:text="${document.contact != null && document.contact.getVatin() != ''} ? 'IČ DPH: ' + ${document.contact.getVatin()} : ''"></span><br></br>
                 </p>
             </div>
         </div>
