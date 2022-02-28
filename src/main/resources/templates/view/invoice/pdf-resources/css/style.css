@@ -27,12 +27,12 @@ p {
 
 .box header h1, header .h1 {
     font-size: 24px;
-    font-family: 'sans-serif';
+    font-family: 'DejaVu Sans', 'sans-serif';
     font-weight: bold;
 }
 
 .open-sans {
-    font-family: 'sans-serif';
+    font-family: 'Open Sans', 'sans-serif';
 }
 
 .float-left{
