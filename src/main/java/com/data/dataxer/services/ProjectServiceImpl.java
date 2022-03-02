@@ -319,9 +319,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     private BigDecimal countHourNetto(Integer timeSum, BigDecimal priceSum) {
-        BigDecimal minutePrice = priceSum.divide(new BigDecimal(timeSum / 60), 2, RoundingMode.HALF_UP);
-
-        return minutePrice.multiply(new BigDecimal(60)).setScale(2, RoundingMode.HALF_UP);
+        return priceSum.divide(new BigDecimal(timeSum/(double)3600), 2, RoundingMode.HALF_UP);
     }
 
     private List<Integer> getAllProjectYears(Long id) {
