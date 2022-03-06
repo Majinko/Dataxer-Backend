@@ -19,9 +19,12 @@ public class TodoList extends BaseEntity {
 
     private String title;
 
-    @Column(nullable = false)
-    private boolean isPrivate = true;
+    @Column(columnDefinition = "text")
+    private String note;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "todo")
+    @Column(nullable = false)
+    private Boolean isPrivate = true;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "todoList")
     private List<Todo> todos = new ArrayList<>();
 }

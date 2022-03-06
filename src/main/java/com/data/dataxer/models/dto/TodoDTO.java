@@ -13,5 +13,5 @@ public class TodoDTO {
     private AppUserDTO assignedUser;
     private String title;
     private String note;
-    private LocalDateTime finishedAt;
+    private LocalDateTime createdAt;
 }

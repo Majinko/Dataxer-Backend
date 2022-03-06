@@ -70,7 +70,6 @@ public class QTimeRepositoryImpl implements QTimeRepository {
         QTime qTime = QTime.time1;
 
         Map<String, Path> pathMapping = ImmutableMap.<String, Path>builder()
-                .put("time.id", QTask.task.id)
                 .build();
 
         if (!rqlFilter.equals("")) {

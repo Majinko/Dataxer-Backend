@@ -22,9 +22,10 @@ public class Todo extends BaseEntity {
     private AppUser assignedUser;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    private Todo todo;
+    private TodoList todoList;
 
     private String title;
 
+    @Column(columnDefinition = "text")
     private String note;
 }
