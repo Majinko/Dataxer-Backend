@@ -27,6 +27,7 @@ public class DemandServiceImpl implements DemandService {
         Demand storedDemand = this.demandRepository.save(demand);
 
         int demandPackPosition = 0;
+
         for (DemandPack demandPack : demand.getPacks()) {
             demandPack.setDemand(storedDemand);
             demandPack.setPosition(demandPackPosition);
@@ -34,6 +35,7 @@ public class DemandServiceImpl implements DemandService {
             int demandPackItemPosition = 0;
             for (DemandPackItem demandPackItem : demandPack.getDemandPackItems()) {
                 demandPackItem.setDemand(storedDemand);
+                demandPackItem.setDemandPack(demandPack);
                 demandPackItem.setPosition(demandPackItemPosition);
 
                 demandPackItemPosition++;

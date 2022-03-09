@@ -18,7 +18,7 @@ public class DemandPack extends BaseEntity {
     @ManyToOne
     private Demand demand;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "demandPack")
+    @OneToMany(mappedBy = "demandPack", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<DemandPackItem> demandPackItems = new ArrayList<>();
 
     private String title;

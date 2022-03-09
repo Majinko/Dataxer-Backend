@@ -29,8 +29,8 @@ public class Demand extends BaseEntity {
 
     @ManyToMany(fetch = FetchType.LAZY)
     List<Contact> contacts;
-
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "demand")
+    
+    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "demand")
     private List<DemandPack> packs;
 
     @Column(columnDefinition = "text")
