@@ -350,16 +350,16 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         return documentPacks;
     }
 
-    private DocumentPack generateDocumentPackForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal price) {
+    private DocumentPack generateDocumentPackForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal totalPrice) {
         DocumentPack taxDocumentPack = new DocumentPack();
 
         taxDocumentPack.setTax(tax);
-        taxDocumentPack.setPrice(price);
-        taxDocumentPack.setTotalPrice(price.multiply(new BigDecimal(1.0 + ((double) tax / 100))).setScale(2, RoundingMode.HALF_UP));
+        taxDocumentPack.setPrice(totalPrice.divide(new BigDecimal(1.0 + tax/100.0), 2, RoundingMode.HALF_UP));
+        taxDocumentPack.setTotalPrice(totalPrice);
         taxDocumentPack.setTitle("Daňový doklad k prijatej platbe");
         taxDocumentPack.setShowItems(true);
 
-        taxDocumentPack.setPackItems(List.of(generateDocumentPackItemForTaxDocument(proformaInvoice, tax, price)));
+        taxDocumentPack.setPackItems(List.of(generateDocumentPackItemForTaxDocument(proformaInvoice, tax, totalPrice)));
 
         return taxDocumentPack;
     }
@@ -380,15 +380,15 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         return summaryInvoicePack;
     }
 
-    private DocumentPackItem generateDocumentPackItemForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal price) {
+    private DocumentPackItem generateDocumentPackItemForTaxDocument(Invoice proformaInvoice, Integer tax, BigDecimal totalPrice) {
         DocumentPackItem documentPackItem = new DocumentPackItem();
 
         documentPackItem.setTitle(this.generateTaxDocumentPackTitle(getNewestPaymentPayedDate(proformaInvoice.getId()), proformaInvoice));
         documentPackItem.setQty(1f);
         documentPackItem.setDiscount(BigDecimal.valueOf(0));
         documentPackItem.setTax(tax);
-        documentPackItem.setPrice(price);
-        documentPackItem.setTotalPrice(price.multiply(new BigDecimal(1.0 + ((double) tax / 100))).setScale(2, RoundingMode.HALF_UP));
+        documentPackItem.setPrice(totalPrice.divide(new BigDecimal(1.0 + tax/100.0), 2, RoundingMode.HALF_UP));
+        documentPackItem.setTotalPrice(totalPrice);
 
         return documentPackItem;
     }
