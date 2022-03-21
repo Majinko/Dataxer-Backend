@@ -38,6 +38,8 @@ public interface TimeMapper {
     @Mapping(target = "user.overviewData", ignore = true)
     @Mapping(target = "user.times", ignore = true)
     @Mapping(target = "user.defaultProfile", ignore = true)
+    @Mapping(target = "user.overviewData", ignore = true)
+    @Mapping(target = "user.times", ignore = true)
     TimeDTO timeToTimeDTO(Time time);
 
     @Mapping(target = "project", ignore = true)

@@ -306,7 +306,7 @@ public class ProjectServiceImpl implements ProjectService {
         BigDecimal allActiveMonths = new BigDecimal(this.qTimeRepository.getProjectAllUsersActiveMonth(startYear, endYear, SecurityUtils.defaultProfileId()).size());
 
         if (userActiveMonths == 0 || projectTotalCost == null) {
-            return new BigDecimal(userActiveMonths);
+            return BigDecimal.ZERO;
         }
 
         BigDecimal coefficient = new BigDecimal((this.convertTimeSecondsToHours(userTimeBetweenYears)) / userActiveMonths).setScale(2, RoundingMode.HALF_UP);
