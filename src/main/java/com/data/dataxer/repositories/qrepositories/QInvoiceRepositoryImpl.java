@@ -167,6 +167,7 @@ public class QInvoiceRepositoryImpl implements QInvoiceRepository {
                 .where(QInvoice.invoice.appProfile.id.eq(appProfileId))
                 .where(QInvoice.invoice.createdDate.year().eq(localDate.getYear()))
                 .where(QInvoice.invoice.documentType.in(types))
+                .orderBy(QInvoice.invoice.number.desc())
                 .orderBy(QInvoice.invoice.createdDate.desc())
                 .limit(1l)
                 .fetchOne();

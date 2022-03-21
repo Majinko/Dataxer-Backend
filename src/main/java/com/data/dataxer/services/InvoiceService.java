@@ -37,7 +37,7 @@ public interface InvoiceService {
     //parameter je id zalohovej faktury
     Invoice generateTaxDocument(Long proformaInvoiceId);
 
-    HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems);
+    HashMap<Integer, BigDecimal> getTaxesValuesMapWithDiscount(List<DocumentPackItem> documentPackItems);
 
     HashMap<Integer, BigDecimal> getInvoicePayedTaxesValuesMap(List<DocumentPack> packs);
 
