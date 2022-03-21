@@ -330,7 +330,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
 
         //storing keys desc****************
         HashMap<Integer, BigDecimal> valuesForTaxes = getTaxesValuesMap(this.getInvoiceItems(proformaInvoice.getPacks()));
-        //zoradene zaklady pre dph so zlavou (suma je bez dph)
+        //zoradene zaklady pre dph so zlavou (suma je s dph)
         LinkedHashMap<Integer, BigDecimal> sortedValuesForTaxesWithDiscount = Helpers.sortHashmapAndSubtractDiscount(valuesForTaxes, proformaInvoice.getDiscount());
 
         for (Integer keyTax : sortedValuesForTaxesWithDiscount.keySet()) {
@@ -428,10 +428,10 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     }
 
     /**
-     * Spocita pre jednotlive dane zaklad dane (price)
+     * Spocita pre jednotlive dane zaklad dane (price) so zlavou
      */
     @Override
-    public HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems) {
+    public HashMap<Integer, BigDecimal> getTaxesValuesMapWithDiscount(List<DocumentPackItem> documentPackItems) {
         HashMap<Integer, BigDecimal> mappedTaxedValues = new HashMap<>();
 
         for (DocumentPackItem documentPackItem : documentPackItems) {
@@ -460,6 +460,25 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
                     price = documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
                             ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1)).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
                 }
+                mappedTaxedValues.put(documentPackItem.getTax(), price);
+            }
+        }
+        return mappedTaxedValues;
+    }
+
+    private HashMap<Integer, BigDecimal> getTaxesValuesMap(List<DocumentPackItem> documentPackItems) {
+        HashMap<Integer, BigDecimal> mappedTaxedValues = new HashMap<>();
+
+        for (DocumentPackItem documentPackItem : documentPackItems) {
+            if (mappedTaxedValues.containsKey(documentPackItem.getTax())) {
+                BigDecimal newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
+                            documentPackItem.getTotalPrice() != null && documentPackItem.getTotalPrice().compareTo(BigDecimal.ZERO) != -1
+                                    ? documentPackItem.getTotalPrice().multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1))
+                                    .setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
+                mappedTaxedValues.replace(documentPackItem.getTax(), newValue);
+            } else {
+                BigDecimal price = documentPackItem.getTotalPrice() != null && documentPackItem.getTotalPrice().compareTo(BigDecimal.ZERO) != -1
+                            ? documentPackItem.getTotalPrice().multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1)).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
                 mappedTaxedValues.put(documentPackItem.getTax(), price);
             }
         }

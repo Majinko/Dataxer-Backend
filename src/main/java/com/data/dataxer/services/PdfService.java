@@ -21,7 +21,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 
 @Service
@@ -110,7 +109,7 @@ public class PdfService {
 
     private Context getBasicContext(DocumentBase document) {
         Company company = this.companyService.findById(document.getCompany().getId());
-        HashMap<Integer, BigDecimal> taxesValuesMap = invoiceService.getTaxesValuesMap(invoiceService.getInvoiceItems(document.getPacks()));
+        HashMap<Integer, BigDecimal> taxesValuesMap = invoiceService.getTaxesValuesMapWithDiscount(invoiceService.getInvoiceItems(document.getPacks()));
         LinkedHashMap<Integer, BigDecimal> sortedTaxesValuesMap = Helpers.sortHashmapAndSubtractDiscount(taxesValuesMap, document.getDiscount());
 
         Context context = new Context();
