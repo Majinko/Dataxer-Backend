@@ -2,6 +2,7 @@ package com.data.dataxer.controllers;
 
 import com.data.dataxer.mappers.DemandMapper;
 import com.data.dataxer.models.dto.DemandDTO;
+import com.data.dataxer.models.dto.DemandPackItemDTO;
 import com.data.dataxer.services.DemandService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/demand")
@@ -42,12 +46,10 @@ public class DemandController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("id")));
 
-        //return ResponseEntity.ok(demandService.paginate(pageable, rqlFilter, sortExpression).map(demandMapper::demandToDemandDTO));
-
-        return null;
+        return ResponseEntity.ok(demandService.paginate(pageable, rqlFilter, sortExpression).map(demandMapper::demandToDemandPaginateDTO));
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/getById/{id}")
     public ResponseEntity<DemandDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(demandMapper.demandToDemandDTO(demandService.getById(id)));
     }
@@ -55,5 +57,10 @@ public class DemandController {
     @GetMapping("/destroy/{id}")
     public void destroy(@PathVariable Long id) {
         this.demandService.destroy(id);
+    }
+
+    @GetMapping("/demandPackItem/{demandId}")
+    public ResponseEntity<List<DemandPackItemDTO>> getDemandPackItem(@PathVariable Long demandId) {
+        return ResponseEntity.ok(this.demandService.getDemandPackItem(demandId).stream().map(demandMapper::demandPackItemToDemandPackItemDTO).collect(Collectors.toList()));
     }
 }

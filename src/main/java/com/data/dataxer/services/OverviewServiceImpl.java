@@ -88,7 +88,7 @@ public class OverviewServiceImpl implements OverviewService {
             }
         }
 
-        return this.fillUsersOverviewData();
+        return this.fillUsersOverviewData(fromDate, toDate);
     }
 
     @Override
@@ -158,7 +158,7 @@ public class OverviewServiceImpl implements OverviewService {
 
     /**
      * @param params  Obsahuje LocalDate posledneho behu tasku
-     * @param company Nie je null ked spusta task -> task nema session a setnutu default company tak beriu podla company id z tasku
+     * @param appProfile Je null ked spusta task -> task nema session a setnuty default profil tak beriu podla profil id z tasku
      * @return
      */
     @Override
@@ -295,11 +295,11 @@ public class OverviewServiceImpl implements OverviewService {
         return response;
     }
 
-    private List<UserHourOverviewDTO> fillUsersOverviewData() {
+    private List<UserHourOverviewDTO> fillUsersOverviewData(LocalDate fromDate, LocalDate toDate) {
         List<UserHourOverviewDTO> filedResponse = new ArrayList<>();
 
         HashMap<Long, Salary> userSalaryHashMap = this.getAllUsersSalaries(
-                userTimeData.keySet().stream().map(AppUser::getId).collect(Collectors.toList())
+                userTimeData.keySet().stream().map(AppUser::getUid).collect(Collectors.toList()), fromDate, toDate
         );
 
         userTimeData.keySet().iterator().forEachRemaining(key -> {
@@ -327,11 +327,11 @@ public class OverviewServiceImpl implements OverviewService {
         return filedResponse;
     }
 
-    private HashMap<Long, Salary> getAllUsersSalaries(List<Long> userIds) {
+    private HashMap<Long, Salary> getAllUsersSalaries(List<String> userIds, LocalDate fromDate, LocalDate toDate) {
         HashMap<Long, Salary> userSalaryHashMap = new HashMap<>();
 
         //load just needed salaries
-        List<Salary> userSalaries = this.qSalaryRepository.getSalariesForUsersByIds(userIds, SecurityUtils.defaultProfileId());
+        List<Salary> userSalaries = this.qSalaryRepository.getSalariesForMonthAndYearByUserIds(userIds, fromDate, toDate, SecurityUtils.defaultProfileId());
 
         for (Salary salary : userSalaries) {
             userSalaryHashMap.put(salary.getUser().getId(), salary);

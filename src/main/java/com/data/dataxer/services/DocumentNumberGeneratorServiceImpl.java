@@ -5,10 +5,7 @@ import com.data.dataxer.models.enums.DocumentType;
 import com.data.dataxer.models.enums.Periods;
 import com.data.dataxer.repositories.CompanyRepository;
 import com.data.dataxer.repositories.DocumentNumberGeneratorRepository;
-import com.data.dataxer.repositories.qrepositories.QCostRepository;
-import com.data.dataxer.repositories.qrepositories.QDocumentNumberGeneratorRepository;
-import com.data.dataxer.repositories.qrepositories.QInvoiceRepository;
-import com.data.dataxer.repositories.qrepositories.QPriceOfferRepository;
+import com.data.dataxer.repositories.qrepositories.*;
 import com.data.dataxer.securityContextUtils.SecurityUtils;
 import com.data.dataxer.utils.FormatValidator;
 import com.data.dataxer.utils.StringUtils;
@@ -33,6 +30,8 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
     private QCostRepository qCostRepository;
     @Autowired
     private QPriceOfferRepository qPriceOfferRepository;
+    @Autowired
+    private QDemandRepository qDemandRepository;
     @Autowired
     private CompanyRepository companyRepository;
 
@@ -142,6 +141,12 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
                     lastNumber = cost.getNumber();
                 }
                 break;
+            case DEMAND:
+                Demand demand = this.loadLastDemandByPeriod(dateToGenerate, documentNumberGenerator.getPeriod(), documentNumberGenerator.getCompany().getId());
+                if (demand != null) {
+                    lastNumber = demand.getNumber();
+                }
+                break;
             case PRICE_OFFER:
             default:
                 PriceOffer priceOffer = this.loadLastPriceOfferByPeriod(dateToGenerate, documentNumberGenerator.getPeriod(), documentNumberGenerator.getCompany().getId());
@@ -185,6 +190,17 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
             case HALF_YEAR:
             case YEAR:
             default: return this.qPriceOfferRepository.getLastPriceOfferByYear(date, companyId, SecurityUtils.defaultProfileId());
+        }
+    }
+
+    private Demand loadLastDemandByPeriod(LocalDate date, Periods period, Long companyId) {
+        switch (period) {
+            case DAILY: return this.qDemandRepository.getLastDemandByDayAndMonthAndYear(date, companyId, SecurityUtils.defaultProfileId());
+            case MONTHLY: return this.qDemandRepository.getLastDemandByMonthAndYear(date, companyId, SecurityUtils.defaultProfileId());
+            case QUARTER: return this.qDemandRepository.getLastDemandByQuarterAndYear(date, companyId, SecurityUtils.defaultProfileId());
+            case HALF_YEAR:
+            case YEAR:
+            default: return this.qDemandRepository.getLastDemandByYear(date, companyId, SecurityUtils.defaultProfileId());
         }
     }
 

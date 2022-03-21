@@ -2,10 +2,12 @@ package com.data.dataxer.models.domain;
 
 import com.data.dataxer.mappers.HashMapConverter;
 import com.data.dataxer.models.enums.DocumentState;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -23,21 +25,28 @@ public class Demand extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "company_id", referencedColumnName = "id")
+    Company company;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id")
     Project project;
 
     @ManyToMany(fetch = FetchType.LAZY)
     List<Contact> contacts;
-    
+
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "demand")
-    private List<DemandPack> packs;
+    List<DemandPack> packs;
 
     @Column(columnDefinition = "text")
     @Convert(converter = HashMapConverter.class)
     Map<String, Object> documentData;
 
     String title;
+
+    String number;
 
     @Column(columnDefinition = "text")
     String description;
@@ -59,4 +68,7 @@ public class Demand extends BaseEntity {
     LocalDate dueDate;
 
     LocalDateTime deletedAt;
+
+    @Transient
+    boolean internal; // ci som dopyt vytvaral ja alebo prisiel z vonku
 }

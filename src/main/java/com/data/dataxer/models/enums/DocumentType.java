@@ -6,6 +6,7 @@ public enum DocumentType {
     INVOICE("invoice"),
     TAX_DOCUMENT("tax_document"),
     COST("cost"),
+    DEMAND("demand"),
     SUMMARY_INVOICE("summary_invoice");
 
     private String name;

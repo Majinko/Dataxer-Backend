@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -75,4 +76,12 @@ public class Company implements Serializable {
     private Integer position;
 
     private LocalDateTime deletedAt;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Company)) return false;
+        Company company = (Company) o;
+        return Objects.equals(getCin(), company.getCin()); // pri porovnavani spolocnosti je najdolozitejsie aby bolo len jedno id
+    }
 }

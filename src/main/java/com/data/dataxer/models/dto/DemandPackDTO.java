@@ -12,6 +12,5 @@ public class DemandPackDTO {
 
     private boolean showItems;
 
-    private DemandDTO demand;
     private List<DemandPackItemDTO> packItems;
 }

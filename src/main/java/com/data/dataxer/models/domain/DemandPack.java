@@ -19,7 +19,7 @@ public class DemandPack extends BaseEntity {
     private Demand demand;
 
     @OneToMany(mappedBy = "demandPack", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<DemandPackItem> demandPackItems = new ArrayList<>();
+    private List<DemandPackItem> packItems = new ArrayList<>();
 
     private String title;
 

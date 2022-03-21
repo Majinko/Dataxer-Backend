@@ -3,8 +3,6 @@ package com.data.dataxer.repositories;
 import com.data.dataxer.models.domain.Contact;
 import com.data.dataxer.models.domain.QContact;
 import com.querydsl.core.types.dsl.StringPath;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;

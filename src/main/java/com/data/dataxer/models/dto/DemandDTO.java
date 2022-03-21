@@ -18,16 +18,18 @@ public class DemandDTO {
     private String source;
     private String state;
     private String note;
+    private String number;
+
+    private boolean internal;
 
     private LocalDate createdDate;
     private LocalDate deliveredDate;
     private LocalDate dueDate;
 
-    private CompanyDTO companyDTO;
+    private Map<String, Object> documentData;
+
     private ProjectDTO project;
     private CompanyDTO company;
-
-    private Map<String, Object> documentData;
 
     private List<Contact> contacts;
     private List<DemandPackDTO> packs;

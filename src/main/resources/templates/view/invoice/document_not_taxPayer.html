@@ -97,8 +97,6 @@
                     <tr th:if="${packItem.getDiscount() != null and packItem.getDiscount() &gt; 0.00}">
                         <td class="text-left white-space-nowrap" colspan="3" th:text="'Zľava ' + ${packItem.getDiscount()} + ' %'"></td>
                         <td class="text-right nowrap" th:text="${#numbers.formatDecimal(packItem.countPriceDiscount(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
-                        <td></td>
-                        <td class="text-right nowrap" th:text="${#numbers.formatDecimal(packItem.countTotalPriceDiscount(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
                         <td class="text-right nowrap" th:text="${#numbers.formatDecimal(packItem.countQuantityTotalPriceDiscount(), 1, 'WHITESPACE', 2, 'COMMA')} + ' &euro;'"></td>
                     </tr>
                 </th:block>
@@ -198,7 +196,8 @@
         </div>
 
         <div class="row" style="text-align: center; margin-top: 23px; bottom: 0; ">
-            <p style="font-size: 7px; margin-bottom: 0; padding-bottom: 0;" th:text="'Vystavil:' + ${user.get('displayName')} + '&nbsp;|&nbsp;' + ${user.get('phone')} + '&nbsp;|&nbsp;' + ${createdWeb} + '&nbsp;|&nbsp;' + ${user.get('email')}"></p>
+            <p style="font-size: 7px; margin-bottom: 0; padding-bottom: 0;"
+               th:text="'Vystavil: ' + ${user.get('name') != null && user.get('name') != '' ? user.get('name') : user.get('displayName')} + '&nbsp;|&nbsp;' + ${user.get('phone') != null && user.get('phone') != '' ? user.get('phone') + '&nbsp;|&nbsp;' : ''} + ${createdWeb != null && createdWeb != '' ? createdWeb + '&nbsp;|&nbsp;' : ''} + ${user.get('email') != null && user.get('email') != '' ? user.get('email') : ''}"></p>
             <p style="font-size: 7px;" th:text="'Vygenerované cez dataxer.com'"></p>
         </div>
     </div>

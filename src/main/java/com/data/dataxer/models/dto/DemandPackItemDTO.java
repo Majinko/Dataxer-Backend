@@ -12,7 +12,6 @@ public class DemandPackItemDTO {
     private Float qty;
     private int position;
 
-    private DemandDTO demand;
-    private DemandPackDTO demandPack;
     private CategoryDTO category;
+    private ItemDTO item;
 }

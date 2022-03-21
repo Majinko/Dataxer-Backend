@@ -19,6 +19,7 @@ public interface AppUserRepository extends JpaRepository<AppUser, Long> {
     @Query("SELECT u FROM AppUser u left join fetch u.roles where u.uid = ?1")
     AppUser findByUid(String uid); // todo add company
 
+    @Query("SELECT u FROM AppUser u WHERE u.defaultProfile.id = ?1")
     List<AppUser> findAllByDefaultProfileId(Long appProfileId);
 
     @Query("SELECT u FROM AppUser u WHERE u.id in (SELECT c.appUsers FROM Company c )")
