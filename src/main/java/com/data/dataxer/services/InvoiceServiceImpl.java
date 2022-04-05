@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class InvoiceServiceImpl extends DocumentHelperService implements InvoiceService {
+
+    public static final String PAYED_BY_DEPOSIT = "Uhradené zálohou";
+
     @Autowired
     private InvoiceRepository invoiceRepository;
 
@@ -370,7 +373,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
                                                                LocalDate taxDocumentCreated, String taxDocumentVariableSymbol) {
         DocumentPack summaryInvoicePack = new DocumentPack();
 
-        summaryInvoicePack.setTitle("Uhradené zálohou");
+        summaryInvoicePack.setTitle(PAYED_BY_DEPOSIT);
         summaryInvoicePack.setTax(taxDocumentPack.getTax());
         summaryInvoicePack.setPrice(taxDocumentPack.getPrice().negate());
         summaryInvoicePack.setTotalPrice(taxDocumentPack.getTotalPrice().negate());
@@ -416,7 +419,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
         List<DocumentPackItem> documentPackItems = new ArrayList<>();
 
         packs.forEach(pack -> {
-            if (!"Uhradené zálohou".equals(pack.getTitle())) {
+            if (!PAYED_BY_DEPOSIT.equals(pack.getTitle())) {
                 if (pack.getCustomPrice() != null && pack.getCustomPrice()) {
                     DocumentPackItem tmpItem = new DocumentPackItem();
                     tmpItem.setTax(pack.getTax());
@@ -494,7 +497,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     public HashMap<Integer, BigDecimal> getInvoicePayedTaxesValuesMap(List<DocumentPack> packs) {
         HashMap<Integer, BigDecimal> mappedPayedTaxedValues = new HashMap<>();
         for (DocumentPack pack : packs) {
-            if (pack.getPrice().compareTo(BigDecimal.ZERO) == -1) {
+            if (PAYED_BY_DEPOSIT.equals(pack.getTitle())) {
                 if (mappedPayedTaxedValues.containsKey(pack.getTax())) {
                     BigDecimal newValue = mappedPayedTaxedValues.get(pack.getTax()).add(pack.getPrice());
                     mappedPayedTaxedValues.replace(pack.getTax(), newValue);
@@ -519,7 +522,7 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     public HashMap<Integer, BigDecimal> getTaxPayedTaxesValuesMap(List<DocumentPack> packs) {
         HashMap<Integer, BigDecimal> mappedPayedTaxedValues = new HashMap<>();
         for (DocumentPack pack : packs) {
-            if (pack.getTotalPrice().compareTo(BigDecimal.ZERO) == -1) {
+            if (PAYED_BY_DEPOSIT.equals(pack.getTitle())) {
                 if (mappedPayedTaxedValues.containsKey(pack.getTax())) {
                     BigDecimal newValue = mappedPayedTaxedValues.get(pack.getTax()).add(pack.getTotalPrice().subtract(pack.getPrice()));
                     mappedPayedTaxedValues.replace(pack.getTax(), newValue);
