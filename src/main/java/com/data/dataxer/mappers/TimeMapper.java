@@ -67,8 +67,6 @@ public interface TimeMapper {
 
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "user.overviewData", ignore = true)
-    @Mapping(target = "user.times", ignore = true)
     @Mapping(target = "category", ignore = true)
     TimeDTO timeToTimeDTOWithoutRelation(Time time);
 

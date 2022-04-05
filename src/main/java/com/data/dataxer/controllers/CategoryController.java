@@ -5,7 +5,6 @@ import com.data.dataxer.models.dto.CategoryDTO;
 import com.data.dataxer.models.dto.CategoryNestedDTO;
 import com.data.dataxer.services.CategoryService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
