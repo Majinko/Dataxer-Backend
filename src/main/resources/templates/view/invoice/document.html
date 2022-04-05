@@ -96,7 +96,7 @@
                             th:text="${packItem.getTitle()} ?: ''"></td>
                         <td class="text-center"
                             th:if="${pack.getCustomPrice() == null || pack.getCustomPrice() == false}"
-                            th:text="${#numbers.formatDecimal(packItem.getQty(), 1, 'WHITESPACE', 0, 'COMMA')}"></td>
+                            th:text="${#numbers.formatDecimal(packItem.getQty(), 1, 'WHITESPACE', 3, 'COMMA')}"></td>
                         <td class="text-center" th:if="${pack.getCustomPrice() == true || packItem.getQty() == null}"
                             th:text="''"></td>
                         <td class="text-center"

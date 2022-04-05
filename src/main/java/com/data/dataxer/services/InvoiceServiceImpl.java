@@ -410,19 +410,22 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
     }
 
     // return all item in invoices
+    // dont add tax document pack
     @Override
     public List<DocumentPackItem> getInvoiceItems(List<DocumentPack> packs) {
         List<DocumentPackItem> documentPackItems = new ArrayList<>();
 
         packs.forEach(pack -> {
-            if (pack.getCustomPrice() != null && pack.getCustomPrice()) {
-                DocumentPackItem tmpItem = new DocumentPackItem();
-                tmpItem.setTax(pack.getTax());
-                tmpItem.setPrice(pack.getPrice());
-                tmpItem.setTotalPrice(pack.getTotalPrice());
-                documentPackItems.add(tmpItem);
-            } else {
-                documentPackItems.addAll(pack.getPackItems());
+            if (!"Uhradené zálohou".equals(pack.getTitle())) {
+                if (pack.getCustomPrice() != null && pack.getCustomPrice()) {
+                    DocumentPackItem tmpItem = new DocumentPackItem();
+                    tmpItem.setTax(pack.getTax());
+                    tmpItem.setPrice(pack.getPrice());
+                    tmpItem.setTotalPrice(pack.getTotalPrice());
+                    documentPackItems.add(tmpItem);
+                } else {
+                    documentPackItems.addAll(pack.getPackItems());
+                }
             }
         });
 
@@ -442,12 +445,12 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
                 BigDecimal newValue;
                 if (documentPackItem.getDiscount() != null && documentPackItem.getDiscount().compareTo(BigDecimal.ZERO) == 1) {
                     newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
-                            documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                            documentPackItem.getPrice() != null
                                     ? documentPackItem.getPrice().add(documentPackItem.countPriceDiscount())
                                     .multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1)).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
                 } else {
                     newValue = mappedTaxedValues.get(documentPackItem.getTax()).add(
-                            documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                            documentPackItem.getPrice() != null
                                     ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1))
                                     .setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO);
                 }
@@ -455,11 +458,11 @@ public class InvoiceServiceImpl extends DocumentHelperService implements Invoice
             } else {
                 BigDecimal price;
                 if (documentPackItem.getDiscount() != null && documentPackItem.getDiscount().compareTo(BigDecimal.ZERO) == 1) {
-                    price = documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                    price = documentPackItem.getPrice() != null
                             ? documentPackItem.getPrice().add(documentPackItem.countPriceDiscount()).multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1))
                             .setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
                 } else {
-                    price = documentPackItem.getPrice() != null && documentPackItem.getPrice().compareTo(BigDecimal.ZERO) != -1
+                    price = documentPackItem.getPrice() != null
                             ? documentPackItem.getPrice().multiply(new BigDecimal(documentPackItem.getQty() != null ? documentPackItem.getQty() : 1)).setScale(2, RoundingMode.HALF_UP) : BigDecimal.ZERO;
                 }
                 mappedTaxedValues.put(documentPackItem.getTax(), price);
