@@ -167,6 +167,7 @@ public class DocumentNumberGeneratorServiceImpl implements DocumentNumberGenerat
 
     private Invoice loadLastInvoiceByPeriod(DocumentType type, LocalDate date, Periods period, Long companyId) {
         List<DocumentType> typesToSearch;
+
         if (type.equals(DocumentType.PROFORMA)) {
             typesToSearch = List.of(type);
         } else {
