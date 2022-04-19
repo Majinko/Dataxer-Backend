@@ -52,7 +52,7 @@
     "firebase": "^8.3.0",
     "iban": "0.0.14",
     "lodash": "^4.17.21",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "ng-apexcharts": "^1.5.9",
     "ngx-avatar": "^4.0.0",
     "ngx-filesize": "^2.0.16",
