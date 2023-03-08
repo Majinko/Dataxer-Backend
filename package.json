@@ -31,7 +31,7 @@
     "@angular/router": "^12.2.2",
     "@kolkov/angular-editor": "^1.2.0",
     "@nestjs/common": "^8.0.6",
-    "@nestjs/core": "^8.0.6",
+    "@nestjs/core": "^9.0.5",
     "@nestjs/ng-universal": "^5.0.1",
     "@nestjs/platform-express": "^8.0.6",
     "@ng-select/ng-select": "^5.1.0",
